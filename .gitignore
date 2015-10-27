@@ -1,0 +1,11 @@
+*.swp
+.qsys_edit/
+/*.qsf
+/*.qpf
+db/
+incremental_db/
+output_files/
+software_examples/
+software/
+stamps/
+/*.sopcinfo
