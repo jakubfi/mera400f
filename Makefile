@@ -6,6 +6,7 @@ TOPLEVEL = regs
 SOURCES_DIR= src
 SOURCES = regs.v
 ASSIGNMENTS = assignments.qsf
+QSYS_SYNTH = VERILOG
 
 FAMILY = Cyclone II
 DEVICE = EP2C8Q208C8
@@ -24,6 +25,7 @@ FIT_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS) --part="$(DEVICE)"
 ASM_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS)
 STA_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS)
 PGM_ARGS = $(COMMON_ARGS) -c "$(CABLE)"
+QSYS_ARGS = --synthesis=$(QSYS_SYNTH)
 
 STAMP = touch
 STAMP_DIR = stamps
@@ -47,6 +49,7 @@ SRCS_TDF = $(filter %.tdf,$(SRCS))
 SRCS_VHD = $(filter %.vhd,$(SRCS))
 SRCS_SMF = $(filter %.smf,$(SRCS))
 SRCS_EDF = $(filter %.edf,$(SRCS))
+SOPCINFO = $(subst .qsys,.sopcinfo,$(SRCS_QSYS))
 
 $(PROJECT_FILE):
 ifneq ("$(wildcard $(PROJECT_FILE))","")
@@ -77,6 +80,7 @@ map: $(MAP_READY)
 fit: $(FIT_READY)
 asm: $(OUT_DIR)/$(PROJECT).sof
 install: jtag
+qsys: $(SOPCINFO)
 
 $(MAP_READY): $(PROJECT_FILE) $(SETTINGS_FILE) $(SOURCES_FILE)
 	quartus_map $(MAP_ARGS) $(PROJECT) && $(STAMP) $(MAP_READY)
@@ -95,11 +99,13 @@ jtag: $(OUT_DIR)/$(PROJECT).sof
 
 as: $(OUT_DIR)/$(PROJECT).sof
 	quartus_pgm $(PGM_ARGS) -m AS -o "pv;$(OUT_DIR)/$(PROJECT).pof"
+$(SOPCINFO): $(SRCS_QSYS)
+	qsys-generate $(SRCS_QSYS) $(QSYS_ARGS)
 
 # --- Cleanups -----------------------------------------------------------
 
 clean:
-	rm -rf *.rpt *.chg smart.log *.htm *.eqn *.pin *.sof *.pof db incremental_db $(OUT_DIR) *.map.summary $(STAMP_DIR)* *.sopcinfo
+	rm -rf *.rpt *.chg smart.log *.htm *.eqn *.pin *.sof *.pof db incremental_db $(OUT_DIR) *.map.summary $(STAMP_DIR)/* *.sopcinfo
 distclean: clean
 	rm -rf $(PROJECT_FILE) $(SETTINGS_FILE) $(SOURCES_FILE)
 
