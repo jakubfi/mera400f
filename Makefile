@@ -1,10 +1,12 @@
 
 # --- User configuration -------------------------------------------------
 
-PROJECT = mera_regs
-TOPLEVEL = regs
+PROJECT = mera400f
+TOPLEVEL = mera400f
 SOURCES_DIR= src
-SOURCES = regs.v
+SOURCES = mera400f.v regs.v
+TESTS_DIR = tests
+TESTS = regs_tb.v
 ASSIGNMENTS = assignments.qsf
 QSYS_SYNTH = VERILOG
 
@@ -18,6 +20,7 @@ OUT_DIR = output_files
 PROJECT_FILE = $(PROJECT).qpf
 SETTINGS_FILE = $(PROJECT).qsf
 SOURCES_FILE = $(PROJECT)_sources.qsf
+
 COMMON_ARGS = --no_banner --64bit
 SETTINGS_ARGS = --write_settings_files=off --read_settings_files=on
 MAP_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS) --family="$(FAMILY)"
@@ -50,6 +53,8 @@ SRCS_VHD = $(filter %.vhd,$(SRCS))
 SRCS_SMF = $(filter %.smf,$(SRCS))
 SRCS_EDF = $(filter %.edf,$(SRCS))
 SOPCINFO = $(subst .qsys,.sopcinfo,$(SRCS_QSYS))
+TSTS = $(addprefix $(TESTS_DIR)/,$(TESTS))
+OBJS = $(subst .v,.bin,$(TSTS))
 
 $(PROJECT_FILE):
 ifneq ("$(wildcard $(PROJECT_FILE))","")
@@ -81,6 +86,11 @@ fit: $(FIT_READY)
 asm: $(OUT_DIR)/$(PROJECT).sof
 install: jtag
 qsys: $(SOPCINFO)
+ivtest: $(OBJS)
+	$(foreach var,$(OBJS),./$(var))
+
+%.bin: %.v
+	iverilog -y $(SOURCES_DIR) -y $(TESTS_DIR) -o $@ $<
 
 $(MAP_READY): $(PROJECT_FILE) $(SETTINGS_FILE) $(SOURCES_FILE)
 	quartus_map $(MAP_ARGS) $(PROJECT) && $(STAMP) $(MAP_READY)
@@ -99,13 +109,15 @@ jtag: $(OUT_DIR)/$(PROJECT).sof
 
 as: $(OUT_DIR)/$(PROJECT).sof
 	quartus_pgm $(PGM_ARGS) -m AS -o "pv;$(OUT_DIR)/$(PROJECT).pof"
+
 $(SOPCINFO): $(SRCS_QSYS)
 	qsys-generate $(SRCS_QSYS) $(QSYS_ARGS)
 
 # --- Cleanups -----------------------------------------------------------
 
 clean:
-	rm -rf *.rpt *.chg smart.log *.htm *.eqn *.pin *.sof *.pof db incremental_db $(OUT_DIR) *.map.summary $(STAMP_DIR)/* *.sopcinfo
+	rm -rf *.rpt *.chg smart.log *.htm *.eqn *.pin *.sof *.pof db incremental_db $(OUT_DIR) *.map.summary $(STAMP_DIR)/* *.sopcinfo $(TESTS_DIR)/*.bin
+
 distclean: clean
-	rm -rf $(PROJECT_FILE) $(SETTINGS_FILE) $(SOURCES_FILE)
+	rm -rf $(PROJECT_FILE) $(SETTINGS_FILE) $(SOURCES_FILE) $(STAMP_DIR)
 
