@@ -2,13 +2,14 @@
 # --- User configuration -------------------------------------------------
 
 PROJECT = mera400f
-TOPLEVEL = mera400f
+TOPLEVEL = $(PROJECT)
 SOURCES_DIR= src
 SOURCES = mera400f.v regs.v
 TESTS_DIR = tests
 TESTS = regs_tb.v
 ASSIGNMENTS = assignments.qsf
 QSYS_SYNTH = VERILOG
+ALTLOGFILTER = | tools/altlogfilter -c
 
 FAMILY = Cyclone II
 DEVICE = EP2C8Q208C8
@@ -38,6 +39,7 @@ FIT_READY = $(STAMP_DIR)/fit.stamp
 .phony: all clean distclean init map fit asm install jtag as sta
 
 all: asm
+test: ivtest
 
 # --- Prepare project configuration --------------------------------------
 
@@ -60,8 +62,8 @@ $(PROJECT_FILE):
 ifneq ("$(wildcard $(PROJECT_FILE))","")
 	@echo "Project configuration file \"$(PROJECT_FILE)\" has already been generated, nothing to do."
 else
-	quartus_sh --prepare -f "$(FAMILY)" -d "$(DEVICE)" -t "$(TOPLEVEL)" $(PROJECT)
-	quartus_sh --set PROJECT_OUTPUT_DIRECTORY="$(OUT_DIR)" $(PROJECT)
+	quartus_sh --prepare -f "$(FAMILY)" -d "$(DEVICE)" -t "$(TOPLEVEL)" $(PROJECT) $(ALTLOGFILTER)
+	quartus_sh --set PROJECT_OUTPUT_DIRECTORY="$(OUT_DIR)" $(PROJECT) $(ALTLOGFILTER)
 	echo "" >> $(SETTINGS_FILE)
 	echo -e "source $(SOURCES_DIR)/$(ASSIGNMENTS)" >> $(SETTINGS_FILE)
 	echo -e "source $(SOURCES_FILE)" >> $(SETTINGS_FILE)
@@ -86,20 +88,15 @@ fit: $(FIT_READY)
 asm: $(OUT_DIR)/$(PROJECT).sof
 install: jtag
 qsys: $(SOPCINFO)
-ivtest: $(OBJS)
-	$(foreach var,$(OBJS),./$(var))
-
-%.bin: %.v
-	iverilog -y $(SOURCES_DIR) -y $(TESTS_DIR) -o $@ $<
 
 $(MAP_READY): $(PROJECT_FILE) $(SETTINGS_FILE) $(SOURCES_FILE)
-	quartus_map $(MAP_ARGS) $(PROJECT) && $(STAMP) $(MAP_READY)
+	quartus_map $(MAP_ARGS) $(PROJECT) $(ALTLOGFILTER) && $(STAMP) $(MAP_READY)
 
 $(FIT_READY): $(MAP_READY) $(SOURCES_DIR)/$(ASSIGNMENTS)
-	quartus_fit $(FIT_ARGS) $(PROJECT) && $(STAMP) $(FIT_READY)
+	quartus_fit $(FIT_ARGS) $(PROJECT) $(ALTLOGFILTER) && $(STAMP) $(FIT_READY)
 
 $(OUT_DIR)/$(PROJECT).sof: $(FIT_READY)
-	quartus_asm $(ASM_ARGS) $(PROJECT)
+	quartus_asm $(ASM_ARGS) $(PROJECT) $(ALTLOGFILTER)
 
 sta: $(FIT_READY)
 	quartus_sta $(STA_ARGS) $(PROJECT)
@@ -112,6 +109,14 @@ as: $(OUT_DIR)/$(PROJECT).sof
 
 $(SOPCINFO): $(SRCS_QSYS)
 	qsys-generate $(SRCS_QSYS) $(QSYS_ARGS)
+
+# --- Icarus Verilog testing ---------------------------------------------
+
+ivtest: $(OBJS)
+	$(foreach var,$(OBJS),./$(var))
+
+%.bin: %.v
+	iverilog -y $(SOURCES_DIR) -y $(TESTS_DIR) -o $@ $<
 
 # --- Cleanups -----------------------------------------------------------
 

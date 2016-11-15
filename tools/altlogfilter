@@ -1,0 +1,143 @@
+#!/bin/env python3
+
+import re
+import sys
+import os
+import argparse
+
+# ------------------------------------------------------------------------
+class LogLine:
+
+    CSI = "\x1B["
+    BOLD = CSI + '01m'
+    WARNING = BOLD + CSI + '33m'
+    ERROR = BOLD + CSI + '95m'
+    NORMAL = CSI + 'm'
+    NONE = ""
+
+    # --------------------------------------------------------------------
+    def __init__(self, line, color=0):
+        self.color = color
+        try:
+            self.line = line.rstrip()
+            res = re.findall("([\ ]*)([\ a-zA-Z0-9\(\)]+):[ \t]+(.*)", line)[0]
+            self.indent = int(len(res[0]) / 4)
+            level_full = res[1]
+            lr = re.findall("([\ a-zA-Z]+[a-zA-Z])[ \t]*\(?([0-9]*)\)?", level_full)[0]
+            self.level = lr[0]
+            if lr[1]:
+                self.id = int(lr[1])
+            else:
+                self.id = 0
+            self.message = res[2]
+        except Exception:
+            self.message = line.rstrip()
+            self.line = line.rstrip()
+            self.indent = 0
+            self.id = 0
+            self.level = "LineNotFiltered"
+
+    # --------------------------------------------------------------------
+    def __str__(self):
+        endcolor = self.NORMAL
+        color = self.NONE
+        if not self.color:
+            color = self.NONE
+            endcolor = self.NONE
+        elif 'Warning' in self.level:
+            color = self.WARNING
+        elif self.level == 'Error':
+            color = self.ERROR
+
+        if self.id:
+            id = " (%i)" % self.id
+        else:
+            id = ""
+
+        return "%s%s%s%s: %s" % (color, self.level, endcolor, id, self.message)
+
+# ------------------------------------------------------------------------
+class LogFilter:
+    # --------------------------------------------------------------------
+    def __init__(self, pass_all, debug=0):
+        self.pass_all = pass_all
+        self.debug = debug
+        self.filters = []
+        self.supp = []
+        self.suppressed = {}
+
+    # --------------------------------------------------------------------
+    def is_suppressed(self, l):
+        for f in self.supp:
+            if l.level == f[0] or l.id == f[1] or l.indent >= f[2]:
+                if self.debug:
+                    print("*** (%s, %i, %i) suppressed: '%s'" % (f[0], f[1], f[2], l.line))
+                return True
+        return False
+
+    # --------------------------------------------------------------------
+    def add(self, f):
+        fr = re.findall("([^:]*)?:([^:]*)?:([^:]*)?", f)[0]
+        level = fr[0]
+        if fr[1]:
+            id = int(fr[1])
+        else:
+            id = -1
+        if fr[2]:
+            indent = int(fr[2])
+        else:
+            indent = 666
+
+        self.supp.append((level, id, indent))
+
+    # --------------------------------------------------------------------
+    def process(self, l):
+        if self.pass_all or not self.is_suppressed(l):
+            print(l)
+        else:
+            try:
+                self.suppressed[l.level] += 1
+            except KeyError:
+                self.suppressed[l.level] = 1
+
+# ------------------------------------------------------------------------
+# --- MAIN ---------------------------------------------------------------
+# ------------------------------------------------------------------------
+
+# parse commandline
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--suppress", help="Suppress contition specified as: <level:id:min_indent_level>, any element can be ommited, colons are mandatory", action='append', default=[])
+parser.add_argument("-n", "--nothing", help="Suppress nothing (ommit all default filters)", default=0, const=1, action="store_const")
+parser.add_argument("-d", "--debug", help="Enable filter debug", default=0, const=1, action="store_const")
+parser.add_argument("-S", "--stats", help="Show suppression statistics", default=0, const=1, action="store_const")
+parser.add_argument("-c", "--color", help="Use colored output", default=0, const=1, action="store_const")
+args = parser.parse_args()
+
+# setup default filters
+
+flt = LogFilter(args.nothing, debug=args.debug)
+flt.add("Info::")
+flt.add("Extra Info::")
+flt.add(":20028:")
+flt.add(":292013:")
+flt.add(":332012:")
+flt.add("::1")
+
+# parse output
+
+while True:
+    line = sys.stdin.readline()
+    if not line: break
+    l = LogLine(line, args.color)
+    flt.process(l)
+
+# print suppression statistics
+
+if args.stats and flt.suppressed:
+    print("*** messages suppressed by the filter:", end="")
+    for s in flt.suppressed:
+        print(" %s=%i"% (s, flt.suppressed[s]), end="")
+    print("")
+
+# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
