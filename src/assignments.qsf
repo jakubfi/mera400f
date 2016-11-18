@@ -1,3 +1,4 @@
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
+set_global_assignment -name OUTPUT_PIN_LOAD 10 -section_id "3.3-V LVTTL"
 

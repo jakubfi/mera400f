@@ -31,7 +31,7 @@ module regs (
 		read_add <= addr;
 	end
 
-	assign l = rd ? mem[read_add] : 'bz;
+	assign l = rd ? mem[read_add] : 16'bz;
 
 endmodule
 
