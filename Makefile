@@ -38,8 +38,9 @@ FIT_READY = $(STAMP_DIR)/fit.stamp
 
 .phony: all clean distclean init map fit asm install jtag as sta
 
-all: asm
+all: map
 test: ivtest
+sum: mapsum
 
 # --- Prepare project configuration --------------------------------------
 
@@ -84,7 +85,11 @@ $(SOURCES_FILE): $(SRCS)
 # --- Actual targets -----------------------------------------------------
 
 map: $(MAP_READY)
+mapsum: $(MAP_READY)
+	cat $(OUT_DIR)/$(PROJECT).map.summary
 fit: $(FIT_READY)
+fitsum: $(FIT_READY)
+	cat $(OUT_DIR)/$(PROJECT).fit.summary
 asm: $(OUT_DIR)/$(PROJECT).sof
 install: jtag
 qsys: $(SOPCINFO)

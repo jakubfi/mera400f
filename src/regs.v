@@ -1,7 +1,7 @@
 /*
 	MERA-400 user registers
 
-	unit:		P-R2-3
+	unit:			P-R2-3
 	document:	12-006368-01-8A
 	pages:		2-59, 2-60, 2-61, 2-62
 */
