@@ -126,10 +126,13 @@ flt.add("::1")
 
 # parse output
 
+errors = 0
 while True:
     line = sys.stdin.readline()
     if not line: break
     l = LogLine(line, args.color)
+    if "Error" in l.level:
+        errors += 1
     flt.process(l)
 
 # print suppression statistics
@@ -139,5 +142,7 @@ if args.stats and flt.suppressed:
     for s in flt.suppressed:
         print(" %s=%i"% (s, flt.suppressed[s]), end="")
     print("")
+
+sys.exit(errors)
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
