@@ -1,5 +1,5 @@
 
-# --- User configuration -------------------------------------------------
+# --- Project configuration -------------------------------------------------
 
 PROJECT = mera400f
 TOPLEVEL = $(PROJECT)
@@ -9,21 +9,40 @@ TESTS_DIR = tests
 TESTS = regs_tb.v
 ASSIGNMENTS = $(SOURCES_DIR)/assignments.qsf
 QSYS_SYNTH = VERILOG
-ALTLOGFILTER = | tools/altlogfilter -c
+ALTLOGFILTER = alf -c --
 
-FAMILY = Cyclone II
+FAMILY = CycloneII
 DEVICE = EP2C8Q208C8
 PGM_CABLE = 1
+
+FPGA_ROOT = ~/fpga
+LIBS32_DIR = $(FPGA_ROOT)/lib32
+
+# --- Quartus environment and tools --------------------------------------
+
+ALTERA_ROOT = $(FPGA_ROOT)/altera/13.0sp1
+Q_BINDIR = $(ALTERA_ROOT)/quartus/bin
+LIB_PATHS = $(LIBS32_DIR):$(ALTERA_ROOT)/quartus/linux64:$(ALTERA_ROOT)/quartus/linux
+NIOSDEV = $(ALTERA_ROOT)/nios2eds
+
+Q_LIB_PREFIX = LD_LIBRARY_PATH=$(LIB_PATHS)
+Q_SH =  $(Q_LIB_PREFIX) $(Q_BINDIR)/quartus_sh
+Q_MAP = $(Q_LIB_PREFIX) $(Q_BINDIR)/quartus_map
+Q_FIT = $(Q_LIB_PREFIX) $(Q_BINDIR)/quartus_fit
+Q_ASM = $(Q_LIB_PREFIX) $(Q_BINDIR)/quartus_asm
+Q_STA = $(Q_LIB_PREFIX) $(Q_BINDIR)/quartus_sta
+Q_PGM = $(Q_LIB_PREFIX) $(Q_BINDIR)/quartus_pgm
+QSYS_GEN = $(Q_LIB_PREFIX) SOPC_KIT_NIOS2=$(NIOSDEV) $(ALTERA_ROOT)/quartus/sopc_builder/bin/qsys-generate
 
 # --- Tool arguments -----------------------------------------------------
 
 COMMON_ARGS = --no_banner --64bit
 SETTINGS_ARGS = --write_settings_files=off --read_settings_files=on
-MAP_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS) --family="$(FAMILY)"
-FIT_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS) --part="$(DEVICE)"
+MAP_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS) --family=$(FAMILY)
+FIT_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS) --part=$(DEVICE)
 ASM_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS)
 STA_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS)
-PGM_ARGS = $(COMMON_ARGS) -c "$(PGM_CABLE)"
+PGM_ARGS = $(COMMON_ARGS) -c $(PGM_CABLE)
 QSYS_ARGS = --synthesis=$(QSYS_SYNTH)
 
 # --- Files --------------------------------------------------------------
@@ -68,8 +87,8 @@ install: jtag
 qsys: $(SOPCINFO)
 
 $(SETTINGS_FILE): Makefile
-	quartus_sh --prepare -f "$(FAMILY)" -d "$(DEVICE)" -t "$(TOPLEVEL)" $(PROJECT) $(ALTLOGFILTER)
-	quartus_sh --set PROJECT_OUTPUT_DIRECTORY="$(OUT_DIR)" $(PROJECT) $(ALTLOGFILTER)
+	$(ALTLOGFILTER) $(Q_SH) --prepare -f $(FAMILY) -d $(DEVICE) -t $(TOPLEVEL) $(PROJECT)
+	$(ALTLOGFILTER) $(Q_SH) --set PROJECT_OUTPUT_DIRECTORY=$(OUT_DIR) $(PROJECT)
 	@echo "" >> $(SETTINGS_FILE)
 	@echo -e "source $(ASSIGNMENTS)" >> $(SETTINGS_FILE)
 	@echo -e "source $(SOURCES_FILE)" >> $(SETTINGS_FILE)
@@ -86,28 +105,28 @@ $(SOURCES_FILE): $(SETTINGS_FILE)
 	@$(foreach var,$(SRCS_EDF),echo "set_global_assignment -name EDIF_FILE $(var)" >> $(SOURCES_FILE);)
 
 $(MAP_OUTPUT): $(SRCS) $(SOURCES_FILE)
-	quartus_map $(MAP_ARGS) $(PROJECT) $(ALTLOGFILTER)
+	$(ALTLOGFILTER) $(Q_MAP) $(MAP_ARGS) $(PROJECT)
 
 $(FIT_OUTPUT): $(MAP_OUTPUT) $(ASSIGNMENTS)
-	quartus_fit $(FIT_ARGS) $(PROJECT) $(ALTLOGFILTER)
+	$(ALTLOGFILTER) $(Q_FIT) $(FIT_ARGS) $(PROJECT)
 
 $(SOF_OUTPUT): $(FIT_OUTPUT)
-	quartus_asm $(ASM_ARGS) $(PROJECT) $(ALTLOGFILTER)
+	$(ALTLOGFILTER) $(Q_ASM) $(ASM_ARGS) $(PROJECT)
 
 $(POF_OUTPUT): $(FIT_OUTPUT)
-	quartus_asm $(ASM_ARGS) $(PROJECT) $(ALTLOGFILTER)
+	$(ALTLOGFILTER) $(Q_ASM) $(ASM_ARGS) $(PROJECT)
 
 sta: $(FIT_OUTPUT)
-	quartus_sta $(STA_ARGS) $(PROJECT)
+	$(Q_STA) $(STA_ARGS) $(PROJECT)
 
 jtag: $(SOF_OUTPUT)
-	quartus_pgm $(PGM_ARGS) -m JTAG -o "p;$(SOF_OUTPUT)"
+	$(Q_PGM) $(PGM_ARGS) -m JTAG -o "p;$(SOF_OUTPUT)"
 
 as: $(POF_OUTPUT)
-	quartus_pgm $(PGM_ARGS) -m AS -o "pv;$(POF_OUTPUT)"
+	$(Q_PGM) $(PGM_ARGS) -m AS -o "pv;$(POF_OUTPUT)"
 
 $(SOPCINFO): $(SRCS_QSYS)
-	qsys-generate $(SRCS_QSYS) $(QSYS_ARGS)
+	$(QSYS_GEN) $(SRCS_QSYS) $(QSYS_ARGS)
 
 # --- Icarus Verilog testing ---------------------------------------------
 
