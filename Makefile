@@ -8,7 +8,7 @@ SOURCES = mera400f.v \
 	p_r.v regs.v r0.v rb.v \
 	p_d.v ir.v decoder16.v decoder8.v
 TESTS_DIR = tests
-TESTS = regs_tb.v
+TESTS = regs.v
 ASSIGNMENTS = $(SOURCES_DIR)/assignments.qsf
 QSYS_SYNTH = VERILOG
 # See: https://github.com/jakubfi/altlogfilter (or comment out the line below)
