@@ -1,28 +1,28 @@
 /*
 	MERA-400 user registers
 
-	unit:			P-R2-3
 	document:	12-006368-01-8A
-	pages:		2-59, 2-60, 2-61, 2-62
+	unit:			P-R2-3
+	pages:		2-59..2-62
 */
 
 /* synthesis ramstyle = "M4K" */
 
 module regs (
-	output [15:0] l,
-	input [15:0] w,
+	output [0:15] l,
+	input [0:15] w,
 	input ra, rb,
 	input piszrn, czytrn,
 	input piszrw, czytrw
 );
 
-	reg [2:0] read_add;
-	reg [15:0] mem [15:0];
+	reg [0:2] read_add;
+	reg [0:15] mem [0:15];
 
 	wire wr = piszrn | piszrw;
 	wire rd = czytrn | czytrw;
 	wire h = czytrw | piszrw;
-	wire [2:0] addr = {h, ra, rb};
+	wire [0:2] addr = {h, ra, rb};
 	wire strobe = wr | rd;
 
 	always @ (posedge strobe) 
@@ -31,7 +31,7 @@ module regs (
 		read_add <= addr;
 	end
 
-	assign l = rd ? mem[read_add] : 16'bz;
+	assign l = rd ? mem[read_add] : 16'b1;
 
 endmodule
 

@@ -1,0 +1,181 @@
+/*
+	MERA-400 R0 register
+
+	document:	12-006368-01-8A
+	unit:			P-R2-3
+	pages:		2-65..2-66
+*/
+
+/* synthesis ramstyle = "M4K" */
+
+module r0 (
+	// buses
+	input [0:15] w,
+	output [0:8] r0,
+	// data signals
+	input zs, s_1, s0, carry,
+	input vl, vg, exy, exx,
+	// strobe signals
+	input strob1,
+	input ust_z, ust_v, ust_mc, ust_y, ust_x,
+	input cleg,
+	// commands
+	input w_zmvc, w_legy,
+	input w8_x,
+	// async
+	input zero_v,
+	input zer
+);
+
+	reg [0:8] tr0;
+	initial tr0 = 9'b0;
+
+	// --- R00, Z flag --------------------------------------------------------
+	wire set0, clk0, reset0;
+
+	assign set0 = ~(w[0] & w_zmvc);
+	assign clk0 = ~(ust_z & strob1);
+	assign reset0 = ~((set0 & w_zmvc) | zer);
+
+	always @ (posedge clk0, negedge set0, negedge reset0) begin
+		if (!reset0) tr0[0] <= 1'b0;
+		else if (!set0) tr0[0] <= 1'b1;
+		else tr0[0] <= zs;
+	end
+
+	// --- R01, M flag --------------------------------------------------------
+	wire set1, clk1, reset1;
+
+	assign set1 = ~(w[1] & w_zmvc);
+	assign clk1 = ~(ust_mc & strob1);
+	assign reset1 = ~((set1 & w_zmvc) | zer);
+
+	always @ (posedge clk1, negedge set1, negedge reset1) begin
+		if (!reset1) tr0[1] <= 1'b0;
+		else if (!set1) tr0[1] <= 1'b1;
+		else tr0[1] <= s_1;
+	end
+
+	// --- R02, V flag --------------------------------------------------------
+	wire j2, clk2, reset2, set2;
+
+	assign j2 = s0 ^ s_1;
+	assign clk2 = ust_v & strob1;
+	assign set2 = ~(w[2] & w_zmvc);
+	assign reset2 = ~((set2 & w_zmvc) | (zero_v ^ zer));
+
+	always @ (negedge clk2, negedge set2, negedge reset2) begin
+		if (!reset2) tr0[2] <= 1'b0;
+		else if (!set2) tr0[2] <= 1'b1;
+		else tr0[2] <= j2;
+	end
+
+	// --- R03, C flag --------------------------------------------------------
+	wire j3, k3, clk3, reset3, set3;
+
+	assign k3 = ~carry;
+	assign j3 = carry;
+	assign clk3 = ust_mc & strob1;
+	assign set3 = ~(w[3] & w_zmvc);
+	assign reset3 = ~((set3 & w_zmvc) | zer);
+
+	always @ (negedge clk3, negedge set3, negedge reset3) begin
+		if (!reset3) tr0[3] <= 1'b0;
+		else if (!set3) tr0[3] <= 1'b1;
+		else case ({j3, k3})
+			2'b00: tr0[3] <= tr0[3];
+			2'b01: tr0[3] <= 1'b0;
+			2'b10: tr0[3] <= 1'b1;
+			2'b11: tr0[3] <= ~tr0[3];
+		endcase
+	end
+
+	// --- R04, L flag --------------------------------------------------------
+	wire set4, clk4, reset4;
+
+	assign clk4 = ~cleg;
+	assign set4 = zer | (w_legy & reset4);
+	assign reset4 = ~(w[4] & w_legy);
+
+	always @ (posedge clk4, negedge reset4, negedge set4) begin
+		if (!reset4) tr0[4] <= 1'b0;
+		else if (!set4) tr0[4] <= 1'b1;
+		else tr0[4] <= ~vl;
+	end
+
+	// --- R05, E flag --------------------------------------------------------
+	wire set5, clk5, reset5;
+
+	assign clk5 = ~cleg;
+	assign reset5 = zer | (w_legy & set5);
+	assign set5 = ~(w[5] & w_legy);
+
+	always @ (posedge clk5, negedge reset5, negedge set5) begin
+		if (!reset5) tr0[5] <= 1'b0;
+		else if (!set5) tr0[5] <= 1'b1;
+		else tr0[5] <= zs;
+	end
+
+	// --- R06, G flag --------------------------------------------------------
+	wire set6, clk6, reset6;
+
+	assign clk6 = ~cleg;
+	assign set6 = zer | (w_legy & reset6);
+	assign reset6 = ~(w[6] & w_legy);
+
+	always @ (posedge clk6, negedge reset6, negedge set6) begin
+		if (!reset6) tr0[6] <= 1'b0;
+		else if (!set6) tr0[6] <= 1'b1;
+		else tr0[6] <= vg;
+	end
+
+	// --- R07, Y flag --------------------------------------------------------
+	wire set7, clk7, reset7;
+
+	assign clk7 = ~(ust_y & strob1);
+	assign set7 = zer | (w_legy & reset7);
+	assign reset7 = ~(w[7] & w_legy);
+
+	always @ (posedge clk7, negedge reset7, negedge set7) begin
+		if (!reset7) tr0[7] <= 1'b0;
+		else if (!set7) tr0[7] <= 1'b1;
+		else tr0[7] <= exy;
+	end
+
+	// --- R08, X flag --------------------------------------------------------
+	wire set8, clk8, reset8;
+
+	assign clk8 = ~(ust_x & strob1);
+	assign set8 = zer | (w8_x & reset8);
+	assign reset8 = ~(w[8] & w8_x);
+
+	always @ (posedge clk8, negedge reset8, negedge set8) begin
+		if (!reset8) tr0[8] <= 1'b0;
+		else if (!set8) tr0[8] <= 1'b1;
+		else tr0[8] <= exx;
+	end
+
+	assign r0 = tr0;
+
+endmodule
+
+module r0_9_15(
+	input [9:15] w,
+	input lrp,
+	input zer,
+	output [9:15] r0
+);
+
+	reg [9:15] r;
+
+	always @ (posedge lrp, negedge zer) begin
+		if (~zer) r = 0;
+		else if (lrp) r = w;
+	end
+
+	assign r0 = r;
+
+endmodule
+
+
+// vim: tabstop=2 shiftwidth=2 autoindent noexpandtab

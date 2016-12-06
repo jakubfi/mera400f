@@ -11,7 +11,7 @@ module regs_tb();
 	reg piszrw;
 	reg ra, rb;
 
-	regs U1(.w(w), .l(l), .czytrn(czytrn), .piszrn(piszrn), .czytrw(czytrw), .piszrw(piszrw), .ra(ra), .rb(rb), .rc(0));
+	regs U1(.w(w), .l(l), .czytrn(czytrn), .piszrn(piszrn), .czytrw(czytrw), .piszrw(piszrw), .ra(ra), .rb(rb));
 
 
 	initial begin
