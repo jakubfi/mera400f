@@ -1,5 +1,5 @@
 /*
-	MERA-400 P-D unit
+	MERA-400 P-D unit (instriction decoder)
 
 	document:	12-006368-01-8A
 	unit:			P-D2-3

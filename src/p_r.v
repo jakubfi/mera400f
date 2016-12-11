@@ -1,5 +1,5 @@
 /*
-	MERA-400 P-R unit
+	MERA-400 P-R unit (registers)
 
 	document:	12-006368-01-8A
 	unit:			P-R2-3
