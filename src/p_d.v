@@ -15,7 +15,7 @@ module p_d(
 
 	input si1,				// B79
 	output ls,				// A91
-	output pj,				// B92
+	output rj,				// B92
 	output bs,				// A93
 	output ou,				// B87
 	output in,				// A88
@@ -141,7 +141,7 @@ module p_d(
 
 	ir u_ir(.w(w), .strob1(strob1), .w_ir(w_ir), .ir(ir));
 	assign c0 = ~|ir[13:15];
-	assign ir13_14 = |ir[13:14];
+	wire ir13_14 = |ir[13:14];
 
 	// page 2-31 - preliminary decoder
 
@@ -154,33 +154,39 @@ module p_d(
 	wire gr = ~(~l & ~g);
 	assign gr__ = ~gr;
 
+	wire lw, tw, rw, pw, bb, bm, bc, bn;
 	decoder16 dec_01(.en({~si11 ,  ir[1]}), .i(ir[2:5]), .o({lw, tw, ls, ri, rw, pw, rj, is, bb, bm, bs, bc, bn, ou, in, pufa}));
-	decoder16 dec_10(.en({ ir[0], ~si12 }), .i(ir[2:5]), .o({aw, ac, sw, cw, _or, om, nr, nm, er, em, xr, xm, cl, lb, rb, cb}));
+	wire aw, ac, sw, cw, _or, om, nr, nm, er, em, xr, xm, cl, lb;
+	decoder16 dec_10(.en({ ir[0], ~si12 }), .i(ir[2:5]), .o({aw, ac, sw, cw, _or, om, nr, nm, er, em, xr, xm, cl, lb, rb__, cb}));
+	wire awt, trb, irb, drb, cwt, lwt, lws, rws, js, c, s, j, l, g, b_n;
 	decoder16 dec_11(.en({ ir[0],  ir[1]}), .i(ir[2:5]), .o({awt, trb, irb, drb, cwt, lwt, lws, rws, js, ka2, c, s, j, l, g, b_n}));
 
 	// page 2-32 - preliminary decoder
 
-	wire [1:7] __a;
+	wire [0:7] __a;
 	decoder8 dec_a(.en(1), .i(ir[7:9]), .o(__a));
 	wire snef = ~(&(~__a[5:7]));
 
 	decoder8 dec_s(.en(s), .i(ir[7:9]), .o({hlt, mcl, sin, gi, lip}));
-	wire gmio = ~(~mcl & ~gi & ~inou);
+	wire gmio = ~(~mcl & ~gi & ~inou__);
 	wire hsm = ~(~hlt & ~sin & ~__bn5);
 
-	wire inou;
-	decoder8 dec_bn(.en(b_n), .i(ir[7:9]), .o({mb, im, ki, __bn5, fi, sp, rz, ib}));
+	wire __bn5;
+	decoder8 dec_bn(.en(b_n), .i(ir[7:9]), .o({mb, im, ki, fi, sp, __bn5, rz, ib}));
 	wire fimb = ~fi & ~im & ~mb;
 
 	wire b_1 = &ir[10:12];
 	wire [0:3] __null;
+	wire ngl, srz;
 	decoder8 dec_c(.en(c), .i({b_1, ir[15], ir[6]}), .o({__null, ngl, srz, rpc, lpc}));
 	wire pcrs = ~(~rpc & ~lpc & ~rc__ & ~sx);
 	assign shc = c & ir[11];
 
+	wire sx, __oth4, sly, slx, srxy;
 	wire __other_en = c & b0;
 	decoder8 dec_other(.en(__other_en), .i(ir[13:15]), .o({rc__, zb__, sx, ng__, __oth4, sly, slx, srxy}));
 	wire sl = ~slx & ~__oth4 & ~sly;
+	assign b0 = &ir[10:12];
 
 	// page 2-33 - ineffective and illegal instrictions
 
@@ -188,7 +194,7 @@ module p_d(
 	assign _0_v = js & ~__a[4] & we;
 
 	wire __b34567 = ~(~ir[10] & ~(ir[11] & ir[12]));
-	wire __nef_1 = (inou & q) | (__b34567 & c) | (q & s) | (q & ~snef & b_n);
+	wire __nef_1 = (inou__ & q) | (__b34567 & c) | (q & s) | (q & ~snef & b_n);
 
 	wire __nef_2 = (md & mc_3) | (c & ir13_14) | (b_1 & s);
 
@@ -198,7 +204,7 @@ module p_d(
 	wire __nef_jxs = js & ~(r0[8] | ~__a[5]);
 	wire __nef_jvs = js & ~(r0[2] | ~__a[4]);
 	wire __nef_jm = __a[5] & ~(r0[1] | ~j);
-	wire __nef_j1 = __nef_jys | __nef_jxs | __nef_jvs | __nef_jm;
+	wire __nef_j1 = ~(__nef_jys | __nef_jxs | __nef_jvs | __nef_jm);
 
 	wire __nef_jn = ~(~(~__a[6] | ~j) & r0[5]);
 	wire __nef_jz = __a[4] & ~(~j | r0[0]);
@@ -206,9 +212,9 @@ module p_d(
 	wire __nef_jg = __jjs_ & ~(r0[6] | ~__a[3]);
 	wire __nef_je = __jjs_ & ~(r0[5] | ~__a[2]);
 	wire __nef_jl = __jjs_ & ~(r0[4] | ~__a[1]);
-	wire __nef_j2 = __nef_jz | __nef_jg | __nef_je | __nef_jl;
+	wire __nef_j2 = ~(__nef_jz | __nef_jg | __nef_je | __nef_jl);
 
-	assign nef = ~(~__nef_1 & ir01 & __nef_2 & __nef_jcs & ~__nef_j1 & __nef_jn & ~p & ~__nef_j2);
+	assign nef = ~(~__nef_1 & ir01 & ~__nef_2 & __nef_jcs & __nef_j1 & __nef_jn & ~p & __nef_j2);
 	assign xi = ~(~__nef_1 & ~__nef_2 & ir01);
 
 	// page 2-34
@@ -217,8 +223,8 @@ module p_d(
 	assign amb = (uka & p4) | (cns & w__);
 	wire a = ~(~aw & ~ac & ~awt);
 	wire __m90_1 = ~(~a & ~trb & ~ib);
-	assign lwrs_ = ~(~lws & ~rws);
-	wire __m49 = ~(~lwrs_ & ~lj & ~js & ~krb);
+	assign lwrs__ = ~(~lws & ~rws);
+	wire __m49 = ~(~lwrs__ & ~lj & ~js & ~krb);
 	assign apb = (~uka & p4) | (__m90_1 & w__) | (__m49 & we);
 	wire ans = ~(~sw & ~ng__ & ~a);
 	assign jkrb = ~(~js & ~krb);
@@ -231,18 +237,16 @@ module p_d(
 
 	// page 2-35
 
-	wire lrcb;
-
 	wire __m84 = riirb ^ nglbb;
 	wire sds = (wz & ~(~xm & ~em)) | (~(~bm & ~is & ~er & ~xr) & w__) | (w__ & __m84) | (we & wlsbs);
 	wire ssb = w__ & ~(~ngl & ~oc__ & ~bc);
 	wire nglbb = ~(~bb & ~ngl);
 	assign bcoc__ = ~(~oc__ & ~bc);
 	wire wlsbs = ~(~wls & ~bs);
-	wire ssca = (__m84 & w__) | (w__ & ~(~bs & ~bn & ~nr)) | (~wz & ~(~emnm & ~lrcb)) | (we & ls);
+	wire ssca = (__m84 & w__) | (w__ & ~(~bs & ~bn & ~nr)) | (~wz & ~(~emnm & ~lrcb__)) | (we & ls);
 	wire emnm = ~(~em & ~nm);
-	wire ssab = rb & w__ & wpb;
-	wire ssaa = (~(~rb & wpb) & w__) | (w__ & lb);
+	wire ssab = rb__ & w__ & wpb;
+	wire ssaa = (~(~rb__ & wpb) & w__) | (w__ & lb);
 
 	// page 2-36
 
@@ -256,7 +260,7 @@ module p_d(
 	assign sab = ~ssab & ~amb & __m50 & ~ap1;
 	assign saa = ~ap1 & __m50 & ~amb & ~ssaa;
 	wire orxr = ~(~_or & ~xr);
-	assign lrcb__ = ~(~rb & (~cb & ~lb));
+	assign lrcb__ = ~(~rb__ & (~cb & ~lb));
 	wire mis = ~(~m & ~is);
 	wire lbcb = ~(~lb & ~cb);
 	assign aryt = ~(~cw & ~cwt);
@@ -283,23 +287,24 @@ module p_d(
 
 	// page 2-38
 
-	wire sr, llb;
+	wire llb;
 
 	assign ewa = (pcrs & pp) | (~(~ngl & ~ri & ~rj) & pp) | (we & (~wls & ls) | (~wpb & lbcb & wr));
 	wire prawy = lbcb & wpb;
-	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & ~(~uj__ & ~lwt__));
+	assign ewp = (lrcb__ & wx) | (wx & sr__ & ~lk) | (rj & ~(~uj__ & ~lwt__));
 	assign uj__ = j & ~__a[7];
+	assign lwt__ = ~(~lwt & ~lw);
 	assign lj = ~(~__a[7] | ~j);
 	assign ewe = (lj & ww) | (ls & ~wa) | (pp & ~(~llb & ~zb__ & ~js)) | (~wzi & krb & w__);
 
 	// page 2-39
 
-	wire lac, grlk, rbib, bmib, sew__;
+	wire sew__;
 
-	assign ekc_1 = (~lac & wr & (~grlk & ~lrcb)) | (~lrcb & wp) | (~llb & we) | (~(rbib | ~wzi | ~(~krb & ~is)) & w__);
+	assign ekc_1 = (~lac__ & wr & (~grlk & ~lrcb__)) | (~lrcb__ & wp) | (~llb & we) | (~(rbib | ~wzi | ~(~krb & ~is)) & w__);
 	assign ewz = (w__ & ~wzi & is) | (wr & m) | (pp & lrcbsr);
-	wire lrcbsr = ~(~lrcb & ~sr);
-	wire __m88 = ~(~is & ~rb & bmib & ~prawy);
+	wire lrcbsr = ~(~lrcb__ & ~sr__);
+	wire __m88 = ~(~is & ~rb__ & bmib & ~prawy);
 	assign ew__ = (wr & __m88) | (we & wlsbs) | (ri & ww) | (~(~ng__ & ~lbcb) & wa) | (pp & sew__);
 
 	// page 2-40
@@ -317,6 +322,30 @@ module p_d(
 	assign p16 = (__m63 & w__ & cns) | (riirb & w__) | (ib && w__) | (slx & r0[8]) | __m31;
 	wire __m31 = (~(~ac & __m63) & w__ & r0[3]) | (r0[7] & sly) | (uka & p4) | (lj & we);
 
+	// page 2-41
+
+	wire __m60 = (~lk & inou__);
+	wire __m76 = l ^ __m60;
+	assign ewr = (wp & lrcb__) | (lk & wr & l) | (lws & we) | (__m76 & wx) | __m20;
+	wire __m20 = ((~lk & inou__) & wm) | (~(~fimb & ~lac__ & ~tw) & pp);
+	assign ewm = gmio & pp;
+	assign efp = ~(fppn & pp);
+	assign sar__ = ~(~l & ~lws & ~tw);
+	wire __m75 = ~((~pw & ~rw) & ~lj & ~rz & ~ki);
+	assign eww = (we & rws) | (pp & __m75) | (ri & wa) | (lk & ww & g) | __m33;
+	wire __m33 = (wx & g) | (mis & wz) | (rbib & w__);
+	assign srez__ = rbib ^ mis;
+
+	// page 2-42
+
+	assign ewx = (lrcbsr & wz) | (pp & (gr ^ hsm)) | ((inou__ & lk) & wm) | (lk & ~(~inou__ & ~sr__) & wx);
+	assign axy = ~(sr__ & ~(ir[6] & rbib));
+	wire grlk = gr & lk;
+	assign inou__ = ~(~in & ~ou);
+	assign ekc_2 = (wx & hsm) | (wm & ~inou__) | ((~grlk & ~lj) & ~ri & ww) | (pcrs & wa);
+	wire rbib = ~(~rb__ & ~ib);
+	wire bmib = ~ib & ~bm;
+	assign lac__ = ~(bmib & ~mis);
 
 endmodule
 

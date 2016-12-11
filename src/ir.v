@@ -9,7 +9,7 @@
 /* synthesis ramstyle = "M4K" */
 
 module ir(
-	input [10:15] w,
+	input [0:15] w,
 	input strob1,
 	input w_ir,
 	output [0:15] ir
