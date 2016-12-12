@@ -1,73 +1,74 @@
 /*
-	MERA-400 P-D unit (instriction decoder)
+	MERA-400 P-D unit (instruction decoder)
 
 	document:	12-006368-01-8A
 	unit:			P-D2-3
 	pages:		2-30..2-43
+	sheets:		14
 */
 
 module p_d(
-	input [0:15] w,		// A80, A81, B78, B77, B09, B08, B35, A27, A30, A29, B15, B16, B25, B26, B13, B12
+	input [0:15] w,		// A80, A81, B78, B77, B09, B08, B35, A27, A30, A29, B15, B16, B25, B26, B13, B12 - W bus
 	input strob1,			// B85
-	input w_ir,				// B86
-	output [0:15] ir,	// A78, A79, B75, B74, A19, A18, A21, A22, B17, A33, A31, A32, B30, B27, B06, B07
-	output c0,				// B05
+	input w_ir,				// B86 - W->IR: send bus W to instruction register IR
+	output [0:15] ir,	// A78, A79, B75, B74, A19, A18, A21, A22, B17, A33, A31, A32, B30, B27, B06, B07 - IR register
+	output c0,				// B05 - C=0 (opcode field C is 0 - instruction argument is stored in the next word)
 
 	input si1,				// B79
-	output ls,				// A91
-	output rj,				// B92
-	output bs,				// A93
-	output ou,				// B87
-	output in,				// A88
-	output is,				// A92
-	output ri,				// B67
-	output pufa,			// A85
-	output rb__,			// A15
-	output cb,				// B89
-	output sc__,			// B90
-	output oc__,			// B88
-	output ka2,				// A83
-	output gr__,			// B47
+	output ls,				// A91 - LS
+	output rj,				// B92 - RJ
+	output bs,				// A93 - BS
+	output ou,				// B87 - OU
+	output in,				// A88 - IN
+	output is,				// A92 - IS
+	output ri,				// B67 - RI
+	output pufa,			// A85 - any of the wide or floating point arithmetic instructions
+	output rb__,			// A15 - RB*: RB instruction
+	output cb,				// B89 - CB
+	output sc__,			// B90 - SC*: S|C opcode group
+	output oc__,			// B88 - OC*: BRC, BLC
+	output ka2,				// A83 - KA2 opcode group
+	output gr__,			// B47 - GR*: G|L opcode group
 
-	output hlt,				// A34
-	output mcl,				// B34
-	output sin,				// B28
-	output gi,				// A28
-	output lip,				// A35
-	output mb,				// B39
-	output im,				// B40
-	output ki,				// B38
-	output fi,				// B41
-	output sp,				// B37
-	output rz,				// B42
-	output ib,				// B36
-	output lpc,				// A09
-	output rpc,				// A10
-	output shc,				// A57
-	output rc__,			// B04
-	output ng__,			// B03
+	output hlt,				// A34 - HLT
+	output mcl,				// B34 - MCL
+	output sin,				// B28 - SIU, SIL, SIT, CIT
+	output gi,				// A28 - GIU, GIL
+	output lip,				// A35 - LIP
+	output mb,				// B39 - MB
+	output im,				// B40 - IM
+	output ki,				// B38 - KI
+	output fi,				// B41 - FI
+	output sp,				// B37 - SP
+	output rz,				// B42 - RZ
+	output ib,				// B36 - IB
+	output lpc,				// A09 - LPC
+	output rpc,				// A10 - RPC
+	output shc,				// A57 - SHC
+	output rc__,			// B04 - RC*: RIC, RKY
+	output ng__,			// B03 - NG*: NGA, NGL
 	output zb__,			// B20
-	output b0,				// A25
+	output b0,				// A25 - B=0 (opcode field B is 0 - no B-modification)
 
-	input q,					// B19
-	input mc_3,				// B10
-	input [0:8] r0,		// B29, B33, B31, A16, B23, B22, B21, B32, A26
+	input q,					// B19 - Q: system flag
+	input mc_3,				// B10 - MC=3: three consecutive pre-modifications
+	input [0:8] r0,		// B29, B33, B31, A16, B23, B22, B21, B32, A26 - R0 register flags
 	output _0_v,			// A14
-	input p,					// A23
-	output md,				// B11
-	output xi,				// A24
-	output nef,				// A20
+	input p,					// A23 - P flag (branch)
+	output md,				// B11 - MD
+	output xi,				// A24 - instruction is illegal
+	output nef,				// A20 - instruction is ineffective
 
-	input w__,				// A61
-	input p4,					// A77
-	input we,					// A65
+	input w__,				// A61 - W& state
+	input p4,					// A77 - P4 state
+	input we,					// A65 - WE state
 	output amb,				// A75
 	output apb,				// B65
 	output jkrb,			// A86
 	output lwrs__,		// A67
 	output saryt,			// B62
-	output ap1,				// A76
-	output am1,				// A90
+	output ap1,				// A76 - AP1: register A plus 1 (for IRB)
+	output am1,				// A90 - AM1: register A minus 1 (for DRB)
 
 	input wz,					// A66
 	input wls,				// A70
@@ -85,8 +86,8 @@ module p_d(
 	output nrf,				// A12
 
 	input at15,				// A07
-	input wx,					// A64
-	input wa,					// A63
+	input wx,					// A64 - state WX
+	input wa,					// A63 - state WA
 	output ust_z,			// B49
 	output ust_v,			// A08
 	output ust_mc,		// B80
@@ -137,13 +138,16 @@ module p_d(
 	output lac__			// B43
 );
 
-	// page 2-30 - IR, instruction register
+	// sheet 1, page 2-30
+	// * IR - instruction register
 
 	ir u_ir(.w(w), .strob1(strob1), .w_ir(w_ir), .ir(ir));
 	assign c0 = ~|ir[13:15];
 	wire ir13_14 = |ir[13:14];
 
-	// page 2-31 - preliminary decoder
+	// sheet 2, page 2-31
+	// * decoder for 2-arg instructions with normal argument (opcodes 020-036 and 040-057)
+	// * decoder for KA1 instruction group (opcodes 060-067)
 
 	wire si11 = si1 & ir[0];
 	wire si12 = si1 & ir[1];
@@ -161,7 +165,11 @@ module p_d(
 	wire awt, trb, irb, drb, cwt, lwt, lws, rws, js, c, s, j, l, g, b_n;
 	decoder16 dec_11(.en({ ir[0],  ir[1]}), .i(ir[2:5]), .o({awt, trb, irb, drb, cwt, lwt, lws, rws, js, ka2, c, s, j, l, g, b_n}));
 
-	// page 2-32 - preliminary decoder
+	// sheet 3, page 2-32
+	// * opcode field A register number decoder
+	// * S opcode group decoder
+	// * B/N opcode group decoder
+	// * C opcode group decoder
 
 	wire [0:7] __a;
 	decoder8 dec_a(.en(1), .i(ir[7:9]), .o(__a));
@@ -188,7 +196,9 @@ module p_d(
 	wire sl = ~slx & ~__oth4 & ~sly;
 	assign b0 = &ir[10:12];
 
-	// page 2-33 - ineffective and illegal instrictions
+	// sheet 4, page 2-33
+	// * ineffective instructions
+	// * illegal instructions
 
 	assign md = __a[5] & b_n;
 	assign _0_v = js & ~__a[4] & we;
@@ -217,7 +227,7 @@ module p_d(
 	assign nef = ~(~__nef_1 & ir01 & ~__nef_2 & __nef_jcs & __nef_j1 & __nef_jn & ~p & __nef_j2);
 	assign xi = ~(~__nef_1 & ~__nef_2 & ir01);
 
-	// page 2-34
+	// sheet 5, page 2-34
 
 	wire cns = ~(~ccb & ~ng__ & ~sw);
 	assign amb = (uka & p4) | (cns & w__);
@@ -235,7 +245,8 @@ module p_d(
 	wire krb = ~(~irb & drb);
 	assign am1 = drb & w__;
 
-	// page 2-35
+	// sheet 6, page 2-35
+	// * control signals
 
 	wire __m84 = riirb ^ nglbb;
 	wire sds = (wz & ~(~xm & ~em)) | (~(~bm & ~is & ~er & ~xr) & w__) | (w__ & __m84) | (we & wlsbs);
@@ -248,7 +259,8 @@ module p_d(
 	wire ssab = rb__ & w__ & wpb;
 	wire ssaa = (~(~rb__ & wpb) & w__) | (w__ & lb);
 
-	// page 2-36
+	// sheet 7, page 2-36
+	// * ALU control signals
 
 	wire __m93 = ~(~sl & ~ls & ~orxr);
 	wire __m50 = ~(__m93 & w__) | (w__ & nglbb) | (wlsbs & we) | (wz & ~nm & ~(~mis & ~lrcb__));
@@ -270,7 +282,8 @@ module p_d(
 	assign nrf = ir[7] & ka2 & ir[6];
 	wire fppn = pufa ^ nrf;
 
-	// page 2-37
+	// sheet 8, page 2-37
+	// * R0 flags control signals
 
 	wire nor__ = ~(~ngl & ~er & ~nr & ~orxr);
 	assign ust_z = (nor__ & w__) | (w__ & ans) | (m & wz);
@@ -285,7 +298,8 @@ module p_d(
 	assign ust_x = wa & sx;
 	assign blr = w__ & oc__ & ~ir[6];
 
-	// page 2-38
+	// sheet 9, page 2-38
+	// * execution phase control signals
 
 	wire llb;
 
@@ -297,7 +311,9 @@ module p_d(
 	assign lj = ~(~__a[7] | ~j);
 	assign ewe = (lj & ww) | (ls & ~wa) | (pp & ~(~llb & ~zb__ & ~js)) | (~wzi & krb & w__);
 
-	// page 2-39
+	// sheet 10, page 2-39
+	// * execution phase control signals
+	// * instruction cycle end signal
 
 	wire sew__;
 
@@ -307,7 +323,8 @@ module p_d(
 	wire __m88 = ~(~is & ~rb__ & bmib & ~prawy);
 	assign ew__ = (wr & __m88) | (we & wlsbs) | (ri & ww) | (~(~ng__ & ~lbcb) & wa) | (pp & sew__);
 
-	// page 2-40
+	// sheet 11, page 2-40
+	// * control signals
 
 	assign lar__ = ~lb & ~ri & ~ans & ~trb & ~ls & ~sl & ~nor__ & krb;
 	wire __m92 = (~bc & ~bn & ~bb) & ~trb & ~oc__;
@@ -322,7 +339,8 @@ module p_d(
 	assign p16 = (__m63 & w__ & cns) | (riirb & w__) | (ib && w__) | (slx & r0[8]) | __m31;
 	wire __m31 = (~(~ac & __m63) & w__ & r0[3]) | (r0[7] & sly) | (uka & p4) | (lj & we);
 
-	// page 2-41
+	// sheet 12, page 2-41
+	// * execution phase control signals
 
 	wire __m60 = (~lk & inou__);
 	wire __m76 = l ^ __m60;
@@ -336,7 +354,9 @@ module p_d(
 	wire __m33 = (wx & g) | (mis & wz) | (rbib & w__);
 	assign srez__ = rbib ^ mis;
 
-	// page 2-42
+	// sheet 13, page 2-42
+	// * execution phase control signal
+	// * instruction cycle end signal
 
 	assign ewx = (lrcbsr & wz) | (pp & (gr ^ hsm)) | ((inou__ & lk) & wm) | (lk & ~(~inou__ & ~sr__) & wx);
 	assign axy = ~(sr__ & ~(ir[6] & rbib));
