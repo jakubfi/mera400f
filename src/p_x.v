@@ -174,7 +174,7 @@ module p_x(
 	// sheet 2, page 2-2
 	// * state registers
 
-	wire ei1, ei2, ei3, ei4, ei5;
+	wire ei4;
 
 	always @ (posedge got, posedge clo) begin
 		if (clo) {i2, i3, i4, i5, wx, wm} <= 'b0;
@@ -222,6 +222,43 @@ module p_x(
 	// sheet 4, page 2-4
 	// * strobs
 
+	wire zw, oken;
+
+	wire __m53_6 = ~(sgot & __tstep);
+	wire __got = ~((~(zw & oken & __got) & __m53_6) & ~st812 & ~strob2);
+	univib uni_got(.clk(__clk), .a(__got), .b(1), .q(got__));
+	wire __m53_11 = ~(~(__tstep & ~sgot) & ~st56);
+	univib uni_strob2(.clk(__clk), .a(__m53_11), .b(1), .q(strob2));
+	wire gotst1 = ~(~got__ & ~strob1);
+
+	reg __tstep; // M21_6
+	wire __tstep_s = ~mode & sts;
+	wire step_ = ~step;
+	always @ (posedge __tstep_s, posedge step_, posedge mode) begin
+		if (mode) __tstep <= 1'b0;
+		else if (__tstep_s) __tstep <= 1'b1;
+		else __tstep <= 1'b0;
+	end
+
+	assign strob1 = ~(~strob_fp & ~st56 & ~st812 & ~__tstep);
+
+	// sheet 5, page 2-5
+	// interrupt phase control signals
+
+	wire exr;
+
+	assign arm4 = strob2 & i2 & lip;
+	assign blw_pw = ~przerw_z & lg_3 & i3 & przerw;
+	wire ei5 = ~(i4 & ~(lip & i1));
+	wire exrprzerw = ~(~przerw & ~exr);
+	wire ei2 = i1 & przerw_z;
+	wire i3lips = ~lipsp__ & i3;
+	assign ekc_1 = (lg_3 & i3lips) | (i5 & ~lip);
+	assign zer_sp = ~lip & i5;
+	assign lipsp__ = ~(~lip & ~sp);
+	wire ei1 = ~(~exr & ~lip) & pp;
+	wire ei3 = (~przerw_z & przerw & i1) | (i1 & exr) | (sp & pp) | (i2) | __m25;
+	wire __m25 = (i5 & lip) | (~lipsp__ & ~lg_0 & i3) | (i3 & lipsp__ & ~lg_3);
 
 
 endmodule
