@@ -8,6 +8,8 @@
 */
 
 module p_x(
+	input __clk, // clock for "univibrators"
+
 	input ek1,	// A32 - Enter state K1
 	input ewp,	// A34 - Enter state WP
 	input ek2,	// A29 - Enter state K2
@@ -17,42 +19,42 @@ module p_x(
 	input ewr,	// A41 - Enter state WR
 	input ew__,	// A36 - Enter state W&
 	input ewz,	// A37 - Enter state WZ
-	output k1,	// A23 - state K1
-	output wp,	// B21 - state WP
-	output k2,	// A27
-	output wa,	// A25 - state WA
-	output wz,	// A42
-	output w__,	// B43 - state W&
-	output wr,	// B42 - state WR
-	output we,	// B45 - state WE
+	output reg k1,	// A23 - state K1
+	output reg wp,	// B21 - state WP
+	output reg k2,	// A27
+	output reg wa,	// A25 - state WA
+	output reg wz,	// A42
+	output reg w__,	// B43 - state W&
+	output reg wr,	// B42 - state WR
+	output reg we,	// B45 - state WE
 	input sp1,	// A11
 	input ep1,	// A12
-	input spo,	// A79
-	input epo,	// A09
-	input stpo,	// B48
+	input sp0,	// A79
+	input ep0,	// A09
+	input stp0,	// B48
 	input ep2,	// A21 - Enter state P2
 	input ep5,	// A20 - Enter state P5
 	input ep4,	// A19 - Enter state P4
 	input ep3,	// A18 - Enter state P3
-	output p1,	// A15 - state P1
-	output p0,	// A14 - state P0
-	output p2,	// A16 - state P2
-	output p5,	// B22 - state P5
-	output p4,	// A26 - state P5
-	output p3,	// A17 - state P3
+	output reg p1,	// A15 - state P1
+	output reg p0,	// A14 - state P0
+	output reg p2,	// A16 - state P2
+	output reg p5,	// B22 - state P5
+	output reg p4,	// A26 - state P5
+	output reg p3,	// A17 - state P3
 
 	input si1,	// B52
 	input ewx,	// B50 - Enter state WX
 	input ewm,	// B49 - Enter state WM
 	input eww,	// A46 - Enter state WW
-	output i5,	// B61 - state I5
-	output i4,	// A51 - state I4
-	output i3,	// B60 - state I3
-	output i2,	// A58 - state I2
-	output i1,	// B59 - state I1
-	output ww,	// A44 - state WW
-	output wm,	// A45 - state WM
-	output wx,	// A71 - state WX
+	output reg i5,	// B61 - state I5
+	output reg i4,	// A51 - state I4
+	output reg i3,	// B60 - state I3
+	output reg i2,	// A58 - state I2
+	output reg i1,	// B59 - state I1
+	output reg ww,	// A44 - state WW
+	output reg wm,	// A45 - state WM
+	output reg wx,	// A71 - state WX
 
 	input laduj,				// A38
 	output as2_sum_at,	// A13
@@ -148,10 +150,78 @@ module p_x(
 
 );
 
+	// sheet 1, page 2-1
+	// * state registers
+
+	always @ (posedge got, posedge clo) begin
+		if (clo) {k1, wp, k2, wa, we, wr, w__, wz, p2, p5, p4, p3} <= 'b0;
+		else {k1, wp, k2, wa, we, wr, w__, wz, p2, p5, p4, p3}
+				<= {ek1, ewp, ek2, ewa, ewe, ewr, ew__, ewz, ep2, ep5, ep4, ep3};
+	end
+
+	always @ (posedge got, posedge sp1) begin
+		if (sp1) p1 <= 1'b1;
+		else p1 <= ep1;
+	end
+
+	wire __sp0 = ~(~clo & ~sp0);
+
+	always @ (posedge got, posedge __sp0) begin
+		if (__sp0) p0 <= 1'b1;
+		else p0 <= ep0;
+	end
+
+	// sheet 2, page 2-2
+	// * state registers
+
+	wire ei1, ei2, ei3, ei4, ei5;
+
+	always @ (posedge got, posedge clo) begin
+		if (clo) {i2, i3, i4, i5, wx, wm} <= 'b0;
+		else {i2, i3, i4, i5, wx, wm} <= {ei2, ei3, ei4, ei5, ewx, ewm};
+	end
+
+	initial i1 = 0;
+	always @ (posedge got, posedge clo, posedge si1) begin
+		if (clo) i1 <= 'b0;
+		else if (si1) i1 <= 'b1;
+		else i1 <= ei1;
+	end
+
+	// sheet 3, page 2-3
+	// * state transition delays
+
+	wire stp0__;
+
+	assign as2_sum_at = ~(~wz & ~p4 & ~we & ~w__);
+	wire __m19_6 = ~(~w__ & ~we & ~p4 & ~(k2 & laduj));
+	wire __m18 = ~(~p1 & ~k1 & ~k2 & ~i1 & ~i3);
+	wire __m20 = ~(~p5 & ~wr & ~ww & ~wm & ~i2 & ~i4 & ~i5);
+	wire __m16 = ~(~wz & ~stp0__ & ~p3 & ~wa);
+	wire __m15 = ~(~p2 & ~wp & ~wx);
+
+	wire sgot = ~(__m19_6 & __m18);
+
 	// 74123 multivibrators configuration:
 	// propagation delay: ~30ns
 	// pulse length @ 12pF, 5..10kohm: 80..130 ns
 	// pulse length @ 22pF, 5..10kohm: 110..190 ns
+
+	// TODO: actual delays
+	wire __q1, __q2, __q3, __q4, __q5;
+	univib uni1(.clk(__clk), .a(got), .b(__m19_6), .q(__q1)); // 12pF
+	univib uni2(.clk(__clk), .a(got), .b(__m18 & ok__), .q(__q2)); // 22pF
+	univib uni3(.clk(__clk), .a(got), .b(__m20 & ok__), .q(__q3)); // 12pF
+	univib uni4(.clk(__clk), .a(got), .b(__m16), .q(__q4)); // 12pF
+	univib uni5(.clk(__clk), .a(got), .b(__m15), .q(__q5)); // 12pF
+
+	wire st56 = __q1 & __q2;
+	wire st812 = __q3 & __q4 & __q5;
+	wire sts = ~(~st56 & st812);
+
+	// sheet 4, page 2-4
+	// * strobs
+
 
 
 endmodule

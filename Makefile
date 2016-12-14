@@ -7,7 +7,7 @@ SOURCES_DIR = src
 SOURCES = mera400f.v \
 	p_r.v regs.v r0.v rb.v \
 	p_d.v ir.v decoder16.v decoder8.v \
-	p_x.v
+	p_x.v univib.v
 TESTS_DIR = tests
 TESTS = regs.v
 ASSIGNMENTS = $(SOURCES_DIR)/assignments.qsf
