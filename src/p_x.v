@@ -9,7 +9,7 @@
 
 module p_x(
 	input __clk, // clock for "univibrators"
-
+	// sheet 1
 	input ek1,	// A32 - Enter state K1
 	input ewp,	// A34 - Enter state WP
 	input ek2,	// A29 - Enter state K2
@@ -21,16 +21,16 @@ module p_x(
 	input ewz,	// A37 - Enter state WZ
 	output reg k1,	// A23 - state K1
 	output reg wp,	// B21 - state WP
-	output reg k2,	// A27
+	output reg k2,	// A27 - state K2
 	output reg wa,	// A25 - state WA
-	output reg wz,	// A42
+	output reg wz,	// A42 - state WZ
 	output reg w__,	// B43 - state W&
 	output reg wr,	// B42 - state WR
 	output reg we,	// B45 - state WE
-	input sp1,	// A11
-	input ep1,	// A12
-	input sp0,	// A79
-	input ep0,	// A09
+	input sp1,	// A11 - Set state P1
+	input ep1,	// A12 - Enter state P1
+	input sp0,	// A79 - Set state P0
+	input ep0,	// A09 - Enter state P0
 	input stp0,	// B48
 	input ep2,	// A21 - Enter state P2
 	input ep5,	// A20 - Enter state P5
@@ -42,8 +42,8 @@ module p_x(
 	output reg p5,	// B22 - state P5
 	output reg p4,	// A26 - state P5
 	output reg p3,	// A17 - state P3
-
-	input si1,	// B52
+	// sheet 2
+	input si1,	// B52 - Set state I1
 	input ewx,	// B50 - Enter state WX
 	input ewm,	// B49 - Enter state WM
 	input eww,	// A46 - Enter state WW
@@ -55,47 +55,47 @@ module p_x(
 	output reg ww,	// A44 - state WW
 	output reg wm,	// A45 - state WM
 	output reg wx,	// A71 - state WX
-
+	// sheet 3
 	input laduj,				// A38
 	output as2_sum_at,	// A13
-
+	// sheet 4
 	input strob_fp,	// A28
 	input mode,			// B54
 	input step,			// A48
 	output got,			// A83
 	output strob2,	// A49
 	output strob1,	// A22 A90
-
+	// sheet 5
 	input przerw_z,	// A61
 	input przerw,		// A24
 	input lip,			// B77
 	input sp,				// A67
 	input lg_0,			// B67
 	input pp,				// A64
-	input lg_3,			// A68
+	input lg_3,			// A68 - LG=3 (Licznik Grupowy)
 	output arm4,		// B79
 	output blw_pw,	// B85
-	output ekc_1,		// A76
+	output ekc_1,		// A76 - EKC*1 - Enter state KC (Koniec Cyklu)
 	output zer_sp,	// A73
 	output lipsp,		// A66
-
+	// sheet 6
 	input sbar__,		// A53
-	input q,				// A55
+	input q,				// A55 - Q system flag
 	input in,				// A03 - instruction IN
 	input ou,				// B19 - instruction OU
 	input k2fetch,	// B41
-	input red_fp,		// A39
-	output pn_nb,		// B94
-	output bp_nb,		// B93
-	output bar_nb,	// A75
+	output red_fp,		// A39
+	output pn_nb,		// B94 - PN->NB
+	output bp_nb,		// B93 - BP->NB
+	output bar_nb,	// A75 - BAR->NB
 	output barnb,		// A72
-	output q_nb,		// A74
+	output q_nb,		// A74 - Q->NB
 	output df,			// B92
-	output w_dt,		// A81
+	output w_dt,		// A81 - W->DT
 	output dr,			// A87
-	output dt_w,		// A65
-	output ar_ad,		// B63
-
+	output dt_w,		// A65 DT->W
+	output ar_ad,		// B63 AR->AD
+	// sheet 7
 	input mcl,			// A43 - instruction MCL
 	input gi,				// A47
 	input ir6,			// B58
@@ -115,9 +115,9 @@ module p_x(
 	output i3_ex_przer,	// A52
 	output ck_rz_w,	// B91
 	output zerz,		// B85
-
+	// sheet 8
 	input sr_fp,		// B53
-	input zw1,			// A85
+	input zw1,			// A85 - module 1 allowed to use the system bus (CPU) (ZezWolenie 1)
 	input srez__,		// B76
 	input wzi,			// A60
 	input is,				// A84
@@ -125,10 +125,9 @@ module p_x(
 	input rok,			// A89
 	input efp,			// B09
 	input exl,			// A78 - instruction EXL
-	output zgi,			// C69
-	output zg,			// B44
-	output ok__,		// A80
-
+	output zg,			// B44 - request to use the system bus (ZGłoszenie)
+	output ok__,		// A80 - OK*
+	// sheet 9
 	input stop_n,		// B55
 	input zga,			// B57
 	input rpe,			// A82
@@ -147,7 +146,6 @@ module p_x(
 	output dad12,		// A08
 	output dad13,		// A07
 	output dad14		// A05
-
 );
 
 	// sheet 1, page 2-1
@@ -225,6 +223,7 @@ module p_x(
 	wire zw, oken;
 
 	wire __m53_6 = ~(sgot & __tstep);
+	// NOTE: 33pF cap to ground
 	wire __got = ~((~(zw & oken & __got) & __m53_6) & ~st812 & ~strob2);
 	univib uni_got(.clk(__clk), .a(__got), .b(1), .q(got__));
 	wire __m53_11 = ~(~(__tstep & ~sgot) & ~st56);
@@ -260,7 +259,65 @@ module p_x(
 	wire ei3 = (~przerw_z & przerw & i1) | (i1 & exr) | (sp & pp) | (i2) | __m25;
 	wire __m25 = (i5 & lip) | (~lipsp__ & ~lg_0 & i3) | (i3 & lipsp__ & ~lg_3);
 
+	// sheet 6, page 2-6
 
+	wire zwzg, read_fp;
+	assign red_fp = read_fp;
+
+	wire __m28 = ~(~wr & ~p1 & ~p5 & ~wm & ~k2fbs & ~ww & ~red_fp);
+	wire __m30 = ~(~red_fp & ~wm & ~p5 & ~ww & ~k2fbs & ~(wr & ~inou));
+
+	assign pn_nb = ~(barnb & ~wm) & zwzg;
+	assign bp_nb = (barnb & ~wm) & zwzg;
+	assign bar_nb = barnb & zwzg;
+	assign barnb = (is & sp) | (ww & sbar__) | (sbar__ & wr) | (q & ~__m28);
+	assign q_nb = zwzg & ~i2;
+	wire inou = ~(~in & ~ou);
+	wire __m40 = ~(~i2 & (~in & ~wm) & ~k1);
+	assign df = __m40 & zwzg;
+	wire __m49 = ~(~ou & ~wm) ^ w;
+	assign w_dt = __m49 & zwzg;
+	assign dr = r & zwzg;
+	wire r = ~(k2fetch & ~p5 & ~i4 & ~i1 & ~i3lips & ~wr & ~p1 & ~red_fp);
+	assign dt_w = __m40 & r;
+	assign ar_ad = __m30 & zwzg;
+
+	// sheet 7, page 2-7
+	// * system bus drivers
+
+	assign ic_ad = zwzg & ~(~k1 & ~p1 & ~(~inou & wr));
+	assign dmcl = zwzg & ~(~mcl | ~wm);
+	assign ddt15 = zwzg & ~(~wm | ~gi);
+	assign ddt0 = zwzg & (~(~wm | ~gi) & ir[6]);
+	assign din = zwzg & ~(~wm | ~gi);
+	assign dad15 = zwzg & ~(~i5 & ~i1);
+	assign dad10 = zwzg & ~(~i1 & ~(i4 & exr) & ~i5);
+	assign dad9 = zwzg & ~(~i1 & ~i4 & ~i5);
+	// jumper ABC set to AB
+	// NOTE: unused: wire __c = ~(~arz & q & ~exrprzerw);
+	assign dw =  zwzg & w;
+	wire w = ~(~i5 & i3_ex_przer & ~ww & ~k2_bin_store);
+	assign i3_ex_przer = ~(exrprzerw & i3);
+	wire rw = r ^ w;
+	wire k2fbs = k2_bin_store & k2fetch;
+	assign ck_rz_n = ~(~(wr & fi) & ~lrz & ~blw_pw);
+	// TODO: ~25ns delay
+	wire __ck_rz_n_dly = ~ck_rz_n;
+	assign zerz = ~(__ck_rz_n_dly & ck_rz_n & ~blw_pw);
+
+	// sheet 8, page 2-8
+/*
+	wire zwzg = 
+	assign zw1 = 
+	assign zgi =
+	assign zg = 
+	wire zw = ~zw1;
+	wire ad_ad = 
+	wire alarm = 
+	assign ok = 
+	assign oken = ~(~ren & ~rok);
+	wire exr = 
+*/
 endmodule
 
 // vim: tabstop=2 shiftwidth=2 autoindent noexpandtab

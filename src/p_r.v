@@ -8,6 +8,7 @@
 */
 
 module p_r(
+	// sheet 1
 	input blr,				// A50 - BLokuj Rejestry
 	input lpc,				// A94 - LPC instruction
 	input wa,					// B94 - state WA
@@ -19,16 +20,16 @@ module p_r(
 	input w_r,				// B47
 	input strob1,			// B32
 	input strob2,			// B42
-
+	// sheet 2-5
 	input [0:15] w,		// B07, B12, B11, B10, B22, B24, B25, B23, B13, B19, B20, B21, B16, B08, B17, B18 - bus W
 	output wand [0:15] l,	// A04, A03, A28, A27, A09, A10, A26, A25, A07, A08, A16, A17, A06, A05, A18, A19 - bus L
-
+	// sheet 6
 	input bar_nb,			// B83 - BAR->NB: output BAR register to system bus
 	input w_rbb,			// A51 - RB[4:9] clock in
 	input w_rbc,			// B46 - RB[0:3] clock in
 	input w_rba,			// B50 - RB[10:15] clock in
 	output wand [0:3] dnb,	// A86,  A90, A87, B84 - DNB: NB system bus driver
-
+	// sheet 7
 	input rpn,				// B85
 	input bp_nb,			// B86
 	input pn_nb,			// A92
@@ -47,19 +48,19 @@ module p_r(
 	output dqb,				// B89 - Q system bus driver
 	output q,					// A53 - Q: system flag
 	output zer,				// A52
-
+	// sheet 8
 	input ust_z,			// B53
 	input ust_mc,			// B55
 	input s0,					// B92
 	input ust_v,			// A93
 	input zero_v,			// B91
 	output [0:8] r0,	// A44, A46, A43, A42, A41, A45, A40, A39, B09 - CPU flags in R0 register
-
+	// sheet 9
 	input exy,				// A37
 	input ust_y,			// B40
 	input exx,				// A38
 	input ust_x,			// B41
-
+	// sheet 10-11
 	input kia,				// B81
 	input kib,				// A91
 	input [0:15] rz,	// B70, B76, B60, B66, A60, A64, A68, A56, B80, A80, A74, A84, A77, B74, A71, B57

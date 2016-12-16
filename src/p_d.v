@@ -8,12 +8,13 @@
 */
 
 module p_d(
+	// sheet 1
 	input [0:15] w,		// A80, A81, B78, B77, B09, B08, B35, A27, A30, A29, B15, B16, B25, B26, B13, B12 - W bus
 	input strob1,			// B85
 	input w_ir,				// B86 - W->IR: send bus W to instruction register IR
 	output [0:15] ir,	// A78, A79, B75, B74, A19, A18, A21, A22, B17, A33, A31, A32, B30, B27, B06, B07 - IR register
 	output c0,				// B05 - C=0 (opcode field C is 0 - instruction argument is stored in the next word)
-
+	// sheet 2
 	input si1,				// B79
 	output ls,				// A91 - LS
 	output rj,				// B92 - RJ
@@ -29,7 +30,7 @@ module p_d(
 	output oc__,			// B88 - OC*: BRC, BLC
 	output ka2,				// A83 - KA2 opcode group
 	output gr__,			// B47 - GR*: G|L opcode group
-
+	// sheet 3
 	output hlt,				// A34 - HLT
 	output mcl,				// B34 - MCL
 	output sin,				// B28 - SIU, SIL, SIT, CIT
@@ -49,7 +50,7 @@ module p_d(
 	output ng__,			// B03 - NG*: NGA, NGL
 	output zb__,			// B20
 	output b0,				// A25 - B=0 (opcode field B is 0 - no B-modification)
-
+	// sheet 4
 	input q,					// B19 - Q: system flag
 	input mc_3,				// B10 - MC=3: three consecutive pre-modifications
 	input [0:8] r0,		// B29, B33, B31, A16, B23, B22, B21, B32, A26 - R0 register flags
@@ -58,7 +59,7 @@ module p_d(
 	output md,				// B11 - MD
 	output xi,				// A24 - instruction is illegal
 	output nef,				// A20 - instruction is ineffective
-
+	// sheet 5
 	input w__,				// A61 - W& state
 	input p4,					// A77 - P4 state
 	input we,					// A65 - WE state
@@ -66,25 +67,25 @@ module p_d(
 	output apb,				// B65
 	output jkrb,			// A86
 	output lwrs__,		// A67
-	output saryt,			// B62
+	output saryt,			// B62 - SARYT: ALU operation mode (0 - logic, 1 - arythmetic)
 	output ap1,				// A76 - AP1: register A plus 1 (for IRB)
 	output am1,				// A90 - AM1: register A minus 1 (for DRB)
-
-	input wz,					// A66
+	// sheet 6
+	input wz,					// A66 - state WZ
 	input wls,				// A70
 	output bcoc__,		// A89
-
-	output sd,				// A69
-	output scb,				// A82
-	output sca,				// A71
-	output sb,				// A74
-	output sab,				// A73
-	output saa,				// A72
+	// sheet 7
+	output sd,				// A69 - ALU function select
+	output scb,				// A82 - ALU function select
+	output sca,				// A71 - ALU function select
+	output sb,				// A74 - ALU function select
+	output sab,				// A73 - ALU function select
+	output saa,				// A72 - ALU function select
 	output lrcb__,		// A45
 	output aryt,			// A68
 	output sbar__,		// B91
 	output nrf,				// A12
-
+	// sheet 8
 	input at15,				// A07
 	input wx,					// A64 - state WX
 	input wa,					// A63 - state WA
@@ -97,44 +98,44 @@ module p_d(
 	output ust_y,			// A53
 	output ust_x,			// A47
 	output blr,				// A87
-
+	// sheet 9
 	input wpb,				// A58
 	input wr,					// A60
 	input pp,					// A62
 	input ww,					// B60
 	input wzi,				// A59
-	output ewa,				// A55
-	output ewp,				// A56
+	output ewa,				// A55 - Enter WA
+	output ewp,				// A56 - Enter WP
 	output uj__,			// B18
 	output lwt__,			// B94
 	output lj,				// B50
-	output ewe,				// A54
-
+	output ewe,				// A54 - Enter WE
+	// sheet 10
 	input wp,					// A37
 	output ekc_1,			// A42
-	output ewz,				// A49
-	output ew__,			// A50
-
+	output ewz,				// A49 - Enter WZ
+	output ew__,			// A50 - Enter W&
+	// sheet 11
 	output lar__,			// B82
 	output ssp__,			// B81
 	output ka1,				// A94
-	output na,				// A84
+	output na,				// A84 - Normalny Argument
 	output exl,				// A06
 	output p16,				// A36
-
+	// sheet 12
 	input lk,					// A52
 	input wm,					// A38
-	output ewr,				// A51
-	output ewm,				// A48
+	output ewr,				// A51 - Enter WR
+	output ewm,				// A48 - Enter WM
 	output efp,				// A11
 	output sar__,			// A05
-	output eww,				// A41
+	output eww,				// A41 - Enter WW
 	output srez__,		// A17
-
-	output ewx,				// A43
+	// sheet 13
+	output ewx,				// A43 - Enter WX
 	output axy,				// A46
-	output inou__,		// A39
-	output ekc_2,			// A40
+	output inou__,		// A39 - INOU* - IN or OU instruction
+	output ekc_2,			// A40 - EKC*2 - Enter cycle end (Koniec Cyklu)
 	output lac__			// B43
 );
 
@@ -332,7 +333,7 @@ module p_d(
 	assign sew__ = ~(__m92 & ~krb & ~nor__ & ~sl & ~sw & ~a & ~c__);
 	assign llb = ~(~bs & ~ls & ~lwrs__);
 	assign ka1 = ~(~(~si11 & ~si12 & ~ir[2]) & ~js);
-	wire uka = ~(~ka1 | ~ir[6]);
+	wire uka = ~(~ka1 | ~ir[6]); // Ujemny Krótki Argument
 	assign na = ~ka1 & ~ka2 & ~sc & ir01;
 	assign exl = ~ir[6] & ka2 & ir[7];
 	wire __m63 = ~(ng__ & ir[6]);
