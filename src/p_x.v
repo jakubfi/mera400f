@@ -93,8 +93,9 @@ module p_x(
 	output df,			// B92
 	output w_dt,		// A81 - W->DT
 	output dr,			// A87
-	output dt_w,		// A65 DT->W
-	output ar_ad,		// B63 AR->AD
+	output dt_w,		// A65 - DT->W
+	output ar_ad,		// B63 - AR->AD
+	output ds,			// A88 - DS: "Send" Driver // NOTE: missing on original schematic
 	// sheet 7
 	input mcl,			// A43 - instruction MCL
 	input gi,				// A47
@@ -281,6 +282,7 @@ module p_x(
 	wire r = ~(k2fetch & ~p5 & ~i4 & ~i1 & ~i3lips & ~wr & ~p1 & ~red_fp);
 	assign dt_w = __m40 & r;
 	assign ar_ad = __m30 & zwzg;
+	assign ds = ~(ou & ~wm) & zwzg; // NOTE: missing on original schematic
 
 	// sheet 7, page 2-7
 	// * system bus drivers
