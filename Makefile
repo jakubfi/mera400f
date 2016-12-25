@@ -10,7 +10,7 @@ SOURCES = mera400f.v \
 	p_d.v ir.v decoder16.v decoder8.v \
 	p_x.v univib.v
 TESTS_DIR = tests
-TESTS = regs.v
+TESTS = regs.v p_d.v
 ASSIGNMENTS = $(SOURCES_DIR)/assignments.qsf
 QSYS_SYNTH = VERILOG
 # See: https://github.com/jakubfi/altlogfilter (or comment out the line below)
@@ -136,7 +136,7 @@ $(SOPCINFO): $(SRCS_QSYS)
 # --- Icarus Verilog testing ---------------------------------------------
 
 ivtest: $(OBJS)
-	$(foreach var,$(OBJS),./$(var))
+	$(foreach var, $(OBJS), ./$(var);)
 
 %.bin: %.v
 	iverilog -y $(SOURCES_DIR) -y $(TESTS_DIR) -o $@ $<
