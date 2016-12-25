@@ -77,14 +77,14 @@ module p_x(
 	output blw_pw,	// B85
 	output ekc_1,		// A76 - EKC*1 - Enter state KC (Koniec Cyklu)
 	output zer_sp,	// A73
-	output lipsp,		// A66
+	output lipsp__,	// A66
 	// sheet 6
 	input sbar__,		// A53
 	input q,				// A55 - Q system flag
 	input in,				// A03 - instruction IN
 	input ou,				// B19 - instruction OU
 	input k2fetch,	// B41
-	output red_fp,		// A39
+	input red_fp,		// A39
 	output pn_nb,		// B94 - PN->NB
 	output bp_nb,		// B93 - BP->NB
 	output bar_nb,	// A75 - BAR->NB
@@ -169,15 +169,14 @@ module p_x(
 		if (__sp0) p0 <= 1'b1;
 		else p0 <= ep0;
 	end
+	wire stp0__ = ~(p0 & stp0);
 
 	// sheet 2, page 2-2
 	// * state registers
 
-	wire ei4;
-
 	always @ (posedge got, posedge clo) begin
-		if (clo) {i2, i3, i4, i5, wx, wm} <= 'b0;
-		else {i2, i3, i4, i5, wx, wm} <= {ei2, ei3, ei4, ei5, ewx, ewm};
+		if (clo) {i2, i3, i4, i5, wx, wm, ww} <= 'b0;
+		else {i2, i3, i4, i5, wx, wm, ww} <= {ei2, ei3, ei4, ei5, ewx, ewm, eww};
 	end
 
 	initial i1 = 0;
@@ -189,8 +188,6 @@ module p_x(
 
 	// sheet 3, page 2-3
 	// * state transition delays
-
-	wire stp0__;
 
 	assign as2_sum_at = ~(~wz & ~p4 & ~we & ~w__);
 	wire __m19_6 = ~(~w__ & ~we & ~p4 & ~(k2 & laduj));
@@ -221,7 +218,8 @@ module p_x(
 	// sheet 4, page 2-4
 	// * strobs
 
-	wire zw, oken;
+	wire got__;
+	assign got = got__;
 
 	wire __m53_6 = ~(sgot & __tstep);
 	// NOTE: 33pF cap to ground
@@ -229,7 +227,7 @@ module p_x(
 	univib uni_got(.clk(__clk), .a(__got), .b(1), .q(got__));
 	wire __m53_11 = ~(~(__tstep & ~sgot) & ~st56);
 	univib uni_strob2(.clk(__clk), .a(__m53_11), .b(1), .q(strob2));
-	wire gotst1 = ~(~got__ & ~strob1);
+	wire gotst1 = ~(~got__ & ~strob1_int);
 
 	reg __tstep; // M21_6
 	wire __tstep_s = ~mode & sts;
@@ -240,18 +238,18 @@ module p_x(
 		else __tstep <= 1'b0;
 	end
 
-	assign strob1 = ~(~strob_fp & ~st56 & ~st812 & ~__tstep);
+	wire strob1_int = ~(~strob_fp & ~st56 & ~st812 & ~__tstep);
+	assign strob1 = strob1_int; // NOTE: Error (35000) workaround (https://www.altera.com/support/support-resources/knowledge-base/solutions/rd06192013_268.html)
 
 	// sheet 5, page 2-5
 	// interrupt phase control signals
-
-	wire exr;
 
 	assign arm4 = strob2 & i2 & lip;
 	assign blw_pw = ~przerw_z & lg_3 & i3 & przerw;
 	wire ei5 = ~(i4 & ~(lip & i1));
 	wire exrprzerw = ~(~przerw & ~exr);
 	wire ei2 = i1 & przerw_z;
+	wire ei4 = i3 & lg_0;
 	wire i3lips = ~lipsp__ & i3;
 	assign ekc_1 = (lg_3 & i3lips) | (i5 & ~lip);
 	assign zer_sp = ~lip & i5;
@@ -262,8 +260,8 @@ module p_x(
 
 	// sheet 6, page 2-6
 
-	wire zwzg, read_fp;
-	assign red_fp = read_fp;
+	wire read_fp;
+	assign read_fp = red_fp;
 
 	wire __m28 = ~(~wr & ~p1 & ~p5 & ~wm & ~k2fbs & ~ww & ~red_fp);
 	wire __m30 = ~(~red_fp & ~wm & ~p5 & ~ww & ~k2fbs & ~(wr & ~inou));
@@ -290,9 +288,9 @@ module p_x(
 	assign ic_ad = zwzg & ~(~k1 & ~p1 & ~(~inou & wr));
 	assign dmcl = zwzg & ~(~mcl | ~wm);
 	assign ddt15 = zwzg & ~(~wm | ~gi);
-	assign ddt0 = zwzg & (~(~wm | ~gi) & ir[6]);
+	assign ddt0 = zwzg & (~(~wm | ~gi) & ir6);
 	assign din = zwzg & ~(~wm | ~gi);
-	assign dad15 = zwzg & ~(~i5 & ~i1);
+	assign dad15_i = zwzg & ~(~i5 & ~i1);
 	assign dad10 = zwzg & ~(~i1 & ~(i4 & exr) & ~i5);
 	assign dad9 = zwzg & ~(~i1 & ~i4 & ~i5);
 	// jumper ABC set to AB
@@ -302,24 +300,62 @@ module p_x(
 	assign i3_ex_przer = ~(exrprzerw & i3);
 	wire rw = r ^ w;
 	wire k2fbs = k2_bin_store & k2fetch;
-	assign ck_rz_n = ~(~(wr & fi) & ~lrz & ~blw_pw);
+	assign ck_rz_w = ~(~(wr & fi) & ~lrz & ~blw_pw);
 	// TODO: ~25ns delay
-	wire __ck_rz_n_dly = ~ck_rz_n;
-	assign zerz = ~(__ck_rz_n_dly & ck_rz_n & ~blw_pw);
+	wire __ck_rz_w_dly = ~ck_rz_w;
+	assign zerz = ~(__ck_rz_w_dly & ck_rz_w & ~blw_pw);
 
 	// sheet 8, page 2-8
-/*
-	wire zwzg = 
-	assign zw1 = 
-	assign zgi =
-	assign zg = 
-	wire zw = ~zw1;
-	wire ad_ad = 
-	wire alarm = 
-	assign ok = 
-	assign oken = ~(~ren & ~rok);
-	wire exr = 
-*/
+
+	wire __m47_q;
+
+	wire zgi;
+	wire __m64 = ~sr_fp & ~si1 & ~sp1;
+	wire __m16_6 = ~((~wm & ~i2 & ~wr & ~ww) & ~read_fp & (~i1 & ~i3 & ~i4 & ~i5) & (~k2fbs & ~p1 & ~p5 & ~k1));
+	ffjk jk47_1(.s(~__m64), .j(__m16_6), .clk(gotst1), .k(zgi), .r(clo), .q(zgi));
+	wire zwzg = ~(~zgi & zw1);
+	assign zg = ~(~zgi & ~__m47_q & ~(zw & oken));
+	wire zw = zw1;
+
+	wire __m46 = ~clo & ~(strob2 & w__ & wzi);
+	ffjk jk47_2(.s(0), .j(srez__ & wr), .clk(ok__), .k(__m47_q), .r(~__m46), .q(__m47_q));
+	wire ad_ad = zw & zgi & (i4 & __m37_q);
+	wire alarm = ~ok__ & zwzg;
+
+	wire __m57 = ~ren & ~talarm & ~rok;
+	ffjk jk37_1(.s(0), .j(zwzg), .clk(~__m57), .k(1), .r(~zgi), .q(ok__));
+	wire oken = ~(~ren & ~rok);
+
+	// NOTE .j(~efp) if no AWP
+	wire __m37_q;
+	ffjk jk37_2(.s(0), .j(0), .clk(got), .k(i5), .r(clo), .q(__m37_q));
+	// NOTE: & ~efp if no AWP
+	wire exr = ~(~__m37_q & ~exl);
+
+	// sheet 9, page 2-9
+
+	wire __m59 = zwzg & rw;
+	wire __m61 = stop_n & zga & __m59;
+	ffd __m66_1(.s(~__m55), .d(__m61), .clk(~strob1_int), .r(~__m59), .q(hlt_n));
+
+	assign bod = ~(~rpe & ~ren);
+
+	assign b_parz = strob1_int & rpe & r;
+	assign b_p0 = rw & talarm;
+	wire __m55 = ~(~(~b_parz & ~b_p0) & bar_nb);
+	ffd __m66_2(.s(~__m55), .d(0), .clk(clo), .r(stop), .q(awaria));
+
+	assign zz1 = 1;
+
+	// >=5us
+	wire talarm;
+	univib #(.TICKS(250)) talarm_dly(.clk(), .a(0), .b(alarm), .q(talarm));
+
+	assign dad12 = ad_ad & pufa;
+	assign dad13 = ad_ad & ir7;
+	assign dad14 = ad_ad & ir8;
+	assign dad15_ir9 = ad_ad & ir9;
+
 endmodule
 
 // vim: tabstop=2 shiftwidth=2 autoindent noexpandtab
