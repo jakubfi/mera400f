@@ -3,21 +3,17 @@ module rb(
 	input w_rba,
 	input w_rbb,
 	input w_rbc,
-	output [0:15] rb
+	output reg [0:15] rb
 );
 
-	reg [0:15] r;
-
 	always @ (negedge w_rbc)
-		r[0:3] = w[12:14];
+		rb[0:3] <= w[12:14];
 
 	always @ (negedge w_rbb)
-		r[4:9] = w[10:15];
+		rb[4:9] <= w[10:15];
 
 	always @ (negedge w_rba)
-		r[10:15] = w[10:15];
-
-	assign rb = r;
+		rb[10:15] <= w[10:15];
 
 endmodule
 

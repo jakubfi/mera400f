@@ -122,7 +122,7 @@ module p_r(
 	// * R0 control signals
 
 	assign zgpn = rpn ^ 1'b1;
-	assign dpn = ~((1'b0 ^ bs) & bp_nb) & ~(1'b0 & pn_nb);
+	assign dpn = ~((1'b0 ^ bs) & bp_nb) & ~(1'b0 & pn_nb); // NOTE: pn_nb not used due to 1cpu configuration?
 	assign dqb = q_nb & q;
 	reg __bs;
 	always @ (negedge cnb0_3, negedge clm) begin
@@ -175,7 +175,7 @@ module p_r(
 	assign ki =
 		(sel == 2'b00) ? rz :
 		(sel == 2'b01) ? {rs[0:9], bs, q, nb[0:3]} :
-		(sel == 2'b10) ? rb :
+		(sel == 2'b10) ? rRB :
 		zp;
 
 endmodule

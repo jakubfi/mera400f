@@ -11,7 +11,7 @@
 module r0 (
 	// buses
 	input [0:15] w,
-	output [0:8] r0,
+	output reg [0:8] r0,
 	// data signals
 	input zs, s_1, s0, carry,
 	input vl, vg, exy, exx,
@@ -27,8 +27,9 @@ module r0 (
 	input zer
 );
 
-	reg [0:8] tr0;
-	initial tr0 = 9'b0;
+	initial begin
+		r0 = 9'b0;
+	end
 
 	// --- R00, Z flag --------------------------------------------------------
 	wire set0, clk0, reset0;
@@ -38,9 +39,9 @@ module r0 (
 	assign reset0 = ~((set0 & w_zmvc) | zer);
 
 	always @ (posedge clk0, negedge set0, negedge reset0) begin
-		if (!reset0) tr0[0] <= 1'b0;
-		else if (!set0) tr0[0] <= 1'b1;
-		else tr0[0] <= zs;
+		if (!reset0) r0[0] <= 1'b0;
+		else if (!set0) r0[0] <= 1'b1;
+		else r0[0] <= zs;
 	end
 
 	// --- R01, M flag --------------------------------------------------------
@@ -51,9 +52,9 @@ module r0 (
 	assign reset1 = ~((set1 & w_zmvc) | zer);
 
 	always @ (posedge clk1, negedge set1, negedge reset1) begin
-		if (!reset1) tr0[1] <= 1'b0;
-		else if (!set1) tr0[1] <= 1'b1;
-		else tr0[1] <= s_1;
+		if (!reset1) r0[1] <= 1'b0;
+		else if (!set1) r0[1] <= 1'b1;
+		else r0[1] <= s_1;
 	end
 
 	// --- R02, V flag --------------------------------------------------------
@@ -65,9 +66,9 @@ module r0 (
 	assign reset2 = ~((set2 & w_zmvc) | (zero_v ^ zer));
 
 	always @ (negedge clk2, negedge set2, negedge reset2) begin
-		if (!reset2) tr0[2] <= 1'b0;
-		else if (!set2) tr0[2] <= 1'b1;
-		else tr0[2] <= j2;
+		if (!reset2) r0[2] <= 1'b0;
+		else if (!set2) r0[2] <= 1'b1;
+		else r0[2] <= j2;
 	end
 
 	// --- R03, C flag --------------------------------------------------------
@@ -80,13 +81,13 @@ module r0 (
 	assign reset3 = ~((set3 & w_zmvc) | zer);
 
 	always @ (negedge clk3, negedge set3, negedge reset3) begin
-		if (!reset3) tr0[3] <= 1'b0;
-		else if (!set3) tr0[3] <= 1'b1;
+		if (!reset3) r0[3] <= 1'b0;
+		else if (!set3) r0[3] <= 1'b1;
 		else case ({j3, k3})
-			2'b00: tr0[3] <= tr0[3];
-			2'b01: tr0[3] <= 1'b0;
-			2'b10: tr0[3] <= 1'b1;
-			2'b11: tr0[3] <= ~tr0[3];
+			2'b00: r0[3] <= r0[3];
+			2'b01: r0[3] <= 1'b0;
+			2'b10: r0[3] <= 1'b1;
+			2'b11: r0[3] <= ~r0[3];
 		endcase
 	end
 
@@ -98,9 +99,9 @@ module r0 (
 	assign reset4 = ~(w[4] & w_legy);
 
 	always @ (posedge clk4, negedge reset4, negedge set4) begin
-		if (!reset4) tr0[4] <= 1'b0;
-		else if (!set4) tr0[4] <= 1'b1;
-		else tr0[4] <= ~vl;
+		if (!reset4) r0[4] <= 1'b0;
+		else if (!set4) r0[4] <= 1'b1;
+		else r0[4] <= ~vl;
 	end
 
 	// --- R05, E flag --------------------------------------------------------
@@ -111,9 +112,9 @@ module r0 (
 	assign set5 = ~(w[5] & w_legy);
 
 	always @ (posedge clk5, negedge reset5, negedge set5) begin
-		if (!reset5) tr0[5] <= 1'b0;
-		else if (!set5) tr0[5] <= 1'b1;
-		else tr0[5] <= zs;
+		if (!reset5) r0[5] <= 1'b0;
+		else if (!set5) r0[5] <= 1'b1;
+		else r0[5] <= zs;
 	end
 
 	// --- R06, G flag --------------------------------------------------------
@@ -124,9 +125,9 @@ module r0 (
 	assign reset6 = ~(w[6] & w_legy);
 
 	always @ (posedge clk6, negedge reset6, negedge set6) begin
-		if (!reset6) tr0[6] <= 1'b0;
-		else if (!set6) tr0[6] <= 1'b1;
-		else tr0[6] <= vg;
+		if (!reset6) r0[6] <= 1'b0;
+		else if (!set6) r0[6] <= 1'b1;
+		else r0[6] <= vg;
 	end
 
 	// --- R07, Y flag --------------------------------------------------------
@@ -137,9 +138,9 @@ module r0 (
 	assign reset7 = ~(w[7] & w_legy);
 
 	always @ (posedge clk7, negedge reset7, negedge set7) begin
-		if (!reset7) tr0[7] <= 1'b0;
-		else if (!set7) tr0[7] <= 1'b1;
-		else tr0[7] <= exy;
+		if (!reset7) r0[7] <= 1'b0;
+		else if (!set7) r0[7] <= 1'b1;
+		else r0[7] <= exy;
 	end
 
 	// --- R08, X flag --------------------------------------------------------
@@ -150,12 +151,10 @@ module r0 (
 	assign reset8 = ~(w[8] & w8_x);
 
 	always @ (posedge clk8, negedge reset8, negedge set8) begin
-		if (!reset8) tr0[8] <= 1'b0;
-		else if (!set8) tr0[8] <= 1'b1;
-		else tr0[8] <= exx;
+		if (!reset8) r0[8] <= 1'b0;
+		else if (!set8) r0[8] <= 1'b1;
+		else r0[8] <= exx;
 	end
-
-	assign r0 = tr0;
 
 endmodule
 
