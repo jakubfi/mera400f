@@ -44,6 +44,7 @@ module p_m(
 	input k1,
 	output laduj,
 	output k2_bin_store,
+	output k2fetch,
 	output w_rbc__,
 	output w_rba__,
 	output w_rbb__,
@@ -214,7 +215,7 @@ module p_m(
 
 	wire __m76 = ~hlt_n & ~stop__ & ~clo;
 	wire __m44 = ~(pon & work);
-	ffd __start(.s(~start__), .r(__m76), .d(1), .q(start), .clk(_m44));
+	ffd __start(.s(~start__), .r(__m76), .d(1), .q(start), .clk(__m44));
 
 	wire __m43 = __m44 & ~si1;
 	ffd __wait(.s(0), .r(__m43), .d(hlt), .q(_wait), .clk(wx));
@@ -237,7 +238,7 @@ module p_m(
 	wire __m43_11 = ~clo & ~__pc_q;
 	wire __m13_11;
 	ffjk __m13(.s(ekc_fp), .r(__m43_11), .clk(got), .j(~__m27), .k(0), .q(__m13_11));
-	wire __kc_q;
+	wire __kc_q, __pc_q;
 	// TODO: actual timings
 	univib __kc(.clk(clk), .a(0), .b(__m13_11), .q(__kc_q));
 
@@ -245,10 +246,10 @@ module p_m(
 	univib __pc(.clk(clk), .a(__kc_q), .b(1), .q(__pc_q));
 
 	wire rescyc = ~clm & ~strob2 & ~si1;
-
+	wire pr;
 	ffd __pr(.s(~rescyc), .r(0), .d(~dpr), .q(pr), .clk(__kc_q));
-	ffd __przerw(.s(0), .r(0), .d(~drzperw), .q(przerw), .clk(__kc_q));
-
+	assign sp0 = ~pr & przerw & ~__kc_q;
+	ffd __przerw(.s(0), .r(0), .d(~dprzerw), .q(przerw), .clk(__kc_q));
 	assign si1 = ~(__kc_q & ~przerw);
 	assign sp1 = przerw & ~pr & __kc_q;
 	wire zerstan = ~(~__pc_q & ~clm & ~p0);
@@ -257,13 +258,15 @@ module p_m(
 	//  * ff: FETCH, STORE, LOAD, BIN (bootstrap)
 
 	wire __m30 = strob2 & k2;
+	wire __m14_12 = ~(rdt9 & rdt11 & lg_0);
+	wire __m47_8 = ~(strob1 & k1);
 
 	wire bin, load, fetch, store;
 
 	ffd __store(.s(panel_store), .d(0), .clk(__m30), .r(clm), .q(store));
 	ffd __fetch(.s(panel_fetch), .d(0), .clk(__m30), .r(clm), .q(fetch));
 	ffd __load(.s(panel_load), .d(0), .clk(__m30), .r(clm), .q(load));
-	ffd __bin(.s(panel_bin), .d(), .clk(), .r(clm), .q(bin));
+	ffd __bin(.s(panel_bin), .d(__m14_12), .clk(__m47_8), .r(clm), .q(bin));
 
 	assign laduj = load;
 	wire sfl = ~(~store & ~load & ~fetch);
@@ -295,7 +298,7 @@ module p_m(
 	assign ek1 = ~(~(p0_k2 & bin) & ~(k1 & bin & ~lg_3));
 	// TODO: no sign on schematic
 	wire lg_plus_1 = ~((bin & k2) | (k1 & rdt9));
-	// TODO: no sign on schematic
+	// TODO: no sign on schematic, not connected anywhere
 	wire zero_lg = ~rdt9 & k1s1 & rok;
 
 	// sheet 5, page 2-14
@@ -304,6 +307,8 @@ module p_m(
 
 	wire __m31 = ~((~js & bcoc__) | (zs));
 	wire __m43_8 = ~(p2 & strob1) & ~clm;
+	wire __m46 = ~(ssp__ & strob1 & w__);
+	wire __m45 = ~(strob1 & rok & ~inou & wm);
 	wire p_;
 	ffd __p(.s(~__m43_8), .d(__m31), .clk(__m46), .r(__m45), .q(p_));
 	assign p = ~p_;
@@ -319,9 +324,9 @@ module p_m(
 	assign mc_3 = &__mc;
 	assign mc = ~|__mc;
 
-	wire __m77 = ~(~reswd & ~(~md & p4));
+	wire __m77 = ~(~reswp & ~(~md & p4));
 
-	wire reswd = ~(__m43_8 & ~(sc__ & strob2 & p1));
+	wire reswp = ~(__m43_8 & ~(sc__ & strob2 & p1));
 	assign xi__ = ~p & p1 & strob2 & xi;
 
 	// sheet 6, page 2-15
@@ -332,6 +337,7 @@ module p_m(
 	ffd __wm(.s(0), .d(__m86), .clk(strob2), .r(xi), .q(wm));
 
 	wire __m88 = pr & ~b0 & na;
+	wire wb;
 	ffjk __wb(.s(0), .j(__m88), .clk(~strob1), .k(p4), .r(zerstan), .q(wb));
 	wire wpp;
 	ffjk __wp(.s(setwp), .j(0), .clk(~strob1), .k(p4), .r(reswp), .q(wpp));
@@ -372,7 +378,7 @@ module p_m(
 
 	wire __m98_6 = ~(wm & p2);
 
-	assign ipc1 = ~(__m98_6 & ~p1 & ~ic_1);
+	assign icp1 = ~(__m98_6 & ~p1 & ~ic_1);
 
 	// sheet 8, page 2-17
 
@@ -420,8 +426,6 @@ module p_m(
 	// sheet 10, page 2-19
 	//  * general register selectors
 
-	wire _7_rkod;
-
 	//rc = (rsc & p0_k2) | (ir10 & p4) | (ir13 & p3) | (_7_rkod) | (0 & rlp_fp) | (lgc & w);
 	//rb = (ir14 & p3) | (ir11 & p4) | (rsb & p0_k2) | (_7_rkod) | (rlp_fp & lpb) | (lgb & w);
 	//ra = (_7_rkod) | (ir15 & p3) | (p4 & ir12) | (p0_k2 & rsa) | (w & lga) | (rlp_fp & lpa);
@@ -433,7 +437,7 @@ module p_m(
 	// sheet 11, page 2-20
 	//  * step counter (licznik kroków)
 
-	wire lk1, lk2, lk3, lk4;
+	wire lk0, lk1, lk2, lk3;
 
 	wire __m64_8 = (ir9 & gr) | (ir8 & gr) | (inou & bod) | (ir15 & shc);
 	wire __m65_6 = ~((shc & ir14) | gr);
@@ -465,7 +469,7 @@ module p_m(
 	reg __wls;
 	assign wls = __wls;
 	wire __wls_1 = wa & ls;
-	always @ (posedge __wls_1) begin
+	always @ (__wls_1) begin
 		if (__wls_1) __wls <= 1'b1;
 		else __wls <= 1'b0;
 	end
@@ -482,7 +486,7 @@ module p_m(
 	wire __m50 = (ur & wre) | (lipsp__ & lg_1 & i3) | (lwtsr & wp) | (wa & rjcpc);
 	wire __m66 = (wr & sar__) | (zb__ & we) | (lar__ & w__) | (wm & in & rok);
 	assign w_r = ~(~__m50 & ~s_fp & ~__m66);
-	wire _t_rkod = (w__ & bs) | (ls & we);
+	wire _7_rkod = (w__ & bs) | (ls & we);
 
 	// sheet 14, page 2-23
 	//  * W bus to IC, AC, AR microoperations
@@ -536,7 +540,7 @@ module p_m(
 
 	wire pb_;
 	wire pb = ~pb_;
-	ffd __pb(.s(~lrcb), .d(at15), .clk(~str1wx), .r(0), .q(pb_));
+	ffd __pb(.s(~lrcb__), .d(at15), .clk(~str1wx), .r(0), .q(pb_));
 	assign wprb = pb;
 	wire mwax = (i3_ex_prz & lg_3) | (wp & ~pac) | (ri & ww) | (wac & psr);
 	wire mwbx = (~pat & wp) | (srez__ & ww);
@@ -555,7 +559,7 @@ module p_m(
 	wire __m73 = ~((k2 & load) | (psr & wkb) | (ir6 & wa & rc));
 	assign mwa = __m56 & ~mwax & ~dt_w & ~wirpsr & f13;
 	assign mwb = __m56 & ~f13 & ~wirpsr & ~mwbx & ~we & ~w__ & ~p4 & __m73;
-	assign mwc = ~wirpsr & ~dt_w & __m73 & ~(wa & lrcb);
+	assign mwc = ~wirpsr & ~dt_w & __m73 & ~(wa & lrcb__);
 
 endmodule
 
