@@ -2,7 +2,7 @@
 # --- Project configuration -------------------------------------------------
 
 PROJECT = mera400f
-TOPLEVEL = p_p
+TOPLEVEL = p_a
 SOURCES_DIR = src
 SOURCES = mera400f.v \
 	counter4.v \
@@ -13,7 +13,8 @@ SOURCES = mera400f.v \
 	p_d.v ir.v \
 	p_x.v \
 	p_m.v \
-	p_p.v rm.v rzp.v
+	p_p.v rm.v rzp.v \
+	p_a.v
 TESTS_DIR = tests
 TESTS = regs.v p_d.v
 ASSIGNMENTS = $(SOURCES_DIR)/assignments.qsf
