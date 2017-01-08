@@ -162,7 +162,7 @@ module p_p(
 	wire __m11_3 = ~(~rdt15 & ~zgpn);
 	wire __m12_6 = ~(__m11_3 & ~rdt15);
 	wire __m9_5;
-	ffd_ __dok(.s_(1), .d(__m12_6), .c(~__m14_6), .r_(~__m12_3), .q(__m9_5));
+	ffd __dok(.s_(1), .d(__m12_6), .c(~__m14_6), .r_(~__m12_3), .q(__m9_5));
 	assign dok = rin & __m9_5;
 
 	wire _rz29 = __m14_6 & rdt15 & rdt0;

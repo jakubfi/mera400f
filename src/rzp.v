@@ -12,11 +12,11 @@ module rzp(
 	output prio_out	// interrupt priority chain output
 );
 
-	ffjk_ __rz(.c_(ckrz_), .j(w), .k(rp), .r_(zerrz_), .s_(intr_), .q(rz));
+	ffjk __rz(.c_(ckrz_), .j(w), .k(rp), .r_(zerrz_), .s_(intr_), .q(rz));
 
 	assign sz = ~(rz & imask);
 
-	ffd_ __rp(.s_(prio_in_), .d(sz), .c(ckrp), .r_(1'b1), .q(rp));
+	ffd __rp(.s_(prio_in_), .d(sz), .c(ckrp), .r_(1'b1), .q(rp));
 
 	assign prio_out = ~rp & prio_in_;
 

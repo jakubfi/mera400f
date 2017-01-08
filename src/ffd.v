@@ -1,4 +1,4 @@
-module ffd_(
+module ffd(
 	input c, d, r_, s_,
 	output reg q
 );

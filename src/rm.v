@@ -4,7 +4,7 @@ module rmx(
 );
 
 	wire __r_ = ~(~zi & clm__);
-	ffd_ r(.s_(1'b1), .d(~w_), .c(clrs), .r_(__r_), .q(rs));
+	ffd r(.s_(1'b1), .d(~w_), .c(clrs), .r_(__r_), .q(rs));
 
 endmodule
 

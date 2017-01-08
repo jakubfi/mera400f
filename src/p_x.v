@@ -312,23 +312,23 @@ module p_x(
 	wire zgi;
 	wire __m64 = ~sr_fp & ~si1 & ~sp1;
 	wire __m16_6 = ~((~wm & ~i2 & ~wr & ~ww) & ~read_fp & (~i1 & ~i3 & ~i4 & ~i5) & (~k2fbs & ~p1 & ~p5 & ~k1));
-	ffjk jk47_1(.s(~__m64), .j(__m16_6), .clk(gotst1), .k(zgi), .r(clo), .q(zgi));
+	ffjk __jk47_1(.s_(__m64), .j(__m16_6), .c_(~gotst1), .k(zgi), .r_(~clo), .q(zgi));
 	wire zwzg = ~(~zgi & zw1);
 	assign zg = ~(~zgi & ~__m47_q & ~(zw & oken));
 	wire zw = zw1;
 
 	wire __m46 = ~clo & ~(strob2 & w__ & wzi);
-	ffjk jk47_2(.s(0), .j(srez__ & wr), .clk(ok__), .k(__m47_q), .r(~__m46), .q(__m47_q));
+	ffjk __jk47_2(.s_(1), .j(srez__ & wr), .c_(~ok__), .k(__m47_q), .r_(__m46), .q(__m47_q));
 	wire ad_ad = zw & zgi & (i4 & __m37_q);
 	wire alarm = ~ok__ & zwzg;
 
 	wire __m57 = ~ren & ~talarm & ~rok;
-	ffjk jk37_1(.s(0), .j(zwzg), .clk(~__m57), .k(1), .r(~zgi), .q(ok__));
+	ffjk __jk37_1(.s_(1), .j(zwzg), .c_(__m57), .k(1), .r_(zgi), .q(ok__));
 	wire oken = ~(~ren & ~rok);
 
 	// NOTE .j(~efp) if no AWP
 	wire __m37_q;
-	ffjk jk37_2(.s(0), .j(0), .clk(got), .k(i5), .r(clo), .q(__m37_q));
+	ffjk __jk37_2(.s_(1), .j(0), .c_(~got), .k(i5), .r_(~clo), .q(__m37_q));
 	// NOTE: & ~efp if no AWP
 	wire exr = ~(~__m37_q & ~exl);
 
@@ -336,14 +336,14 @@ module p_x(
 
 	wire __m59 = zwzg & rw;
 	wire __m61 = stop_n & zga & __m59;
-	ffd __m66_1(.s(~__m55), .d(__m61), .clk(~strob1_int), .r(~__m59), .q(hlt_n));
+	ffd __m66_1(.s_(__m55), .d(__m61), .c(strob1_int), .r_(__m59), .q(hlt_n));
 
 	assign bod = ~(~rpe & ~ren);
 
 	assign b_parz = strob1_int & rpe & r;
 	assign b_p0 = rw & talarm;
 	wire __m55 = ~(~(~b_parz & ~b_p0) & bar_nb);
-	ffd __m66_2(.s(~__m55), .d(0), .clk(clo), .r(stop), .q(awaria));
+	ffd __m66_2(.s_(__m55), .d(0), .c(~clo), .r_(~stop), .q(awaria));
 
 	assign zz1 = 1;
 

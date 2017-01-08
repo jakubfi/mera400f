@@ -1,4 +1,4 @@
-module ffjk_(
+module ffjk(
 	input c_, j, k, r_, s_,
 	output reg q
 );
