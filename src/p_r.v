@@ -73,20 +73,21 @@ module p_r(
 	// sheet 1, page 2-58
 	// * user register control signals
 
-	wire __rabc_ = ~(~ra & ~rb & ~rc);
-	wire __rpcwa_ = ~(rpc & wa);
+	wire __m53_6 = ~(~ra & ~rb & ~rc);
+	wire __m60_6 = ~(rpc & wa);
 
 	wire rpp = blr;
-	wire rpa = ~blr & ~(__rpcwa_ & __rabc_);
+	wire rpa = ~blr & ~(__m60_6 & __m53_6);
 	wire rpb = rpa;
-	wire lro = ~(lpc & wa & strob_a);
-	wire czytrw = ~blr & rc & __rpcwa_;
+
+	wire lr0 = ~(lpc & wa & strob_a);
+	wire czytrw = ~blr & rc & __m60_6;
 	wire wr0 = ~ra & ~rb & ~rc;
-	wire czytrn = ~blr & ~rc & __rpcwa_ & __rabc_;
-	wire __piszrn = __rabc_ & ~rc & w_r;
-	wire piszrn = (strob_a & __piszrn) | (strob_b & __piszrn);
-	wire __piszrw = rc & w_r;
-	wire piszrw = (strob_a & __piszrw) | (strob_b & __piszrw);
+	wire czytrn = ~blr & ~rc & __m60_6 & __m53_6;
+	wire __m63_12 = __m53_6 & ~rc & w_r;
+	wire piszrn = (strob_a & __m63_12) | (strob_b & __m63_12);
+	wire __m64_6 = rc & w_r;
+	wire piszrw = (strob_a & __m64_6) | (strob_b & __m64_6);
 
 	wire strob_a = ~(~strob1 | ~w_r);
 	wire strob_b = ~(~strob2 | ~as2);
@@ -94,9 +95,8 @@ module p_r(
 	// sheets 2..5, pages 2-59..2-62
 	// * R1-R7 user registers
 
-	wire [0:15] _l;
-	assign l = _l;
-	regs u_regs(.w(w), .l(_l), .czytrn(czytrn), .piszrn(piszrn), .czytrw(czytrw), .piszrw(piszrw), .ra(ra), .rb(rb));
+	wire [0:15] __l_regs;
+	regs u_regs(.w(w), .l(__l_regs), .czytrn(czytrn), .piszrn(piszrn), .czytrw(czytrw), .piszrw(piszrw), .ra(ra), .rb(rb));
 
 	// sheet 6, page 2-63
 	// * RB register (binary load register)
@@ -104,18 +104,16 @@ module p_r(
 	// * R0 register positions 10-15 and system bus drivers
 
 	wire [0:15] rRB;
-	wire [0:15] __r0;
-	rb u_rb(.w(w[10:15]), .w_rba(w_rba), .w_rbb(w_rbb), .w_rbc(w_rbc), .rb(rRB));
+	rb __rb(.w(w[10:15]), .w_rba_(~w_rba), .w_rbb_(~w_rbb), .w_rbc_(~w_rbc), .rb(rRB));
+
 	wire [0:3] nb;
-	reg [0:3] __nb;
-	always @ (negedge cnb0_3, negedge clm) begin
-		if (~clm) __nb = 0;
-		else __nb = w[12:15];
-	end
-	assign nb = __nb;
-	assign dnb = ~(nb & {4{bar_nb}});
-	r0_9_15 u_r0_9_15(.w(w[9:15]), .lrp(lrp), .zer(zer), .r0(__r0[9:15]));
-	assign l[9:15] = ~(~__r0[9:15] & {7{rpb}});
+	nb __nb(.w(w[12:15]), .cnb_(~cnb0_3), .clm_(~clm), .nb(nb));
+	assign dnb = nb & {4{bar_nb}};
+
+	wire [0:15] __r0_;
+	r0_9_15 u_r0_9_15(.w(w[9:15]), .lrp(lrp), .zer_(~zer), .r0_(__r0_[9:15]));
+
+	wire [9:15] __l_r0 = ~(__r0_[9:15] & {7{rpb}});
 
 	// sheet 7, page 2-64
 	// * Q and BS flag registers and system bus drivers
@@ -124,34 +122,29 @@ module p_r(
 	assign zgpn = rpn ^ 1'b1;
 	assign dpn = ~((1'b0 ^ bs) & bp_nb) & ~(1'b0 & pn_nb); // NOTE: pn_nb not used due to 1cpu configuration?
 	assign dqb = q_nb & q;
-	reg __bs;
-	always @ (negedge cnb0_3, negedge clm) begin
-		if (~clm) __bs = 1'b0;
-		else __bs <= w[11];
-	end
-	wire bs = __bs;
+
+	wire bs;
+	ffd __bs(.c(~cnb0_3), .d(w[11]), .r_(~clm), .s_(1), .q(bs));
+
 	wire cnb0_3 = w_bar & strob1;
-	reg __q;
-	always @ (negedge cnb0_3, negedge zer) begin
-		if (~zer) __q = 1'b0;
-		else __q <= w[10];
-	end
-	assign q = __q;
+
+	ffd __q(.c(~cnb0_3), .d(w[10]), .r_(~zer), .s_(1), .q(q));
+
 	assign zer = ~(~zer_fp & ~clm);
 
-	wire vg = (~aryt & ~(zs & ~carry)) | (~(zs & s_1));
+	wire vg = (~aryt & ~(zs | ~carry)) | (aryt & ~(zs | s_1));
 	wire vl = (~aryt & ~carry) | (aryt & s_1);
 
-	wire __s_ustr0_fp_ = ~(strob_a & ~ustr0_fp);
-	wire __s_wr0_a = ~(strob_a & w_r & wr0 & ~q); // TODO: w_r is a guess (no connection on the schematic)
-	wire __s_wr0_b = ~(strob_b & ~q & wr0 & w_r); // TODO: w_r is a guess (no connection on the schematic)
-	wire __s_wr_b = ~(strob_b & w_r & wr0);
-	wire __s_wr_a = ~(strob_a & w_r & wr0); // TODO: w_r is a guess (no connection on the schematic)
+	wire __m60_3 = ~(strob_a & ~ustr0_fp);
+	wire __m62_6 = ~(strob_a & w_r & wr0 & ~q); // TODO: w_r is a guess (no connection on the schematic)
+	wire __m62_8 = ~(strob_b & ~q & wr0 & w_r); // TODO: w_r is a guess (no connection on the schematic)
+	wire __m61_12 = ~(strob_b & w_r & wr0);
+	wire __m61_8 = ~(strob_a & w_r & wr0); // TODO: w_r is a guess (no connection on the schematic)
 
-	wire w_zmvc = ~(__s_ustr0_fp_ & lro & __s_wr0_b & __s_wr0_a);
-	wire w_legy = ~(__s_wr0_a & lro & __s_wr0_b);
-	wire lrp = lro & __s_wr_a & __s_wr_b;
-	wire w8_x = ~(__s_wr_b & lro & __s_wr_a);
+	wire w_zmvc = ~(__m60_3 & lr0 & __m62_8 & __m62_6);
+	wire w_legy = ~(__m62_6 & lr0 & __m62_8);
+	wire lrp = lr0 & __m61_8 & __m61_12;
+	wire w8_x = ~(__m61_12 & lr0 & __m61_8);
 	wire cleg = strob_b & ust_leg;
 
 	// sheets 8..9, pages 2-65..2-66
@@ -161,12 +154,19 @@ module p_r(
 	.strob1(strob1), .ust_z(ust_z),
 	.ust_v(ust_v), .ust_mc(ust_mc), .ust_y(ust_y), .ust_x(ust_x), .cleg(cleg), .w_zmvc(w_zmvc), .w_legy(w_legy),
 	.w8_x(w8_x), .zero_v(zero_v), .zer(zer));
+
 	// assignments below are on pages 2-59..2-62
-	assign l[0:3] = ~(~r0[0:3] & {4{rpa}});
-	assign l[4:7] = ~(~r0[4:7] & {4{rpa}});
-	assign l[8] = ~(~r0[8] & rpb);
-	assign l[8:11] = ~(~r0[0:3] & {4{rpp}});
-	assign l[12:15] = ~(~r0[4:7] & {4{rpp}});
+	wire [0:8] __l_flags;
+	wire [8:15] __l_flags2;
+	assign __l_flags[0:3] = ~(~r0[0:3] & {4{rpa}});
+	assign __l_flags[4:7] = ~(~r0[4:7] & {4{rpa}});
+	assign __l_flags[8] = ~(~r0[8] & rpb);
+
+	assign __l_flags2[8:11] = ~(~r0[0:3] & {4{rpp}});
+	assign __l_flags2[12:15] = ~(~r0[4:7] & {4{rpp}});
+
+	// L bus final open-collector composition
+	assign l = __l_regs & {{9{1'b1}}, __l_r0} & {__l_flags, {7{1'b1}}} & {{8{1'b1}}, __l_flags2};
 
 	// sheets 10..11, pages 2-67..2-68
 	// * KI bus

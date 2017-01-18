@@ -1,18 +1,18 @@
 module rb(
 	input [10:15] w,
-	input w_rba,
-	input w_rbb,
-	input w_rbc,
+	input w_rba_,
+	input w_rbb_,
+	input w_rbc_,
 	output reg [0:15] rb
 );
 
-	always @ (negedge w_rbc)
+	always @ (posedge w_rbc_)
 		rb[0:3] <= w[12:14];
 
-	always @ (negedge w_rbb)
+	always @ (posedge w_rbb_)
 		rb[4:9] <= w[10:15];
 
-	always @ (negedge w_rba)
+	always @ (posedge w_rba_)
 		rb[10:15] <= w[10:15];
 
 endmodule

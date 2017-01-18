@@ -39,8 +39,8 @@ module r0 (
 	assign reset0 = ~((set0 & w_zmvc) | zer);
 
 	always @ (posedge clk0, negedge set0, negedge reset0) begin
-		if (!reset0) r0[0] <= 1'b0;
-		else if (!set0) r0[0] <= 1'b1;
+		if (~reset0) r0[0] <= 1'b0;
+		else if (~set0) r0[0] <= 1'b1;
 		else r0[0] <= zs;
 	end
 
@@ -52,8 +52,8 @@ module r0 (
 	assign reset1 = ~((set1 & w_zmvc) | zer);
 
 	always @ (posedge clk1, negedge set1, negedge reset1) begin
-		if (!reset1) r0[1] <= 1'b0;
-		else if (!set1) r0[1] <= 1'b1;
+		if (~reset1) r0[1] <= 1'b0;
+		else if (~set1) r0[1] <= 1'b1;
 		else r0[1] <= s_1;
 	end
 
@@ -62,27 +62,27 @@ module r0 (
 
 	assign j2 = s0 ^ s_1;
 	assign clk2 = ust_v & strob1;
-	assign set2 = ~(w[2] & w_zmvc);
 	assign reset2 = ~((set2 & w_zmvc) | (zero_v ^ zer));
+	assign set2 = ~(w[2] & w_zmvc);
 
 	always @ (negedge clk2, negedge set2, negedge reset2) begin
-		if (!reset2) r0[2] <= 1'b0;
-		else if (!set2) r0[2] <= 1'b1;
+		if (~reset2) r0[2] <= 1'b0;
+		else if (~set2) r0[2] <= 1'b1;
 		else r0[2] <= j2;
 	end
 
 	// --- R03, C flag --------------------------------------------------------
 	wire j3, k3, clk3, reset3, set3;
 
-	assign k3 = ~carry;
 	assign j3 = carry;
 	assign clk3 = ust_mc & strob1;
-	assign set3 = ~(w[3] & w_zmvc);
+	assign k3 = ~carry;
 	assign reset3 = ~((set3 & w_zmvc) | zer);
+	assign set3 = ~(w[3] & w_zmvc);
 
 	always @ (negedge clk3, negedge set3, negedge reset3) begin
-		if (!reset3) r0[3] <= 1'b0;
-		else if (!set3) r0[3] <= 1'b1;
+		if (~reset3) r0[3] <= 1'b0;
+		else if (~set3) r0[3] <= 1'b1;
 		else case ({j3, k3})
 			2'b00: r0[3] <= r0[3];
 			2'b01: r0[3] <= 1'b0;
@@ -94,85 +94,86 @@ module r0 (
 	// --- R04, L flag --------------------------------------------------------
 	wire set4, clk4, reset4;
 
+	assign set4 = ~(zer | (w_legy & reset4));
 	assign clk4 = ~cleg;
-	assign set4 = zer | (w_legy & reset4);
 	assign reset4 = ~(w[4] & w_legy);
 
+	// NOTE: negated output
 	always @ (posedge clk4, negedge reset4, negedge set4) begin
-		if (!reset4) r0[4] <= 1'b0;
-		else if (!set4) r0[4] <= 1'b1;
-		else r0[4] <= ~vl;
+		if (~reset4) r0[4] <= 1'b1;
+		else if (~set4) r0[4] <= 1'b0;
+		else r0[4] <= vl;
 	end
 
 	// --- R05, E flag --------------------------------------------------------
 	wire set5, clk5, reset5;
 
-	assign clk5 = ~cleg;
-	assign reset5 = zer | (w_legy & set5);
 	assign set5 = ~(w[5] & w_legy);
+	assign clk5 = ~cleg;
+	assign reset5 = ~(zer | (w_legy & set5));
 
 	always @ (posedge clk5, negedge reset5, negedge set5) begin
-		if (!reset5) r0[5] <= 1'b0;
-		else if (!set5) r0[5] <= 1'b1;
+		if (~reset5) r0[5] <= 1'b0;
+		else if (~set5) r0[5] <= 1'b1;
 		else r0[5] <= zs;
 	end
 
 	// --- R06, G flag --------------------------------------------------------
 	wire set6, clk6, reset6;
 
+	assign set6 = ~(zer | (w_legy & reset6));
 	assign clk6 = ~cleg;
-	assign set6 = zer | (w_legy & reset6);
 	assign reset6 = ~(w[6] & w_legy);
 
+	// NOTE: negated output
 	always @ (posedge clk6, negedge reset6, negedge set6) begin
-		if (!reset6) r0[6] <= 1'b0;
-		else if (!set6) r0[6] <= 1'b1;
+		if (~reset6) r0[6] <= 1'b1;
+		else if (~set6) r0[6] <= 1'b0;
 		else r0[6] <= vg;
 	end
 
 	// --- R07, Y flag --------------------------------------------------------
 	wire set7, clk7, reset7;
 
+	assign set7 = ~(zer | (w_legy & reset7));
 	assign clk7 = ~(ust_y & strob1);
-	assign set7 = zer | (w_legy & reset7);
 	assign reset7 = ~(w[7] & w_legy);
 
+	// NOTE: negated output
 	always @ (posedge clk7, negedge reset7, negedge set7) begin
-		if (!reset7) r0[7] <= 1'b0;
-		else if (!set7) r0[7] <= 1'b1;
+		if (~reset7) r0[7] <= 1'b1;
+		else if (~set7) r0[7] <= 1'b0;
 		else r0[7] <= exy;
 	end
 
 	// --- R08, X flag --------------------------------------------------------
 	wire set8, clk8, reset8;
 
+	assign set8 = ~(zer | (w8_x & reset8));
 	assign clk8 = ~(ust_x & strob1);
-	assign set8 = zer | (w8_x & reset8);
 	assign reset8 = ~(w[8] & w8_x);
 
+	// NOTE: negated output
 	always @ (posedge clk8, negedge reset8, negedge set8) begin
-		if (!reset8) r0[8] <= 1'b0;
-		else if (!set8) r0[8] <= 1'b1;
+		if (~reset8) r0[8] <= 1'b1;
+		else if (~set8) r0[8] <= 1'b0;
 		else r0[8] <= exx;
 	end
 
 endmodule
 
+// --------------------------------------------------------------------
 module r0_9_15(
 	input [9:15] w,
 	input lrp,
-	input zer,
-	output [9:15] r0
+	input zer_,
+	output reg [9:15] r0_
 );
 
-	reg [9:15] r;
-
-	always @ (posedge lrp, negedge zer) begin
-		if (~zer) r = 0;
-		else if (lrp) r = w;
+	always @ (posedge lrp, negedge zer_) begin
+		if (~zer_) r0_ <= 7'b0;
+		else if (lrp) r0_ <= w;
 	end
-
-	assign r0 = r;
 
 endmodule
 

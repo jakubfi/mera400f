@@ -2,7 +2,7 @@
 # --- Project configuration -------------------------------------------------
 
 PROJECT = mera400f
-TOPLEVEL = p_a
+TOPLEVEL = p_r
 SOURCES_DIR = src
 SOURCES = mera400f.v \
 	counter4.v \
@@ -10,7 +10,7 @@ SOURCES = mera400f.v \
 	decoder16.v decoder8.v \
 	univib.v \
 	alu181.v carry182.v \
-	p_r.v regs.v r0.v rb.v \
+	p_r.v regs.v r0.v rb.v nb.v \
 	p_d.v ir.v \
 	p_x.v \
 	p_m.v \
