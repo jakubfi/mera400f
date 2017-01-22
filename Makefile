@@ -26,6 +26,9 @@ ASSIGNMENTS = $(SOURCES_DIR)/assignments.qsf
 QSYS_SYNTH = VERILOG
 # See: https://github.com/jakubfi/altlogfilter (or comment out the line below)
 ALTLOGFILTER = alf -c --
+# Workaround for no error exit codes in iverilog:
+# fail when iverilogs prints "error" or "fail" on stdout
+TESTFILTER = | awk 'BEGIN{IGNORECASE=1}/error|fail/{code=1}{print}END{exit(code)}'
 
 FAMILY = CycloneII
 DEVICE = EP2C8Q208C8
@@ -150,7 +153,7 @@ ivtest: $(OBJS)
 
 %.bin: %.v $(SRCS)
 	iverilog -y $(SOURCES_DIR) -y $(TESTS_DIR) -o $@ $<
-	./$@
+	@./$@ $(TESTFILTER)
 
 # --- Cleanups -----------------------------------------------------------
 
