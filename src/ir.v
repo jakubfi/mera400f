@@ -6,23 +6,16 @@
 	pages:    2-30
 */
 
-/* synthesis ramstyle = "M4K" */
-
 module ir(
 	input [0:15] w,
-	input strob1,
+	input c,
 	input w_ir,
-	output [0:15] ir
+	output reg [0:15] ir
 );
 
-	reg [0:15] __ir;
-
-	wire __clk = strob1 & w_ir;
-	always @ (posedge __clk) begin
-		__ir <= w;
+	always @ (posedge c) begin
+		ir <= w;
 	end
-
-	assign ir = __ir;
 
 endmodule
 

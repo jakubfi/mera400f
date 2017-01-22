@@ -1,10 +1,10 @@
 module decoder16(
-	input [0:1] en,
+	input [0:1] en_,
 	input [0:3] i,
 	output [0:15] o
 );
 
-	wire s = &en;
+	wire s = &(~en_);
 	assign o[0]  = s & ~i[0] & ~i[1] & ~i[2] & ~i[3];
 	assign o[1]  = s & ~i[0] & ~i[1] & ~i[2] &  i[3];
 	assign o[2]  = s & ~i[0] & ~i[1] &  i[2] & ~i[3];

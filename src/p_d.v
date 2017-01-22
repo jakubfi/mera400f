@@ -142,7 +142,7 @@ module p_d(
 	// sheet 1, page 2-30
 	// * IR - instruction register
 
-	ir u_ir(.w(w), .strob1(strob1), .w_ir(w_ir), .ir(ir));
+	ir __ir(.w(w), .c(strob1 & w_ir), .w_ir(w_ir), .ir(ir));
 	assign c0 = ~|ir[13:15];
 	wire ir13_14 = |ir[13:14];
 
@@ -150,21 +150,21 @@ module p_d(
 	// * decoder for 2-arg instructions with normal argument (opcodes 020-036 and 040-057)
 	// * decoder for KA1 instruction group (opcodes 060-067)
 
-	wire si11 = si1 & ir[0];
-	wire si12 = si1 & ir[1];
+	wire si11 = ~(~si1 & ir[0]);
+	wire si12 = ~(~si1 & ir[1]);
 	wire ir01 = ~(~ir[1] & ~ir[0]);
 	assign sc__ = ~(~s & ~c);
-	wire sc = ~sc__;
-	assign oc__ = ~(ka2 & ir[7]);
+	wire sc = sc__;
+	assign oc__ = ka2 & ~ir[7];
 	wire gr = ~(~l & ~g);
-	assign gr__ = ~gr;
+	assign gr__ = gr;
 
 	wire lw, tw, rw, pw, bb, bm, bc, bn;
-	decoder16 dec_01(.en({~si11 ,  ir[1]}), .i(ir[2:5]), .o({lw, tw, ls, ri, rw, pw, rj, is, bb, bm, bs, bc, bn, ou, in, pufa}));
+	decoder16 dec_01(.en_({~si11 ,  ~ir[1]}), .i(ir[2:5]), .o({lw, tw, ls, ri, rw, pw, rj, is, bb, bm, bs, bc, bn, ou, in, pufa}));
 	wire aw, ac, sw, cw, _or, om, nr, nm, er, em, xr, xm, cl, lb;
-	decoder16 dec_10(.en({ ir[0], ~si12 }), .i(ir[2:5]), .o({aw, ac, sw, cw, _or, om, nr, nm, er, em, xr, xm, cl, lb, rb__, cb}));
+	decoder16 dec_10(.en_({~ir[0], ~si12 }), .i(ir[2:5]), .o({aw, ac, sw, cw, _or, om, nr, nm, er, em, xr, xm, cl, lb, rb__, cb}));
 	wire awt, trb, irb, drb, cwt, lwt, lws, rws, js, c, s, j, l, g, b_n;
-	decoder16 dec_11(.en({ ir[0],  ir[1]}), .i(ir[2:5]), .o({awt, trb, irb, drb, cwt, lwt, lws, rws, js, ka2, c, s, j, l, g, b_n}));
+	decoder16 dec_11(.en_({~ir[0], ~ir[1]}), .i(ir[2:5]), .o({awt, trb, irb, drb, cwt, lwt, lws, rws, js, ka2, c, s, j, l, g, b_n}));
 
 	// sheet 3, page 2-32
 	// * opcode field A register number decoder
@@ -172,28 +172,29 @@ module p_d(
 	// * B/N opcode group decoder
 	// * C opcode group decoder
 
-	wire [0:7] __a;
-	decoder8 dec_a(.en(1), .i(ir[7:9]), .o(__a));
-	wire snef = ~(&(~__a[5:7]));
+	wire [0:7] a_eq;
+	decoder8 dec_a(.en_(0), .i(ir[7:9]), .o(a_eq));
+	wire snef = ~(&(~a_eq[5:7]));
 
-	decoder8 dec_s(.en(s), .i(ir[7:9]), .o({hlt, mcl, sin, gi, lip}));
-	wire gmio = ~(~mcl & ~gi & ~inou__);
+	decoder8 dec_s(.en_(~s), .i(ir[7:9]), .o({hlt, mcl, sin, gi, lip}));
+	wire gmio = ~mcl & ~gi & ~inou__;
 	wire hsm = ~(~hlt & ~sin & ~__bn5);
 
 	wire __bn5;
-	decoder8 dec_bn(.en(b_n), .i(ir[7:9]), .o({mb, im, ki, fi, sp, __bn5, rz, ib}));
-	wire fimb = ~fi & ~im & ~mb;
+	decoder8 dec_bn(.en_(~b_n), .i(ir[7:9]), .o({mb, im, ki, fi, sp, __bn5, rz, ib}));
+	wire fimb = ~(~fi & ~im & ~mb);
 
+// ------8<------8<------8<------
 	wire b_1 = &ir[10:12];
 	wire [0:3] __null;
 	wire ngl, srz;
-	decoder8 dec_c(.en(c), .i({b_1, ir[15], ir[6]}), .o({__null, ngl, srz, rpc, lpc}));
+	decoder8 dec_c(.en_(c), .i({b_1, ir[15], ir[6]}), .o({__null, ngl, srz, rpc, lpc}));
 	wire pcrs = ~(~rpc & ~lpc & ~rc__ & ~sx);
 	assign shc = c & ir[11];
 
 	wire sx, __oth4, sly, slx, srxy;
 	wire __other_en = c & b0;
-	decoder8 dec_other(.en(__other_en), .i(ir[13:15]), .o({rc__, zb__, sx, ng__, __oth4, sly, slx, srxy}));
+	decoder8 dec_other(.en_(__other_en), .i(ir[13:15]), .o({rc__, zb__, sx, ng__, __oth4, sly, slx, srxy}));
 	wire sl = ~slx & ~__oth4 & ~sly;
 	assign b0 = &ir[10:12];
 
@@ -201,28 +202,28 @@ module p_d(
 	// * ineffective instructions
 	// * illegal instructions
 
-	assign md = __a[5] & b_n;
-	assign _0_v = js & ~__a[4] & we;
+	assign md = a_eq[5] & b_n;
+	assign _0_v = js & ~a_eq[4] & we;
 
 	wire __b34567 = ~(~ir[10] & ~(ir[11] & ir[12]));
 	wire __nef_1 = (inou__ & q) | (__b34567 & c) | (q & s) | (q & ~snef & b_n);
 
 	wire __nef_2 = (md & mc_3) | (c & ir13_14) | (b_1 & s);
 
-	wire __nef_jcs = ~(js & ~(r0[3] | __a[7]));
+	wire __nef_jcs = ~(js & ~(r0[3] | a_eq[7]));
 
-	wire __nef_jys = js & ~(r0[7] | ~__a[6]);
-	wire __nef_jxs = js & ~(r0[8] | ~__a[5]);
-	wire __nef_jvs = js & ~(r0[2] | ~__a[4]);
-	wire __nef_jm = __a[5] & ~(r0[1] | ~j);
+	wire __nef_jys = js & ~(r0[7] | ~a_eq[6]);
+	wire __nef_jxs = js & ~(r0[8] | ~a_eq[5]);
+	wire __nef_jvs = js & ~(r0[2] | ~a_eq[4]);
+	wire __nef_jm = a_eq[5] & ~(r0[1] | ~j);
 	wire __nef_j1 = ~(__nef_jys | __nef_jxs | __nef_jvs | __nef_jm);
 
-	wire __nef_jn = ~(~(~__a[6] | ~j) & r0[5]);
-	wire __nef_jz = __a[4] & ~(~j | r0[0]);
+	wire __nef_jn = ~(~(~a_eq[6] | ~j) & r0[5]);
+	wire __nef_jz = a_eq[4] & ~(~j | r0[0]);
 	wire __jjs_ = ~(~j & ~js);
-	wire __nef_jg = __jjs_ & ~(r0[6] | ~__a[3]);
-	wire __nef_je = __jjs_ & ~(r0[5] | ~__a[2]);
-	wire __nef_jl = __jjs_ & ~(r0[4] | ~__a[1]);
+	wire __nef_jg = __jjs_ & ~(r0[6] | ~a_eq[3]);
+	wire __nef_je = __jjs_ & ~(r0[5] | ~a_eq[2]);
+	wire __nef_jl = __jjs_ & ~(r0[4] | ~a_eq[1]);
 	wire __nef_j2 = ~(__nef_jz | __nef_jg | __nef_je | __nef_jl);
 
 	assign nef = ~(~__nef_1 & ir01 & ~__nef_2 & __nef_jcs & __nef_j1 & __nef_jn & ~p & __nef_j2);
@@ -307,9 +308,9 @@ module p_d(
 	assign ewa = (pcrs & pp) | (~(~ngl & ~ri & ~rj) & pp) | (we & (~wls & ls) | (~wpb & lbcb & wr));
 	wire prawy = lbcb & wpb;
 	assign ewp = (lrcb__ & wx) | (wx & sr__ & ~lk) | (rj & ~(~uj__ & ~lwt__));
-	assign uj__ = j & ~__a[7];
+	assign uj__ = j & ~a_eq[7];
 	assign lwt__ = ~(~lwt & ~lw);
-	assign lj = ~(~__a[7] | ~j);
+	assign lj = ~(~a_eq[7] | ~j);
 	assign ewe = (lj & ww) | (ls & ~wa) | (pp & ~(~llb & ~zb__ & ~js)) | (~wzi & krb & w__);
 
 	// sheet 10, page 2-39
