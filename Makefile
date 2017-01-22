@@ -7,11 +7,12 @@ SOURCES_DIR = src
 SOURCES = mera400f.v \
 	counter4.v \
 	ffd.v ffjk.v \
-	decoder16.v decoder8.v \
+	decoder16.v decoder_bcd.v \
 	univib.v \
 	alu181.v carry182.v \
+	latch16.v \
 	p_r.v regs.v r0.v rb.v nb.v \
-	p_d.v ir.v \
+	p_d.v \
 	p_x.v \
 	p_m.v \
 	p_p.v rm.v rzp.v \
