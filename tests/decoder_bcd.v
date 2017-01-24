@@ -1,12 +1,7 @@
 `timescale 1ns/100ps
+`include "tbassert.inc"
 
-module decoder_bcd_test();
-
-`define tbassert(signal, value) \
-	if (signal !== value) begin \
-		$display("FAILED: got %d, expected %d!", signal, value); \
-		$finish; \
-	end
+module test();
 
 	reg a, b, c, d;
 	wire [0:9] o_;

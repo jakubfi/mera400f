@@ -1,12 +1,7 @@
 `timescale 1ns/100ps
+`include "tbassert.inc"
 
-module latch16_test();
-
-`define tbassert(signal, value) \
-	if (signal !== value) begin \
-		$display("FAILED: got %d, expected %d!", signal, value); \
-		$finish; \
-	end
+module test();
 
 	reg [0:15] d;
 	reg c;

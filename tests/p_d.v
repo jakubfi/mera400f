@@ -1,12 +1,7 @@
 `timescale 1ns/100ps
+`include "tbassert.inc"
 
-module regs_tb();
-
-`define tbassert(signal, value) \
-	if (signal !== value) begin \
-		$display("FAILED: got %d, expected %d!", signal, value); \
-		$finish; \
-	end
+module test();
 
 	reg si1_, p_;
 	reg [0:8] r0;

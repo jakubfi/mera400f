@@ -1,6 +1,6 @@
 `timescale 1ns/100ps
 
-module alu_test();
+module test();
 
 	function [4:0] fn;
 		input m;

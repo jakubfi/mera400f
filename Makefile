@@ -152,7 +152,7 @@ $(SOPCINFO): $(SRCS_QSYS)
 ivtest: $(OBJS)
 
 %.bin: %.v $(SRCS)
-	iverilog -y $(SOURCES_DIR) -y $(TESTS_DIR) -o $@ $<
+	iverilog -y $(SOURCES_DIR) -I $(TESTS_DIR) -o $@ $<
 	@./$@ $(TESTFILTER)
 
 # --- Cleanups -----------------------------------------------------------

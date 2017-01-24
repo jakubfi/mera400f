@@ -1,10 +1,5 @@
 `timescale 1ns/100ps
-
-`define tbassert(signal, value) \
-	if (signal !== value) begin \
-		$display("FAILED: got %d, expected %d!", signal, value); \
-		$finish; \
-	end
+`include "tbassert.inc"
 
 module test();
 
