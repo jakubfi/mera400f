@@ -6,7 +6,7 @@ module nb(
 );
 
 	always @ (posedge cnb_, negedge clm_) begin
-		if (~clm_) nb <= 4'b0;
+		if (~clm_) nb <= 4'd0;
 		else nb <= w[12:15];
 	end
 

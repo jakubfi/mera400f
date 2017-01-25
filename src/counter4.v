@@ -7,11 +7,11 @@ module counter4(
 );
 
 	initial begin
-		o = 4'b0;
+		o = 4'd0;
 	end
 
 	always @ (posedge cd, posedge l, posedge r) begin
-		if (r) o <= 4'b0;
+		if (r) o <= 4'd0;
 		else if (l) o <= i;
 		else o <= o + 1'b1;
 	end

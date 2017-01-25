@@ -184,7 +184,7 @@ module p_a(
 	wire __ic_load = (w_ic & stroba) | (w_ic & strobb);
 
 	always @ (posedge __ic_cu, posedge __ic_load, posedge off) begin
-		if (off) ic <= 16'b0;
+		if (off) ic <= 16'd0;
 		else if (__ic_cu) ic <= ic + 1'b1;
 		else ic <= w;
 	end
@@ -192,17 +192,17 @@ module p_a(
 	// sheet 11, 12
 
 	wire [0:15] a;
-	assign a[0:7] = bac ? 8'b0 :
+	assign a[0:7] = bac ? 8'd0 :
 		{ab, aa} == 2'b00 ? l[8:15] :
 		{ab, aa} == 2'b01 ? ic[0:7] :
 		{ab, aa} == 2'b10 ? ar[0:7] :
 		l[0:7];
-	assign a[8:9] = bab ? 2'b0 :
+	assign a[8:9] = bab ? 2'd0 :
 		{ab, aa} == 2'b00 ? ir[8:9] :
 		{ab, aa} == 2'b01 ? ic[8:9] :
 		{ab, aa} == 2'b10 ? ar[8:9] :
 		l[8:9];
-	assign a[10:15] = baa ? 6'b0 :
+	assign a[10:15] = baa ? 6'd0 :
 		{ab, aa} == 2'b00 ? ir[10:15] :
 		{ab, aa} == 2'b01 ? ic[10:15] :
 		{ab, aa} == 2'b10 ? ar[10:15] :
@@ -212,7 +212,7 @@ module p_a(
 
 	assign dad = ar_ad ? ar :
 		ic_ad ? ic :
-		16'b0;
+		16'd0;
 
 	assign zga = (barnb == kl[0]) && (kl[1:15] == dad[1:15]);
 

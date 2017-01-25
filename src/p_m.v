@@ -317,7 +317,7 @@ module p_m(
 
 	reg [1:0] __mc;
 	always @ (posedge setwp, posedge __m77) begin
-		if (__m77) __mc <= 2'b0;
+		if (__m77) __mc <= 2'd0;
 		else __mc <= __mc + 1'b1;
 	end
 

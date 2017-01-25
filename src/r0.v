@@ -28,7 +28,7 @@ module r0 (
 );
 
 	initial begin
-		r0 = 9'b0;
+		r0 = 9'd0;
 	end
 
 	// --- R00, Z flag --------------------------------------------------------
@@ -171,7 +171,7 @@ module r0_9_15(
 );
 
 	always @ (posedge lrp, negedge zer_) begin
-		if (~zer_) r0_ <= 7'b0;
+		if (~zer_) r0_ <= 7'd0;
 		else if (lrp) r0_ <= w;
 	end
 
