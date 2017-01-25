@@ -2,7 +2,7 @@
 # --- Project configuration -------------------------------------------------
 
 PROJECT = mera400f
-TOPLEVEL = p_d
+TOPLEVEL = p_r
 SOURCES_DIR = src
 SOURCES = mera400f.v \
 	counter4.v \

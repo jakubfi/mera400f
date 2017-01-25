@@ -2,7 +2,7 @@ module nb(
 	input [12:15] w,
 	input cnb_,
 	input clm_,
-	output reg [0:4] nb
+	output reg [0:3] nb
 );
 
 	always @ (posedge cnb_, negedge clm_) begin

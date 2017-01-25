@@ -274,7 +274,11 @@ module p_d(
 	assign _0_v = ~js_ & ~a_eq_[4] & we;
 
 	wire M85_11 = ~(~ir[10] & ~(ir[11] & ir[12]));
-	wire M27_8 = ~((inou & q) | (M85_11 & c) | (q & ~s_) | (q & ~snef & ~b_n_));
+	`ifdef INOU_USER_ILLEGAL
+		wire M27_8 = ~((inou & q) | (M85_11 & c) | (q & ~s_) | (q & ~snef & ~b_n_));
+	`else
+		wire M27_8 = ~((1'b0 & q) | (M85_11 & c) | (q & ~s_) | (q & ~snef & ~b_n_));
+	`endif
 	wire M40_8 = ~((md & mc_3) | (c & ir13_14 & b_1) | (snef & ~s_));
 
 	wire M28_6 = ~(~(r0[3] | a_eq_[7]) & ~js_); // nef JCS

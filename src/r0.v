@@ -13,12 +13,12 @@ module r0 (
 	input [0:15] w,
 	output reg [0:8] r0,
 	// data signals
-	input zs, s_1, s0, carry,
-	input vl, vg, exy, exx,
+	input zs, s_1, s0, carry_,
+	input vl_, vg_, exy_, exx_,
 	// strobe signals
 	input strob1,
 	input ust_z, ust_v, ust_mc, ust_y, ust_x,
-	input cleg,
+	input cleg_,
 	// commands
 	input w_zmvc, w_legy,
 	input w8_x,
@@ -74,9 +74,9 @@ module r0 (
 	// --- R03, C flag --------------------------------------------------------
 	wire j3, k3, clk3, reset3, set3;
 
-	assign j3 = carry;
+	assign j3 = ~carry_;
 	assign clk3 = ust_mc & strob1;
-	assign k3 = ~carry;
+	assign k3 = carry_;
 	assign reset3 = ~((set3 & w_zmvc) | zer);
 	assign set3 = ~(w[3] & w_zmvc);
 
@@ -95,21 +95,21 @@ module r0 (
 	wire set4, clk4, reset4;
 
 	assign set4 = ~(zer | (w_legy & reset4));
-	assign clk4 = ~cleg;
+	assign clk4 = cleg_;
 	assign reset4 = ~(w[4] & w_legy);
 
 	// NOTE: negated output
 	always @ (posedge clk4, negedge reset4, negedge set4) begin
 		if (~reset4) r0[4] <= 1'b1;
 		else if (~set4) r0[4] <= 1'b0;
-		else r0[4] <= vl;
+		else r0[4] <= ~vl_;
 	end
 
 	// --- R05, E flag --------------------------------------------------------
 	wire set5, clk5, reset5;
 
 	assign set5 = ~(w[5] & w_legy);
-	assign clk5 = ~cleg;
+	assign clk5 = cleg_;
 	assign reset5 = ~(zer | (w_legy & set5));
 
 	always @ (posedge clk5, negedge reset5, negedge set5) begin
@@ -122,14 +122,14 @@ module r0 (
 	wire set6, clk6, reset6;
 
 	assign set6 = ~(zer | (w_legy & reset6));
-	assign clk6 = ~cleg;
+	assign clk6 = cleg_;
 	assign reset6 = ~(w[6] & w_legy);
 
 	// NOTE: negated output
 	always @ (posedge clk6, negedge reset6, negedge set6) begin
 		if (~reset6) r0[6] <= 1'b1;
 		else if (~set6) r0[6] <= 1'b0;
-		else r0[6] <= vg;
+		else r0[6] <= ~vg_;
 	end
 
 	// --- R07, Y flag --------------------------------------------------------
@@ -143,7 +143,7 @@ module r0 (
 	always @ (posedge clk7, negedge reset7, negedge set7) begin
 		if (~reset7) r0[7] <= 1'b1;
 		else if (~set7) r0[7] <= 1'b0;
-		else r0[7] <= exy;
+		else r0[7] <= ~exy_;
 	end
 
 	// --- R08, X flag --------------------------------------------------------
@@ -157,7 +157,7 @@ module r0 (
 	always @ (posedge clk8, negedge reset8, negedge set8) begin
 		if (~reset8) r0[8] <= 1'b1;
 		else if (~set8) r0[8] <= 1'b0;
-		else r0[8] <= exx;
+		else r0[8] <= ~exx_;
 	end
 
 endmodule
@@ -172,7 +172,7 @@ module r0_9_15(
 
 	always @ (posedge lrp, negedge zer_) begin
 		if (~zer_) r0_ <= 7'd0;
-		else if (lrp) r0_ <= w;
+		else if (lrp) r0_ <= ~w;
 	end
 
 endmodule
