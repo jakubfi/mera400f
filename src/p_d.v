@@ -45,7 +45,7 @@ module p_d(
 	output ib_,				// B36 - IB
 	output lpc,				// A09 - LPC
 	output rpc,				// A10 - RPC
-	output shc_,				// A57 - SHC
+	output shc_,			// A57 - SHC
 	output rc$_,			// B04 - RC*: RIC, RKY
 	output ng$_,			// B03 - NG*: NGA, NGL
 	output zb$_,			// B20
@@ -61,8 +61,8 @@ module p_d(
 	output nef,				// A20 - instruction is ineffective
 	// sheet 5
 	input w$_,				// A61 - W& state
-	input p4_,					// A77 - P4 state
-	input we_,					// A65 - WE state
+	input p4_,				// A77 - P4 state
+	input we_,				// A65 - WE state
 	output amb,				// A75
 	output apb,				// B65
 	output jkrb_,			// A86
@@ -71,24 +71,24 @@ module p_d(
 	output ap1,				// A76 - AP1: register A plus 1 (for IRB)
 	output am1,				// A90 - AM1: register A minus 1 (for DRB)
 	// sheet 6
-	input wz_,					// A66 - state WZ
+	input wz_,				// A66 - state WZ
 	input wls,				// A70
-	output bcoc$,		// A89
+	output bcoc$,			// A89
 	// sheet 7
 	output sd_,				// A69 - ALU function select
-	output scb_,				// A82 - ALU function select
-	output sca_,				// A71 - ALU function select
+	output scb_,			// A82 - ALU function select
+	output sca_,			// A71 - ALU function select
 	output sb_,				// A74 - ALU function select
-	output sab_,				// A73 - ALU function select
-	output saa_,				// A72 - ALU function select
+	output sab_,			// A73 - ALU function select
+	output saa_,			// A72 - ALU function select
 	output lrcb$_,		// A45
 	output aryt,			// A68
-	output sbar$,		// B91
+	output sbar$,			// B91
 	output nrf,				// A12
 	// sheet 8
-	input at15_,				// A07
-	input wx_,					// A64 - state WX
-	input wa_,					// A63 - state WA
+	input at15_,			// A07
+	input wx_,				// A64 - state WX
+	input wa_,				// A63 - state WA
 	output ust_z,			// B49
 	output ust_v,			// A08
 	output ust_mc,		// B80
@@ -97,12 +97,12 @@ module p_d(
 	output sr$_,			// B46
 	output ust_y,			// A53
 	output ust_x,			// A47
-	output blr_,				// A87
+	output blr_,			// A87
 	// sheet 9
 	input wpb_,				// A58
-	input wr_,					// A60
-	input pp_,					// A62
-	input ww_,					// B60
+	input wr_,				// A60
+	input pp_,				// A62
+	input ww_,				// B60
 	input wzi,				// A59
 	output ewa,				// A55 - Enter WA
 	output ewp,				// A56 - Enter WP
@@ -111,37 +111,37 @@ module p_d(
 	output lj_,				// B50
 	output ewe,				// A54 - Enter WE
 	// sheet 10
-	input wp_,					// A37
-	output ekc_1_,			// A42
+	input wp_,				// A37
+	output ekc_1_,		// A42
 	output ewz,				// A49 - Enter WZ
-	output ew$,			// A50 - Enter W&
+	output ew$,				// A50 - Enter W&
 	// sheet 11
 	output lar$_,			// B82
 	output ssp$,			// B81
-	output ka1_,				// A94
+	output ka1_,			// A94
 	output na_,				// A84 - Normalny Argument
-	output exl_,				// A06
-	output p16_,				// A36
+	output exl_,			// A06
+	output p16_,			// A36
 	// sheet 12
 	input lk,					// A52
-	input wm_,					// A38
+	input wm_,				// A38
 	output ewr,				// A51 - Enter WR
 	output ewm,				// A48 - Enter WM
 	output efp,				// A11
 	output sar$,			// A05
 	output eww,				// A41 - Enter WW
-	output srez$,		// A17
+	output srez$,			// A17
 	// sheet 13
 	output ewx,				// A43 - Enter WX
 	output axy,				// A46
 	output inou$_,		// A39 - INOU* - IN or OU instruction
-	output ekc_2_,			// A40 - EKC*2 - Enter cycle end (Koniec Cyklu)
+	output ekc_2_,		// A40 - EKC*2 - Enter cycle end (Koniec Cyklu)
 	output lac$_			// B43
 );
 
 	parameter INOU_USER_ILLEGAL = 1'b1;
 
-	wor __NC;
+	wor __NC; // unconnected signals here, to suppress warnings
 
 	// sheet 1, page 2-30
 	// * IR - instruction register

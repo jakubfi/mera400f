@@ -11,43 +11,43 @@ module p_r(
 	// sheet 1
 	input blr_,				// A50 - BLokuj Rejestry
 	input lpc,				// A94 - LPC instruction
-	input wa_,					// B94 - state WA
+	input wa_,				// B94 - state WA
 	input rpc,				// B03 - RPC instruction
-	input ra_,					// B48 - user register address
-	input rb_,					// B49 - user register address
+	input ra_,				// B48 - user register address
+	input rb_,				// B49 - user register address
 	input as2,				// B43
-	input rc_,					// A49
+	input rc_,				// A49
 	input w_r_,				// B47
-	input strob1_,			// B32
-	input strob2_,			// B42
+	input strob1_,		// B32
+	input strob2_,		// B42
 	// sheet 2-5
 	input [0:15] w,		// B07, B12, B11, B10, B22, B24, B25, B23, B13, B19, B20, B21, B16, B08, B17, B18 - bus W
 	output wand [0:15] l,	// A04, A03, A28, A27, A09, A10, A26, A25, A07, A08, A16, A17, A06, A05, A18, A19 - bus L
 	// sheet 6
-	input bar_nb_,			// B83 - BAR->NB: output BAR register to system bus
+	input bar_nb_,		// B83 - BAR->NB: output BAR register to system bus
 	input w_rbb_,			// A51 - RB[4:9] clock in
 	input w_rbc_,			// B46 - RB[0:3] clock in
 	input w_rba_,			// B50 - RB[10:15] clock in
-	output [0:3] dnb_,	// A86,  A90, A87, B84 - DNB: NB system bus driver
+	output [0:3] dnb_,// A86,  A90, A87, B84 - DNB: NB system bus driver
 	// sheet 7
 	input rpn_,				// B85
 	input bp_nb,			// B86
 	input pn_nb,			// A92
 	input q_nb,				// B90
 	input w_bar,			// B56 - W->BAR: send W bus to {BAR, Q, BS} registers
-	input zer_fp_,			// A89
+	input zer_fp_,		// A89
 	input clm_,				// B93
-	input ustr0_fp_,		// A11
+	input ustr0_fp_,	// A11
 	input ust_leg,		// B39
 	input aryt,				// B45
 	input zs,					// A47
 	input carry_,			// A48
 	input s_1,				// B44
 	output zgpn,			// B88
-	output dpn_,				// B87 - PN system bus driver
-	output dqb_,				// B89 - Q system bus driver
+	output dpn_,			// B87 - PN system bus driver
+	output dqb_,			// B89 - Q system bus driver
 	output q,					// A53 - Q: system flag
-	output zer_,				// A52
+	output zer_,			// A52
 	// sheet 8
 	input ust_z,			// B53
 	input ust_mc,			// B55
@@ -180,10 +180,10 @@ module p_r(
 
 	// jumper on C-D: no AWP
 	wire M60_3 = ~(AWP_PRESENT & ustr0_fp_ & strob_a);
-	wire M62_6 = ~(strob_a & w_r & wr0 & ~q); // TODO: w_r is a guess (no connection on the schematic)
-	wire M62_8 = ~(~q & wr0 & w_r & strob_b); // TODO: w_r is a guess (no connection on the schematic)
+	wire M62_6 = ~(strob_a & w_r & wr0 & ~q); // NOTE: w_r is a guess (no connection on the schematic)
+	wire M62_8 = ~(~q & wr0 & w_r & strob_b); // NOTE: w_r is a guess (no connection on the schematic)
 	wire M61_12 = ~(wr0 & w_r & strob_b);
-	wire M61_8 = ~(wr0 & w_r & strob_a); // TODO: w_r is a guess (no connection on the schematic)
+	wire M61_8 = ~(wr0 & w_r & strob_a); // NOTE: w_r is a guess (no connection on the schematic)
 
 	wire w_zmvc = ~(M60_3 & lr0 & M62_8 & M62_6);
 	wire w_legy = ~(M62_6 & lr0 & M62_8);

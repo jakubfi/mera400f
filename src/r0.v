@@ -1,13 +1,3 @@
-/*
-	MERA-400 R0 register
-
-	document:	12-006368-01-8A
-	unit:			P-R2-3
-	pages:		2-65..2-66
-*/
-
-/* synthesis ramstyle = "M4K" */
-
 module r0 (
 	// buses
 	input [0:15] w,
