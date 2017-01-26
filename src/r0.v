@@ -68,7 +68,8 @@ module r0 (
 	always @ (negedge clk2, negedge set2, negedge reset2) begin
 		if (~reset2) r0[2] <= 1'b0;
 		else if (~set2) r0[2] <= 1'b1;
-		else r0[2] <= j2;
+		else if (j2) r0[2] <= 1'b1;
+		else r0[2] <= r0[2];
 	end
 
 	// --- R03, C flag --------------------------------------------------------

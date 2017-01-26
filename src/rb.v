@@ -7,7 +7,7 @@ module rb(
 );
 
 	always @ (posedge w_rbc_)
-		rb[0:3] <= w[12:14];
+		rb[0:3] <= w[12:15];
 
 	always @ (posedge w_rbb_)
 		rb[4:9] <= w[10:15];

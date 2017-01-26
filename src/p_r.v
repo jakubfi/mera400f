@@ -7,8 +7,6 @@
 	sheets:		12
 */
 
-`include "cpuconfig.v"
-
 module p_r(
 	// sheet 1
 	input blr_,				// A50 - BLokuj Rejestry
@@ -72,6 +70,9 @@ module p_r(
 	output [0:15] ki	// B71, B77, B59, B67, A59, A65, A69, A55, B82, A79, A73, B73, A76, A88, A72, B58
 );
 
+	parameter CPU_NUMBER = 1'b0;
+	parameter AWP_PRESENT = 1'b1;
+
 	// sheet 1, page 2-58
 	// * user register control signals
 
@@ -132,7 +133,7 @@ module p_r(
 		.clm_(clm_),
 		.nb(nb)
 	);
-	assign dnb_ = ~(nb & {4{bar_nb_}});
+	assign dnb_ = ~(nb & {4{~bar_nb_}});
 
 	wire [0:15] R0_;
 	r0_9_15 R0_9_15(
@@ -148,21 +149,12 @@ module p_r(
 	// * Q and BS flag registers and system bus drivers
 	// * R0 control signals
 
-	`ifdef CPU_NUMBER_1 // jumper 8-9
-		assign zgpn = ~rpn_ ^ 1'b0;
-	`else // jumper 7-8
-		assign zgpn = ~rpn_ ^ 1'b1;
-	`endif
-
-	`ifdef CPU_NUMBER_1 // jumper 8-9
-		wire M35_8 = 1'b1 ^ bs;
-		wire M23_11 = ~(1'b1 & pn_nb);
-	`else // jumper 7-8
-		wire M35_8 = 1'b0 ^ bs;
-		wire M23_11 = ~(1'b0 & pn_nb);
-	`endif
+	// jumper on 7-8 : CPU 0
+	// jumper on 8-9 : CPU 1
+	assign zgpn = ~rpn_ ^ ~CPU_NUMBER;
+	wire M35_8 = CPU_NUMBER ^ bs;
+	wire M23_11 = ~(CPU_NUMBER & pn_nb);
 	assign dpn_ = ~(M35_8 & bp_nb) & M23_11;
-
 	assign dqb_ = ~(q_nb & q);
 
 	wire bs;
@@ -186,11 +178,8 @@ module p_r(
 
 	assign zer_ = zer_fp_ & clm_;
 
-	`ifdef AWP_PRESENT
-		wire M60_3 = ~(ustr0_fp_ & strob_a);
-	`else
-		wire M60_3 = ~(1'b0 & strob_a);
-	`endif
+	// jumper on C-D: no AWP
+	wire M60_3 = ~(AWP_PRESENT & ustr0_fp_ & strob_a);
 	wire M62_6 = ~(strob_a & w_r & wr0 & ~q); // TODO: w_r is a guess (no connection on the schematic)
 	wire M62_8 = ~(~q & wr0 & w_r & strob_b); // TODO: w_r is a guess (no connection on the schematic)
 	wire M61_12 = ~(wr0 & w_r & strob_b);
@@ -208,6 +197,7 @@ module p_r(
 	// sheets 8..9, pages 2-65..2-66
 	// * R0 register positions 0-9: CPU flags: ZMVCLEGYX
 
+	wire zer = ~zer_;
 	r0 REG_R0(
 		.w(w),
 		.r0(r0),
@@ -232,8 +222,6 @@ module p_r(
 		.zero_v(zero_v),
 		.zer(zer)
 	);
-
-	wire zer = ~zer_;
 
 	// assignments below are on pages 2-59..2-62
 	wire [0:8] __l_flags;
