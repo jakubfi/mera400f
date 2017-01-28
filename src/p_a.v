@@ -84,7 +84,7 @@ module p_a(
 	wire bwa = ~bwa_;
 	wire w_dt = ~w_dt_;
 
-	wire [0:2] W_SEL = {mwa, mwb, mwc};
+	wire [0:2] W_SEL = {mwc, mwb, mwa};
 	assign w[0:7] = bwb ? {8{1'b0}} :
 		(W_SEL == {3'b000}) ? ir[0:7] :
 		(W_SEL == {3'b001}) ? kl[0:7] :
@@ -217,7 +217,7 @@ module p_a(
 	// sheet 8
 
 	wire M49_6 = ~((w_ac & strobb) | (w_ac & stroba));
-	wire strobb = ~(~as2 | strob2_);
+	wire strobb = ~(as2_ | strob2_);
 	wire as2_ = ~as2;
 	wire stroba = ~(as2 | strob1_);
 
@@ -232,7 +232,7 @@ module p_a(
 
 	// WZI
 
-	wire M65_11 = ~(as2 & strob1_);
+	wire M65_11 = ~(as2 & strob1);
 	assign s_1 = M7_8 ^ carry_;
 	wire M42_8 = ~(z1_ & z2_ & z3_ & z4_ & z5_ & z6_ & z7_ & z8_);
 	assign zs = ~(s_1 | M42_8);
@@ -253,7 +253,7 @@ module p_a(
 
 	wire M51_6 = ~((w_ar & strobb) | (w_ar & stroba));
 	wire load_ar = ~M51_6;
-	always @ (posedge load_ar, posedge arm4_, posedge arp1) begin
+	always @ (posedge load_ar, posedge arm4_, negedge arp1) begin
 		if (load_ar) ar <= w;
 		else if (arm4_) ar <= ar - 3'd4;
 		else ar <= ar + 1'b1;
@@ -305,8 +305,8 @@ module p_a(
 	wire ic_ad = ~ic_ad_;
 	wire ar_ad = ~ar_ad_;
 
-	wire [0:15] dad1_ = {16{ar_ad}} & ar;
-	wire [0:15] dad2_ = {16{ic_ad}} & ic;
+	wire [0:15] dad1_ = ~({16{ar_ad}} & ar);
+	wire [0:15] dad2_ = ~({16{ic_ad}} & ic);
 	assign dad_ = dad1_ & dad2_;
 
 	wire zga_ = ~(&(kl[0:7] ^ {barnb, dad_[1:7]}));
