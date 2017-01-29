@@ -198,18 +198,15 @@ module p_a(
 
 	// sheet 7
 
-	wire AT_SEL0 = ~(wx_ & as2_);
-	wire AT_SEL1 = as2;
-
-	reg [0:15] at;
-	always @ (posedge strob1_) begin
-		case ({AT_SEL1, AT_SEL0})
-			2'b00 : at <= at;
-			2'b01 : at <= {eat0, at[0:14]};
-			2'b10 : at <= at; // NOTE: shouldn't happen (by design). In real CPU it would shift "0" on the right side of each quad-bit
-			2'b11 : at <= f;
-		endcase
-	end
+	wire [0:15] at;
+	at REG_AT(
+		.s0(~(wx_ & as2_)),
+		.s1(as2),
+		.c(~strob1),
+		.sl(eat0),
+		.f(f),
+		.at(at)
+	);
 
 	assign at15_ = ~at[15];
 	assign exy_ = ~((at[15] & axy) | (a[0] & ~axy));
@@ -221,10 +218,12 @@ module p_a(
 	wire as2_ = ~as2;
 	wire stroba = ~(as2 | strob1_);
 
-	reg [0:15] ac;
-	always @ (posedge M49_6) begin
-		ac <= w;
-	end
+	wire [0:15] ac;
+	ac REG_AC(
+		.c(M49_6),
+		.w(w),
+		.ac(ac)
+	);
 
 	wire M8_11 = ac[0] ^ a[0];
 	wire M8_3 = ~ac[0] ^ a[0];
@@ -249,31 +248,28 @@ module p_a(
 
 	// sheet 9
 
-	reg [0:15] ar;
-
 	wire M51_6 = ~((w_ar & strobb) | (w_ar & stroba));
-	wire load_ar = ~M51_6;
-	always @ (posedge load_ar, posedge arm4_, negedge arp1) begin
-		if (load_ar) ar <= w;
-		else if (arm4_) ar <= ar - 3'd4;
-		else ar <= ar + 1'b1;
-	end
 
+	wire [0:15] ar;
+	ar REG_AR(
+		.l_(M51_6),
+		.p1(arp1),
+		.m4(arm4_),
+		.w(w),
+		.ar(ar)
+	);
 	assign arz_ = ~(&(~ar[0:7]));
 
 	// sheet 10
 
-	reg [0:15] ic;
-	wire ic_cu = ~(icp1 & strob1);
-	wire M51_8 = ~((w_ic & stroba) | (w_ic & strobb));
-	wire ic_load = ~M51_8;
-	wire off = ~off_;
-
-	always @ (posedge ic_cu, posedge ic_load, posedge off) begin
-		if (off) ic <= 16'd0;
-		else if (ic_load) ic <= w;
-		else ic <= ic + 1'b1;
-	end
+	wire [0:15] ic;
+	ic REG_IC(
+		.cu(~(icp1 & strob1)),
+		.l_(~((w_ic & stroba) | (w_ic & strobb))),
+		.r(~off_),
+		.w(w),
+		.ic(ic)
+	);
 
 	// sheet 11, 12
 
