@@ -234,7 +234,12 @@ module p_r(
 	assign __l_flags2[12:15] = ~(~r0[4:7] & {4{rpp}});
 
 	// L bus final open-collector composition
-	assign l = __l_regs & {{9{1'b1}}, __l_r0} & {__l_flags, {7{1'b1}}} & {{8{1'b1}}, __l_flags2};
+	assign l = 
+		__l_regs // user registers
+		& {{9{1'b1}}, __l_r0} // user-settable r0 part
+		& {__l_flags, {7{1'b1}}} // r0 flags at original positions
+		& {{8{1'b1}}, __l_flags2} // r0 flags shifted right 8 bits
+	;
 
 	// sheets 10..11, pages 2-67..2-68
 	// * KI bus
