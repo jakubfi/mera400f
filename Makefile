@@ -2,7 +2,7 @@
 # --- Project configuration -------------------------------------------------
 
 PROJECT = mera400f
-TOPLEVEL = p_a
+TOPLEVEL = pp
 SOURCES_DIR = src
 SOURCES = mera400f.v \
 	counter4.v \
@@ -11,14 +11,15 @@ SOURCES = mera400f.v \
 	univib.v \
 	alu181.v carry182.v \
 	latch16.v \
-	p_r.v regs.v r0.v rb.v nb.v \
-	p_d.v \
-	p_x.v \
-	p_m.v \
-	p_p.v rm.v rzp.v \
-	p_a.v at.v ac.v ar.v ic.v
+	dly.v \
+	pr.v regs.v r0.v rb.v nb.v \
+	pd.v \
+	px.v \
+	pm.v \
+	pp.v rzrp.v \
+	pa.v at.v ac.v ar.v ic.v
 TESTS_DIR = tests
-TESTS = regs.v p_d.v \
+TESTS = regs.v pd.v \
 	alu_add_16bit_182.v alu_add_16bit.v alu_fn.v \
 	decoder_bcd.v decoder16.v \
 	latch16.v \

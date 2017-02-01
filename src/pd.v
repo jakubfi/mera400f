@@ -7,7 +7,7 @@
 	sheets:		14
 */
 
-module p_d(
+module pd(
 	// sheet 1
 	input [0:15] w,		// A80, A81, B78, B77, B09, B08, B35, A27, A30, A29, B15, B16, B25, B26, B13, B12 - W bus
 	input strob1,			// B85

@@ -1,14 +1,16 @@
-module univib
-	#(parameter TICKS = 4'd5)
-(
+module univib(
 	input clk,
 	input a, b,
 	output reg q
 );
-	reg [3:0] r = TICKS;
+
+	parameter ticks = 3'd5;
+	localparam width = $clog2(ticks+1);
 
 	wire done = ~|r;
 	wire trig = ~a & b;
+
+	reg [width-1:0] r = ticks;
 
 	always @ (posedge trig, posedge done) begin
 		if (done) q <= 1'b0;
@@ -17,7 +19,7 @@ module univib
 
 	always @ (posedge clk) begin
 		if (q) r <= r - 1'b1;
-		else r <= 4'b0101;
+		else r <= ticks;
 	end
 
 endmodule

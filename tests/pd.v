@@ -12,7 +12,7 @@ module test();
 	wire lwt$_, md;
 	wire pufa, ka1_, ka2_, aryt;
 
-	p_d U1(
+	pd U1(
 		.si1_(si1_), .p_(p_), .q(q), .r0(r0),
 		.w(w), .ir(ir),
 		.strob1(strob1), .w_ir(w_ir),

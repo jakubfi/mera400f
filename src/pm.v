@@ -7,7 +7,7 @@
 	sheets:		19
 */
 
-module p_m(
+module pm(
 	input clk,
 	// sheet 1
 	input start__,

@@ -7,7 +7,7 @@
 	sheets:		10
 */
 
-module p_x(
+module px(
 	input __clk, // clock for "univibrators"
 	// sheet 1
 	input ek1,	// A32 - Enter state K1

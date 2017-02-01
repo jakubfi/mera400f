@@ -7,7 +7,7 @@
 	sheets:		12
 */
 
-module p_r(
+module pr(
 	// sheet 1
 	input blr_,				// A50 - BLokuj Rejestry
 	input lpc,				// A94 - LPC instruction
