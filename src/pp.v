@@ -79,8 +79,8 @@ module pp(
 	// sheet 1, 2
 	// * RM - interrupt mask register
 
-	wire clm$ = ~(clm_ & ~(strob1 & ~i4_));
-	wire clrs = ~(~strob1_ & w_rm); // M44_8 = M44_11 = -CLRS5-9
+	wire clm$ = ~(clm_ & ~(strob1 & i4$));
+	wire clrs_ = ~(strob1 & w_rm); // M44_8 = M44_11 = -CLRS5-9
 	wire strob1 = ~strob1_;
 	wire i4$ = ~i4_;
 
@@ -89,8 +89,14 @@ module pp(
 	genvar num;
 	generate
 		for (num=0 ; num<10 ; num=num+1) begin : GEN_REG_RM
-			wire rm_reset = ~(zi_[num] & clm$);
-			ffd REG_RM(.s_(1'b1), .d(w[num]), .c(clrs), .r_(rm_reset), .q(rs[num]));
+			wire rm_reset_ = ~(zi_[num] & clm$);
+			ffd REG_RM(
+				.s_(1'b1),
+				.d(w[num]),
+				.c(clrs_),
+				.r_(rm_reset_),
+				.q(rs[num])
+			);
 			// NOTE: Ix = RS[x] (Ix's not included due to name collisions)
 		end
 	endgenerate
@@ -119,17 +125,17 @@ module pp(
 		M70_3			// 31 software interrupt low
 	};
 
+	// RZ input: software interrupt drivers (sheet 10)
+	wire M104_12 = ~wx_ & ~sin_ & strob1;
+	wire M89_6 = ~(ir14 & M104_12);
+	wire M70_3 = ~(ir15 & M104_12);
+
 	// RZ input: W bus, synchronous (software-set) interrupt sources
 	wire [0:31] INT_SYNC = {
 		w[0:11],		// software-settable interrupts
 		{16{1'b0}}, // channel interrupts cannot be set synchronously
 		w[12:15]		// software-settable interrupts
 	};
-
-	// RZ input: software interrupt drivers (sheet 10)
-	wire M104_12 = ~wx_ & ~sin_ & strob1;
-	wire M89_6 = ~(ir14 & M104_12);
-	wire M70_3 = ~(ir15 & M104_12);
 
 	// RZ input: clocks
 	wire ck_rzwm = ~(strob1 & ck_rz_w);
@@ -228,7 +234,7 @@ module pp(
 	assign __NC = rp_[0];
 	assign __NC = rp_[16];
 	assign __NC = PRIO_OUT[31];
-	assign __NC = |__rz[12:27]
+	assign __NC = |__rz[12:27];
 
 	// sheet 3
 
@@ -257,11 +263,10 @@ module pp(
 	wire M12_3 = ~rin_dly;
 
 	// TODO: cap + diode?
-	wire zw_dly = zw;
+	wire zw_dly = ~zw;
 
 	wire M14_6;
-	// TODO: actual timing
-	univib TRIG_RIN(
+	univib #(.ticks(3'd7)) TRIG_RIN( // 7 ticks = 140ns @ 50MHz (153ns orig.)
 		.clk(clk),
 		.a(M12_3),
 		.b(zw_dly),
@@ -270,6 +275,7 @@ module pp(
 
 	wire M11_3 = ~(rdt15_ & zgpn_);
 	wire M12_6 = ~(M11_3 & rdt15_);
+
 	wire M9_5;
 	ffd REG_DOK(
 		.s_(1'b1),
@@ -288,7 +294,7 @@ module pp(
 	wire [0:15] zk_;
 	decoder16 DEC_ZK(
 		.en1_(M11_3),
-		.en2_(M14_6),
+		.en2_(~M14_6),
 		.a(~rdt14_),
 		.b(~rdt13_),
 		.c(~rdt12_),
