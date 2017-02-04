@@ -3,16 +3,16 @@ module counter4(
 	input [0:3] i,
 	output reg [0:3] o,
 	input r,
-	input l
+	input l_
 );
 
 	initial begin
 		o = 4'd0;
 	end
 
-	always @ (posedge cd, posedge l, posedge r) begin
+	always @ (posedge cd, negedge l_, posedge r) begin
 		if (r) o <= 4'd0;
-		else if (l) o <= i;
+		else if (~l_) o <= i;
 		else o <= o + 1'b1;
 	end
 
