@@ -237,16 +237,16 @@ module pm(
 	wire __cycle_q;
 	ffd REG_CYCLE(
 		.s_(cycle_),
-		.r_(rescyc_),
 		.d(1'b0),
-		.q(__cycle_q),
-		.c(1'b1)
+		.c(1'b1),
+		.r_(rescyc_),
+		.q(__cycle_q)
 	);
 
 	wire run_ = ~(start & wait_);
 	assign run = ~run_;
 	wire dpr_ = run_ & ~__cycle_q;
-	wire dprzerw_ = ~((~__cycle_q & ~start) & irq & p_ & mc_);
+	wire dprzerw_ = ~(~(~__cycle_q & ~start) & irq & p_ & mc_);
 	wire stpc = ~(dpr_ & dprzerw_);
 
 	// sheet 2, page 2-12
@@ -287,7 +287,6 @@ module pm(
 	wire rescyc_ = clm_ & strob2_ & si1_;
 
 	wire pr_;
-	wire pr = ~pr_;
 	ffd REG_PR(
 		.s_(rescyc_),
 		.d(dpr_),
@@ -295,11 +294,12 @@ module pm(
 		.r_(1'b1),
 		.q(pr_)
 	);
+	wire pr = ~pr_;
 
 	assign sp0_ = ~(pr_ & przerw_ & M90_13);
 
 	ffd REG_PRZERW(
-		.s_(1'b1),
+		.s_(clm_),
 		.d(dprzerw_),
 		.c(M90_5),
 		.r_(1'b1),
@@ -353,7 +353,7 @@ module pm(
 	wire k2 = ~k2_;
 	wire ur = ~(k2 & ~(~load & ~fetch));
 	wire ar_1 = ~(k2 & ~load);
-	wire k2store_ = k2 & store;
+	wire k2store_ = ~(k2 & store);
 	assign k2_bin_store_ = ~(k2 & ~(~store & ~bin));
 	assign k2fetch_ = ~(k2 & fetch);
 	wire bin_ = ~bin;
@@ -373,11 +373,11 @@ module pm(
 	wire p0_k2 = ~(~k2 & p0_);
 	assign ep0 = ~(~k2 & k1_) & bin_;
 	assign stp0 = ~(bin_ & ~stpc & ~sfl);
-	assign ek2 = ~(~(~p0_ & sfl) & ~(k1 & bin & lg_3));
+	assign ek2 = ~(~(~p0_ & sfl) & ~(bin & lg_3 & k1));
 	assign ek1 = ~(~(p0_k2 & bin) & ~(k1 & bin & ~lg_3));
-	wire lg_plus_1 = ~((bin & k2) | (k1 & ~rdt9_));
+	wire lg_plus_1 = ~((bin & k2) | (k1 & rdt9));
 	// NOTE: not connected anywhere
-	wire zero_lg = ~(rdt9 & k1s1 & rok);
+	wire zero_lg = ~(~rdt9 & k1s1 & rok);
 	wire rdt9 = ~rdt9_;
 
 	// sheet 5, page 2-15
@@ -431,12 +431,12 @@ module pm(
 		.q(wm_q)
 	);
 
-	wire M88_12 = pr & b0_ & ~na_;
+	wire M86_12 = pr & b0_ & ~na_;
 	wire M103_3 = ~(~(p4 & wpp_) & p2_);
 	wire wb;
 	ffjk REG_WB(
 		.s_(1'b1),
-		.j(M88_12),
+		.j(M86_12),
 		.c_(strob1),
 		.k(M103_3),
 		.r_(zerstan_),
@@ -448,15 +448,15 @@ module pm(
 		.s_(setwp_),
 		.j(1'b0),
 		.c_(strob1),
-		.k(1'b1),
+		.k(1'b1), // NOTE: or p4?
 		.r_(reswp_),
 		.q(wpp)
 	);
+	wire wpp_ = ~wpp;
 
-	wire p4wp_ = ~(p4 & wp);
+	wire p4wp_ = ~(p4 & wpp);
 	wire wpb = ~(~wb & wpp_);
 	wire bla = ~(p4 & ka1ir6 & wpp_);
-	wire wpp_ = ~wpp;
 	wire nair6 = ~na_ & ir6;
 	wire ka12x = ~(~(~na_ & c0) & ka2_ & ka1_);
 	wire ka1ir6 = ka1 & ir6;
@@ -465,10 +465,11 @@ module pm(
 	// sheet 7, page 2-17
 	//  * main loop state transition signals
 
-	// NOTE: nair6_ is probably mislabelled
+	wire p3 = ~p3_;
+	// NOTE: nair6_ is probably mislabeled
 	wire nair6_ = nair6;
 	wire M69_1 = ~(nair6_ | wpb);
-	wire M100_8 = ~(~p3_ & ka1ir6);
+	wire M100_8 = ~(p3 & ka1ir6);
 	wire M89_10 = ~(wm_q | ka12x);
 	wire M89_13 = ~(p1_ | nef);
 	wire M100_11 = ~(p3_ & p4_);
@@ -478,7 +479,6 @@ module pm(
 	wire M85_8 = ~(M100_11 & nair6_ & ~wpb);
 	wire M84_6 = ~(nair6_ & M89_10 & M89_13 & ~wpb);
 
-	wire p3 = ~p3_;
 	assign pp_ = M85_12 & M85_6 & p5_;
 	assign ep5 = ~(M85_8 & M84_6);
 
@@ -523,7 +523,7 @@ module pm(
 
 	wire M62_3 = ~(wrwwgr_ & i3_ & lg_plus_1) & strob1;
 	wire M62_11 = zerstan_ & i1_;
-	wire M78_8 = ~((slg2) | (slg1 & ir9) );
+	wire M78_8 = ~((slg2) | (slg1 & ir9));
 	wire M94_6 = ~(slg1 & ir8);
 	wire M78_6 = ~((slg2 & (ir8 & ir9)) | (slg1 & ir7));
 	wire M80_12 = lgb & lga & gr;
@@ -569,17 +569,17 @@ module pm(
 	//  * general register selectors
 
 	// NOTE: 1'b0 is there on every version of the schematic
-	assign rc_ = ~((rsc & p0_k2) | (ir10 & p4) | (ir13 & p3) | (_7_rkod_) | (1'b0 & ~rlp_fp_) | (lgc & w));
-	assign rb_ = ~((ir14 & p3) | (ir11 & p4) | (rsb & p0_k2) | (_7_rkod_) | (~rlp_fp_ & lpb) | (lgb & w));
-	assign ra_ = ~((_7_rkod_) | (ir15 & p3) | (p4 & ir12) | (p0_k2 & rsa) | (w & lga) | (~rlp_fp_ & lpa));
+	assign rc_ = ~((rsc & p0_k2) | (ir10 & p4) | (ir13 & p3) | (~_7_rkod_) | (1'b0 & ~rlp_fp_) | (lgc & w));
+	assign rb_ = ~((ir14 & p3) | (ir11 & p4) | (rsb & p0_k2) | (~_7_rkod_) | (~rlp_fp_ & lpb) | (lgb & w));
+	assign ra_ = ~((~_7_rkod_) | (ir15 & p3) | (p4 & ir12) | (p0_k2 & rsa) | (w & lga) | (~rlp_fp_ & lpa));
 
 	// sheet 11, page 2-21
 	//  * step counter (licznik kroków)
 
 	wire lk0, lk1, lk2, lk3;
 
-	wire M64_8 = ~((ir9 & gr) | (ir8 & gr) | (inou & bod) | (ir15 & shc));
-	wire M65_6 = ~((shc & ir14) | gr);
+	wire M64_8 = (ir9 & gr) | (ir8 & gr) | (inou & bod) | (ir15 & shc);
+	wire M65_6 = ~((shc & ir14) | (gr));
 	wire M94_8 = ~(M65_6 & okinou_);
 	wire M49_8 = (shc & ir13) | (gr & (~ir9 & ir8));
 	wire M85_11 = shc & ir6;
@@ -600,7 +600,7 @@ module pm(
 	wire ruj = ~(rj_ & uj$_);
 	wire pac_ = ~(uj$_ & rj_ & lwt$_);
 	wire lwtsr = ~(lwt$_ & sr$_);
-	wire lrcblac = ~(lac$_ & lrcb$_);
+	wire lrcblac = ~(lac$_ & lrcb_);
 	wire lrcb_ = lrcb$_;
 	wire pat_ = ~(lrcb_ & sr$_);
 	// name conflict: wire rc_ = rc$_;
@@ -625,8 +625,8 @@ module pm(
 	wire ri = ~ri_;
 	wire warx_ = ~((p1 & wpp_) | (wpp_ & p3) | (ri & wa) | (war & ur));
 	wire M50_8 = ~((ur & wre) | (lipsp & lg_1 & i3) | (lwtsr & wp) | (wa & rjcpc));
-	wire M66_8 = ~((wr & sar$) | (zb_ & we) | (lar$ & w$) | (wm & ~in_ & rok));
-	assign w_r_ = M50_8 & s_fp_ & ~M66_8;
+	wire M66_8 = ~((wr & sar$) | (~zb_ & we) | (lar$ & w$) | (wm & ~in_ & rok));
+	assign w_r_ = M50_8 & s_fp_ & M66_8;
 	wire _7_rkod_ = (w$ & ~bs_) | (ls & we);
 	wire wm = ~wm_;
 	wire wm$ = ~wm_;
@@ -701,7 +701,7 @@ module pm(
 		.q(pb_)
 	);
 	wire pb = ~pb_;
-	assign wprb_ = ~pb_;
+	assign wprb_ = ~pb;
 
 	wire mwax_ = ~((i3_ex_prz & lg_3) | (wp & pac_) | (ri & ww) | (wac & psr));
 	wire mwbx_ = ~((pat_ & wp) | (srez$ & ww));
