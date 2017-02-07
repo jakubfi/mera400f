@@ -175,10 +175,9 @@ module px(
 	);
 	assign p1_ = ~p1;
 
-	wire __sp0 = clo_ & sp0_;
 	wire p0;
 	ffd REG_P0(
-		.s_(__sp0),
+		.s_(clo_ & sp0_),
 		.d(ep0),
 		.c(got),
 		.r_(1'b1),
@@ -218,9 +217,8 @@ module px(
 	wire M16_8 = ~(wz_ & stp0$_ & p3_ & wa_);
 	wire M15_8 = ~(p2_ & wp_ & wx_);
 
-	wire sgot = ~(M19_6 & M18_8);
+	wire sgot = ~(M19_6 | M18_8);
 
-	// TODO: actual delays
 	wire __q1_, __q2_, __q3_, __q4_, __q5_;
 	wire __q1, __q2, __q3, __q4, __q5;
 	assign {__q1_, __q2_, __q3_, __q4_, __q5_} = ~{__q1, __q2, __q3, __q4, __q5};
@@ -279,7 +277,7 @@ module px(
 	wire got = got$;
 
 	wire M53_11 = ~(M21_5 & ~sgot);
-	wire M53_8 = M53_11 & st56_;
+	wire M53_8 = ~(M53_11 & st56_);
 
 	wire strob2;
 	univib #(.ticks(3'd6)) VIB_STROB2( // 6 ticks = 120ns @ 50MHz (110-190ns)
@@ -317,7 +315,7 @@ module px(
 	wire ei2 = i1 & przerw_z;
 	wire exr = ~exr_;
 	wire ei4 = i3 & lg_0;
-	wire i3lips_ = ~(~lipsp$_ & i3);
+	wire i3lips_ = ~(lipsp$ & i3);
 	assign ekc_1_ = ~((lg_3 & ~i3lips_) | (i5 & lip_));
 	assign zer_sp_ = ~(lip_ & i5);
 	wire lipsp$ = ~(lip_ & sp_);
@@ -341,13 +339,13 @@ module px(
 	assign barnb = (i3 & sp) | (ww & sbar$) | (sbar$ & wr) | (q & M28_8);
 	assign q_nb = zwzg & i2_;
 	wire inou = ~(in_ & ou_);
-	wire M40_8 = ~(i2_ & (in_ & wm_) & k1_);
+	wire M40_8 = ~(i2_ & (in_ | wm_) & k1_);
 	assign df_ = ~(M40_8 & zwzg);
 	wire M49_3 = ~(ou_ | wm_) ^ w;
 	assign w_dt_ = ~(M49_3 & zwzg);
 	assign dr_ = ~(r & zwzg);
 	wire r = ~(k2fetch & p5_ & i4_ & i1_ & i3lips_ & wr_ & p1_ & red_fp_);
-	assign dt_w_ = ~(M40_8 & r);
+	assign dt_w_ = ~(M40_8 | r);
 	assign ar_ad_ = ~(M30_8 & zwzg);
 	assign ds_ = ~(ou_ | wm_) & zwzg; // NOTE: missing on original schematic
 
@@ -362,7 +360,7 @@ module px(
 	assign din_ = ~(zwzg & M44_1);
 	assign dad15_i_ = ~(zwzg & ~(i5_ & i1_));
 	assign dad10_ = ~(zwzg & ~(i1_ & ~(i4 & exr) & i5_));
-	assign dad9_ = ~(zwzg & ~(i1 & i4_ & i5_));
+	assign dad9_ = ~(zwzg & ~(i1_ & i4_ & i5_));
 	wire M40_12 = ~(~arz & q & ~exrprzerw);
 	// A-C : 0-256 write deny
 	// B-A : no write deny
@@ -409,7 +407,7 @@ module px(
 	assign zg = ~(zgi_ & ~M47_15 & ~(zw & oken));
 	wire zw = ~zw1_;
 
-	wire M46_8 = clo_ & ~(strob2 & w$ & wzi & is_);
+	wire M46_8 = clo_ & ~(strob2 & w$ & wzi & ~is_);
 	wire M47_15;
 	ffjk JK47(
 		.s_(1'b1),
@@ -439,17 +437,18 @@ module px(
 	wire oken = ~(ren_ & rok_);
 
 	// E-F: no AWP
-	wire EFP = efp_ | ~AWP_PRESENT;
+	wire EF = efp_ | ~AWP_PRESENT;
+	wire M65_6 = ~EF;
 	wire M37_15;
-	ffjk __jk37_2(
+	ffjk JK37(
 		.s_(1'b1),
-		.j(~EFP),
-		.c_(~got),
+		.j(M65_6),
+		.c_(got_),
 		.k(i5),
 		.r_(clo_),
 		.q(M37_15)
 	);
-	wire exr_ = ~M37_15 & EFP & exl_;
+	wire exr_ = ~M37_15 & EF & exl_;
 
 	// sheet 9, page 2-9
 
