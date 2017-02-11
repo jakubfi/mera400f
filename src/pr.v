@@ -159,20 +159,20 @@ module pr(
 
 	wire bs;
 	ffd REG_BS(
-		.c(cnb0_3_),
-		.d(w[11]),
-		.r_(clm_),
 		.s_(1'b1),
+		.d(w[11]),
+		.c(cnb0_3_),
+		.r_(clm_),
 		.q(bs)
 	);
 
 	wire cnb0_3_ = ~(w_bar & strob1);
 
 	ffd REG_Q(
-		.c(cnb0_3_),
-		.d(w[10]),
-		.r_(zer_),
 		.s_(1'b1),
+		.d(w[10]),
+		.c(cnb0_3_),
+		.r_(zer_),
 		.q(q)
 	);
 
