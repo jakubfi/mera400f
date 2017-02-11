@@ -22,7 +22,7 @@ module pr(
 	input strob2_,		// B42
 	// sheet 2-5
 	input [0:15] w,		// B07, B12, B11, B10, B22, B24, B25, B23, B13, B19, B20, B21, B16, B08, B17, B18 - bus W
-	output wand [0:15] l,	// A04, A03, A28, A27, A09, A10, A26, A25, A07, A08, A16, A17, A06, A05, A18, A19 - bus L
+	output [0:15] l,	// A04, A03, A28, A27, A09, A10, A26, A25, A07, A08, A16, A17, A06, A05, A18, A19 - bus L
 	// sheet 6
 	input bar_nb_,		// B83 - BAR->NB: output BAR register to system bus
 	input w_rbb_,			// A51 - RB[4:9] clock in
