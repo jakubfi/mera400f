@@ -53,7 +53,7 @@ module pr(
 	input ust_mc,			// B55
 	input s0,					// B92
 	input ust_v,			// A93
-	input zero_v,			// B91
+	input _0_v,				// B91
 	output [0:8] r0,	// A44, A46, A43, A42, A41, A45, A40, A39, B09 - CPU flags in R0 register
 	// sheet 9
 	input exy_,				// A37
@@ -219,7 +219,7 @@ module pr(
 		.w_zmvc(w_zmvc),
 		.w_legy(w_legy),
 		.w8_x(w8_x),
-		.zero_v(zero_v),
+		._0_v(_0_v),
 		.zer(zer)
 	);
 

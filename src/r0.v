@@ -13,7 +13,7 @@ module r0 (
 	input w_zmvc, w_legy,
 	input w8_x,
 	// async
-	input zero_v,
+	input _0_v,
 	input zer
 );
 
@@ -43,7 +43,7 @@ module r0 (
 		.c_(ust_v & strob1),
 		.j(s0 ^ s_1),
 		.k(1'b0),
-		.r_(~((set2 & w_zmvc) | (zero_v ^ zer))),
+		.r_(~((set2 & w_zmvc) | (_0_v ^ zer))),
 		.s_(set2),
 		.q(r0[2])
 	);
