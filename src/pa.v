@@ -53,7 +53,7 @@ module pa(
 	input arm4_,
 	input w_ar,
 	input arp1,
-	output arz_,
+	output arz,
 	// sheet 10
 	input icp1,
 	input w_ic,
@@ -85,6 +85,7 @@ module pa(
 	wire w_dt = ~w_dt_;
 
 	wire [0:2] W_SEL = {mwc, mwb, mwa};
+
 	assign w[0:7] = bwb ? {8{1'b0}} :
 		(W_SEL == {3'b000}) ? ir[0:7] :
 		(W_SEL == {3'b001}) ? kl[0:7] :
@@ -94,6 +95,7 @@ module pa(
 		(W_SEL == {3'b101}) ? at[0:7] :
 		(W_SEL == {3'b110}) ? ac[0:7] :
 		a[0:7];
+
 	assign w[8:15] = bwa ? {8{1'b0}} :
 		(W_SEL == {3'b000}) ? ir[8:15] :
 		(W_SEL == {3'b001}) ? kl[8:15] :
@@ -258,7 +260,7 @@ module pa(
 		.w(w),
 		.ar(ar)
 	);
-	assign arz_ = ~(&(~ar[0:7]));
+	assign arz = ~(&(~ar[0:7]));
 
 	// sheet 10
 
