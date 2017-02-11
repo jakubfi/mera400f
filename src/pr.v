@@ -236,9 +236,9 @@ module pr(
 	// L bus final open-collector composition
 	assign l = 
 		__l_regs // user registers
-		& {{9{1'b1}}, __l_r0} // user-settable r0 part
-		& {__l_flags, {7{1'b1}}} // r0 flags at original positions
-		& {{8{1'b1}}, __l_flags2} // r0 flags shifted right 8 bits
+		& {9'b111111111, __l_r0} // user-settable r0 part
+		& {__l_flags, 7'b1111111} // r0 flags at original positions
+		& {8'b11111111, __l_flags2} // r0 flags shifted right 8 bits
 	;
 
 	// sheets 10..11, pages 2-67..2-68

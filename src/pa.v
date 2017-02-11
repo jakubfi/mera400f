@@ -95,17 +95,17 @@ module pa(
 
 	wire [0:2] W_SEL = {mwc, mwb, mwa};
 
-	assign w[0:7] = bwb ? 8'b0 :
+	assign w[0:7] = bwb ? 8'd0 :
 		(W_SEL == 3'b000) ? ir[0:7] :
 		(W_SEL == 3'b001) ? kl[0:7] :
 		(W_SEL == 3'b010) ? ~rdt_[0:7] :
-		(W_SEL == 3'b011) ? {8{1'b0}} :
+		(W_SEL == 3'b011) ? 8'd0 :
 		(W_SEL == 3'b100) ? ki[0:7] :
 		(W_SEL == 3'b101) ? at[0:7] :
 		(W_SEL == 3'b110) ? ac[0:7] :
 		a[0:7];
 
-	assign w[8:15] = bwa ? 8'b0 :
+	assign w[8:15] = bwa ? 8'd0 :
 		(W_SEL == 3'b000) ? ir[8:15] :
 		(W_SEL == 3'b001) ? kl[8:15] :
 		(W_SEL == 3'b010) ? ~rdt_[8:15] :
