@@ -76,7 +76,7 @@ module px(
 	input lg_3,			// A68 - LG=3 (Licznik Grupowy)
 	output arm4_,		// B79
 	output blw_pw_,	// B85
-	output ekc_1_,	// A76 - EKC*1 - Enter state KC (Koniec Cyklu)
+	output ekc_i_,	// A76 - EKC*I - Enter state KC (Koniec Cyklu)
 	output zer_sp_,	// A73
 	output lipsp$_,	// A66
 	// sheet 6
@@ -114,7 +114,7 @@ module px(
 	output dad10_,	// B82
 	output dad9_,		// A86
 	output dw_,			// A93
-	output i3_ex_przer,	// A52
+	output i3_ex_przer_,	// A52
 	output ck_rz_w,	// B91
 	output zerz_,		// B85
 	// sheet 8
@@ -316,7 +316,7 @@ module px(
 	wire exr = ~exr_;
 	wire ei4 = i3 & lg_0;
 	wire i3lips_ = ~(lipsp$ & i3);
-	assign ekc_1_ = ~((lg_3 & ~i3lips_) | (i5 & lip_));
+	assign ekc_i_ = ~((lg_3 & ~i3lips_) | (i5 & lip_));
 	assign zer_sp_ = ~(lip_ & i5);
 	wire lipsp$ = ~(lip_ & sp_);
 	assign lipsp$_ = ~lipsp$;
@@ -367,8 +367,8 @@ module px(
 	wire ABC_A = M40_12 | ~LOW_MEM_WRITE_DENY;
 	wire M59_3 = w & ABC_A;
 	assign dw_ = ~(zwzg & M59_3);
-	wire w = ~(i5_ & i3_ex_przer & ww_ & k2_bin_store_);
-	assign i3_ex_przer = ~(exrprzerw & i3);
+	wire w = ~(i5_ & i3_ex_przer_ & ww_ & k2_bin_store_);
+	assign i3_ex_przer_ = ~(exrprzerw & i3);
 	wire rw = r ^ w;
 	// NOTE: k2fbs_ not k2fbs ?
 	wire k2fbs_ = k2_bin_store_ & k2fetch;
