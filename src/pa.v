@@ -13,8 +13,11 @@ module pa(
 	input [0:15] ki,
 	input [0:15] rdt_,
 	input w_dt_,
-	input mwa_, mwb_, mwc_,
-	input bwa_, bwb_,
+	input mwa_,
+	input mwb_,
+	input mwc_,
+	input bwa_,
+	input bwb_,
 	output [0:15] ddt_,
 	output [0:15] w,
 	// sheet 2
@@ -22,12 +25,16 @@ module pa(
 	// sheet 4
 	// sheet 5
 	input saryt,
-	input sab_, scb_, sb_, sd_,
+	input sab_,
+	input scb_,
+	input sb_,
+	input sd_,
 	output s0,
 	output carry_,
 	// sheet 6
 	input p16_,
-	input saa_, sca_,
+	input saa_,
+	input sca_,
 	output j$,
 	output exx_,
 	// sheet 7
@@ -59,7 +66,9 @@ module pa(
 	input w_ic,
 	input off_,
 	// sheet 11, 12
-	input baa_, bab_, bac_,
+	input baa_,
+	input bab_,
+	input bac_,
 	input ab_,
 	input aa_,
 	input [0:15] l,
