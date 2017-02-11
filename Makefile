@@ -2,7 +2,7 @@
 # --- Project configuration -------------------------------------------------
 
 PROJECT = mera400f
-TOPLEVEL = px
+TOPLEVEL = cpu
 SOURCES_DIR = src
 SOURCES = mera400f.v \
 	counter4.v \
@@ -17,7 +17,8 @@ SOURCES = mera400f.v \
 	px.v \
 	pm.v \
 	pp.v rzrp.v \
-	pa.v at.v ac.v ar.v ic.v
+	pa.v at.v ac.v ar.v ic.v \
+	cpu.v
 TESTS_DIR = tests
 TESTS = regs.v pd.v \
 	alu_add_16bit_182.v alu_add_16bit.v alu_fn.v \
