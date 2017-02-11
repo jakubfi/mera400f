@@ -8,7 +8,7 @@
 */
 
 module pp(
-	input clk,
+	input __clk,
 	// sheet 1, 2
 	input [0:15] w,
 	input clm_,
@@ -256,7 +256,7 @@ module pp(
 
 	wire rin_dly;
 	dly #(.ticks(4'd15)) DLY_RIN( // 15 ticks = 300ns @ 50MHz
-		.clk(clk),
+		.clk(__clk),
 		.i(~rin_),
 		.o(rin_dly)
 	);
@@ -267,7 +267,7 @@ module pp(
 
 	wire M14_6;
 	univib #(.ticks(3'd7)) TRIG_RIN( // 7 ticks = 140ns @ 50MHz (153ns orig.)
-		.clk(clk),
+		.clk(__clk),
 		.a(M12_3),
 		.b(zw_dly),
 		.q(M14_6)
