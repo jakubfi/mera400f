@@ -8,7 +8,7 @@
 */
 
 module pm(
-	input clk,
+	input __clk,
 	// sheet 1
 	input start$_,
 	input pon_,
@@ -44,7 +44,7 @@ module pm(
 	input k1_,
 	output laduj,
 	output k2_bin_store_,
-	output k2fetch_,
+	output k2fetch,
 	output w_rbc$_,
 	output w_rba$_,
 	output w_rbb$_,
@@ -270,7 +270,7 @@ module pm(
 
 	wire M90_5;
 	univib #(.ticks(3'd7)) VIB_KC( // 7 ticks = 140ns @ 50MHz (100-200ns orig.)
-		.clk(clk),
+		.clk(__clk),
 		.a(1'b0),
 		.b(M13_11),
 		.q(M90_5)
@@ -278,7 +278,7 @@ module pm(
 
 	wire M90_13;
 	univib #(.ticks(3'd6)) VIB_PC( // 6 ticks = 120ns @ 50MHz (90-150ns orig.)
-		.clk(clk),
+		.clk(__clk),
 		.a(M90_5),
 		.b(1'b1),
 		.q(M90_13)
@@ -355,7 +355,7 @@ module pm(
 	wire ar_1 = ~(k2 & ~load);
 	wire k2store_ = ~(k2 & store);
 	assign k2_bin_store_ = ~(k2 & ~(~store & ~bin));
-	assign k2fetch_ = ~(k2 & fetch);
+	assign k2fetch = ~(k2 & fetch);
 	wire bin_ = ~bin;
 
 	assign w_rbc$_ = k1s1 & lg_0;
