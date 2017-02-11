@@ -6,10 +6,6 @@ module counter4(
 	input l_
 );
 
-	initial begin
-		o = 4'd0;
-	end
-
 	always @ (posedge cd, negedge l_, posedge r) begin
 		if (r) o <= 4'd0;
 		else if (~l_) o <= i;

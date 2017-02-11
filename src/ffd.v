@@ -3,10 +3,6 @@ module ffd(
 	output reg q
 );
 
-	initial begin
-		q = 1'b0;
-	end
-
 	wire r = ~r_;
 	wire s = ~s_;
 

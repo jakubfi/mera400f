@@ -3,10 +3,6 @@ module ffjk(
 	output reg q
 );
 
-	initial begin
-		q = 1'b0;
-	end
-
 	wire clk = ~c_;
 	wire r = ~r_;
 	wire s = ~s_;
