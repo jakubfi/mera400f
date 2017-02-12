@@ -25,7 +25,7 @@ TESTS = regs.v pd.v \
 	decoder_bcd.v decoder16.v \
 	latch16.v \
 	ar.v at.v ic.v ac.v
-ASSIGNMENTS = $(SOURCES_DIR)/assignments.qsf
+SETTINGS = $(SOURCES_DIR)/settings.qsf
 QSYS_SYNTH = VERILOG
 # See: https://github.com/jakubfi/altlogfilter (or comment out the line below)
 ALTLOGFILTER = alf -c --
@@ -112,7 +112,7 @@ $(SETTINGS_FILE): Makefile
 	$(ALTLOGFILTER) $(Q_SH) --prepare -f $(FAMILY) -d $(DEVICE) -t $(TOPLEVEL) $(PROJECT)
 	$(ALTLOGFILTER) $(Q_SH) --set PROJECT_OUTPUT_DIRECTORY=$(OUT_DIR) $(PROJECT)
 	@echo "" >> $(SETTINGS_FILE)
-	@echo -e "source $(ASSIGNMENTS)" >> $(SETTINGS_FILE)
+	@echo -e "source $(SETTINGS)" >> $(SETTINGS_FILE)
 	@echo -e "source $(SOURCES_FILE)" >> $(SETTINGS_FILE)
 
 $(SOURCES_FILE): $(SETTINGS_FILE)
@@ -129,7 +129,7 @@ $(SOURCES_FILE): $(SETTINGS_FILE)
 $(MAP_OUTPUT): $(SRCS) $(SOURCES_FILE)
 	$(ALTLOGFILTER) $(Q_MAP) $(MAP_ARGS) $(PROJECT)
 
-$(FIT_OUTPUT): $(MAP_OUTPUT) $(ASSIGNMENTS)
+$(FIT_OUTPUT): $(MAP_OUTPUT) $(SETTINGS)
 	$(ALTLOGFILTER) $(Q_FIT) $(FIT_ARGS) $(PROJECT)
 
 $(SOF_OUTPUT): $(FIT_OUTPUT)
