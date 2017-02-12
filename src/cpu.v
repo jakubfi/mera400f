@@ -12,14 +12,14 @@ module cpu(
 	input panel_store_, panel_fetch_, panel_load_, panel_bin_,
 	input oprq_, stop$_, start$_, work, mode_, step_, stop_n, cycle_,
 	input wre, rsa, rsb, rsc,
-	input wic, wac, war, wir,wrs, wrz, wkb,
+	input wic, wac, war, wir, wrs, wrz, wkb,
 	input zegar_,
 	// to control panel
 	output p0_,
 	output [0:15] w,
 
 	// system bus
-	input rpa_,
+											input rpa_,
 	// -DCL/-DM-CL			-RCL
 	// -OFF
 	output dw_,
