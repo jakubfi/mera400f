@@ -17,13 +17,15 @@ All names match those on original schematic, with the following 'cosmetic' chang
 
 * all signal names are lowercase instead of uppercase,
 * bus signals are grouped together (IR0..IR15 becomes ir[0:15]),
-* signals that are not named on schematic get the name `Mxx_yy` where x is the component number, y is the pin number,
-* components get uppercase names (related to component function)
-* active-low signal names end with underscore
+* additional named signals get the name `Mxx_yy` where x is the component number, y is the pin number from which the signal originates,
+* components and submodules get uppercase names (related to component function, in most cases),
+* active-low signal names end with underscore,
 * special characters treatment:
-  * special character in the middle of the name is replaced with an underscore (eg. `W->LEGY` becomes `w_legy`, `-EKC*2` becomes `ekc_2_`),
-  * star at the end of signal name is replaced with dollar sign (eg. `OK*` becomes `ok$`),
-  * `W&` changes name to `w$` (and `-W&` becomes `w$_`),
-  * in complex names underscores are used as replacements (eg. `I3/EX+PRZER/` becomes `i3_ex_przer`, `CK->RZ*W` becomes `ck_rz_w`),
+  * special characters in the middle of the name are replaced with an underscore (eg. `W->LEGY` becomes `w_legy`, `-EKC*2` becomes `ekc_2_`),
+  * star or atmark at the end of signal name is replaced with dollar sign (eg. `OK*` becomes `ok$`, `-W&` becomes `w$_`),
+  * for complex names underscores are used as special characters replacements (eg. `I3/EX+PRZER/` becomes `i3_ex_przer`, `CK->RZ*W` becomes `ck_rz_w`),
+* signal names which start with a number are prefixed with an underscore (eg. `0->V` becomes `_0_v`),
+* polish diacritics are replaced with non-diacritics,
+* for a couple of signal names polarity (and also the name) has been changed to reflect the reality
 
 
