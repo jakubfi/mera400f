@@ -39,14 +39,16 @@ module cpu(
 											input zw,
 	output zz_,
 
-// AWP outputs
-input fi0_, fi1_, fi2_, fi3_,
-input read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, zer_fp_, ustr0_fp_, s_fp_,
-input f13_, lpa, lpb,
-input [0:15] zp,
+	input [0:30] awp_dummy,
 
 	input __clk
 );
+
+	parameter CPU_NUMBER = 1'b0;
+	parameter AWP_PRESENT = 1'b1;
+	parameter INOU_USER_ILLEGAL = 1'b1;
+	parameter STOP_ON_NOMEM = 1'b1;
+	parameter LOW_MEM_WRITE_DENY = 1'b0;
 
 	// -DDT open-collector composition
 	assign ddt_[0] = pa_ddt_[0] & px_ddt0_;
@@ -71,7 +73,7 @@ input [0:15] zp,
 
 wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw_, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, dmcl_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, hlt_n_, bod, b_parz_, b_p0_, awaria_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
 
-px PX(
+px #(.AWP_PRESENT(AWP_PRESENT), .STOP_ON_NOMEM(STOP_ON_NOMEM), .LOW_MEM_WRITE_DENY(LOW_MEM_WRITE_DENY)) PX(
 	.__clk(__clk),
 	.ek1(ek1),
 	.ewp(ewp),
@@ -403,7 +405,7 @@ pm PM(
 wire [0:15] ir;
 wire c0, ls_, rj_, bs_, ou_, in_, is_, ri_, pufa, rb$_, cb_, sc$, oc$_, ka2_, gr$_, hlt, mcl_, sin_, gi_, lip_, mb_, im_, ki_, fi_, sp_, rz_, ib_, lpc, rpc, shc_, rc$_, ng$_, zb$_, b0_, _0_v, md, xi, nef, amb, apb, jkrb_, lwrs$_, saryt, ap1, am1, bcoc$, sd_, scb_, sca_, sb_, sab_, saa_, lrcb$_, aryt, sbar$, nrf, ust_z, ust_v, ust_mc, ust_leg, eat0, sr$_, ust_y, ust_x, blr_, ewa, ewp, uj$_, lwt$_, lj_, ewe, ekc_1_, ewz, ew$, lar$, ssp$, ka1_, na_, exl_, p16_, ewr, ewm, efp_, sar$, eww, srez$, ewx, axy, inou$_, ekc_2_, lac$_;
 
-pd PD(
+pd #(.INOU_USER_ILLEGAL(INOU_USER_ILLEGAL)) PD(
 	.w(w),
 	.strob1(strob1),
 	.w_ir(w_ir),
@@ -531,7 +533,7 @@ wire zgpn, q, zer_;
 wire [0:8] r0;
 wire [0:15] ki;
 
-pr PR(
+pr #(.CPU_NUMBER(CPU_NUMBER), .AWP_PRESENT(AWP_PRESENT)) PR(
 	.blr_(blr_),
 	.lpc(lpc),
 	.wa_(wa_),
@@ -649,7 +651,6 @@ pp PP(
 // --- P-A ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-//wire [0:15] w;
 wire s0, carry_, j$, exx_, at15_, exy_, s_1, wzi, zs, arz;
 wire zga;
 wire [0:15] pa_ddt_;
@@ -716,6 +717,30 @@ pa PA(
 	.ar_ad_(ar_ad_),
 	.zga(zga)
 );
+
+// -----------------------------------------------------------------------
+// --- AWP ---------------------------------------------------------------
+// -----------------------------------------------------------------------
+
+wire fi0_, fi1_, fi2_, fi3_;
+wire read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, zer_fp_, ustr0_fp_, s_fp_;
+wire f13_, lpa, lpb;
+wire [0:15] zp;
+
+generate
+	if (~AWP_PRESENT) begin
+		assign {fi0_, fi1_, fi2_, fi3_} = 4'b1111;
+		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, zer_fp_, ustr0_fp_, s_fp_} = 8'b11111111;
+		assign {f13_, lpa, lpb} = 3'b100;
+		assign zp = 16'hffff;
+	end else begin
+		// TODO: instantiate the real AWP
+		assign {fi0_, fi1_, fi2_, fi3_} = awp_dummy[0:3];
+		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, zer_fp_, ustr0_fp_, s_fp_} = awp_dummy[4:11];
+		assign {f13_, lpa, lpb} = awp_dummy[12:14];
+		assign zp = awp_dummy[15:30];
+	end
+endgenerate
 
 endmodule
 
