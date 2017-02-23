@@ -28,4 +28,51 @@ All names match those on original schematic, with the following 'cosmetic' chang
 * polish diacritics are replaced with non-diacritics,
 * for a couple of signal names polarity (and also the name) has been changed to reflect the reality
 
+Control Panel serial protocol
+============================================
 
+Control Panel recognizes following serial commands (8N1):
+
+* `001 FFFF V` - Set function key FFFF (see below) to position V (0-off, 1-on)
+* `01 KKKKKK` - set data keys 10-15 to binary value K
+* `100 KKKKK` - set data keys 5-9 to binary value K
+* `101 KKKKK` - set data keys 0-4 to binary value K
+* `110 xxxxx` - read LED status (unimplemented)
+* `111 xPPPP` - Set rotary switch to position PPPP (see below)
+
+`x` bits value doesn't matter.
+
+Function keys (FFFF):
+
+* `0000` - START
+* `0001` - MODE
+* `0010` - CLOCK
+* `0011` - STOP*N (momentary)
+* `0100` - STEP (momentary)
+* `0101` - FETCH (momentary)
+* `0110` - STORE (momentary)
+* `0111` - CYCLE (momentary)
+* `1000` - LOAD (momentary)
+* `1001` - BIN
+* `1010` - OPRQ (momentary)
+* `1011` - CLEAR (momentary)
+
+If a momentary switch is set to 1, it automaticaly bounces back, there is no need to explicitly set it back to 0.
+
+Rotary switch positions (PPPP):
+
+* `0000` - R0
+* `0001` - R1
+* `0010` - R2
+* `0011` - R3
+* `0100` - R4
+* `0101` - R5
+* `0110` - R6
+* `0111` - R7
+* `1000` - IC
+* `1001` - AC
+* `1010` - AR
+* `1011` - IR
+* `1100` - RS
+* `1101` - RZ
+* `1110` - KB

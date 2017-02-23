@@ -1,7 +1,44 @@
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
 set_global_assignment -name OUTPUT_PIN_LOAD 10 -section_id "3.3-V LVTTL"
+set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
 
 # -- Clocks --------------------------------------------------------------
 set_location_assignment PIN_23 -to CLK_EXT
+
+# -- UART ----------------------------------------------------------------
+set_location_assignment PIN_160 -to RXD
+set_location_assignment PIN_163 -to TXD
+
+# -- Keys ----------------------------------------------------------------
+set_location_assignment PIN_144 -to K1
+set_location_assignment PIN_145 -to K2
+set_location_assignment PIN_146 -to K3
+set_location_assignment PIN_147 -to K4
+
+# -- 7-seg: digits -------------------------------------------------------
+set_location_assignment PIN_106 -to DIG[0]
+set_location_assignment PIN_105 -to DIG[1]
+set_location_assignment PIN_104 -to DIG[2]
+set_location_assignment PIN_127 -to DIG[3]
+set_location_assignment PIN_128 -to DIG[4]
+set_location_assignment PIN_133 -to DIG[5]
+set_location_assignment PIN_134 -to DIG[6]
+set_location_assignment PIN_135 -to DIG[7]
+
+# -- 7-seg: segments -----------------------------------------------------
+set_location_assignment PIN_110 -to SEG[0]
+set_location_assignment PIN_112 -to SEG[1]
+set_location_assignment PIN_113 -to SEG[2]
+set_location_assignment PIN_114 -to SEG[3]
+set_location_assignment PIN_115 -to SEG[4]
+set_location_assignment PIN_116 -to SEG[5]
+set_location_assignment PIN_117 -to SEG[6]
+set_location_assignment PIN_118 -to SEG[7]
+
+set_location_assignment PIN_101 -to DEBUG
+set_location_assignment PIN_99 -to DEBUG2
+
+# -- Buzzer --------------------------------------------------------------
+set_location_assignment PIN_30 -to BUZZER
 

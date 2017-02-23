@@ -2,7 +2,7 @@
 # --- Project configuration -------------------------------------------------
 
 PROJECT = mera400f
-TOPLEVEL = mera400f
+TOPLEVEL = pk
 SOURCES_DIR = src
 SOURCES = mera400f.v \
 	counter4.v \
@@ -18,6 +18,7 @@ SOURCES = mera400f.v \
 	pm.v \
 	pp.v rzrp.v \
 	pa.v at.v ac.v ar.v ic.v \
+	pk.v uart.v sevenseg.v impulse.v \
 	cpu.v
 TESTS_DIR = tests
 TESTS = regs.v pd.v \
