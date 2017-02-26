@@ -1,4 +1,5 @@
 module cpu(
+	input run_trig,
 
 	// from power supply (?)
 	input off_,
@@ -80,7 +81,7 @@ module cpu(
 	assign DEBUG[2] = ep1;
 	assign DEBUG[3] = sp1_;
 	assign DEBUG[4] = clo_;
-	assign DEBUG[5] = 1;
+	assign DEBUG[5] = run_trig;
 	assign DEBUG[6] = p2_;
 	assign DEBUG[7] = p3_;
 	assign DEBUG[8] = p4_;
@@ -100,6 +101,7 @@ wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, 
 
 px #(.AWP_PRESENT(AWP_PRESENT), .STOP_ON_NOMEM(STOP_ON_NOMEM), .LOW_MEM_WRITE_DENY(LOW_MEM_WRITE_DENY)) PX(
 	.__clk(__clk),
+	.run_trig(run_trig),
 	.ek1(ek1),
 	.ewp(ewp),
 	.ek2(ek2),

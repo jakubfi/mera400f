@@ -9,6 +9,7 @@
 
 module px(
 	input __clk, // clock for "univibrators"
+	input run_trig,
 	// sheet 1
 	input ek1,	// A32 - Enter state K1
 	input ewp,	// A34 - Enter state WP
@@ -269,7 +270,7 @@ module px(
 	wire got$;
 	univib #(.ticks(3'd5)) VIB_GOT( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
-		.a(M15_6),
+		.a(M15_6|run_trig),
 		.b(1'b1),
 		.q(got$)
 	);

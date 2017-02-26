@@ -20,6 +20,21 @@ module mera400f(
 	wire pon_ = 0; // 05 A12 -- 23 Z41 -- 24 R41
 	wire pout_ = 1; // 07 A24 -- 23 Z42 -- 24 R42
 
+	reg run_trig;
+	initial run_trig = 0;
+	reg [15:0] run_trig_counter;
+	initial run_trig_counter = 16'hffff;
+	always @ (posedge CLK_EXT) begin
+		if (run_trig_counter != 0) begin
+			run_trig_counter <= run_trig_counter - 1'b1;
+			if (run_trig_counter == 4) begin
+				run_trig <= 1;
+			end
+		end else begin
+				run_trig <= 0;
+		end
+	end
+
 	// input: ??
 	wire clm_ = 1; // 23 Z09 -- 24 R09
 	wire clo_ = 1; // 09 W80 -- 23 Z08 -- 24 R08 -- 12 X70
@@ -67,6 +82,7 @@ module mera400f(
 	CPU0(
 		// FPGA
 		.__clk(CLK_EXT),
+		.run_trig(run_trig),
 		.DEBUG(DEBUG),
 		// control panel
 		.off_(off_),
