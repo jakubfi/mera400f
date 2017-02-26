@@ -1,4 +1,5 @@
 module cpu(
+
 	// from power supply (?)
 	input off_,
 	input pon_,
@@ -17,6 +18,14 @@ module cpu(
 	// to control panel
 	output p0_,
 	output [0:15] w,
+	output hlt_n_,
+	output p_,
+	output run,
+	output wait_,
+	output irq,
+	output q,
+	output mc_,
+	output awaria_,
 
 	// system bus
 											input rpa_,
@@ -40,7 +49,7 @@ module cpu(
 	output zz_,
 
 	input [0:30] awp_dummy,
-
+	output [15:0] DEBUG,
 	input __clk
 );
 
@@ -67,11 +76,28 @@ module cpu(
 	assign dad_[14] = pa_dad_[14] & px_dad14_ & pp_dad14_;
 	assign dad_[15] = pa_dad_[15] & px_dad15_ir9_ & px_dad15_i_ & pp_dad15_;
 
+	assign DEBUG[0] = p0_;
+	assign DEBUG[1] = p1_;
+	assign DEBUG[2] = ep1;
+	assign DEBUG[3] = sp1_;
+	assign DEBUG[4] = clo_;
+	assign DEBUG[5] = 1;
+	assign DEBUG[6] = p2_;
+	assign DEBUG[7] = p3_;
+	assign DEBUG[8] = p4_;
+	assign DEBUG[9] = p5_;
+	assign DEBUG[10] = 1;
+	assign DEBUG[11] = 1;
+	assign DEBUG[12] = 1;
+	assign DEBUG[13] = strob1_;
+	assign DEBUG[14] = strob2_;
+	assign DEBUG[15] = got_;
+
 // -----------------------------------------------------------------------
 // --- P-X ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw_, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, dmcl_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, hlt_n_, bod, b_parz_, b_p0_, awaria_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
+wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw_, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, dmcl_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
 
 px #(.AWP_PRESENT(AWP_PRESENT), .STOP_ON_NOMEM(STOP_ON_NOMEM), .LOW_MEM_WRITE_DENY(LOW_MEM_WRITE_DENY)) PX(
 	.__clk(__clk),
@@ -211,7 +237,7 @@ px #(.AWP_PRESENT(AWP_PRESENT), .STOP_ON_NOMEM(STOP_ON_NOMEM), .LOW_MEM_WRITE_DE
 // --- P-M ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire start, wait_, run, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, p_, mc_3, mc_, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa_, bab_, bac_, aa_, ab_, wprb_, bwb_, bwa_, kia_, kib_, w_ir, mwa_, mwb_, mwc_;
+wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa_, bab_, bac_, aa_, ab_, wprb_, bwb_, bwa_, kia_, kib_, w_ir, mwa_, mwb_, mwc_;
 
 pm PM(
 	.__clk(__clk),
@@ -529,7 +555,7 @@ pd #(.INOU_USER_ILLEGAL(INOU_USER_ILLEGAL)) PD(
 // -----------------------------------------------------------------------
 
 wire [0:15] l;
-wire zgpn, q, zer_;
+wire zgpn, zer_;
 wire [0:8] r0;
 wire [0:15] ki;
 
@@ -594,7 +620,7 @@ pr #(.CPU_NUMBER(CPU_NUMBER), .AWP_PRESENT(AWP_PRESENT)) PR(
 
 wire [0:9] rs;
 wire [0:15] rz;
-wire przerw_z, irq, pp_dad11_, pp_dad12_, pp_dad13_, pp_dad14_, pp_dad4_, pp_dad15_;
+wire przerw_z, pp_dad11_, pp_dad12_, pp_dad13_, pp_dad14_, pp_dad4_, pp_dad15_;
 
 pp PP(
 	.__clk(__clk),

@@ -38,13 +38,11 @@
 
 module pk(
 	// FPGA I/Os
-	output DEBUG, DEBUG2,
 	input CLK_EXT,
 	input RXD,
 	output TXD,
 	output [7:0] SEG,
 	output [7:0] DIG,
-	output BUZZER,
 	// sheet 1
 	input hlt_n_,
 	input off_,
@@ -68,7 +66,6 @@ module pk(
 	output reg zegar_,
 	// sheet 4
 	input [0:15] w,
-	input dc_,
 	input p_,
 	input mc_,
 	input alarm_,
@@ -92,8 +89,6 @@ module pk(
 );
 
   parameter TIMER_CYCLE_MS = 4'd10;
-
-	assign BUZZER = 1;
 
 	// --- FPGA: 1KHz internal clock generator
 

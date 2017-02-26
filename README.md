@@ -53,7 +53,7 @@ Function keys (FFFF):
 * `0110` - STORE (momentary)
 * `0111` - CYCLE (momentary)
 * `1000` - LOAD (momentary)
-* `1001` - BIN
+* `1001` - BIN (momentary)
 * `1010` - OPRQ (momentary)
 * `1011` - CLEAR (momentary)
 
