@@ -48,7 +48,6 @@ module cpu(
 											input zw,
 	output zz_,
 
-	input [0:30] awp_dummy,
 	output [15:0] DEBUG,
 	input __clk
 );
@@ -761,10 +760,10 @@ generate
 		assign zp = 16'hffff;
 	end else begin
 		// TODO: instantiate the real AWP
-		assign {fi0_, fi1_, fi2_, fi3_} = awp_dummy[0:3];
-		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, zer_fp_, ustr0_fp_, s_fp_} = awp_dummy[4:11];
-		assign {f13_, lpa, lpb} = awp_dummy[12:14];
-		assign zp = awp_dummy[15:30];
+		assign {fi0_, fi1_, fi2_, fi3_} = 4'b1111;
+		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, zer_fp_, ustr0_fp_, s_fp_} = 8'b11111111;
+		assign {f13_, lpa, lpb} = 3'b100;
+		assign zp = 16'hffff;
 	end
 endgenerate
 

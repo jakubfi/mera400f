@@ -57,12 +57,9 @@ module mera400f(
 	wire [0:15] w;
 	wire hlt_n_, p_, run, wait_, irq, q, mc_, awaria_;
 
-	// awp
-	wire [0:30] awp_dummy = 31'b0000000000000000000000000000000;
-
 	cpu #(
 		.CPU_NUMBER(1'b0),
-		.AWP_PRESENT(1'b1),
+		.AWP_PRESENT(1'b0),
 		.INOU_USER_ILLEGAL(1'b1),
 		.STOP_ON_NOMEM(1'b1),
 		.LOW_MEM_WRITE_DENY(1'b0)
@@ -135,8 +132,6 @@ module mera400f(
 		.zg(zg),
 		.zw(zw),
 		.zz_(zz_),
-		// AWP
-		.awp_dummy(awp_dummy)
 	);
 
 // -----------------------------------------------------------------------
