@@ -80,15 +80,15 @@ module cpu(
 	assign DEBUG[1] = p1_;
 	assign DEBUG[2] = ep1;
 	assign DEBUG[3] = sp1_;
-	assign DEBUG[4] = clo_;
+	assign DEBUG[4] = panel_load_;
 	assign DEBUG[5] = run_trig;
 	assign DEBUG[6] = p2_;
 	assign DEBUG[7] = p3_;
 	assign DEBUG[8] = p4_;
 	assign DEBUG[9] = p5_;
-	assign DEBUG[10] = 1;
-	assign DEBUG[11] = 1;
-	assign DEBUG[12] = 1;
+	//assign DEBUG[10] = 1;
+	//assign DEBUG[11] = 1;
+	//assign DEBUG[12] = 1;
 	assign DEBUG[13] = strob1_;
 	assign DEBUG[14] = strob2_;
 	assign DEBUG[15] = got_;
@@ -242,6 +242,9 @@ wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch, w_rbc$_, w
 
 pm PM(
 	.__clk(__clk),
+	.DEBUG_KC(DEBUG[10]),
+	.DEBUG_PC(DEBUG[11]),
+	.DEBUG_RESCYC_(DEBUG[12]),
 	.start$_(start$_),
 	.pon_(pon_),
 	.work(work),

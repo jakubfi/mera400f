@@ -107,9 +107,10 @@ module pk(
 	// --- FPGA: uart action trigger
 
 	wire action;
-	impulse UART_ACTION(
+	univib #(.ticks(5'd20)) UART_ACTION(
 		.clk(CLK_EXT),
-		.in(~rx_busy),
+		.a(rx_busy),
+		.b(1'b1),
 		.q(action)
 	);
 
