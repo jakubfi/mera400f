@@ -8,7 +8,7 @@ module cpu(
 	input clm_, clo_,
 
 	// from control panel
-	input kl,
+	input [0:15] kl,
 	input panel_store_, panel_fetch_, panel_load_, panel_bin_,
 	input oprq_, stop$_, start$_, work, mode_, step_, stop_n, cycle_,
 	input wre, rsa, rsb, rsc,
