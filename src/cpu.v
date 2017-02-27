@@ -5,8 +5,6 @@ module cpu(
 	input off_,
 	input pon_,
 	input pout_,
-
-	// ??
 	input clm_, clo_,
 
 	// from control panel
@@ -30,7 +28,7 @@ module cpu(
 
 	// system bus
 											input rpa_,
-	// -DCL/-DM-CL			-RCL
+	output dmcl_,
 	// -OFF
 	output dw_,
 	output dr_,
@@ -76,28 +74,28 @@ module cpu(
 	assign dad_[14] = pa_dad_[14] & px_dad14_ & pp_dad14_;
 	assign dad_[15] = pa_dad_[15] & px_dad15_ir9_ & px_dad15_i_ & pp_dad15_;
 
-	assign DEBUG[0] = p0_;
-	assign DEBUG[1] = p1_;
-	assign DEBUG[2] = ep1;
-	assign DEBUG[3] = sp1_;
-	assign DEBUG[4] = panel_load_;
-	assign DEBUG[5] = run_trig;
-	assign DEBUG[6] = p2_;
-	assign DEBUG[7] = p3_;
-	assign DEBUG[8] = p4_;
-	assign DEBUG[9] = p5_;
-	//assign DEBUG[10] = 1;
-	//assign DEBUG[11] = 1;
-	//assign DEBUG[12] = 1;
-	assign DEBUG[13] = strob1_;
-	assign DEBUG[14] = strob2_;
-	assign DEBUG[15] = got_;
+	assign DEBUG[0] = pon_;
+	assign DEBUG[1] = run_trig;
+	assign DEBUG[2] = got_;
+	assign DEBUG[3] = strob1_;
+	assign DEBUG[4] = strob2_;
+	assign DEBUG[5] = DEBUG_KC;
+	assign DEBUG[6] = DEBUG_PC;
+	assign DEBUG[7] = DEBUG_RESCYC_;
+	assign DEBUG[8] = ep0;
+	assign DEBUG[9] = sp0_;
+	assign DEBUG[10] = p0_;
+	assign DEBUG[11] = p1_;
+	assign DEBUG[12] = panel_load_;
+	assign DEBUG[13] = k1_;
+	assign DEBUG[14] = k2_;
+	assign DEBUG[15] = 1'b1;
 
 // -----------------------------------------------------------------------
 // --- P-X ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw_, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, dmcl_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
+wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw_, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
 
 px #(.AWP_PRESENT(AWP_PRESENT), .STOP_ON_NOMEM(STOP_ON_NOMEM), .LOW_MEM_WRITE_DENY(LOW_MEM_WRITE_DENY)) PX(
 	.__clk(__clk),
@@ -242,9 +240,9 @@ wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch, w_rbc$_, w
 
 pm PM(
 	.__clk(__clk),
-	.DEBUG_KC(DEBUG[10]),
-	.DEBUG_PC(DEBUG[11]),
-	.DEBUG_RESCYC_(DEBUG[12]),
+	.DEBUG_KC(DEBUG_KC),
+	.DEBUG_PC(DEBUG_PC),
+	.DEBUG_RESCYC_(DEBUG_RESCYC_),
 	.start$_(start$_),
 	.pon_(pon_),
 	.work(work),

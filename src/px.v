@@ -270,7 +270,7 @@ module px(
 	wire got$;
 	univib #(.ticks(3'd5)) VIB_GOT( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
-		.a(M15_6|run_trig),
+		.a(M15_6),
 		.b(1'b1),
 		.q(got$)
 	);

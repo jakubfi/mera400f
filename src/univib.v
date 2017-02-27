@@ -7,6 +7,7 @@ module univib(
 	parameter ticks = 3'd5;
 	localparam width = $clog2(ticks+1);
 
+	initial q = 0;
 	wire done = ~|r;
 	wire trig = ~a & b;
 

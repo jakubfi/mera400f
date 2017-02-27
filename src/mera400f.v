@@ -9,16 +9,21 @@ module mera400f(
 	output BUZZER
 );
 
+	//assign DEBUG[0] = off_;
+	//assign DEBUG[1] = pon_;
+	//assign DEBUG[2] = clm_;
+	//assign DEBUG[3] = clo_;
+	//assign DEBUG[4] = dcl_;
+	//assign DEBUG[5] = rcl_;
+	//assign DEBUG[6] = dmcl_;
+	//assign DEBUG[7] = pout_;
+
 // -----------------------------------------------------------------------
 // --- CPU ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
+	// FPGA cruft
 	assign BUZZER = 1;
-
-	// input: from power supply (?)
-	wire off_ = 1; // 09 B71 -- 11 Y32 -- 23 Z52 -- 24 R52 / 22 P21 -- 09 B41
-	wire pon_ = 0; // 05 A12 -- 23 Z41 -- 24 R41
-	wire pout_ = 1; // 07 A24 -- 23 Z42 -- 24 R42
 
 	reg run_trig;
 	initial run_trig = 0;
@@ -35,13 +40,7 @@ module mera400f(
 		end
 	end
 
-	// input: ??
-	wire clm_ = 1; // 23 Z09 -- 24 R09
-	wire clo_ = 1; // 09 W80 -- 23 Z08 -- 24 R08 -- 12 X70
-
 	// output: to system bus - drivers
-	// -DCL // 11 Y15 -- 22 P39 -- 23 Z40 -- 24 R40
-	// -DM-CL // 04 B88 -- 11 Y16
 	wire dw_;
 	wire dr_;
 	wire ds_;
@@ -53,10 +52,9 @@ module mera400f(
 	wire [0:3] dnb_;
 	wire [0:15] dad_;
 	wire [0:15] ddt_;
+	wire dmcl_;
 	// input: from system bus - receivers
 	wire rpa_ = 1;
-	// -RCL
-	// -OFF
 	wire rin_ = 1;
 	wire rok_ = 1;
 	wire ren_ = 1;
@@ -84,12 +82,13 @@ module mera400f(
 		.__clk(CLK_EXT),
 		.run_trig(run_trig),
 		.DEBUG(DEBUG),
-		// control panel
+		// power supply
 		.off_(off_),
 		.pon_(pon_),
 		.pout_(pout_),
 		.clm_(clm_),
 		.clo_(clo_),
+		// control panel
 		.kl(kl),
 		.panel_store_(panel_store_),
 		.panel_fetch_(panel_fetch_),
@@ -147,7 +146,7 @@ module mera400f(
 		// ssytem bus reservation
 		.zg(zg),
 		.zw(zw),
-		.zz_(zz_),
+		.zz_(zz_)
 	);
 
 // -----------------------------------------------------------------------
@@ -209,13 +208,34 @@ module mera400f(
 	);
 
 // -----------------------------------------------------------------------
-// --- POWER  SUPPLY -----------------------------------------------------
+// --- POWER SUPPLY ------------------------------------------------------
 // -----------------------------------------------------------------------
+
+	wire off_, pout_, pon_, clo_, clm_;
+	puks PUKS(
+		.clk(CLK_EXT),
+		.zoff_(zoff_),
+		.rcl_(rcl_),
+		.dcl_(dcl_),
+		.off_(off_),
+		.pout_(pout_),
+		.pon_(pon_),
+		.clo_(clo_),
+		.clm_(clm_)
+	);
 
 // -----------------------------------------------------------------------
 // --- I/F ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
+	wire rcl_, zoff_;
+	isk ISK(
+		.dmcl_(dmcl_),
+		.dcl_(dcl_),
+		.off_(off_),
+		.rcl_(rcl_),
+		.zoff_(zoff_)
+	);
 
 endmodule
 

@@ -19,6 +19,8 @@ SOURCES = mera400f.v \
 	pp.v rzrp.v \
 	pa.v at.v ac.v ar.v ic.v \
 	pk.v uart.v sevenseg.v impulse.v \
+	puks.v \
+	isk.v \
 	cpu.v
 TESTS_DIR = tests
 TESTS = regs.v pd.v \
