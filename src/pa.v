@@ -86,34 +86,37 @@ module pa(
 
 	// sheet 1..4
 
-	wire mwa = ~mwa_;
-	wire mwb = ~mwb_;
-	wire mwc = ~mwc_;
-	wire bwb = ~bwb_;
-	wire bwa = ~bwa_;
 	wire w_dt = ~w_dt_;
 
-	wire [0:2] W_SEL = {mwc, mwb, mwa};
+	reg [0:15] W;
+	assign w = W;
+	always @ (mwc_, mwb_, mwa_, bwb_, bwa_) begin
 
-	assign w[0:7] = bwb ? 8'd0 :
-		(W_SEL == 3'b000) ? ir[0:7] :
-		(W_SEL == 3'b001) ? kl[0:7] :
-		(W_SEL == 3'b010) ? ~rdt_[0:7] :
-		(W_SEL == 3'b011) ? 8'd0 :
-		(W_SEL == 3'b100) ? ki[0:7] :
-		(W_SEL == 3'b101) ? at[0:7] :
-		(W_SEL == 3'b110) ? ac[0:7] :
-		a[0:7];
+		if (~bwb_) W[0:7] = 8'd0;
+		else case ({mwc_, mwb_, mwa_})
+			3'b111 : W[0:7] <= ir[0:7];
+			3'b110 : W[0:7] <= kl[0:7];
+			3'b101 : W[0:7] <= ~rdt_[0:7];
+			3'b100 : W[0:7] <= 8'd0;
+			3'b011 : W[0:7] <= ki[0:7];
+			3'b010 : W[0:7] <= at[0:7];
+			3'b001 : W[0:7] <= ac[0:7];
+			3'b000 : W[0:7] <= a[0:7];
+		endcase
 
-	assign w[8:15] = bwa ? 8'd0 :
-		(W_SEL == 3'b000) ? ir[8:15] :
-		(W_SEL == 3'b001) ? kl[8:15] :
-		(W_SEL == 3'b010) ? ~rdt_[8:15] :
-		(W_SEL == 3'b011) ? ac[0:7] :
-		(W_SEL == 3'b100) ? ki[8:15] :
-		(W_SEL == 3'b101) ? at[8:15] :
-		(W_SEL == 3'b110) ? ac[8:15] :
-		a[8:15];
+		if (~bwa_) W[8:15] = 8'd0;
+		else case ({mwc_, mwb_, mwa_})
+			3'b111 : W[8:15] <= ir[8:15];
+			3'b110 : W[8:15] <= kl[8:15];
+			3'b101 : W[8:15] <= ~rdt_[8:15];
+			3'b100 : W[8:15] <= ac[0:7];
+			3'b011 : W[8:15] <= ki[8:15];
+			3'b010 : W[8:15] <= at[8:15];
+			3'b001 : W[8:15] <= ac[8:15];
+			3'b000 : W[8:15] <= a[8:15];
+		endcase
+
+	end
 
 	assign ddt_ = ~(w & {16{w_dt}});
 
@@ -284,28 +287,34 @@ module pa(
 
 	// sheet 11, 12
 
-	wire bac = ~bac_;
-	wire ab = ~ab_;
-	wire aa = ~aa_;
-	wire bab = ~bab_;
-	wire baa = ~baa_;
+	reg [0:15] a;
+	always @ (ab_, aa_, bac_, bab_, baa_) begin
 
-	wire [0:15] a;
-	assign a[0:7] = bac ? 8'd0 :
-		{ab, aa} == 2'b00 ? l[8:15] :
-		{ab, aa} == 2'b01 ? ic[0:7] :
-		{ab, aa} == 2'b10 ? ar[0:7] :
-		l[0:7];
-	assign a[8:9] = bab ? 2'd0 :
-		{ab, aa} == 2'b00 ? ir[8:9] :
-		{ab, aa} == 2'b01 ? ic[8:9] :
-		{ab, aa} == 2'b10 ? ar[8:9] :
-		l[8:9];
-	assign a[10:15] = baa ? 6'd0 :
-		{ab, aa} == 2'b00 ? ir[10:15] :
-		{ab, aa} == 2'b01 ? ic[10:15] :
-		{ab, aa} == 2'b10 ? ar[10:15] :
-		l[10:15];
+		if (~bac_) a[0:7] <= 8'd0;
+		else case ({ab_, aa_})
+			2'b11 : a[0:7] <= l[8:15];
+			2'b10 : a[0:7] <= ic[0:7];
+			2'b01 : a[0:7] <= ar[0:7];
+			2'b00 : a[0:7] <= l[0:7];
+		endcase
+
+		if (~bab_) a[8:9] <= 2'd0;
+		else case ({ab_, aa_})
+			2'b11 : a[8:9] <= ir[8:9];
+			2'b10 : a[8:9] <= ic[8:9];
+			2'b01 : a[8:9] <= ar[8:9];
+			2'b00 : a[8:9] <= l[8:9];
+		endcase
+
+		if (~baa_) a[10:15] <= 6'd0;
+		else case ({ab_, aa_})
+			2'b11 : a[10:15] <= ir[10:15];
+			2'b10 : a[10:15] <= ic[10:15];
+			2'b01 : a[10:15] <= ar[10:15];
+			2'b00 : a[10:15] <= l[10:15];
+		endcase
+
+	end
 
 	// sheet 13, 14
 
