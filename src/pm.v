@@ -274,7 +274,7 @@ module pm(
 	wire M90_5;
 	univib #(.ticks(3'd7)) VIB_KC( // 7 ticks = 140ns @ 50MHz (100-200ns orig.)
 		.clk(__clk),
-		.a(1'b0),
+		.a_(1'b0),
 		.b(M13_11),
 		.q(M90_5)
 	);
@@ -284,7 +284,7 @@ module pm(
 	wire M90_13;
 	univib #(.ticks(3'd6)) VIB_PC( // 6 ticks = 120ns @ 50MHz (90-150ns orig.)
 		.clk(__clk),
-		.a(M90_5),
+		.a_(M90_5),
 		.b(1'b1),
 		.q(M90_13)
 	);

@@ -1,6 +1,6 @@
 module univib(
 	input clk,
-	input a, b,
+	input a_, b,
 	output reg q
 );
 
@@ -9,7 +9,7 @@ module univib(
 
 	initial q = 0;
 	wire done = ~|r;
-	wire trig = ~a & b;
+	wire trig = ~a_ & b;
 
 	reg [width-1:0] r = ticks;
 

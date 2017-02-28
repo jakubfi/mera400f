@@ -109,7 +109,7 @@ module pk(
 	wire action;
 	univib #(.ticks(5'd20)) UART_ACTION(
 		.clk(CLK_EXT),
-		.a(rx_busy),
+		.a_(rx_busy),
 		.b(1'b1),
 		.q(action)
 	);

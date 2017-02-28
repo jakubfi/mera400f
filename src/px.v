@@ -225,31 +225,31 @@ module px(
 	assign {__q1_, __q2_, __q3_, __q4_, __q5_} = ~{__q1, __q2, __q3, __q4, __q5};
 	univib #(.ticks(3'd5)) uni1( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
-		.a(got$),
+		.a_(got$),
 		.b(M19_6),
 		.q(__q1)
 	);
 	univib #(.ticks(3'd6)) uni2( // 6 ticks = 120ns @ 50MHz (110-190ns)
 		.clk(__clk),
-		.a(got$),
+		.a_(got$),
 		.b(M18_8 & ok),
 		.q(__q2)
 	);
 	univib #(.ticks(3'd5)) uni3( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
-		.a(got$),
+		.a_(got$),
 		.b(M20_8 & ok),
 		.q(__q3)
 	);
 	univib #(.ticks(3'd5)) uni4( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
-		.a(got$),
+		.a_(got$),
 		.b(M16_8),
 		.q(__q4)
 	);
 	univib #(.ticks(3'd5)) uni5( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
-		.a(got$),
+		.a_(got$),
 		.b(M15_8),
 		.q(__q5)
 	);
@@ -270,7 +270,7 @@ module px(
 	wire got$;
 	univib #(.ticks(3'd5)) VIB_GOT( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
-		.a(M15_6),
+		.a_(M15_6),
 		.b(1'b1),
 		.q(got$)
 	);
@@ -283,7 +283,7 @@ module px(
 	wire strob2;
 	univib #(.ticks(3'd6)) VIB_STROB2( // 6 ticks = 120ns @ 50MHz (110-190ns)
 		.clk(__clk),
-		.a(M53_8),
+		.a_(M53_8),
 		.b(1'b1),
 		.q(strob2)
 	);
@@ -495,7 +495,7 @@ module px(
 	wire talarm;
 	univib #(.ticks(2'd3)) VIB_ALARM( // 3 ticks @ 50MHz = 60ns (60ns orig.)
 		.clk(__clk),
-		.a(1'b0),
+		.a_(1'b0),
 		.b(alarm_dly),
 		.q(talarm)
 	);

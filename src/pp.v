@@ -268,7 +268,7 @@ module pp(
 	wire M14_6;
 	univib #(.ticks(3'd7)) TRIG_RIN( // 7 ticks = 140ns @ 50MHz (153ns orig.)
 		.clk(__clk),
-		.a(M12_3),
+		.a_(M12_3),
 		.b(zw_dly),
 		.q(M14_6)
 	);

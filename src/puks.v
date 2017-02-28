@@ -41,7 +41,7 @@ module puks(
 	wire pon;
 	univib #(.ticks(3'd7)) PON(
 		.clk(clk),
-		.a(1'b0),
+		.a_(1'b0),
 		.b(off_),
 		.q(pon)
 	);
