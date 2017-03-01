@@ -8,6 +8,7 @@
 */
 
 module pa(
+	input __clk,
 	// sheet 1
 	input [0:15] ir,
 	input [0:15] ki,
@@ -90,7 +91,7 @@ module pa(
 
 	reg [0:15] W;
 	assign w = W;
-	always @ (mwc_, mwb_, mwa_, bwb_, bwa_) begin
+	always @ (mwc_, mwb_, mwa_, bwb_, bwa_, ir, kl, rdt_, ki, at, ac, a) begin
 
 		if (~bwb_) W[0:7] = 8'd0;
 		else case ({mwc_, mwb_, mwa_})
@@ -288,7 +289,7 @@ module pa(
 	// sheet 11, 12
 
 	reg [0:15] a;
-	always @ (ab_, aa_, bac_, bab_, baa_) begin
+	always @ (ab_, aa_, bac_, bab_, baa_, l, ir, ic, ar) begin
 
 		if (~bac_) a[0:7] <= 8'd0;
 		else case ({ab_, aa_})
