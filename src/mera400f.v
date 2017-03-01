@@ -98,7 +98,7 @@ module mera400f(
 		.stop$_(stop$_),
 		.start$_(start$_),
 		.work(work),
-		.mode_(mode_),
+		.mode_(mode),
 		.step_(step_),
 		.stop_n(stop_n),
 		.cycle_(cycle_),
@@ -158,7 +158,7 @@ module mera400f(
 	wire wre_, rsa, rsb, rsc;
 	wire wic, wac, war, wir, wrs, wrz, wkb;
 	wire panel_store_, panel_fetch_, panel_load_, panel_bin_;
-	wire oprq_, stop$_, start$_, work, mode_, step_, stop_n, cycle_;
+	wire oprq_, stop$_, start$_, work, mode, step_, stop_n, cycle_;
 	wire dcl_;
 
 	pk #(.TIMER_CYCLE_MS(10)) PK(
