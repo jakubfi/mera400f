@@ -161,7 +161,7 @@ module mera400f(
 	wire oprq_, stop$_, start$_, work, mode, step_, stop_n, cycle_;
 	wire dcl_;
 
-	pk #(.TIMER_CYCLE_MS(10)) PK(
+	pk #(.TIMER_CYCLE_MS(8'd10)) PK(
 		.CLK_EXT(CLK_EXT),
 		.RXD(RXD),
 		.TXD(TXD),
