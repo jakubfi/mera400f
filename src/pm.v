@@ -359,7 +359,7 @@ module pm(
 	assign laduj = load;
 	wire sfl = ~(~store & ~load & ~fetch);
 	wire k2 = ~k2_;
-	wire ur = ~(k2 & ~(~load & ~fetch));
+	wire ur = k2 & ~(~load & ~fetch);
 	wire ar_1 = ~(k2 & ~load);
 	wire k2store_ = ~(k2 & store);
 	assign k2_bin_store_ = ~(k2 & ~(~store & ~bin));
