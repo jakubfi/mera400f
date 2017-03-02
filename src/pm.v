@@ -9,9 +9,6 @@
 
 module pm(
 	input __clk,
-	output DEBUG_KC,
-	output DEBUG_PC,
-	output DEBUG_RESCYC_,
 	// sheet 1
 	input start$_,
 	input pon_,
@@ -279,8 +276,6 @@ module pm(
 		.q(M90_5)
 	);
 
-	assign DEBUG_KC = M90_5;
-
 	wire M90_13;
 	univib #(.ticks(3'd6)) VIB_PC( // 6 ticks = 120ns @ 50MHz (90-150ns orig.)
 		.clk(__clk),
@@ -290,9 +285,6 @@ module pm(
 	);
 
 	wire rescyc_ = clm_ & strob2_ & si1_;
-
-	assign DEBUG_PC = M90_13;
-	assign DEBUG_RESCYC_ = rescyc_;
 
 	wire pr_;
 	ffd REG_PR(

@@ -36,25 +36,6 @@ set_location_assignment PIN_116 -to SEG[5]
 set_location_assignment PIN_117 -to SEG[6]
 set_location_assignment PIN_118 -to SEG[7]
 
-# -- Debug bus -----------------------------------------------------------
-
-set_location_assignment PIN_31 -to DEBUG[0]
-set_location_assignment PIN_33 -to DEBUG[1]
-set_location_assignment PIN_34 -to DEBUG[2]
-set_location_assignment PIN_35 -to DEBUG[3]
-set_location_assignment PIN_37 -to DEBUG[4]
-set_location_assignment PIN_39 -to DEBUG[5]
-set_location_assignment PIN_40 -to DEBUG[6]
-set_location_assignment PIN_47 -to DEBUG[7]
-set_location_assignment PIN_48 -to DEBUG[8]
-set_location_assignment PIN_61 -to DEBUG[9]
-set_location_assignment PIN_60 -to DEBUG[10]
-set_location_assignment PIN_59 -to DEBUG[11]
-set_location_assignment PIN_58 -to DEBUG[12]
-set_location_assignment PIN_43 -to DEBUG[13]
-set_location_assignment PIN_99 -to DEBUG[14]
-set_location_assignment PIN_101 -to DEBUG[15]
-
 # -- Buzzer --------------------------------------------------------------
 set_location_assignment PIN_30 -to BUZZER
 

@@ -5,18 +5,8 @@ module mera400f(
 	input K1, K2, K3, K4,
 	output [7:0] DIG,
 	output [7:0] SEG,
-	output [15:0] DEBUG,
 	output BUZZER
 );
-
-	//assign DEBUG[0] = off_;
-	//assign DEBUG[1] = pon_;
-	//assign DEBUG[2] = clm_;
-	//assign DEBUG[3] = clo_;
-	//assign DEBUG[4] = dcl_;
-	//assign DEBUG[5] = rcl_;
-	//assign DEBUG[6] = dmcl_;
-	//assign DEBUG[7] = pout_;
 
 // -----------------------------------------------------------------------
 // --- CPU ---------------------------------------------------------------
@@ -81,7 +71,6 @@ module mera400f(
 		// FPGA
 		.__clk(CLK_EXT),
 		.run_trig(run_trig),
-		.DEBUG(DEBUG),
 		// power supply
 		.off_(off_),
 		.pon_(pon_),

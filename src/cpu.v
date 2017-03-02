@@ -47,7 +47,6 @@ module cpu(
 											input zw,
 	output zz_,
 
-	output [15:0] DEBUG,
 	input __clk
 );
 
@@ -73,23 +72,6 @@ module cpu(
 	assign dad_[13] = pa_dad_[13] & px_dad13_ & pp_dad13_;
 	assign dad_[14] = pa_dad_[14] & px_dad14_ & pp_dad14_;
 	assign dad_[15] = pa_dad_[15] & px_dad15_ir9_ & px_dad15_i_ & pp_dad15_;
-
-	assign DEBUG[0] = pon_;
-	assign DEBUG[1] = run_trig;
-	assign DEBUG[2] = got_;
-	assign DEBUG[3] = strob1_;
-	assign DEBUG[4] = strob2_;
-	assign DEBUG[5] = DEBUG_KC;
-	assign DEBUG[6] = DEBUG_PC;
-	assign DEBUG[7] = DEBUG_RESCYC_;
-	assign DEBUG[8] = ep0;
-	assign DEBUG[9] = sp0_;
-	assign DEBUG[10] = p0_;
-	assign DEBUG[11] = p1_;
-	assign DEBUG[12] = panel_load_;
-	assign DEBUG[13] = k1_;
-	assign DEBUG[14] = k2_;
-	assign DEBUG[15] = 1'b1;
 
 // -----------------------------------------------------------------------
 // --- P-X ---------------------------------------------------------------
@@ -237,13 +219,9 @@ px #(.AWP_PRESENT(AWP_PRESENT), .STOP_ON_NOMEM(STOP_ON_NOMEM), .LOW_MEM_WRITE_DE
 // -----------------------------------------------------------------------
 
 wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa_, bab_, bac_, aa_, ab_, wprb_, bwb_, bwa_, kia_, kib_, w_ir, mwa_, mwb_, mwc_;
-wire DEBUG_KC, DEBUG_PC, DEBUG_RESCYC_;
 
 pm PM(
 	.__clk(__clk),
-	.DEBUG_KC(DEBUG_KC),
-	.DEBUG_PC(DEBUG_PC),
-	.DEBUG_RESCYC_(DEBUG_RESCYC_),
 	.start$_(start$_),
 	.pon_(pon_),
 	.work(work),
