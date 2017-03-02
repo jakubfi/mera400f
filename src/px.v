@@ -311,6 +311,7 @@ module px(
 
 	assign arm4_ = ~(strob2 & i2 & ~lip_);
 	assign blw_pw_ = ~(~przerw_z & lg_3 & i3 & ~przerw_);
+	// NOTE: i4_ is i4 on schematic
 	wire ei5 = ~(i4_ & ~(~lip_ & i1));
 	wire exrprzerw = ~(przerw_ & exr_);
 	wire ei2 = i1 & przerw_z;

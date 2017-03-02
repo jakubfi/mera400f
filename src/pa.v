@@ -198,6 +198,7 @@ module pa(
 		.cn4_(__NC)
 	);
 
+	// NOTE carries for ALU3 and ALU4 are connected incorrectly on schematic
 	carry182 __carry(
 		.y(g),
 		.x(p),

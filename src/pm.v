@@ -351,6 +351,7 @@ module pm(
 	assign laduj = load;
 	wire sfl = ~(~store & ~load & ~fetch);
 	wire k2 = ~k2_;
+	// NOTE: ur is a NAND output on schematic, instead of AND
 	wire ur = k2 & ~(~load & ~fetch);
 	wire ar_1 = ~(k2 & ~load);
 	wire k2store_ = ~(k2 & store);
