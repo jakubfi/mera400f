@@ -9,7 +9,10 @@ module univib(
 
 	initial q = 0;
 	wire done = ~|r;
-	wire trig = ~a_ & b;
+	reg trig;
+	always @ (posedge clk) begin
+		trig <= ~a_ & b;
+	end
 
 	reg [width-1:0] r = ticks;
 
