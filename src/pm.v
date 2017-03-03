@@ -605,7 +605,7 @@ module pm(
 	wire lrcb_ = lrcb$_;
 	wire pat_ = ~(lrcb_ & sr$_);
 	// name conflict: wire rc_ = rc$_;
-	wire rjcpc = ~(rj_ & ~rpc & rc_);
+	wire rjcpc = ~(rj_ & ~rpc & rc$_);
 	wire ng_ = ng$_;
 	wire lrcbngls$ = ~(lrcb_ & ng_ & ls_);
 	wire ls = ~ls_;
@@ -673,7 +673,7 @@ module pm(
 	wire M71_8 = ~((w$ & ls) | (psr & war));
 	wire M89_4 = ~(pb | rb$_);
 	wire M71_6 = ~((na_ & p3) | (w$ & M89_4));
-	wire M10_4 = ~(ir6 & rc$_);
+	wire M10_4 = ~(ir6 | rc$_);
 	wire M55_8 = ~((M10_4 & wa) | (lg_0 & i3_ex_prz));
 
 	wire we = ~we_;
