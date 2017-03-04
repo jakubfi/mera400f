@@ -564,7 +564,7 @@ pr #(.CPU_NUMBER(CPU_NUMBER), .AWP_PRESENT(AWP_PRESENT)) PR(
 	.pn_nb(pn_nb),
 	.q_nb(q_nb),
 	.w_bar(w_bar),
-	.zer_fp_(zer_fp_),
+	.zer_sp_(zer_sp_),
 	.clm_(clm_),
 	.ustr0_fp_(ustr0_fp_),
 	.ust_leg(ust_leg),
@@ -731,20 +731,20 @@ pa PA(
 // -----------------------------------------------------------------------
 
 wire fi0_, fi1_, fi2_, fi3_;
-wire read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, zer_fp_, ustr0_fp_, s_fp_;
+wire read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, ustr0_fp_, s_fp_;
 wire f13_, lpa, lpb;
 wire [0:15] zp;
 
 generate
 	if (~AWP_PRESENT) begin
 		assign {fi0_, fi1_, fi2_, fi3_} = 4'b1111;
-		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, zer_fp_, ustr0_fp_, s_fp_} = 8'b11111111;
+		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, ustr0_fp_, s_fp_} = 7'b1111111;
 		assign {f13_, lpa, lpb} = 3'b100;
 		assign zp = 16'hffff;
 	end else begin
 		// TODO: instantiate the real AWP
 		assign {fi0_, fi1_, fi2_, fi3_} = 4'b1111;
-		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, zer_fp_, ustr0_fp_, s_fp_} = 8'b11111111;
+		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, ustr0_fp_, s_fp_} = 7'b1111111;
 		assign {f13_, lpa, lpb} = 3'b100;
 		assign zp = 16'hffff;
 	end

@@ -35,7 +35,7 @@ module pr(
 	input pn_nb,			// A92
 	input q_nb,				// B90
 	input w_bar,			// B56 - W->BAR: send W bus to {BAR, Q, BS} registers
-	input zer_fp_,		// A89
+	input zer_sp_,		// A89
 	input clm_,				// B93
 	input ustr0_fp_,	// A11
 	input ust_leg,		// B39
@@ -176,7 +176,7 @@ module pr(
 		.q(q)
 	);
 
-	assign zer_ = zer_fp_ & clm_;
+	assign zer_ = zer_sp_ & clm_;
 
 	// jumper on C-D: no AWP
 	wire M60_3 = ~(AWP_PRESENT & ustr0_fp_ & strob_a);
