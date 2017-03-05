@@ -185,7 +185,7 @@ module mera400f(
 		.wre_(wre_),
 		.rsa(rsa),
 		.rsb(rsb),
-		.rscrsc(),
+		.rsc(rsc),
 		.wic(wic),
 		.wac(wac),
 		.war(war),
