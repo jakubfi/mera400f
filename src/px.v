@@ -333,7 +333,7 @@ module px(
 	assign read_fp_ = red_fp_;
 
 	wire M28_8 = ~(wr_ & p1_ & p5_ & wm_ & k2fbs_ & ww_ & red_fp_);
-	wire M30_8 = ~(red_fp_ & wm_ & p5_ & ww_ & k2fbs_ & ~(wr & ~inou));
+	wire M30_8 = ~(i3_ & red_fp_ & wm_ & p5_ & ww_ & k2fbs_ & ~(wr & ~inou));
 
 	assign pn_nb = ~(barnb & wm_) & zwzg;
 	assign bp_nb = (barnb & wm_) & zwzg;
