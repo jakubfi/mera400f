@@ -85,7 +85,7 @@ module px(
 	input q,				// A55 - Q system flag
 	input in_,			// A03 - instruction IN
 	input ou_,			// B19 - instruction OU
-	input k2fetch,	// B41
+	input k2fetch_,	// B41
 	input red_fp_,	// A39
 	output pn_nb,		// B94 - PN->NB
 	output bp_nb,		// B93 - BP->NB
@@ -346,7 +346,7 @@ module px(
 	wire M49_3 = ~(ou_ | wm_) ^ w;
 	assign w_dt_ = ~(M49_3 & zwzg);
 	assign dr_ = ~(r & zwzg);
-	wire r = ~(k2fetch & p5_ & i4_ & i1_ & i3lips_ & wr_ & p1_ & red_fp_);
+	wire r = ~(k2fetch_ & p5_ & i4_ & i1_ & i3lips_ & wr_ & p1_ & red_fp_);
 	assign dt_w_ = ~(M40_8 | r);
 	assign ar_ad_ = ~(M30_8 & zwzg);
 	assign ds_ = ~(~(ou_ | wm_) & zwzg); // NOTE: missing on original schematic
@@ -372,8 +372,8 @@ module px(
 	wire w = ~(i5_ & i3_ex_przer_ & ww_ & k2_bin_store_);
 	assign i3_ex_przer_ = ~(exrprzerw & i3);
 	wire rw = r ^ w;
-	// NOTE: k2fbs_ not k2fbs ?
-	wire k2fbs_ = k2_bin_store_ & k2fetch;
+	// NOTE: k2fbs_ not k2fbs
+	wire k2fbs_ = k2_bin_store_ & k2fetch_;
 	assign ck_rz_w = ~(~(wr & ~fi_) & lrz_ & blw_pw_);
 
 	wire __ck_rz_w_dly;

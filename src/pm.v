@@ -44,7 +44,7 @@ module pm(
 	input k1_,
 	output laduj,
 	output k2_bin_store_,
-	output k2fetch,
+	output k2fetch_,
 	output w_rbc$_,
 	output w_rba$_,
 	output w_rbb$_,
@@ -356,7 +356,7 @@ module pm(
 	wire ar_1 = ~(k2 & ~load);
 	wire k2store_ = ~(k2 & store);
 	assign k2_bin_store_ = ~(k2 & ~(~store & ~bin));
-	assign k2fetch = ~(k2 & fetch);
+	assign k2fetch_ = ~(k2 & fetch);
 	wire bin_ = ~bin;
 
 	assign w_rbc$_ = k1s1 & lg_0;
