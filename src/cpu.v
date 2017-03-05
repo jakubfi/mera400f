@@ -10,7 +10,7 @@ module cpu(
 	// from control panel
 	input [0:15] kl,
 	input panel_store_, panel_fetch_, panel_load_, panel_bin_,
-	input oprq_, stop$_, start$_, work, mode_, step_, stop_n, cycle_,
+	input oprq_, stop$_, start$_, work, mode, step_, stop_n, cycle_,
 	input wre, rsa, rsb, rsc,
 	input wic, wac, war, wir, wrs, wrz, wkb,
 	input zegar_,
@@ -129,7 +129,7 @@ px #(.AWP_PRESENT(AWP_PRESENT), .STOP_ON_NOMEM(STOP_ON_NOMEM), .LOW_MEM_WRITE_DE
 	.laduj(laduj),
 	.as2_sum_at(as2),
 	.strob_fp_(strob_fp_),
-	.mode_(mode_),
+	.mode(mode),
 	.step_(step_),
 	.got_(got_),
 	.strob2_(strob2_),

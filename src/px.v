@@ -61,7 +61,7 @@ module px(
 	output as2_sum_at,	// A13
 	// sheet 4
 	input strob_fp_,// A28
-	input mode_,		// B54
+	input mode,		// B54
 	input step_,		// A48
 	output got_,		// A83
 	output strob2_,	// A49
@@ -293,10 +293,10 @@ module px(
 
 	wire M21_5;
 	ffd REG_STEP(
-		.s_(~(mode_ & sts)),
+		.s_(~(mode & sts)),
 		.d(1'b0),
 		.c(step_),
-		.r_(mode_),
+		.r_(mode),
 		.q(M21_5)
 	);
 

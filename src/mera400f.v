@@ -87,7 +87,7 @@ module mera400f(
 		.stop$_(stop$_),
 		.start$_(start$_),
 		.work(work),
-		.mode_(mode),
+		.mode(mode),
 		.step_(step_),
 		.stop_n(stop_n),
 		.cycle_(cycle_),
