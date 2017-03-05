@@ -176,14 +176,16 @@ module pr(
 		.q(q)
 	);
 
+	// FIX: -ZER*SP on <A89> was labeled as -ZER*FP
 	assign zer_ = zer_sp_ & clm_;
 
 	// jumper on C-D: no AWP
 	wire M60_3 = ~(AWP_PRESENT & ustr0_fp_ & strob_a);
-	wire M62_6 = ~(strob_a & w_r & wr0 & ~q); // NOTE: w_r is a guess (no connection on the schematic)
-	wire M62_8 = ~(~q & wr0 & w_r & strob_b); // NOTE: w_r is a guess (no connection on the schematic)
+	// FIX: missing connection from +W->R to M62.2, M62.12, M61.10
+	wire M62_6 = ~(strob_a & w_r & wr0 & ~q);
+	wire M62_8 = ~(~q & wr0 & w_r & strob_b);
 	wire M61_12 = ~(wr0 & w_r & strob_b);
-	wire M61_8 = ~(wr0 & w_r & strob_a); // NOTE: w_r is a guess (no connection on the schematic)
+	wire M61_8 = ~(wr0 & w_r & strob_a);
 
 	wire w_zmvc = ~(M60_3 & lr0 & M62_8 & M62_6);
 	wire w_legy = ~(M62_6 & lr0 & M62_8);

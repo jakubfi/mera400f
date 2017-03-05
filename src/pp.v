@@ -125,6 +125,8 @@ module pp(
 		M70_3			// 31 software interrupt low
 	};
 
+	// FIX: missing connection from M104.12 to M89.5, M70.2
+
 	// RZ input: software interrupt drivers (sheet 10)
 	wire M104_12 = ~wx_ & ~sin_ & strob1;
 	wire M89_6 = ~(ir14 & M104_12);

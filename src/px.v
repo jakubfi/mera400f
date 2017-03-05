@@ -291,6 +291,7 @@ module px(
 
 	wire gotst1_ = ~(got_ & strob1_);
 
+	// FIX: +MODE was labeled -MODE
 	wire M21_5;
 	ffd REG_STEP(
 		.s_(~(mode & sts)),
@@ -311,13 +312,14 @@ module px(
 
 	assign arm4_ = ~(strob2 & i2 & ~lip_);
 	assign blw_pw_ = ~(~przerw_z & lg_3 & i3 & ~przerw_);
-	// NOTE: i4_ is i4 on schematic
+	// FIX: -I4 was +I4
 	wire ei5 = ~(i4_ & ~(~lip_ & i1));
 	wire exrprzerw = ~(przerw_ & exr_);
 	wire ei2 = i1 & przerw_z;
 	wire exr = ~exr_;
 	wire ei4 = i3 & lg_0;
 	wire i3lips_ = ~(lipsp$ & i3);
+	// FIX: -EKC*I was labeled -EKC*1
 	assign ekc_i_ = ~((lg_3 & ~i3lips_) | (i5 & lip_));
 	assign zer_sp_ = ~(lip_ & i5);
 	wire lipsp$ = ~(lip_ & sp_);
@@ -333,6 +335,7 @@ module px(
 	assign read_fp_ = red_fp_;
 
 	wire M28_8 = ~(wr_ & p1_ & p5_ & wm_ & k2fbs_ & ww_ & red_fp_);
+	// FIX: -I3 was missing on input of M30
 	wire M30_8 = ~(i3_ & red_fp_ & wm_ & p5_ & ww_ & k2fbs_ & ~(wr & ~inou));
 
 	assign pn_nb = ~(barnb & wm_) & zwzg;
@@ -346,10 +349,12 @@ module px(
 	wire M49_3 = ~(ou_ | wm_) ^ w;
 	assign w_dt_ = ~(M49_3 & zwzg);
 	assign dr_ = ~(r & zwzg);
+	// FIX: -K2FETCH was labeled +K2FETCH
 	wire r = ~(k2fetch_ & p5_ & i4_ & i1_ & i3lips_ & wr_ & p1_ & red_fp_);
 	assign dt_w_ = ~(M40_8 | r);
 	assign ar_ad_ = ~(M30_8 & zwzg);
-	assign ds_ = ~(~(ou_ | wm_) & zwzg); // NOTE: missing on original schematic
+	// FIX: -DS was missing on schematic (together with its driver gate)
+	assign ds_ = ~(~(ou_ | wm_) & zwzg);
 
 	// sheet 7, page 2-7
 	// * system bus drivers
@@ -370,9 +375,10 @@ module px(
 	wire M59_3 = w & ABC_A;
 	assign dw_ = ~(zwzg & M59_3);
 	wire w = ~(i5_ & i3_ex_przer_ & ww_ & k2_bin_store_);
+	// FIX: -I3/EX+PRZERW/ was labeled +I3/EX+PRZERW/
 	assign i3_ex_przer_ = ~(exrprzerw & i3);
 	wire rw = r ^ w;
-	// NOTE: k2fbs_ not k2fbs
+	// FIX: -K2FBS was labeled +K2FBS
 	wire k2fbs_ = k2_bin_store_ & k2fetch_;
 	assign ck_rz_w = ~(~(wr & ~fi_) & lrz_ & blw_pw_);
 

@@ -49,6 +49,7 @@ module r0 (
 	);
 
 	// --- R03, C flag --------------------------------------------------------
+	// FIX: +W2 instead of +W3 was on C (carry) flag input
 	wire set3 = ~(w[3] & w_zmvc);
 	ffjk R03(
 		.s_(set3),

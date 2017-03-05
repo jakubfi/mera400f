@@ -331,6 +331,7 @@ module pd(
 	// sheet 6, page 2-35
 	// * control signals
 
+	// FIX: -WZ on <A66> was labeled as +WZ
 	wire wz = ~wz_;
 	wire M84_8 = riirb ^ nglbb;
 	wire M67_8 = ~(bm_ & is_ & er_ & xr_);

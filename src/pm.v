@@ -351,7 +351,7 @@ module pm(
 	assign laduj = load;
 	wire sfl = ~(~store & ~load & ~fetch);
 	wire k2 = ~k2_;
-	// NOTE: ur is a NAND output on schematic, instead of AND
+	// FIX: +UR was a NAND output on schematic, instead of AND
 	wire ur = k2 & ~(~load & ~fetch);
 	wire ar_1 = ~(k2 & ~load);
 	wire k2store_ = ~(k2 & store);
@@ -377,7 +377,7 @@ module pm(
 	assign ek2 = ~(~(~p0_ & sfl) & ~(bin & lg_3 & k1));
 	assign ek1 = ~(~(p0_k2 & bin) & ~(k1 & bin & ~lg_3));
 	wire lg_plus_1 = ~((bin & k2) | (k1 & rdt9));
-	// NOTE: not connected anywhere
+	// NOTE: not connected anywhere (on every schematic)
 	wire zero_lg = ~(~rdt9 & k1s1 & rok);
 	wire rdt9 = ~rdt9_;
 
@@ -449,7 +449,7 @@ module pm(
 		.s_(setwp_),
 		.j(1'b0),
 		.c_(strob1),
-		.k(1'b1), // NOTE: or p4?
+		.k(1'b1), // FIX: this was incorrectly shorted to +P4
 		.r_(reswp_),
 		.q(wpp)
 	);
@@ -458,6 +458,7 @@ module pm(
 	wire p4wp_ = ~(p4 & wpp);
 	wire wpb = ~(~wb & wpp_);
 	wire bla = ~(p4 & ka1ir6 & wpp_);
+	// FIX: +NAIR6 was -NAIR6
 	wire nair6 = ~na_ & ir6;
 	wire ka12x = ~(~(~na_ & c0) & ka2_ & ka1_);
 	wire ka1ir6 = ka1 & ir6;
@@ -626,6 +627,7 @@ module pm(
 	wire M50_8 = ~((ur & wre) | (lipsp & lg_1 & i3) | (lwtsr & wp) | (wa & rjcpc));
 	wire M66_8 = ~((wr & sar$) | (~zb_ & we) | (lar$ & w$) | (wm & ~in_ & rok));
 	assign w_r_ = M50_8 & s_fp_ & M66_8;
+	// FIX: -7->RKOD was a active-high output of a 7451, which has active-low outputs
 	wire _7_rkod_ = ~((w$ & ~bs_) | (ls & we));
 	wire wm = ~wm_;
 	wire wm$ = ~wm_;
@@ -671,6 +673,7 @@ module pm(
 	wire M71_8 = ~((w$ & ls) | (psr & war));
 	wire M89_4 = ~(pb | rb$_);
 	wire M71_6 = ~((na_ & p3) | (w$ & M89_4));
+	// FIX: M10_4 was labeled as a NAND gate, instead of NOR
 	wire M10_4 = ~(ir6 | rc$_);
 	wire M55_8 = ~((M10_4 & wa) | (lg_0 & i3_ex_prz));
 

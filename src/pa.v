@@ -198,7 +198,7 @@ module pa(
 		.cn4_(__NC)
 	);
 
-	// NOTE carries for ALU3 and ALU4 are connected incorrectly on schematic
+	// FIX: M35 and M33 had 'carry in', G and P pins switched between them
 	carry182 __carry(
 		.y(g),
 		.x(p),
