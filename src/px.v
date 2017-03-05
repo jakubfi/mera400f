@@ -349,7 +349,7 @@ module px(
 	wire r = ~(k2fetch & p5_ & i4_ & i1_ & i3lips_ & wr_ & p1_ & red_fp_);
 	assign dt_w_ = ~(M40_8 | r);
 	assign ar_ad_ = ~(M30_8 & zwzg);
-	assign ds_ = ~(ou_ | wm_) & zwzg; // NOTE: missing on original schematic
+	assign ds_ = ~(~(ou_ | wm_) & zwzg); // NOTE: missing on original schematic
 
 	// sheet 7, page 2-7
 	// * system bus drivers
