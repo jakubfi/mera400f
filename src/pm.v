@@ -467,9 +467,7 @@ module pm(
 	//  * main loop state transition signals
 
 	wire p3 = ~p3_;
-	// NOTE: nair6_ is probably mislabeled
-	wire nair6_ = nair6;
-	wire M69_1 = ~(nair6_ | wpb);
+	wire M69_1 = ~(nair6 | wpb);
 	wire M100_8 = ~(p3 & ka1ir6);
 	wire M89_10 = ~(wm_q | ka12x);
 	wire M89_13 = ~(p1_ | nef);
@@ -477,8 +475,8 @@ module pm(
 
 	wire M85_6 = ~(M69_1 & M100_8 & M100_11);
 	wire M85_12 = ~(M69_1 & M89_10 & M89_13);
-	wire M85_8 = ~(M100_11 & nair6_ & ~wpb);
-	wire M84_6 = ~(nair6_ & M89_10 & M89_13 & ~wpb);
+	wire M85_8 = ~(M100_11 & nair6 & ~wpb);
+	wire M84_6 = ~(nair6 & M89_10 & M89_13 & ~wpb);
 
 	assign pp_ = M85_12 & M85_6 & p5_;
 	assign ep5 = ~(M85_8 & M84_6);
