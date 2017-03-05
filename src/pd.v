@@ -292,14 +292,14 @@ module pd(
 	wire M28_11 = ~(~(a_eq_[6] | j_) & r0[5]); // nef JN
 	wire M1_4 = ~(j_ | r0[0]); // nef JZ
 	wire M28_3 = ~(j_ & js_);
-	wire MXX_8 = ~(
+	wire M15_8 = ~(
 		(~a_eq_[4] & M1_4) |
 		(M28_3 & ~(r0[6] | a_eq_[3])) | // nef JG
 		(M28_3 & ~(r0[5] | a_eq_[2])) | // nef JE
 		(M28_3 & ~(r0[4] | a_eq_[1])) // nef JL
 	);
 
-	assign nef = ~(M27_8 & ir01 & M40_8 & M28_6 & M16_8 & M28_11 & p_ & MXX_8);
+	assign nef = ~(M27_8 & ir01 & M40_8 & M28_6 & M16_8 & M28_11 & p_ & M15_8);
 	assign xi = ~(M27_8 & M40_8 & ir01);
 
 	// sheet 5, page 2-34
