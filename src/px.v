@@ -9,7 +9,6 @@
 
 module px(
 	input __clk, // clock for "univibrators"
-	input run_trig,
 	// sheet 1
 	input ek1,	// A32 - Enter state K1
 	input ewp,	// A34 - Enter state WP

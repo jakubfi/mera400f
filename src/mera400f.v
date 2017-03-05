@@ -15,21 +15,6 @@ module mera400f(
 	// FPGA cruft
 	assign BUZZER = 1;
 
-	reg run_trig;
-	initial run_trig = 0;
-	reg [15:0] run_trig_counter;
-	initial run_trig_counter = 16'hffff;
-	always @ (posedge CLK_EXT) begin
-		if (run_trig_counter != 0) begin
-			run_trig_counter <= run_trig_counter - 1'b1;
-			if (run_trig_counter == 4) begin
-				run_trig <= 1;
-			end
-		end else begin
-				run_trig <= 0;
-		end
-	end
-
 	// output: to system bus - drivers
 	wire dw_;
 	wire dr_;
@@ -70,7 +55,6 @@ module mera400f(
 	CPU0(
 		// FPGA
 		.__clk(CLK_EXT),
-		.run_trig(run_trig),
 		// power supply
 		.off_(off_),
 		.pon_(pon_),
