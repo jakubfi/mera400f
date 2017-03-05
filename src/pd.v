@@ -401,13 +401,13 @@ module pd(
 	wire pp = ~pp_;
 	wire wprb = ~wprb_;
 	wire lrcb = ~lrcb_;
-	assign ewp = (lrcb & wx) | (wx & sr & lk_) | (~rj_ & wa_) | (~pp_ & ~(uj$_ & lwt$_));
+	assign ewp = (lrcb & wx) | (wx & sr & lk_) | (~rj_ & wa) | (~pp_ & ~(uj$_ & lwt$_));
 	assign uj$_ = ~(~j_ & a_eq_[7]);
 	assign lwt$_ = lwt_ & lw_;
 	wire lj = ~(a_eq_[7] | j_);
 	assign lj_ = ~lj;
 	wire wzi_ = ~wzi;
-	assign ewe = (lj & ww) | (ls & wa_) | (~pp_ & ~(llb_ & zb_ & js_)) | (~wzi & krb & w$);
+	assign ewe = (lj & ww) | (ls & wa) | (~pp_ & ~(llb_ & zb_ & js_)) | (~wzi & krb & w$);
 	wire ww = ~ww_;
 
 	// sheet 10, page 2-39
