@@ -626,7 +626,7 @@ module pm(
 	wire M50_8 = ~((ur & wre) | (lipsp & lg_1 & i3) | (lwtsr & wp) | (wa & rjcpc));
 	wire M66_8 = ~((wr & sar$) | (~zb_ & we) | (lar$ & w$) | (wm & ~in_ & rok));
 	assign w_r_ = M50_8 & s_fp_ & M66_8;
-	wire _7_rkod_ = (w$ & ~bs_) | (ls & we);
+	wire _7_rkod_ = ~((w$ & ~bs_) | (ls & we));
 	wire wm = ~wm_;
 	wire wm$ = ~wm_;
 	wire wp = ~wp_;
