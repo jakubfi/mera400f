@@ -26,8 +26,8 @@ functions = {
     "stop"      : 0b00100000,
     "mode1"     : 0b00100011,
     "mode0"     : 0b00100010,
-    "clockon"   : 0b00100101,
-    "clockoff"  : 0b00100100,
+    "clk1"      : 0b00100101,
+    "clk0"      : 0b00100100,
     "stopn"     : 0b00100111,
     "step"      : 0b00101001,
     "fetch"     : 0b00101011,
@@ -57,28 +57,34 @@ functions = {
 }
 
 # ------------------------------------------------------------------------
+def send_keys(val):
+    print("Keys: 0x%04x" % val)
+    k1 = (val >> 0)  & 0b111111
+    k2 = (val >> 6)  & 0b11111
+    k3 = (val >> 11) & 0b11111
+    s.write([0b01000000 | k1])
+    s.write([0b10000000 | k2])
+    s.write([0b10100000 | k3])
+
+# ------------------------------------------------------------------------
 def cmd_process(line, s):
     a = line.lower().split()
+    cmd = a[0]
     if len(a) == 0:
         return 0
-    elif a[0] == "help":
+    elif cmd == "help":
         print(functions.keys())
-    elif a[0] == "quit":
+    elif cmd == "quit":
         return 1
-    elif a[0] == "k":
-        val = int(a[1], 0)
-        k1 = (val >> 0)  & 0b111111
-        k2 = (val >> 6)  & 0b11111
-        k3 = (val >> 11) & 0b11111
-        s.write([0b01000000 | k1])
-        s.write([0b10000000 | k2])
-        s.write([0b10100000 | k3])
+    elif cmd in functions:
+        s.write([functions[cmd]])
     else:
         try:
-            cmd = functions[a[0]]
-            s.write([cmd])
-        except (IndexError, KeyError):
+            val = int(cmd, 0)
+        except:
             print("No such command: %s" % a[0])
+            return 0
+        send_keys(val)
 
     return 0
 
