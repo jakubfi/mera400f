@@ -35,9 +35,9 @@ module mera400f(
 	wire ren_ = 1;
 	wire rpe_ = 1;
 	wire rpn_ = 1;
-	wire [0:15] rdt_ = 16'hbeef;
+	wire [0:15] rdt_ = ~16'hbeef;
 	wire zg;
-	wire zw = 0;
+	wire zw = zg;
 	wire zz_ = 0;
 
 	// output: to control panel
