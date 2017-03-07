@@ -1,15 +1,20 @@
 module ar(
 	input p1,
-	input m4,
+	input m4_,
 	input l_,
 	input [0:15] w,
 	output reg [0:15] ar
 );
 
-	always @ (negedge l_, posedge m4, negedge p1) begin
-		if (~l_) ar <= w;
-		else if (m4) ar <= ar - 3'd4;
-		else ar <= ar + 1'b1;
+	// NOTE: Sensitivities are different for the FPGA implementation.
+	//       Idea behind it is to always be front-edge sensitive
+	always @ (negedge l_, negedge m4_, posedge p1) begin
+		if (~l_) begin
+			ar <= w;
+		end else begin
+			if (~m4_) ar <= ar - 3'd4;
+			else ar <= ar + 1'b1;
+		end
 	end
 
 endmodule

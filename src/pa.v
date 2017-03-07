@@ -265,12 +265,13 @@ module pa(
 	// sheet 9
 
 	wire M51_6 = ~((w_ar & strobb) | (w_ar & stroba));
+	wire M79_3 = stroba & arp1;
 
 	wire [0:15] ar;
 	ar REG_AR(
 		.l_(M51_6),
-		.p1(arp1),
-		.m4(arm4_),
+		.p1(M79_3),
+		.m4_(arm4_),
 		.w(w),
 		.ar(ar)
 	);
@@ -278,10 +279,13 @@ module pa(
 
 	// sheet 10
 
+	wire M56_3 = ~(icp1 & strob1);
+	wire M51_8 = ~((w_ic & stroba) | (w_ic & strobb));
+
 	wire [0:15] ic;
 	ic REG_IC(
-		.cu(~(icp1 & strob1)),
-		.l_(~((w_ic & stroba) | (w_ic & strobb))),
+		.cu_(M56_3),
+		.l_(M51_8),
 		.r(~off_),
 		.w(w),
 		.ic(ic)

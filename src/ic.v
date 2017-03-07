@@ -1,15 +1,21 @@
 module ic(
-	input cu,
+	input cu_,
 	input l_,
 	input r,
 	input [0:15] w,
 	output reg [0:15] ic
 );
 
-	always @ (posedge cu, negedge l_, posedge r) begin
-		if (r) ic <= 16'd0;
-		else if (~l_) ic <= w;
-		else ic <= ic + 1'b1;
+	// NOTE: Sensitivities are different for the FPGA implementation.
+	//       Idea behind it is to always be front-edge sensitive
+	always @ (negedge cu_, negedge l_, posedge r) begin
+		if (~l_) begin
+			ic <= w;
+		end else if (r) begin
+			ic <= 16'd0;
+		end else begin
+			ic <= ic + 1'b1;
+		end
 	end
 
 endmodule
