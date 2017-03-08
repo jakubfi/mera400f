@@ -40,8 +40,8 @@ module mem_dummy_sram(
 	assign ok_ = ~ok;
 	univib #(.ticks(1'd1)) DLY_VIB(
 		.clk(clk),
-		.a_(1'b0),
-		.b(re | we),
+		.a_(re | we),
+		.b(1'b1),
 		.q(ok)
 	);
 
