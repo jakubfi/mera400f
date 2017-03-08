@@ -8,7 +8,8 @@ module ic(
 
 	// NOTE: Sensitivities are different for the FPGA implementation.
 	//       Idea behind it is to always be front-edge sensitive
-	always @ (negedge cu_, negedge l_, posedge r) begin
+	wire clk = ~cu_ | ~l_ | r;
+	always @ (posedge clk) begin
 		if (~l_) begin
 			ic <= w;
 		end else if (r) begin

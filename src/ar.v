@@ -8,10 +8,10 @@ module ar(
 
 	// NOTE: Sensitivities are different for the FPGA implementation.
 	//       Idea behind it is to always be front-edge sensitive
-	always @ (negedge l_, negedge m4_, posedge p1) begin
-		if (~l_) begin
-			ar <= w;
-		end else begin
+	wire clk = ~l_ | ~m4_ | p1;
+	always @ (posedge clk) begin
+		if (~l_) ar <= w;
+		else begin
 			if (~m4_) ar <= ar - 3'd4;
 			else ar <= ar + 1'b1;
 		end
