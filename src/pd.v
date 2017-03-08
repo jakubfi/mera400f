@@ -221,7 +221,7 @@ module pd(
 		.o_({hlt_, mcl_, sin_, gi_, lip_, __NC, __NC, __NC, __NC, __NC})
 	);
 	assign hlt = ~hlt_;
-	wire gmio_ = ~(mcl_ & gi_ & ~inou_);
+	wire gmio_ = ~(mcl_ & gi_ & inou_);
 	wire hsm = ~(hlt_ & sin_ & __bn5_);
 
 	wire __bn5_;
