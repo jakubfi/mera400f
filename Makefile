@@ -26,7 +26,7 @@ TESTS_DIR = tests
 TESTS = regs.v pd.v \
 	alu_add_16bit_182.v alu_add_16bit.v alu_fn.v \
 	decoder_bcd.v decoder16.v \
-	latch16.v \
+	ir.v \
 	ar.v at.v ic.v ac.v
 SETTINGS = $(SOURCES_DIR)/settings.qsf
 QSYS_SYNTH = VERILOG

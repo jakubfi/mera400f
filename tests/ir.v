@@ -8,7 +8,7 @@ module test();
 	wire [0:15] q;
 	reg [0:16] v;
 
-	latch16 U1(
+	ir U1(
 		.d(d),
 		.c(c),
 		.q(q)
