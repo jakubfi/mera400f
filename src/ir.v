@@ -1,11 +1,11 @@
-module latch16(
+module ir(
 	input [0:15] d,
 	input c,
 	output reg [0:15] q
 );
 
-	always @ (d, c) begin
-		if (c) q <= d;
+	always @ (posedge c) begin
+		q <= d;
 	end
 
 endmodule

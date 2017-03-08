@@ -146,7 +146,7 @@ module pd(
 	// sheet 1, page 2-30
 	// * IR - instruction register
 
-	latch16 REG_IR(
+	ir REG_IR(
 		.d(w),
 		.c(strob1 & w_ir),
 		.q(ir)

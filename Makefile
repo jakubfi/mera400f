@@ -10,10 +10,9 @@ SOURCES = mera400f.v \
 	decoder16.v decoder_bcd.v \
 	univib.v \
 	alu181.v carry182.v \
-	latch16.v \
 	dly.v \
 	pr.v regs.v r0.v rb.v nb.v \
-	pd.v \
+	pd.v ir.v \
 	px.v \
 	pm.v \
 	pp.v rzrp.v \
