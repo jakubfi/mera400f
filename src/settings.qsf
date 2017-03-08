@@ -39,3 +39,49 @@ set_location_assignment PIN_118 -to SEG[7]
 # -- Buzzer --------------------------------------------------------------
 set_location_assignment PIN_30 -to BUZZER
 
+# -- FLASH (Spansion S29GL064N, 64Mbit) ----------------------------------
+set_location_assignment PIN_67 -to F_CS
+set_location_assignment PIN_68 -to F_OE
+set_location_assignment PIN_44 -to F_WE
+
+# -- SRAM (ISSI IS61LV25616AL-10, 256K x 16bit) --------------------------
+set_location_assignment PIN_96 -to SRAM_OE
+set_location_assignment PIN_97 -to SRAM_WE
+set_location_assignment PIN_99 -to SRAM_CE
+set_location_assignment PIN_95 -to SRAM_UB
+set_location_assignment PIN_94 -to SRAM_LB
+
+set_location_assignment PIN_69 -to SRAM_D[0]
+set_location_assignment PIN_72 -to SRAM_D[1]
+set_location_assignment PIN_75 -to SRAM_D[2]
+set_location_assignment PIN_77 -to SRAM_D[3]
+set_location_assignment PIN_81 -to SRAM_D[4]
+set_location_assignment PIN_84 -to SRAM_D[5]
+set_location_assignment PIN_87 -to SRAM_D[6]
+set_location_assignment PIN_89 -to SRAM_D[7]
+set_location_assignment PIN_70 -to SRAM_D[8]
+set_location_assignment PIN_74 -to SRAM_D[9]
+set_location_assignment PIN_76 -to SRAM_D[10]
+set_location_assignment PIN_80 -to SRAM_D[11]
+set_location_assignment PIN_82 -to SRAM_D[12]
+set_location_assignment PIN_86 -to SRAM_D[13]
+set_location_assignment PIN_88 -to SRAM_D[14]
+set_location_assignment PIN_90 -to SRAM_D[15]
+set_location_assignment PIN_64 -to SRAM_A[0]
+set_location_assignment PIN_31 -to SRAM_A[1]
+set_location_assignment PIN_33 -to SRAM_A[2]
+set_location_assignment PIN_34 -to SRAM_A[3]
+set_location_assignment PIN_35 -to SRAM_A[4]
+set_location_assignment PIN_37 -to SRAM_A[5]
+set_location_assignment PIN_39 -to SRAM_A[6]
+set_location_assignment PIN_40 -to SRAM_A[7]
+set_location_assignment PIN_47 -to SRAM_A[8]
+set_location_assignment PIN_48 -to SRAM_A[9]
+set_location_assignment PIN_61 -to SRAM_A[10]
+set_location_assignment PIN_60 -to SRAM_A[11]
+set_location_assignment PIN_59 -to SRAM_A[12]
+set_location_assignment PIN_58 -to SRAM_A[13]
+set_location_assignment PIN_57 -to SRAM_A[14]
+set_location_assignment PIN_56 -to SRAM_A[15]
+set_location_assignment PIN_92 -to SRAM_A[16]
+set_location_assignment PIN_41 -to SRAM_A[17]

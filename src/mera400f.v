@@ -5,7 +5,12 @@ module mera400f(
 	input K1, K2, K3, K4,
 	output [7:0] DIG,
 	output [7:0] SEG,
-	output BUZZER
+	output BUZZER,
+	// RAM
+	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,
+	output [17:0] SRAM_A,
+	inout [15:0] SRAM_D,
+	output F_CS, F_OE, F_WE
 );
 
 // -----------------------------------------------------------------------
@@ -31,11 +36,11 @@ module mera400f(
 	// input: from system bus - receivers
 	wire rpa_ = 1;
 	wire rin_ = 1;
-	wire rok_ = 1;
+	wire rok_;
 	wire ren_ = 1;
 	wire rpe_ = 1;
 	wire rpn_ = 1;
-	wire [0:15] rdt_ = ~16'hbeef;
+	wire [0:15] rdt_;
 	wire zg;
 	wire zw = zg;
 	wire zz_ = 0;
@@ -208,6 +213,32 @@ module mera400f(
 		.off_(off_),
 		.rcl_(rcl_),
 		.zoff_(zoff_)
+	);
+
+// -----------------------------------------------------------------------
+// --- MEMORY ------------------------------------------------------------
+// -----------------------------------------------------------------------
+
+	// disable flash, which uses the same D/A buses as sram
+	assign F_CS = 1'b1;
+	assign F_OE = 1'b1;
+	assign F_WE = 1'b1;
+
+	mem_dummy_sram MEM(
+		.clk(CLK_EXT),
+	  .SRAM_CE(SRAM_CE),
+		.SRAM_OE(SRAM_OE),
+		.SRAM_WE(SRAM_WE),
+		.SRAM_UB(SRAM_UB),
+		.SRAM_LB(SRAM_LB),
+		.SRAM_A(SRAM_A),
+	  .SRAM_D(SRAM_D),
+		.ad_(dad_),
+		.rdt_(ddt_),
+		.ddt_(rdt_),
+		.w_(dw_),
+		.r_(dr_),
+		.ok_(rok_)
 	);
 
 endmodule

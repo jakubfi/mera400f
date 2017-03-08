@@ -21,7 +21,8 @@ SOURCES = mera400f.v \
 	pk.v uart.v sevenseg.v impulse.v \
 	puks.v \
 	isk.v \
-	cpu.v
+	cpu.v \
+	mem_dummy_sram.v
 TESTS_DIR = tests
 TESTS = regs.v pd.v \
 	alu_add_16bit_182.v alu_add_16bit.v alu_fn.v \
