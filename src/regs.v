@@ -26,10 +26,8 @@ module reg170(
 
 	reg [0:15] mem [0:3];
 
-	always @ (wa, wb, we_, i) begin
-		if (~we_) begin
-			mem[{wa, wb}] <= i;
-		end
+	always @ (negedge we_) begin
+		mem[{wa, wb}] <= i;
 	end
 
 	assign o = ~re_ ? mem[{ra, rb}] : 16'hffff;
