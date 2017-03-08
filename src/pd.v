@@ -343,7 +343,7 @@ module pd(
 	wire wlsbs = ~(wls_ & bs_);
 	wire ssca_ = ~((M84_8 & w$) | (w$ & ~(bs_ & bn_ & nr_)) | (wz & ~(emnm_ & lrcb_)) | (we & ls));
 	wire ls = ~ls_;
-	wire emnm_ = em_ & ~nm_;
+	wire emnm_ = em_ & nm_;
 	wire ssab_ = ~(~rb_ & w$ & wprb);
 	wire ssaa_ = ~((~(rb_ & wprb) & w$) | (w$ & ~lb_));
 
