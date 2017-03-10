@@ -345,7 +345,7 @@ module pd(
 	wire ls = ~ls_;
 	wire emnm_ = em_ & nm_;
 	wire ssab_ = ~(~rb_ & w$ & wpb);
-	wire ssaa_ = ~((~(rb_ & wpb) & w$) | (w$ & ~lb_));
+	wire ssaa_ = ~((~(rb_ | wpb) & w$) | (w$ & ~lb_));
 
 	// sheet 7, page 2-36
 	// * ALU control signals
