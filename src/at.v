@@ -6,7 +6,7 @@ module at(
 	output reg [0:15] at
 );
 
-	always @ (posedge c) begin
+	always @ (negedge c) begin
 		case ({s1, s0})
 			2'b00 : at <= at;
 			2'b01 : at <= {sl, at[0:14]};
