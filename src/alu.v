@@ -1,3 +1,29 @@
+/*
+
+0-7: {sd, ~scb_, sb, ~sab_}
+8-15: {sd, ~sca_, sb, ~saa_}
+
+			.-> saryt
+			| .-> sd, sca, sb, saa (s[3:0])
+			| |			.-> sd, scb, sb, sab (s[3:0])
+			| |			|
+A+B		1	1001	1001	ad, lws, rws, js, lj, ib, trb, krb
+A-B		1	0110	0110	sw, co, ng, cb
+A|B		0	1110	1110	or, om, ls, is
+A|~B	0	1101	1101	bc, oc
+A&B		0	1011	1011	nr, nm, ls & ~wls, bn, bs
+~A&B	0	0010	0010	ls & wls, bb
+A&~B	0	0111	0111	er, em, is, bm
+A^B		0	0110	0110	xr, xm, bs
+A			1	0000	0000	ri
+A			0	1111	1111	zb, (lb, rb) & W&, irb, sr
+B			0 1010	1010	(lb, rb) & wz
+A-1		1	1111	1111	drb
+~A		0 0000	0000	ngl
+A+A		1 1100	1100	sl
+
+*/
+
 module alu(
 	input [0:15] a, ac,
 	output [0:15] f,
@@ -20,7 +46,7 @@ module alu(
 	wire [0:3] j$1;
 
 	// most significant
-	alu181 ALU0(
+	alu181 ALU_0_3(
 		.a(a[0:3]),
 		.b(ac[0:3]),
 		.s({sd, ~scb_, sb, ~sab_}),
@@ -32,11 +58,10 @@ module alu(
 		.y(g[3]),
 		.cn4_(carry_)
 	);
-
 	wire z1_ = ~(f[0] | f[1]);
 	wire z2_ = ~(f[2] | f[3]);
 
-	alu181 ALU1(
+	alu181 ALU_4_7(
 		.a(a[4:7]),
 		.b(ac[4:7]),
 		.s({sd, ~scb_, sb, ~sab_}),
@@ -57,7 +82,7 @@ module alu(
 
 	assign j$ = &j$1;
 
-	alu181 ALU2(
+	alu181 ALU_8_11(
 		.a(a[8:11]),
 		.b(ac[8:11]),
 		.s({sd, ~sca_, sb, ~saa_}),
@@ -75,7 +100,7 @@ module alu(
 	wire z8_ = ~(f[14] | f[15]);
 
 	// least significant
-	alu181 ALU3(
+	alu181 ALU_12_15(
 		.a(a[12:15]),
 		.b(ac[12:15]),
 		.s({sd, ~sca_, sb, ~saa_}),
