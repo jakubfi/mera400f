@@ -124,7 +124,7 @@ module pa(
 	// sheet 5..6
 
 	wire [0:15] f;
-	wire zero_;
+	wire zsum_;
 	alu ALU(
 		.p16_(p16_),
 		.a(a),
@@ -139,7 +139,7 @@ module pa(
 		.f(f),
 		.j$(j$),
 		.carry_(carry_),
-		.zero_(zero_)
+		.zsum_(zsum_)
 	);
 
 	assign s0 = f[0];
@@ -182,7 +182,7 @@ module pa(
 
 	wire M65_11 = ~(as2 & strob1);
 	assign s_1 = M7_8 ^ carry_;
-	wire M42_8 = zero_;
+	wire M42_8 = zsum_;
 	assign zs = ~(s_1 | M42_8);
 
 	wire wzi_;

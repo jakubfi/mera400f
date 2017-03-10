@@ -35,16 +35,16 @@ module alu(
 	output [0:15] f,
 	output j$,
 	output carry_,
-	output zero_
+	output zsum_
 );
 
 	wor __NC;
 
 	// sheet 5
 
-	wire [0:3] g, p;
-	wire [1:3] c_;
-	wire [0:3] j$1;
+	wire [3:0] g, p;
+	wire [3:1] c_;
+	wire [3:0] j$1;
 
 	// most significant
 	alu181 ALU_0_3(
@@ -115,20 +115,20 @@ module alu(
 	);
 
 	// FIX: M35 and M33 had 'carry in', G and P pins switched between them
-	carry182 __carry(
+	carry182 CARRY(
 		.y(g),
 		.x(p),
 		.cn_(p16_),
-		.cnx_(c_[1]),
+		.cnx_(c_[3]),
 		.cny_(c_[2]),
-		.cnz_(c_[3]),
+		.cnz_(c_[1]),
 		.ox(__NC),
 		.oy(__NC)
 	);
 
 	// on sheet 8
 
-	assign zero_ = ~(z1_ & z2_ & z3_ & z4_ & z5_ & z6_ & z7_ & z8_);
+	assign zsum_ = ~(z1_ & z2_ & z3_ & z4_ & z5_ & z6_ & z7_ & z8_);
 
 endmodule
 
