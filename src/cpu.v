@@ -215,7 +215,7 @@ px #(.AWP_PRESENT(AWP_PRESENT), .STOP_ON_NOMEM(STOP_ON_NOMEM), .LOW_MEM_WRITE_DE
 // --- P-M ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa_, bab_, bac_, aa_, ab_, wprb_, bwb_, bwa_, kia_, kib_, w_ir, mwa_, mwb_, mwc_;
+wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa_, bab_, bac_, aa_, ab_, wpb_, bwb_, bwa_, kia_, kib_, w_ir, mwa_, mwb_, mwc_;
 
 pm PM(
 	.__clk(__clk),
@@ -387,7 +387,7 @@ pm PM(
 	.rz_(rz_),
 	.wir(wir),
 	.blw_pw_(blw_pw_),
-	.wprb_(wprb_),
+	.wpb_(wpb_),
 	.bwb_(bwb_),
 	.bwa_(bwa_),
 	.kia_(kia_),
@@ -492,7 +492,7 @@ pd #(.INOU_USER_ILLEGAL(INOU_USER_ILLEGAL)) PD(
 	.ust_y(ust_y),
 	.ust_x(ust_x),
 	.blr_(blr_),
-	.wprb_(wprb_),
+	.wpb_(wpb_),
 	.wr_(wr_),
 	.pp_(pp_),
 	.ww_(ww_),

@@ -194,7 +194,7 @@ module pm(
 	input rz_,
 	input wir,
 	input blw_pw_,
-	output wprb_, // WPB - Wskaźnik Prawego Bajtu
+	output wpb_, // WPB - Wskaźnik Prawego Bajtu
 	output bwb_,
 	output bwa_,
 	output kia_,
@@ -703,7 +703,7 @@ module pm(
 		.q(pb_)
 	);
 	wire pb = ~pb_;
-	assign wprb_ = ~pb;
+	assign wpb_ = ~pb;
 
 	wire mwax_ = ~((i3_ex_prz & lg_3) | (wp & pac_) | (ri & ww) | (wac & psr));
 	wire mwbx_ = ~((pat_ & wp) | (srez$ & ww));

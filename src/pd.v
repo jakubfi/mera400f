@@ -99,7 +99,7 @@ module pd(
 	output ust_x,			// A47
 	output blr_,			// A87
 	// sheet 9
-	input wprb_,			// A58
+	input wpb_,				// A58
 	input wr_,				// A60
 	input pp_,				// A62
 	input ww_,				// B60
@@ -315,7 +315,7 @@ module pd(
 	wire apb_ = ~((~uka & p4) | (M90_12 & w$) | (M49_6 & we));
 	assign apb = ~apb_;
 	wire ans = ~(sw_ & ng_ & a_);
-	assign jkrb_ = js_ & krb_;
+	assign jkrb_ = ~(~(js_ & krb_));
 	wire M90_8 = ~(sl_ & ri_ & krb_);
 	assign saryt = (we & M49_6) | (p4) | (w$ & M90_8) | ((cns ^ M90_12) & w$);
 	wire riirb = ~(ri_ & irb_);
@@ -344,8 +344,8 @@ module pd(
 	wire ssca_ = ~((M84_8 & w$) | (w$ & ~(bs_ & bn_ & nr_)) | (wz & ~(emnm_ & lrcb_)) | (we & ls));
 	wire ls = ~ls_;
 	wire emnm_ = em_ & nm_;
-	wire ssab_ = ~(~rb_ & w$ & wprb);
-	wire ssaa_ = ~((~(rb_ & wprb) & w$) | (w$ & ~lb_));
+	wire ssab_ = ~(~rb_ & w$ & wpb);
+	wire ssaa_ = ~((~(rb_ & wpb) & w$) | (w$ & ~lb_));
 
 	// sheet 7, page 2-36
 	// * ALU control signals
@@ -396,11 +396,11 @@ module pd(
 	// * execution phase control signals
 
 	wire M77_8 = ~(ngl_ & ri_ & rj_);
-	assign ewa = (pcrs & ~pp_) | (M77_8 & ~pp_) | (we & (wls_ & ls)) | (wprb_ & ~lbcb_ & wr);
+	assign ewa = (pcrs & ~pp_) | (M77_8 & ~pp_) | (we & (wls_ & ls)) | (wpb_ & ~lbcb_ & wr);
 	wire wr = ~wr_;
-	wire prawy_ = ~(~lbcb_ & wprb);
+	wire prawy_ = ~(~lbcb_ & wpb);
 	wire pp = ~pp_;
-	wire wprb = ~wprb_;
+	wire wpb = ~wpb_;
 	wire lrcb = ~lrcb_;
 	assign ewp = (lrcb & wx) | (wx & sr & lk_) | (~rj_ & wa) | (~pp_ & ~(uj$_ & lwt$_));
 	assign uj$_ = ~(~j_ & a_eq_[7]);
