@@ -283,9 +283,9 @@ module pd(
 
 	wire M28_6 = ~(~(r0[3] | a_eq_[7]) & ~js_); // nef JCS
 
-	wire M2_4 = ~(r0[7] | ~a_eq_[6]); // nef JYS
-	wire M2_1 = ~(r0[8] | ~a_eq_[5]); // nef JXS
-	wire M2_13 = ~(r0[2] | ~a_eq_[4]); // nef JVS
+	wire M2_4 = ~(r0[7] | a_eq_[6]); // nef JYS
+	wire M2_1 = ~(r0[8] | a_eq_[5]); // nef JXS
+	wire M2_13 = ~(r0[2] | a_eq_[4]); // nef JVS
 	wire M2_10 = ~(r0[1] | j_); // nef JM
 	wire M16_8 = ~((M2_4 & ~js_) | (M2_1 & ~js_) | (M2_13 & ~js_) | (~a_eq_[5] & M2_10)); // nef J1
 
