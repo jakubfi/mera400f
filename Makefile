@@ -16,7 +16,7 @@ SOURCES = mera400f.v \
 	px.v \
 	pm.v \
 	pp.v rzrp.v \
-	pa.v at.v ac.v ar.v ic.v \
+	pa.v alu.v at.v ac.v ar.v ic.v \
 	pk.v uart.v sevenseg.v impulse.v \
 	puks.v \
 	isk.v \
