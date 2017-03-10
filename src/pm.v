@@ -657,7 +657,7 @@ module pm(
 	assign w_rm = (wrs & ur) | (wr & ~im_) | (lg_2 & lipsp & i3);
 	wire ww = ~ww_;
 	wire lwrs_ = lwrs$_;
-	wire abx = ~((psr & wic) | (wa & rj) | (we & ~lwrs_) | (~lj_ & ww));
+	wire abx = ~((psr & wic) | (wa & rj) | (we & ~(lwrs_ & jkrb$_)) | (~lj_ & ww));
 	wire lj = ~lj_;
 	wire ljkrb = ~(lj_ & jkrb$_);
 
