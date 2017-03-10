@@ -25,16 +25,17 @@ A+A		1 1100	1100	sl
 */
 
 module alu(
-	input [0:15] a, ac,
-	output [0:15] f,
-	input saryt,
 	input p16_,
-	output carry_,
-	output j$,
-	output zero_,
+	input [0:15] a,
+	input [0:15] ac,
+	input saryt,
 	input sd_, sb_,
 	input scb_, sab_,
-	input sca_, saa_
+	input sca_, saa_,
+	output [0:15] f,
+	output j$,
+	output carry_,
+	output zero_
 );
 
 	wor __NC;

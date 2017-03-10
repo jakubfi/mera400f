@@ -126,11 +126,9 @@ module pa(
 	wire [0:15] f;
 	wire zero_;
 	alu ALU(
+		.p16_(p16_),
 		.a(a),
 		.ac(ac),
-		.f(f),
-		.j$(j$),
-		.carry_(carry_),
 		.saryt(saryt),
 		.sd_(sd_),
 		.sb_(sb_),
@@ -138,6 +136,9 @@ module pa(
 		.sab_(sab_),
 		.sca_(sca_),
 		.saa_(saa_),
+		.f(f),
+		.j$(j$),
+		.carry_(carry_),
 		.zero_(zero_)
 	);
 
