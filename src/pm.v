@@ -412,7 +412,7 @@ module pm(
 	wire M77_6 = reswp_ & ~(~md & p4);
 
 	wire reswp_ = M43_8 & ~(sc$ & strob2 & ~p1_);
-	assign xi$_ = p_ & p1 & strob2 & xi;
+	assign xi$_ = ~(p_ & p1 & strob2 & xi);
 	wire xi_ = xi$_;
 	wire p1 = ~p1_;
 
