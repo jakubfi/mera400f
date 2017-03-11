@@ -2,6 +2,7 @@
 
 import serial
 import readline
+from subprocess import Popen, PIPE, STDOUT
 
 # ------------------------------------------------------------------------
 def serial_open(device, baud):
@@ -57,6 +58,10 @@ functions = {
 }
 
 # ------------------------------------------------------------------------
+def cp(s, cmd):
+    s.write([functions[cmd]])
+
+# ------------------------------------------------------------------------
 def send_keys(val):
     print("Keys: 0x%04x" % val)
     k1 = (val >> 0)  & 0b111111
@@ -67,7 +72,19 @@ def send_keys(val):
     s.write([0b10100000 | k3])
 
 # ------------------------------------------------------------------------
-def cmd_process(line, s):
+def asm(s, l):
+    print("emas: %s" % l)
+    p = Popen(['emas', '-O', 'debug'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+    stdout_data = p.communicate(l.encode('ascii'))[0].decode('ascii').split("\n")
+    input_process(s, "stop;clear;0;ic;load;ar;load;kb")
+    for line in stdout_data:
+        if len(line) > 0:
+            print("   %s" % line)
+            dls = line.split()
+            input_process(s, "%s;store" % dls[3])
+
+# ------------------------------------------------------------------------
+def cmd_process(s, line):
     a = line.lower().split()
     cmd = a[0]
     if len(a) == 0:
@@ -76,8 +93,10 @@ def cmd_process(line, s):
         print(functions.keys())
     elif cmd == "quit":
         return 1
+    elif cmd == "asm":
+        asm(s, line[4:])
     elif cmd in functions:
-        s.write([functions[cmd]])
+        cp(s, cmd)
     else:
         try:
             val = int(cmd, 0)
@@ -89,13 +108,17 @@ def cmd_process(line, s):
     return 0
 
 # ------------------------------------------------------------------------
+def input_process(s, line):
+    for cmd in line.split(";"):
+        quit = cmd_process(s, cmd)
+
+# ------------------------------------------------------------------------
 def cmd_loop(s):
     quit = 0
     while not quit:
         try:
             line = input("CPU> ")
-            for cmd in line.split(";"):
-                quit = cmd_process(cmd, s)
+            input_process(s, line)
         except (EOFError, KeyboardInterrupt):
             print("")
             quit = 1
