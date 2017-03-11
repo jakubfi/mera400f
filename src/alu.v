@@ -119,9 +119,9 @@ module alu(
 		.y(g),
 		.x(p),
 		.cn_(p16_),
-		.cnx_(c_[3]),
+		.cnx_(c_[1]),
 		.cny_(c_[2]),
-		.cnz_(c_[1]),
+		.cnz_(c_[3]),
 		.ox(__NC),
 		.oy(__NC)
 	);
