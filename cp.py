@@ -78,10 +78,24 @@ def asm(s, l):
     stdout_data = p.communicate(l.encode('ascii'))[0].decode('ascii').split("\n")
     input_process(s, "stop;clear;0;ic;load;ar;load;kb")
     for line in stdout_data:
-        if len(line) > 0:
+        if len(line) > 0 and "none" not in line:
             print("   %s" % line)
             dls = line.split()
             input_process(s, "%s;store" % dls[3])
+
+# ------------------------------------------------------------------------
+def upload(s, f):
+    print("Uploading: %s" % f)
+    input_process(s, "stop;clear;0;ic;load;ar;load;kb")
+    fh = open(f, "rb")
+    count = 0
+    while True:
+        w = fh.read(2)
+        if len(w)<2: break
+        word = 256*w[0] + w[1]
+        input_process(s, "%s;store" % word)
+        count += 1
+    print("%i words uploaded" % count)
 
 # ------------------------------------------------------------------------
 def cmd_process(s, line):
@@ -95,6 +109,8 @@ def cmd_process(s, line):
         return 1
     elif cmd == "asm":
         asm(s, line[4:])
+    elif cmd == "upload":
+        upload(s, a[1])
     elif cmd in functions:
         cp(s, cmd)
     else:
