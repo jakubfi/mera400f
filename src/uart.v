@@ -34,7 +34,7 @@ module uart_tx(
 	localparam width = $clog2(prescale+1);
 	localparam [width-1:0] period = prescale[width-1:0];
 
-	reg [9:0] txbuf = 10'b1;
+	reg [10:0] txbuf = 11'b1;
 	reg [3:0] state = 0;
 	reg [width-1:0] divcnt;
 
@@ -43,7 +43,7 @@ module uart_tx(
 			if (send) begin // send trigger
 				state <= 1;
 				divcnt <= period;
-				txbuf <= {1'b1, d, 1'b0}; // load data
+				txbuf <= {1'b1, 1'b1, d, 1'b0}; // load data
 			end
 		end else begin // transmission
 			if (divcnt > 0) begin // waiting for the next serial clk tick
@@ -51,7 +51,7 @@ module uart_tx(
 			end else begin // next serial clk tick
 				divcnt <= period; // preload serial clock timer
 				txbuf <= txbuf >> 1; // push the bit
-				if (state < 9) begin
+				if (state < 10) begin
 					state <= state + 1'b1;
 				end else begin
 					state <= 0;
