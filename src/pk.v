@@ -249,7 +249,7 @@ module pk(
 		end
 	end
 
-	assign zegar_ = |timer_cnt & zeg;
+	assign zegar_ = |timer_cnt | ~zeg;
 
 	// sheet 4
 
