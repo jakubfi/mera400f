@@ -129,8 +129,8 @@ module r0_9_15(
 );
 
 	always @ (posedge lrp, negedge zer_) begin
-		if (~zer_) r0_ <= 7'd0;
-		else if (lrp) r0_ <= ~w;
+		if (~zer_) r0_ <= 7'b1111111;
+		else r0_ <= ~w;
 	end
 
 endmodule
