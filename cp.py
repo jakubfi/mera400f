@@ -72,30 +72,39 @@ def send_keys(val):
     s.write([0b10100000 | k3])
 
 # ------------------------------------------------------------------------
+def programmer(s, tab):
+    input_process(s, "stop;clear;0;ic;load;ar;load;kb")
+    count = 0
+    for word in tab:
+        input_process(s, "%s;store" % word)
+        count += 1
+    print("%i word(-s) uploaded" % count)
+
+# ------------------------------------------------------------------------
 def asm(s, l):
-    print("emas: %s" % l)
+    tab = []
+    print("running emas: %s" % l)
     p = Popen(['emas', '-O', 'debug'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
     stdout_data = p.communicate(l.encode('ascii'))[0].decode('ascii').split("\n")
-    input_process(s, "stop;clear;0;ic;load;ar;load;kb")
     for line in stdout_data:
         if len(line) > 0 and "none" not in line:
             print("   %s" % line)
             dls = line.split()
-            input_process(s, "%s;store" % dls[3])
+            tab.append(dls[3])
+    programmer(s, tab)
 
 # ------------------------------------------------------------------------
 def upload(s, f):
+    tab = []
     print("Uploading: %s" % f)
-    input_process(s, "stop;clear;0;ic;load;ar;load;kb")
     fh = open(f, "rb")
-    count = 0
     while True:
         w = fh.read(2)
-        if len(w)<2: break
+        if len(w)<2:
+            break
         word = 256*w[0] + w[1]
-        input_process(s, "%s;store" % word)
-        count += 1
-    print("%i words uploaded" % count)
+        tab.append(word)
+    programmer(s, tab)
 
 # ------------------------------------------------------------------------
 def cmd_process(s, line):
