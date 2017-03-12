@@ -3,13 +3,9 @@ module ffjk(
 	output reg q
 );
 
-	wire clk = ~c_;
-	wire r = ~r_;
-	wire s = ~s_;
-
-	always @ (posedge clk, posedge r, posedge s) begin
-		if (r) q <= 1'b0;
-		else if (s) q <= 1'b1;
+	always @ (negedge c_, negedge r_, negedge s_) begin
+		if (~r_) q <= 1'b0;
+		else if (~s_) q <= 1'b1;
 		else case ({j, k})
 			2'b00 : q <= q;
 			2'b01 : q <= 1'b0;

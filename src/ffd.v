@@ -3,12 +3,9 @@ module ffd(
 	output reg q
 );
 
-	wire r = ~r_;
-	wire s = ~s_;
-
-	always @ (posedge c, posedge r, posedge s) begin
-		if (r) q <= 1'b0;
-		else if (s) q <= 1'b1;
+	always @ (posedge c, negedge r_, negedge s_) begin
+		if (~r_) q <= 1'b0;
+		else if (~s_) q <= 1'b1;
 		else q <= d;
 	end
 
