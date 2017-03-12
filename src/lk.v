@@ -1,4 +1,4 @@
-module counter4(
+module lk(
 	input cd,
 	input [0:3] i,
 	output reg [0:3] o,

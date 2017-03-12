@@ -5,7 +5,6 @@ PROJECT = mera400f
 TOPLEVEL = mera400f
 SOURCES_DIR = src
 SOURCES = mera400f.v \
-	counter4.v \
 	ffd.v ffjk.v \
 	decoder16.v decoder_bcd.v \
 	univib.v \
@@ -14,7 +13,7 @@ SOURCES = mera400f.v \
 	pr.v regs.v r0.v rb.v nb.v \
 	pd.v ir.v \
 	px.v \
-	pm.v \
+	pm.v lk.v \
 	pp.v rzrp.v \
 	pa.v alu.v at.v ac.v ar.v ic.v \
 	pk.v uart.v sevenseg.v impulse.v \

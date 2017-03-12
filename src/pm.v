@@ -584,7 +584,7 @@ module pm(
 	wire M49_8 = (shc & ir13) | (gr & (~ir9 & ir8));
 	wire M85_11 = shc & ir6;
 
-	counter4 CNT_LK(
+	lk CNT_LK(
 		.cd(downlk_),
 		.i({M85_11, M49_8, M94_8, M64_8}),
 		.l_(lolk_),
