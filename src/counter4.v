@@ -9,7 +9,7 @@ module counter4(
 	always @ (posedge cd, negedge l_, posedge r) begin
 		if (r) o <= 4'd0;
 		else if (~l_) o <= i;
-		else o <= o + 1'b1;
+		else o <= o - 1'b1;
 	end
 
 endmodule

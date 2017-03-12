@@ -586,7 +586,7 @@ module pm(
 
 	counter4 CNT_LK(
 		.cd(downlk_),
-		.i({M64_8, M94_8, M49_8, M85_11}),
+		.i({M85_11, M49_8, M94_8, M64_8}),
 		.l_(lolk_),
 		.r(~zerstan_),
 		.o({lk0, lk1, lk2, lk3})
