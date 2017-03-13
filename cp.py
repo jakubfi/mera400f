@@ -4,23 +4,23 @@ import serial
 import readline
 from subprocess import Popen, PIPE, STDOUT
 
-# ------------------------------------------------------------------------
-def serial_open(device, baud):
-    s = serial.Serial(
-        port = device,
-        baudrate = baud,
-        bytesize = serial.EIGHTBITS,
-        parity = serial.PARITY_NONE,
-        stopbits = serial.STOPBITS_ONE,
-        timeout = 1,
-        xonxoff = False,
-        rtscts = False,
-        dsrdtr = False)
-
-    s.flushInput()
-    s.flushOutput()
-    print("%s @ %i bps" % (device, baud))
-    return s
+rot_names = {
+    0b0000 : "R0",
+    0b0001 : "R1",
+    0b0010 : "R2",
+    0b0011 : "R3",
+    0b0100 : "R4",
+    0b0101 : "R5",
+    0b0110 : "R6",
+    0b0111 : "R7",
+    0b1000 : "IC",
+    0b1001 : "AC",
+    0b1010 : "AR",
+    0b1011 : "IR",
+    0b1100 : "RS",
+    0b1101 : "RZ",
+    0b1110 : "KB"
+} 
 
 functions = {
     "start"     : 0b00100001,
@@ -58,12 +58,29 @@ functions = {
 }
 
 # ------------------------------------------------------------------------
+def serial_open(device, baud):
+    s = serial.Serial(
+        port = device,
+        baudrate = baud,
+        bytesize = serial.EIGHTBITS,
+        parity = serial.PARITY_NONE,
+        stopbits = serial.STOPBITS_ONE,
+        timeout = 1,
+        xonxoff = False,
+        rtscts = False,
+        dsrdtr = False)
+
+    s.flushInput()
+    s.flushOutput()
+    print("%s @ %i bps" % (device, baud))
+    return s
+
+# ------------------------------------------------------------------------
 def cp(s, cmd):
     s.write([functions[cmd]])
 
 # ------------------------------------------------------------------------
 def send_keys(val):
-    print("Keys: 0x%04x" % val)
     k1 = (val >> 0)  & 0b111111
     k2 = (val >> 6)  & 0b11111
     k3 = (val >> 11) & 0b11111
@@ -107,12 +124,47 @@ def upload(s, f):
     programmer(s, tab)
 
 # ------------------------------------------------------------------------
+def get_state(s):
+    s.write([0b11000000])
+    res = s.read(4)
+    dleds = res[0]*256 + res[1]
+    rot = res[3] >> 4
+    sleds = (res[2] << 2) | (res[3] & 0b11)
+    status = {
+        'data' : dleds,
+        'rotary' : rot,
+        'rotaryn' : rot_names[rot],
+        'mode' : (sleds >> 9) & 1,
+        'stopn' : (sleds >> 8) & 1,
+        'clock' : (sleds >> 7) & 1,
+        'q' : (sleds >> 6) & 1,
+        'p' : (sleds >> 5) & 1,
+        'mc' : (sleds >> 4) & 1,
+        'irq' : (sleds >> 3) & 1,
+        'run' : (sleds >> 2) & 1,
+        'wait' : (sleds >> 1) & 1,
+        'alarm' : (sleds >> 0) & 1,
+        'leds' : ""
+    }
+    for name in ['mode', 'stopn', 'clock', 'q', 'p', 'mc', 'irq', 'run', 'wait', 'alarm']:
+        if status[name]:
+            status['leds'] += name + " "
+    return status
+
+# ------------------------------------------------------------------------
+def state(s):
+    leds = get_state(s);
+    print("%s 0x%04x (%i) %s" % (leds['rotaryn'], leds['data'], leds['data'], leds['leds']))
+
+# ------------------------------------------------------------------------
 def cmd_process(s, line):
     a = line.lower().split()
-    cmd = a[0]
-    if len(a) == 0:
+    try:
+        cmd = a[0]
+    except IndexError:
+        state(s)
         return 0
-    elif cmd == "help":
+    if cmd == "help":
         print(functions.keys())
     elif cmd == "quit":
         return 1
@@ -120,6 +172,8 @@ def cmd_process(s, line):
         asm(s, line[4:])
     elif cmd == "upload":
         upload(s, a[1])
+    elif cmd == "s":
+        state(s)
     elif cmd in functions:
         cp(s, cmd)
     else:

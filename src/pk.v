@@ -20,21 +20,21 @@
 `define FN_OPRQ		4'b1010
 `define FN_CLEAR	4'b1011
 
-`define ROT_R0 11'b10000000000
-`define ROT_R1 11'b10010000000
-`define ROT_R2 11'b10100000000
-`define ROT_R3 11'b10110000000
-`define ROT_R4 11'b11000000000
-`define ROT_R5 11'b11010000000
-`define ROT_R6 11'b11100000000
-`define ROT_R7 11'b11110000000
-`define ROT_IC 11'b00001000000
-`define ROT_AC 11'b00000100000
-`define ROT_AR 11'b00000010000
-`define ROT_IR 11'b00000001000
-`define ROT_RS 11'b00000000100
-`define ROT_RZ 11'b00000000010
-`define ROT_KB 11'b00000000001
+`define ROT_BUS_R0 11'b10000000000
+`define ROT_BUS_R1 11'b10010000000
+`define ROT_BUS_R2 11'b10100000000
+`define ROT_BUS_R3 11'b10110000000
+`define ROT_BUS_R4 11'b11000000000
+`define ROT_BUS_R5 11'b11010000000
+`define ROT_BUS_R6 11'b11100000000
+`define ROT_BUS_R7 11'b11110000000
+`define ROT_BUS_IC 11'b00001000000
+`define ROT_BUS_AC 11'b00000100000
+`define ROT_BUS_AR 11'b00000010000
+`define ROT_BUS_IR 11'b00000001000
+`define ROT_BUS_RS 11'b00000000100
+`define ROT_BUS_RZ 11'b00000000010
+`define ROT_BUS_KB 11'b00000000001
 
 module pk(
 	// FPGA I/Os
@@ -119,22 +119,27 @@ module pk(
 	wire tx_busy;
 	wire rx_busy;
 	wire [7:0] rx_byte;
-	wire [7:0] tx_byte;
 	uart #(.baud(1_000_000), .clk_speed(50_000_000)) uart0(
 		.clk(CLK_EXT),
 		.rx_byte(rx_byte),
 		.rx_busy(rx_busy),
-		.rxd(RXD)
+		.rxd(RXD),
+		.send(send),
+		.tx_busy(tx_busy),
+		.tx_byte(tx_byte),
+		.txd(TXD)
 	);
 
 	// --- FPGA: serial commands processing
 
 	reg [15:0] keys = 0; // data keys
 	reg [11:0] fnkey = 12'b0; // function keys
-	reg [10:0] rotary = 11'b10010000000; // rotary switch
+	reg [10:0] rotary_bus = `ROT_BUS_R1; // rotary switch bus (after final decoding)
+	reg [3:0] rotary_pos = 4'b0001; // rotary switch position (as send by the user)
 
 	always @ (posedge CLK_EXT) begin
 		if (~action) begin
+			send_leds = 0;
 			// reset all monostable switches
 			fnkey[`FN_STOPN] <= 0;
 			fnkey[`FN_STEP] <= 0;
@@ -153,28 +158,83 @@ module pk(
 				3'b011 : keys[5:0] <= rx_byte[5:0];
 				3'b100 : keys[10:6] <= rx_byte[4:0];
 				3'b101 : keys[15:11] <= rx_byte[4:0];
-				3'b110 : ; // TODO: wyślij ledy
+				3'b110 : send_leds <= 1;
 				3'b111 : begin
+					rotary_pos <= rx_byte[3:0]; // store rotary position for status report
 					case (rx_byte[3:0])
-						4'b0000 : rotary <= `ROT_R0;
-						4'b0001 : rotary <= `ROT_R1;
-						4'b0010 : rotary <= `ROT_R2;
-						4'b0011 : rotary <= `ROT_R3;
-						4'b0100 : rotary <= `ROT_R4;
-						4'b0101 : rotary <= `ROT_R5;
-						4'b0110 : rotary <= `ROT_R6;
-						4'b0111 : rotary <= `ROT_R7;
-						4'b1000 : rotary <= `ROT_IC;
-						4'b1001 : rotary <= `ROT_AC;
-						4'b1010 : rotary <= `ROT_AR;
-						4'b1011 : rotary <= `ROT_IR;
-						4'b1100 : rotary <= `ROT_RS;
-						4'b1101 : rotary <= `ROT_RZ;
-						4'b1110 : rotary <= `ROT_KB;
+						4'b0000 : rotary_bus <= `ROT_BUS_R0;
+						4'b0001 : rotary_bus <= `ROT_BUS_R1;
+						4'b0010 : rotary_bus <= `ROT_BUS_R2;
+						4'b0011 : rotary_bus <= `ROT_BUS_R3;
+						4'b0100 : rotary_bus <= `ROT_BUS_R4;
+						4'b0101 : rotary_bus <= `ROT_BUS_R5;
+						4'b0110 : rotary_bus <= `ROT_BUS_R6;
+						4'b0111 : rotary_bus <= `ROT_BUS_R7;
+						4'b1000 : rotary_bus <= `ROT_BUS_IC;
+						4'b1001 : rotary_bus <= `ROT_BUS_AC;
+						4'b1010 : rotary_bus <= `ROT_BUS_AR;
+						4'b1011 : rotary_bus <= `ROT_BUS_IR;
+						4'b1100 : rotary_bus <= `ROT_BUS_RS;
+						4'b1101 : rotary_bus <= `ROT_BUS_RZ;
+						4'b1110 : rotary_bus <= `ROT_BUS_KB;
+						4'b1111 : rotary_bus <= `ROT_BUS_KB;
 					endcase
 				end
 			endcase
 		end
+	end
+
+	// --- FPGA: send led status
+
+	`define IDLE 0
+	`define SEND 1
+	`define WAIT_BUSY 2
+	`define WAIT_TRANS 3
+
+	// 4 bytes sent back for the status command
+	wire [7:0] data [3:0];
+	assign data[0] = w[0:7];
+	assign data[1] = w[8:15];
+	assign data[2] = {mode, stop_n, zeg, q, ~p_, ~mc_, irq, run};
+	assign data[3] = {rotary_pos, 2'd0, ~wait_, ~alarm_};
+
+	wire send_leds;
+	reg [3:0] snd_state = 0;
+	reg [7:0] tx_byte;
+	reg send = 0;
+	reg [1:0] b_cnt = 0;
+	always @ (posedge CLK_EXT) begin
+		case (snd_state)
+			`IDLE : begin
+				if (send_leds) begin
+					if (~tx_busy) snd_state <= `SEND;
+				end else begin
+					b_cnt <= 0;
+					send <= 0;
+				end
+			end
+			`SEND : begin
+				tx_byte <= data[b_cnt];
+				send <= 1;
+				snd_state <= `WAIT_BUSY;
+			end
+			`WAIT_BUSY : begin
+				if (tx_busy) begin
+					snd_state <= `WAIT_TRANS;
+					send <= 0;
+				end
+			end
+			`WAIT_TRANS : begin
+				if (~tx_busy) begin
+					if (b_cnt == 3) begin
+						snd_state <= 0;
+					end else begin
+						b_cnt <= b_cnt + 1'b1;
+						snd_state <= 1;
+					end
+				end
+			end
+		endcase
 	end
 
 	// --- FPGA: 7-segment display
@@ -264,10 +324,10 @@ module pk(
 
 	// sheet 5
 
-	assign {wre_, rsc, rsb, rsa, wic, wac, war, wir, wrs, wrz, wkb} = rotary;
+	assign {wre_, rsc, rsb, rsa, wic, wac, war, wir, wrs, wrz, wkb} = rotary_bus;
 	none2seg d4(.seg(digs[4]));
-	rb2seg d5(.r(rotary), .seg(digs[5]));
-	ra2seg d6(.r(rotary), .seg(digs[6]));
+	rb2seg d5(.r(rotary_bus), .seg(digs[5]));
+	ra2seg d6(.r(rotary_bus), .seg(digs[6]));
 
 endmodule
 

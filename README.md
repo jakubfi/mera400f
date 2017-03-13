@@ -34,10 +34,14 @@ Control Panel serial protocol
 Control Panel recognizes following serial commands (8N1):
 
 * `001 FFFF V` - Set function key FFFF (see below) to position V (0-off, 1-on)
-* `01 KKKKKK` - set data keys 10-15 to binary value K
-* `100 KKKKK` - set data keys 5-9 to binary value K
-* `101 KKKKK` - set data keys 0-4 to binary value K
-* `110 xxxxx` - read LED status (unimplemented)
+* `01 KKKKKK` - Set data keys 10-15 to binary value K
+* `100 KKKKK` - Set data keys 5-9 to binary value K
+* `101 KKKKK` - Set data keys 0-4 to binary value K
+* `110 xxxxx` - Read LED status. Sends back four bytes:
+  * data leds 0-7
+  * data leds 8-15
+  * MODE, STOP*N, CLOCK, Q, P, MC, IRQ, RUN
+  * rotary switch position, 0, 0, WAIT, ALARM
 * `111 xPPPP` - Set rotary switch to position PPPP (see below)
 
 `x` bits value doesn't matter.
