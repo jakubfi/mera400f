@@ -5,21 +5,22 @@ import readline
 from subprocess import Popen, PIPE, STDOUT
 
 rot_names = {
-    0b0000 : "R0",
-    0b0001 : "R1",
-    0b0010 : "R2",
-    0b0011 : "R3",
-    0b0100 : "R4",
-    0b0101 : "R5",
-    0b0110 : "R6",
-    0b0111 : "R7",
-    0b1000 : "IC",
-    0b1001 : "AC",
-    0b1010 : "AR",
-    0b1011 : "IR",
-    0b1100 : "RS",
-    0b1101 : "RZ",
-    0b1110 : "KB"
+     0 : "R0",
+     1 : "R1",
+     2 : "R2",
+     3 : "R3",
+     4 : "R4",
+     5 : "R5",
+     6 : "R6",
+     7 : "R7",
+     8 : "IC",
+     9 : "AC",
+    10 : "AR",
+    11 : "IR",
+    12 : "RS",
+    13 : "RZ",
+    14 : "KB",
+    15 : "KB"
 } 
 
 functions = {
@@ -90,12 +91,22 @@ def send_keys(val):
 
 # ------------------------------------------------------------------------
 def programmer(s, tab):
-    input_process(s, "stop;clear;0;ic;load;ar;load;kb")
-    count = 0
+    pre_s = get_state(s)
+    input_process(s, "mode0;clk0;stop;clear;0;ic;load;ar;load;kb")
+
     for word in tab:
         input_process(s, "%s;store" % word)
-        count += 1
-    print("%i word(-s) uploaded" % count)
+
+    input_process(s, "ar;0;load;ac")
+    for word in tab:
+        input_process(s, "fetch")
+        state = get_state(s)
+        if word != state['data']:
+            print("UPLOAD FAILED!")
+            return
+
+    print("%i word(-s) uploaded and verified OK" % len(tab))
+    input_process(s, pre_s['rotaryn']);
 
 # ------------------------------------------------------------------------
 def asm(s, l):
@@ -107,7 +118,7 @@ def asm(s, l):
         if len(line) > 0 and "none" not in line:
             print("   %s" % line)
             dls = line.split()
-            tab.append(dls[3])
+            tab.append(int(dls[3], 0))
     programmer(s, tab)
 
 # ------------------------------------------------------------------------
@@ -190,6 +201,7 @@ def cmd_process(s, line):
 def input_process(s, line):
     for cmd in line.split(";"):
         quit = cmd_process(s, cmd)
+    return quit
 
 # ------------------------------------------------------------------------
 def cmd_loop(s):
@@ -197,7 +209,7 @@ def cmd_loop(s):
     while not quit:
         try:
             line = input("CPU> ")
-            input_process(s, line)
+            quit = input_process(s, line)
         except (EOFError, KeyboardInterrupt):
             print("")
             quit = 1
