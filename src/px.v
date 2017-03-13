@@ -208,7 +208,7 @@ module px(
 	assign i1_ = ~i1;
 
 	// sheet 3, page 2-3
-	// * state transition delays
+	// * strob signals
 
 	assign as2_sum_at = ~(wz_ & p4_ & we_ & w$_);
 	wire M19_6 = ~(w$_ & we_ & p4_ & ~(k2 & laduj));
@@ -219,46 +219,46 @@ module px(
 
 	wire sgot = ~(M19_6 | M18_8);
 
-	wire __q1_, __q2_, __q3_, __q4_, __q5_;
-	wire __q1, __q2, __q3, __q4, __q5;
-	assign {__q1_, __q2_, __q3_, __q4_, __q5_} = ~{__q1, __q2, __q3, __q4, __q5};
-	univib #(.ticks(3'd5)) uni1( // 5 ticks = 100ns @ 50MHz (80-130ns)
+	wire STROB1_1, STROB1_2, STROB1_3, STROB1_4, STROB1_5;
+	wire STROB1_1_, STROB1_2_, STROB1_3_, STROB1_4_, STROB1_5_;
+	assign {STROB1_1_, STROB1_2_, STROB1_3_, STROB1_4_, STROB1_5_} = ~{STROB1_1, STROB1_2, STROB1_3, STROB1_4, STROB1_5};
+	univib #(.ticks(3'd5)) VIB_STROB1_1( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
 		.a_(got$),
 		.b(M19_6),
-		.q(__q1)
+		.q(STROB1_1)
 	);
-	univib #(.ticks(3'd6)) uni2( // 6 ticks = 120ns @ 50MHz (110-190ns)
+	univib #(.ticks(3'd6)) VIB_STROB1_2( // 6 ticks = 120ns @ 50MHz (110-190ns)
 		.clk(__clk),
 		.a_(got$),
 		.b(M18_8 & ok),
-		.q(__q2)
+		.q(STROB1_2)
 	);
-	univib #(.ticks(3'd5)) uni3( // 5 ticks = 100ns @ 50MHz (80-130ns)
+	univib #(.ticks(3'd5)) VIB_STROB1_3( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
 		.a_(got$),
 		.b(M20_8 & ok),
-		.q(__q3)
+		.q(STROB1_3)
 	);
-	univib #(.ticks(3'd5)) uni4( // 5 ticks = 100ns @ 50MHz (80-130ns)
+	univib #(.ticks(3'd5)) VIB_STROB1_4( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
 		.a_(got$),
 		.b(M16_8),
-		.q(__q4)
+		.q(STROB1_4)
 	);
-	univib #(.ticks(3'd5)) uni5( // 5 ticks = 100ns @ 50MHz (80-130ns)
+	univib #(.ticks(3'd5)) VIB_STROB1_5( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
 		.a_(got$),
 		.b(M15_8),
-		.q(__q5)
+		.q(STROB1_5)
 	);
 
-	wire st56_ = __q1_ & __q2_;
-	wire st812_ = __q3_ & __q4_ & __q5_;
+	wire st56_ = STROB1_1_ & STROB1_2_;
+	wire st812_ = STROB1_3_ & STROB1_4_ & STROB1_5_;
 	wire sts = ~(st56_ & st812_);
 
 	// sheet 4, page 2-4
-	// * strobs
+	// * got, strob2, step register
 
 	// NOTE: 33pF cap to ground on M15_6
 	wire M15_12 = ~(M15_6 & zw & oken);

@@ -80,3 +80,4 @@ Rotary switch positions (PPPP):
 * `1100` - RS
 * `1101` - RZ
 * `1110` - KB
+* `1111` - KB
