@@ -4,8 +4,8 @@ module ir(
 	output reg [0:15] q
 );
 
-	always @ (posedge c) begin
-		q <= d;
+	always @ (c, d) begin
+		if (c) q <= d;
 	end
 
 endmodule
