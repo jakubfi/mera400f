@@ -492,7 +492,7 @@ module px(
 	assign zz1_ = 1'b0;
 
 	wire alarm_dly;
-	dly #(.ticks(5'd25)) DLY_ALARM( // 250 ticks @ 50MHz = 5us (>=5us orig., ~10us on schematic)
+	dly #(.ticks(5'd250)) DLY_ALARM( // 250 ticks @ 50MHz = 5us (>=5us orig., ~10us on schematic)
 		.clk(__clk),
 		.i(alarm),
 		.o(alarm_dly)
