@@ -9,7 +9,12 @@ module univib(
 
 	initial q = 0;
 	wire done = ~|r;
-	wire trig = ~a_ & b;
+	// TODO: trig is delayed for debugging purposes
+	// (to set GOT, STROB1 and STROB2 apart one cycle)
+	reg trig = 0;
+	always @ (posedge clk) begin
+		trig <= ~a_ & b;
+	end
 
 	reg [width-1:0] r = ticks;
 
