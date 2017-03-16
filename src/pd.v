@@ -47,7 +47,7 @@ module pd(
 	output rpc,				// A10 - RPC
 	output shc_,			// A57 - SHC
 	output rc$_,			// B04 - RC*: RIC, RKY
-	output ng$_,			// B03 - NG*: NGA, NGL
+	output ng$_,			// B03 - NG*: NGA, NGC
 	output zb$_,			// B20
 	output b0_,				// A25 - B=0 (opcode field B is 0 - no B-modification)
 	// sheet 4
@@ -395,7 +395,7 @@ module pd(
 	// sheet 9, page 2-38
 	// * execution phase control signals
 
-	wire M77_8 = ~(ngl_ & ri_ & rj_);
+	wire M77_8 = ~(ng_ & ri_ & rj_);
 	assign ewa = (pcrs & ~pp_) | (M77_8 & ~pp_) | (we & (wls_ & ls)) | (wpb_ & ~lbcb_ & wr);
 	wire wr = ~wr_;
 	wire prawy_ = ~(~lbcb_ & wpb);
