@@ -77,7 +77,7 @@ Rotary switch positions (PPPP):
 * `1001` - AC
 * `1010` - AR
 * `1011` - IR
-* `1100` - RS
+* `1100` - SR
 * `1101` - RZ
 * `1110` - KB
 * `1111` - KB

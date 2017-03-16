@@ -32,7 +32,7 @@
 `define ROT_BUS_AC 11'b00000100000
 `define ROT_BUS_AR 11'b00000010000
 `define ROT_BUS_IR 11'b00000001000
-`define ROT_BUS_RS 11'b00000000100
+`define ROT_BUS_SR 11'b00000000100
 `define ROT_BUS_RZ 11'b00000000010
 `define ROT_BUS_KB 11'b00000000001
 
@@ -174,7 +174,7 @@ module pk(
 						4'b1001 : rotary_bus <= `ROT_BUS_AC;
 						4'b1010 : rotary_bus <= `ROT_BUS_AR;
 						4'b1011 : rotary_bus <= `ROT_BUS_IR;
-						4'b1100 : rotary_bus <= `ROT_BUS_RS;
+						4'b1100 : rotary_bus <= `ROT_BUS_SR;
 						4'b1101 : rotary_bus <= `ROT_BUS_RZ;
 						4'b1110 : rotary_bus <= `ROT_BUS_KB;
 						4'b1111 : rotary_bus <= `ROT_BUS_KB;
