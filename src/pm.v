@@ -449,7 +449,7 @@ module pm(
 		.s_(setwp_),
 		.j(1'b0),
 		.c_(strob1),
-		.k(1'b1), // FIX: this was incorrectly shorted to +P4
+		.k(p4),
 		.r_(reswp_),
 		.q(wpp)
 	);
