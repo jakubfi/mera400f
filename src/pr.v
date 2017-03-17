@@ -246,12 +246,16 @@ module pr(
 	// sheets 10..11, pages 2-67..2-68
 	// * KI bus
 
-	wire [0:1] sel = {~kia_, ~kib_};
-	assign ki =
-		(sel == 2'b00) ? rz :
-		(sel == 2'b01) ? {rs[0:9], bs, q, nb[0:3]} :
-		(sel == 2'b10) ? rRB :
-		zp;
+	reg [0:15] KI;
+	assign ki = KI;
+	always @ (*) begin
+		case ({~kib_, ~kia_})
+			2'b00 : KI <= rz;
+			2'b01 : KI <= {rs[0:9], bs, q, nb[0:3]};
+			2'b10 : KI <= rRB;
+			2'b11 : KI <= zp;
+		endcase
+	end
 
 endmodule
 

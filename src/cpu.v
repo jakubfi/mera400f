@@ -737,13 +737,13 @@ generate
 		assign {fi0_, fi1_, fi2_, fi3_} = 4'b1111;
 		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, ustr0_fp_, s_fp_} = 7'b1111111;
 		assign {f13_, lpa, lpb} = 3'b100;
-		assign zp = 16'hffff;
+		assign zp = 16'h0000;
 	end else begin
 		// TODO: instantiate the real AWP
 		assign {fi0_, fi1_, fi2_, fi3_} = 4'b1111;
 		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, ustr0_fp_, s_fp_} = 7'b1111111;
 		assign {f13_, lpa, lpb} = 3'b100;
-		assign zp = 16'hffff;
+		assign zp = 16'h0000;
 	end
 endgenerate
 
