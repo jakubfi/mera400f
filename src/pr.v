@@ -251,7 +251,7 @@ module pr(
 	always @ (*) begin
 		case ({~kib_, ~kia_})
 			2'b00 : KI <= rz;
-			2'b01 : KI <= {rs[0:9], bs, q, nb[0:3]};
+			2'b01 : KI <= {rs[0:9], q, bs, nb[0:3]};
 			2'b10 : KI <= rRB;
 			2'b11 : KI <= zp;
 		endcase
