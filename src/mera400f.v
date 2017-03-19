@@ -224,7 +224,7 @@ module mera400f(
 	assign F_OE = 1'b1;
 	assign F_WE = 1'b1;
 
-	mem_dummy_sram MEM(
+	mem_elwro_sram MEM(
 		.clk(CLK_EXT),
 	  .SRAM_CE(SRAM_CE),
 		.SRAM_OE(SRAM_OE),
@@ -239,7 +239,7 @@ module mera400f(
 		.ddt_(rdt_),
 		.w_(dw_),
 		.r_(dr_),
-		.s_(s_),
+		.s_(ds_),
 		.ok_(rok_)
 	);
 
