@@ -163,7 +163,7 @@ ivtest: $(OBJS)
 # --- Cleanups -----------------------------------------------------------
 
 clean:
-	rm -rf *.rpt *.chg smart.log *.htm *.eqn *.pin *.sof *.pof db incremental_db $(OUT_DIR) *.map.summary *.sopcinfo $(TESTS_DIR)/*.bin
+	rm -rf *.rpt *.chg smart.log *.htm *.eqn *.pin *.sof *.pof db incremental_db $(OUT_DIR) *.map.summary *.sopcinfo $(TESTS_DIR)/*.bin greybox_tmp *.ddb
 
 distclean: clean
 	rm -rf $(PROJECT_FILE) $(SETTINGS_FILE) $(SOURCES_FILE)
