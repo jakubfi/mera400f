@@ -41,7 +41,6 @@ module mem_dummy_sram(
 	
 			`READ: begin
 				rd_data <= SRAM_D;
-				oe <= 0;
 				ok <= 1;
 				state <= `OK;
 			end
@@ -53,6 +52,7 @@ module mem_dummy_sram(
 			end
 	
 			`OK: begin
+				oe <= 0;
 				if (r_ & w_) begin
 					ok <= 0;
 					state <= `IDLE;
