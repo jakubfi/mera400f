@@ -98,12 +98,14 @@ def programmer(s, tab):
         input_process(s, "%s;store" % word)
 
     input_process(s, "ar;0;load;ac")
+    count = 0;
     for word in tab:
         input_process(s, "fetch")
         state = get_state(s)
         if word != state['data']:
-            print("UPLOAD FAILED!")
+            print("UPLOAD FAILED @ %i: expected 0x%04x, got 0x%04x" % (count, word, state['data']))
             return
+        count += 1
 
     print("%i word(-s) uploaded and verified OK" % len(tab))
     input_process(s, pre_s['rotaryn']);
