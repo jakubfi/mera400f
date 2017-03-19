@@ -219,7 +219,7 @@ module mera400f(
 // --- MEMORY ------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-	// disable flash, which uses the same D/A buses as sram
+	// disable flash, which uses the same D and A buses as sram
 	assign F_CS = 1'b1;
 	assign F_OE = 1'b1;
 	assign F_WE = 1'b1;
@@ -233,11 +233,13 @@ module mera400f(
 		.SRAM_LB(SRAM_LB),
 		.SRAM_A(SRAM_A),
 	  .SRAM_D(SRAM_D),
+		.nb_(dnb_),
 		.ad_(dad_),
 		.rdt_(ddt_),
 		.ddt_(rdt_),
 		.w_(dw_),
 		.r_(dr_),
+		.s_(s_),
 		.ok_(rok_)
 	);
 
