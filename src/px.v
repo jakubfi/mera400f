@@ -279,10 +279,19 @@ module px(
 	wire M53_11 = ~(M21_5 & ~sgot);
 	wire M53_8 = ~(M53_11 & st56_);
 
+	// NOTE: strob2 needs to be triggered with 1-cycle delay
+	// to set it apart from strob1 falling edge. This is needed
+	// for cycles where one action is taken on strob1 falling
+	// edge, and another on the strob2 rising edge.
+	reg strob2_trig = 1;
+	always @ (posedge __clk) begin
+		strob2_trig <= M53_8;
+	end
+
 	wire strob2;
 	univib #(.ticks(3'd6)) VIB_STROB2( // 6 ticks = 120ns @ 50MHz (110-190ns)
 		.clk(__clk),
-		.a_(M53_8),
+		.a_(strob2_trig),
 		.b(1'b1),
 		.q(strob2)
 	);
