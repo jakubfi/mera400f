@@ -77,7 +77,7 @@ module ra2seg(
 		else if (r[5]) seg <= `SSEG_A;
 		else if (r[4]) seg <= `SSEG_A;
 		else if (r[3]) seg <= `SSEG_I;
-		else if (r[2]) seg <= `SSEG_NONE;
+		else if (r[2]) seg <= `SSEG_S;
 		else if (r[1]) seg <= `SSEG_I;
 		else if (r[0]) seg <= `SSEG_II;
 		else seg <= `SSEG_NONE;
@@ -109,7 +109,7 @@ module rb2seg(
 			else if (r[5]) seg <= `SSEG_C;
 			else if (r[4]) seg <= `SSEG_R;
 			else if (r[3]) seg <= `SSEG_R;
-			else if (r[2]) seg <= `SSEG_S;
+			else if (r[2]) seg <= `SSEG_R;
 			else if (r[1]) seg <= `SSEG_N;
 			else if (r[0]) seg <= `SSEG_II;
 			else seg <= `SSEG_NONE;
