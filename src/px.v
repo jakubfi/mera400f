@@ -318,7 +318,7 @@ module px(
 	// sheet 5, page 2-5
 	// interrupt phase control signals
 
-	assign arm4_ = ~(strob2 & i2 & ~lip_);
+	assign arm4_ = ~(strob2 & i1 & ~lip_);
 	assign blw_pw_ = ~(~przerw_z & lg_3 & i3 & ~przerw_);
 	// FIX: -I4 was +I4
 	wire ei5 = ~(i4_ & ~(~lip_ & i1));
