@@ -1,6 +1,5 @@
 Bugs:
 * IC=1 on start
-* LS does not work (loops in WA-WE states)
 
 Needs investigation:
 * IC is cleared on -OFF only? But DTR says 0->IC on CLO!

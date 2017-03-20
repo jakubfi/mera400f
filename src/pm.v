@@ -608,7 +608,9 @@ module pm(
 	wire ng_ = ng$_;
 	wire lrcbngls$ = ~(lrcb_ & ng_ & ls_);
 	wire ls = ~ls_;
-	wire M95_10 = ~(wa_ | ls_);
+	// NOTE: Reset condition was "~-LS" on original schematic and "~(-WE|-LS)" in DTR
+	// Both were wrong. Fixed to what was done in hardware: ~(W&|-LS).
+	wire M95_10 = ~(w$ | ls_);
 	wire wls_ = ~(M95_10 & wls);
 	assign wls = ~(wls_ & wa_);
 	wire wa = ~wa_;
