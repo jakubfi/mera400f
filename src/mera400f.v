@@ -66,6 +66,7 @@ module mera400f(
 		.pout_(pout_),
 		.clm_(clm_),
 		.clo_(clo_),
+		.dmcl_(dmcl_),
 		// control panel
 		.kl(kl),
 		.panel_store_(panel_store_),

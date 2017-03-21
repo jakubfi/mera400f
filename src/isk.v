@@ -8,7 +8,7 @@ module isk(
 
 	assign zoff_ = 1'b1;
 
-	assign rcl_ = dcl_;
+	assign rcl_ = dcl_ & dmcl_;
 
 endmodule
 

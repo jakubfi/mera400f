@@ -1,6 +1,4 @@
 Bugs:
-* IC=1 on start
-* MCL does not work?
 
 Needs investigation:
 * IC is cleared on -OFF only? But DTR says 0->IC on CLO!

@@ -18,21 +18,17 @@ module puks(
 	output reg clm_
 );
 
-	// -POUT: power out, 0.2-2us 
+	// -POUT: power out (0.2-2us strob, not implemented)
 	assign pout_ = 1'b1;
 
-	// -OFF: power lines not ready
-	initial off_ = 1;
-	reg [4:0] power_ok_cnt = 5'd31;
+	// -OFF: power lines not ready (in real hardware: goes high 0.5-2s after the power is switched on)
+	initial off_ = 0;
+	reg [2:0] power_ok_cnt = 3'd7;
 	always @ (posedge clk) begin
-		if (power_ok_cnt > 5'd24) begin
-			power_ok_cnt <= power_ok_cnt - 1'b1;
+		if (power_ok_cnt == 0) begin
 			off_ <= 1;
-		end else if (power_ok_cnt != 0) begin
-			power_ok_cnt <= power_ok_cnt - 1'b1;
-			off_ <= 0;
 		end else begin
-			off_ <= 1;
+			power_ok_cnt <= power_ok_cnt - 1'b1;
 		end
 	end
 
@@ -48,20 +44,8 @@ module puks(
 
 	// -CLO: general reset
 	// -CLM: module reset
-	// (held for cl_hold cycles after startup so CPU gets clo_/clm_ negedge)
-	initial clm_ = 1;
-	initial clo_ = 1;
-	reg [2:0] cl_hold = 3'd7;
-	always @ (posedge clk) begin
-		if (cl_hold != 0) begin
-			cl_hold <= cl_hold - 1'b1;
-			clm_ = 1;
-			clo_ = 1;
-		end else begin
-			clm_ <= off_ & dcl_ & rcl_;
-			clo_ <= off_ & dcl_;
-		end
-	end
+	assign clm_ = off_ & dcl_ & rcl_;
+	assign clo_ = off_ & dcl_;
 
 endmodule
 
