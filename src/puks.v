@@ -33,13 +33,11 @@ module puks(
 	end
 
 	// -PON: power on (0.2-2us strob when power is ready)
-	assign pon_ = ~pon;
-	wire pon;
 	univib #(.ticks(3'd7)) PON(
 		.clk(clk),
 		.a_(1'b0),
 		.b(off_),
-		.q(pon)
+		.q_(pon_)
 	);
 
 	// -CLO: general reset

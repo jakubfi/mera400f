@@ -1,4 +1,5 @@
 Bugs:
+* good/ops/em.asm fails on freshly started fpga with freshly uploaded core
 
 Needs investigation:
 * IC is cleared on -OFF only? But DTR says 0->IC on CLO!

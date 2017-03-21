@@ -219,38 +219,36 @@ module px(
 
 	wire sgot = ~(M19_6 | M18_8);
 
-	wire STROB1_1, STROB1_2, STROB1_3, STROB1_4, STROB1_5;
 	wire STROB1_1_, STROB1_2_, STROB1_3_, STROB1_4_, STROB1_5_;
-	assign {STROB1_1_, STROB1_2_, STROB1_3_, STROB1_4_, STROB1_5_} = ~{STROB1_1, STROB1_2, STROB1_3, STROB1_4, STROB1_5};
 	univib #(.ticks(3'd5)) VIB_STROB1_1( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
 		.a_(got$),
 		.b(M19_6),
-		.q(STROB1_1)
+		.q_(STROB1_1_)
 	);
 	univib #(.ticks(3'd6)) VIB_STROB1_2( // 6 ticks = 120ns @ 50MHz (110-190ns)
 		.clk(__clk),
 		.a_(got$),
 		.b(M18_8 & ok),
-		.q(STROB1_2)
+		.q_(STROB1_2_)
 	);
 	univib #(.ticks(3'd5)) VIB_STROB1_3( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
 		.a_(got$),
 		.b(M20_8 & ok),
-		.q(STROB1_3)
+		.q_(STROB1_3_)
 	);
 	univib #(.ticks(3'd5)) VIB_STROB1_4( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
 		.a_(got$),
 		.b(M16_8),
-		.q(STROB1_4)
+		.q_(STROB1_4_)
 	);
 	univib #(.ticks(3'd5)) VIB_STROB1_5( // 5 ticks = 100ns @ 50MHz (80-130ns)
 		.clk(__clk),
 		.a_(got$),
 		.b(M15_8),
-		.q(STROB1_5)
+		.q_(STROB1_5_)
 	);
 
 	wire st56_ = STROB1_1_ & STROB1_2_;

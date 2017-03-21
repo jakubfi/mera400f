@@ -1,7 +1,8 @@
 module univib(
 	input clk,
 	input a_, b,
-	output reg q
+	output reg q,
+	output q_
 );
 
 	parameter ticks = 3'd5;
@@ -22,6 +23,8 @@ module univib(
 		if (q) r <= r - 1'b1;
 		else r <= ticks;
 	end
+
+	assign q_ = ~q;
 
 endmodule
 
