@@ -139,7 +139,7 @@ module pd(
 	output lac$_			// B43
 );
 
-	parameter INOU_USER_ILLEGAL = 1'b1;
+	parameter INOU_USER_ILLEGAL;
 
 	wor __NC; // unconnected signals here, to suppress warnings
 

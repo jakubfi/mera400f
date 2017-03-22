@@ -56,7 +56,7 @@ module mem_elwro_sram(
 	initial map[1] = 8'd1;
 	initial begin
 		reg [8:0] i;
-		for (i=2 ; i<256 ; i=i+1) begin
+		for (i=9'd2 ; i<9'd256 ; i=i+9'd1) begin
 			map[i] = 0;
 		end
 	end

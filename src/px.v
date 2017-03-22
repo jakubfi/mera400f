@@ -150,9 +150,19 @@ module px(
 	output dad14_		// A05
 );
 
-	parameter AWP_PRESENT = 1'b1;
-	parameter STOP_ON_NOMEM = 1'b1;
-	parameter LOW_MEM_WRITE_DENY = 1'b0;
+	parameter AWP_PRESENT;
+	parameter STOP_ON_NOMEM;
+	parameter LOW_MEM_WRITE_DENY;
+
+	parameter STROB1_1_TICKS;
+	parameter STROB1_2_TICKS;
+	parameter STROB1_3_TICKS;
+	parameter STROB1_4_TICKS;
+	parameter STROB1_5_TICKS;
+	parameter GOT_TICKS;
+	parameter STROB2_TICKS;
+	parameter ALARM_DLY_TICKS;
+	parameter ALARM_TICKS;
 
 	// sheet 1, page 2-1
 	// * state registers
@@ -220,31 +230,31 @@ module px(
 	wire sgot = ~(M19_6 | M18_8);
 
 	wire STROB1_1_, STROB1_2_, STROB1_3_, STROB1_4_, STROB1_5_;
-	univib #(.ticks(3'd5)) VIB_STROB1_1( // 5 ticks = 100ns @ 50MHz (80-130ns)
+	univib #(.ticks(STROB1_1_TICKS)) VIB_STROB1_1(
 		.clk(__clk),
 		.a_(got$),
 		.b(M19_6),
 		.q_(STROB1_1_)
 	);
-	univib #(.ticks(3'd6)) VIB_STROB1_2( // 6 ticks = 120ns @ 50MHz (110-190ns)
+	univib #(.ticks(STROB1_2_TICKS)) VIB_STROB1_2(
 		.clk(__clk),
 		.a_(got$),
 		.b(M18_8 & ok),
 		.q_(STROB1_2_)
 	);
-	univib #(.ticks(3'd5)) VIB_STROB1_3( // 5 ticks = 100ns @ 50MHz (80-130ns)
+	univib #(.ticks(STROB1_3_TICKS)) VIB_STROB1_3(
 		.clk(__clk),
 		.a_(got$),
 		.b(M20_8 & ok),
 		.q_(STROB1_3_)
 	);
-	univib #(.ticks(3'd5)) VIB_STROB1_4( // 5 ticks = 100ns @ 50MHz (80-130ns)
+	univib #(.ticks(STROB1_4_TICKS)) VIB_STROB1_4(
 		.clk(__clk),
 		.a_(got$),
 		.b(M16_8),
 		.q_(STROB1_4_)
 	);
-	univib #(.ticks(3'd5)) VIB_STROB1_5( // 5 ticks = 100ns @ 50MHz (80-130ns)
+	univib #(.ticks(STROB1_5_TICKS)) VIB_STROB1_5(
 		.clk(__clk),
 		.a_(got$),
 		.b(M15_8),
@@ -265,7 +275,7 @@ module px(
 	wire M15_6 = ~(M52_6 & st812_ & strob2_);
 
 	wire got$;
-	univib #(.ticks(3'd5)) VIB_GOT( // 5 ticks = 100ns @ 50MHz (80-130ns)
+	univib #(.ticks(GOT_TICKS)) VIB_GOT(
 		.clk(__clk),
 		.a_(M15_6),
 		.b(1'b1),
@@ -287,7 +297,7 @@ module px(
 	end
 
 	wire strob2;
-	univib #(.ticks(3'd6)) VIB_STROB2( // 6 ticks = 120ns @ 50MHz (110-190ns)
+	univib #(.ticks(STROB2_TICKS)) VIB_STROB2(
 		.clk(__clk),
 		.a_(strob2_trig),
 		.b(1'b1),
@@ -499,14 +509,14 @@ module px(
 	assign zz1_ = 1'b0;
 
 	wire alarm_dly;
-	dly #(.ticks(8'd250)) DLY_ALARM( // 250 ticks @ 50MHz = 5us (>=5us orig., ~10us on schematic)
+	dly #(.ticks(ALARM_DLY_TICKS)) DLY_ALARM(
 		.clk(__clk),
 		.i(alarm),
 		.o(alarm_dly)
 	);
 
 	wire talarm;
-	univib #(.ticks(2'd3)) VIB_ALARM( // 3 ticks @ 50MHz = 60ns (60ns orig.)
+	univib #(.ticks(ALARM_TICKS)) VIB_ALARM(
 		.clk(__clk),
 		.a_(1'b0),
 		.b(alarm_dly),

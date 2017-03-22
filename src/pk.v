@@ -88,21 +88,9 @@ module pk(
 	input ir0 // buzzer?
 );
 
-  parameter TIMER_CYCLE_MS = 4'd10;
-
-	// --- FPGA: 1KHz internal clock generator
-
-	reg CLK_1KHZ = 0;
-	reg [15:0] div1khz = 0;
-	always @ (posedge CLK_EXT) begin
-		div1khz <= div1khz + 1'b1;
-		if (div1khz == 16'd25000) begin
-			CLK_1KHZ <= 1;
-		end else if (div1khz == 16'd50000) begin
-			div1khz <= 0;
-			CLK_1KHZ <= 0;
-		end
-	end
+  parameter TIMER_CYCLE_MS;
+	parameter CLK_EXT_HZ;
+	parameter UART_BAUD;
 
 	// --- FPGA: uart action trigger
 
@@ -119,7 +107,10 @@ module pk(
 	wire tx_busy;
 	wire rx_busy;
 	wire [7:0] rx_byte;
-	uart #(.baud(1_000_000), .clk_speed(50_000_000)) uart0(
+	uart #(
+		.baud(UART_BAUD),
+		.clk_speed(CLK_EXT_HZ))
+	UART0(
 		.clk(CLK_EXT),
 		.rx_byte(rx_byte),
 		.rx_busy(rx_busy),
@@ -135,7 +126,7 @@ module pk(
 	reg [15:0] keys = 0; // data keys
 	reg [11:0] fnkey = 12'b0; // function keys
 	reg [10:0] rotary_bus = `ROT_BUS_R1; // rotary switch bus (after final decoding)
-	reg [3:0] rotary_pos = 4'b0001; // rotary switch position (as send by the user)
+	reg [3:0] rotary_pos = 4'b0001; // rotary switch position (as send by the user), r1 initial
 
 	always @ (posedge CLK_EXT) begin
 		if (~action) begin
@@ -199,7 +190,7 @@ module pk(
 	assign data[3] = {rotary_pos, 2'd0, ~wait_, ~alarm_};
 
 	wire send_leds;
-	reg [3:0] snd_state = 0;
+	reg [1:0] snd_state = 0;
 	reg [7:0] tx_byte;
 	reg send = 0;
 	reg [1:0] b_cnt = 0;
@@ -294,16 +285,19 @@ module pk(
 
 	// sheet 3
 
-	// a: 6-1 : 2 ms = 500 Hz
-	// a: 6-2 : 4 ms = 250 Hz
-	// a: 6-3 : 8 ms = 125 Hz
-	// a: 6-4 : 10 ms = 100 Hz
-	// a: 6-5 : 20 ms = 50 Hz
+	// a: 6-1 : 2 ms = 500 Hz	= 100_000 cycles @ 50MHz
+	// a: 6-2 : 4 ms = 250 Hz = 200_000 cycles @ 50MHz
+	// a: 6-3 : 8 ms = 125 Hz = 400_000 cycles @ 50MHz
+	// a: 6-4 : 10 ms = 100 Hz = 500_000 cycles @ 50MHz
+	// a: 6-5 : 20 ms = 50 Hz = 1_000_000 cycles @ 50MHz
 
-	reg [8:0] timer_cnt = TIMER_CYCLE_MS;
-	always @ (posedge CLK_1KHZ) begin
+	localparam prescale = TIMER_CYCLE_MS * (CLK_EXT_HZ / 1_000);
+  localparam width = $clog2(prescale+1);
+  localparam [width-1:0] period = prescale[width-1:0] - 1'b1;
+	reg [width-1:0] timer_cnt = period;
+	always @ (posedge CLK_EXT) begin
 		if (timer_cnt == 0) begin
-			timer_cnt <= TIMER_CYCLE_MS - 1'b1;
+			timer_cnt <= period;
 		end else begin
 			timer_cnt <= timer_cnt - 1'b1;
 		end

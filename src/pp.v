@@ -74,6 +74,9 @@ module pp(
 
 );
 
+	parameter DOK_DLY_TICKS;
+	parameter DOK_TICKS;
+
 	wor __NC; // unconnected signals here, to suppress warnings
 
 	// sheet 1, 2
@@ -256,19 +259,19 @@ module pp(
 
 	// sheet 11
 
-	wire rin_dly;
-	dly #(.ticks(4'd15)) DLY_RIN( // 15 ticks = 300ns @ 50MHz
+	wire dok_dly;
+	dly #(.ticks(DOK_DLY_TICKS)) DLY_DOK(
 		.clk(__clk),
 		.i(~rin_),
-		.o(rin_dly)
+		.o(dok_dly)
 	);
-	wire M12_3 = ~rin_dly;
+	wire M12_3 = ~dok_dly;
 
 	// TODO: cap + diode?
 	wire zw_dly = ~zw;
 
 	wire M14_6;
-	univib #(.ticks(3'd7)) TRIG_RIN( // 7 ticks = 140ns @ 50MHz (153ns orig.)
+	univib #(.ticks(DOK_TICKS)) TRIG_DOK(
 		.clk(__clk),
 		.a_(M12_3),
 		.b(zw_dly),

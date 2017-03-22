@@ -48,11 +48,33 @@ module cpu(
 	input __clk
 );
 
-	parameter CPU_NUMBER = 1'b0;
+	// --- CPU FEATURES-----------------------------------------------------
+
+	parameter CPU_NUMBER;
 	parameter AWP_PRESENT = 1'b1;
 	parameter INOU_USER_ILLEGAL = 1'b1;
 	parameter STOP_ON_NOMEM = 1'b1;
 	parameter LOW_MEM_WRITE_DENY = 1'b0;
+
+	// --- CPU CORE TIMINGS ------------------------------------------------
+
+	parameter STROB1_1_TICKS = 3'd5; // 80-130ns
+	parameter STROB1_2_TICKS = 3'd6; // 110-190ns
+	parameter STROB1_3_TICKS = 3'd5; // 80-130ns
+	parameter STROB1_4_TICKS = 3'd5; // 80-130ns
+	parameter STROB1_5_TICKS = 3'd5; // 80-130ns
+	parameter GOT_TICKS = 3'd5; // 80-130ns
+	parameter STROB2_TICKS = 3'd6; // 110-190ns
+	parameter KC_TICKS = 3'd7; // 100-200ns
+	parameter PC_TICKS = 3'd6; // 90-150ns
+
+	// --- BUS TIMINGS -----------------------------------------------------
+
+	parameter ALARM_DLY_TICKS = 8'd250; // 2.5-5us in DTR, >=5us from notes on HSO schematic, ~10us in hw(?)
+	parameter ALARM_TICKS = 2'd3; // 60ns
+	parameter DOK_DLY_TICKS = 4'd15; // 300ns
+	parameter DOK_TICKS = 3'd7; // 153ns
+
 
 	// -DDT open-collector composition
 	assign ddt_[0] = pa_ddt_[0] & px_ddt0_;
@@ -77,7 +99,20 @@ module cpu(
 
 wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw_, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
 
-px #(.AWP_PRESENT(AWP_PRESENT), .STOP_ON_NOMEM(STOP_ON_NOMEM), .LOW_MEM_WRITE_DENY(LOW_MEM_WRITE_DENY)) PX(
+px #(
+	.AWP_PRESENT(AWP_PRESENT),
+	.STOP_ON_NOMEM(STOP_ON_NOMEM),
+	.LOW_MEM_WRITE_DENY(LOW_MEM_WRITE_DENY),
+	.STROB1_1_TICKS(STROB1_1_TICKS),
+	.STROB1_2_TICKS(STROB1_2_TICKS),
+	.STROB1_3_TICKS(STROB1_3_TICKS),
+	.STROB1_4_TICKS(STROB1_4_TICKS),
+	.STROB1_5_TICKS(STROB1_5_TICKS),
+	.GOT_TICKS(GOT_TICKS),
+	.STROB2_TICKS(STROB2_TICKS),
+	.ALARM_DLY_TICKS(ALARM_DLY_TICKS),
+	.ALARM_TICKS(ALARM_TICKS)
+) PX(
 	.__clk(__clk),
 	.ek1(ek1),
 	.ewp(ewp),
@@ -217,7 +252,10 @@ px #(.AWP_PRESENT(AWP_PRESENT), .STOP_ON_NOMEM(STOP_ON_NOMEM), .LOW_MEM_WRITE_DE
 
 wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa_, bab_, bac_, aa_, ab_, wpb_, bwb_, bwa_, kia_, kib_, w_ir, mwa_, mwb_, mwc_;
 
-pm PM(
+pm #(
+	.KC_TICKS(KC_TICKS),
+	.PC_TICKS(PC_TICKS)
+)PM(
 	.__clk(__clk),
 	.start$_(start$_),
 	.pon_(pon_),
@@ -409,7 +447,9 @@ pm PM(
 wire [0:15] ir;
 wire c0, ls_, rj_, bs_, ou_, in_, is_, ri_, pufa, rb$_, cb_, sc$, oc$_, ka2_, gr$_, hlt, mcl_, sin_, gi_, lip_, mb_, im_, ki_, fi_, sp_, rz_, ib_, lpc, rpc, shc_, rc$_, ng$_, zb$_, b0_, _0_v, md, xi, nef, amb, apb, jkrb_, lwrs$_, saryt, ap1, am1, bcoc$, sd_, scb_, sca_, sb_, sab_, saa_, lrcb$_, aryt, sbar$, nrf, ust_z, ust_v, ust_mc, ust_leg, eat0, sr$_, ust_y, ust_x, blr_, ewa, ewp, uj$_, lwt$_, lj_, ewe, ekc_1_, ewz, ew$, lar$, ssp$, ka1_, na_, exl_, p16_, ewr, ewm, efp_, sar$, eww, srez$, ewx, axy, inou$_, ekc_2_, lac$_;
 
-pd #(.INOU_USER_ILLEGAL(INOU_USER_ILLEGAL)) PD(
+pd #(
+	.INOU_USER_ILLEGAL(INOU_USER_ILLEGAL)
+) PD(
 	.w(w),
 	.strob1(strob1),
 	.w_ir(w_ir),
@@ -537,7 +577,10 @@ wire zgpn, zer_;
 wire [0:8] r0;
 wire [0:15] ki;
 
-pr #(.CPU_NUMBER(CPU_NUMBER), .AWP_PRESENT(AWP_PRESENT)) PR(
+pr #(
+	.CPU_NUMBER(CPU_NUMBER),
+	.AWP_PRESENT(AWP_PRESENT)
+) PR(
 	.blr_(blr_),
 	.lpc(lpc),
 	.wa_(wa_),
@@ -600,7 +643,10 @@ wire [0:9] rs;
 wire [0:15] rz;
 wire przerw_z, pp_dad11_, pp_dad12_, pp_dad13_, pp_dad14_, pp_dad4_, pp_dad15_;
 
-pp PP(
+pp #(
+	.DOK_DLY_TICKS(DOK_DLY_TICKS),
+	.DOK_TICKS(DOK_TICKS)
+) PP(
 	.__clk(__clk),
 	.w(w),
 	.clm_(clm_),
@@ -661,7 +707,6 @@ wire [0:15] pa_ddt_;
 wire [0:15] pa_dad_;
 
 pa PA(
-	.__clk(__clk),
 	.ir(ir),
 	.ki(ki),
 	.rdt_(rdt_),

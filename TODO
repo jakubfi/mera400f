@@ -1,5 +1,8 @@
 Bugs:
-* good/ops/em.asm fails on freshly started fpga with freshly uploaded core
+* good/ops/em.asm fails on freshly started fpga with freshly uploaded core (this may be fixed now)
+* LIP in user mode does wonders
+* SP in user mode does wonders
+* LF writes something in r4/r5/r6 (this may be fixed now)
 
 Needs investigation:
 * IC is cleared on -OFF only? But DTR says 0->IC on CLO!

@@ -1,11 +1,15 @@
+
+// external board clock frequency in Hz
+`define CLK_EXT_HZ 50_000_000
+
 module mera400f(
 	input CLK_EXT,
+	output BUZZER,
+	// control panel
 	input RXD,
 	output TXD,
-	input K1, K2, K3, K4,
 	output [7:0] DIG,
 	output [7:0] SEG,
-	output BUZZER,
 	// RAM
 	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,
 	output [17:0] SRAM_A,
@@ -55,9 +59,21 @@ module mera400f(
 		.AWP_PRESENT(1'b0),
 		.INOU_USER_ILLEGAL(1'b1),
 		.STOP_ON_NOMEM(1'b1),
-		.LOW_MEM_WRITE_DENY(1'b0)
-	)
-	CPU0(
+		.LOW_MEM_WRITE_DENY(1'b0),
+		.STROB1_1_TICKS(3'd5),
+		.STROB1_2_TICKS(3'd6),
+		.STROB1_3_TICKS(3'd5),
+		.STROB1_4_TICKS(3'd5),
+		.STROB1_5_TICKS(3'd5),
+		.GOT_TICKS(3'd5),
+		.STROB2_TICKS(3'd6),
+		.KC_TICKS(3'd7),
+		.PC_TICKS(3'd6),
+		.ALARM_DLY_TICKS(8'd250),
+		.ALARM_TICKS(2'd3),
+		.DOK_DLY_TICKS(4'd15),
+		.DOK_TICKS(3'd7)
+	) CPU0(
 		// FPGA
 		.__clk(CLK_EXT),
 		// power supply
@@ -140,7 +156,11 @@ module mera400f(
 	wire oprq_, stop$_, start$_, work, mode, step_, stop_n, cycle_;
 	wire dcl_;
 
-	pk #(.TIMER_CYCLE_MS(8'd10)) PK(
+	pk #(
+		.TIMER_CYCLE_MS(8'd10),
+		.CLK_EXT_HZ(`CLK_EXT_HZ),
+		.UART_BAUD(1_000_000)
+	) PK(
 		.CLK_EXT(CLK_EXT),
 		.RXD(RXD),
 		.TXD(TXD),

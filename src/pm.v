@@ -210,6 +210,9 @@ module pm(
 	output mwc_
 );
 
+	parameter KC_TICKS;
+	parameter PC_TICKS;
+
 	// sheet 1, page 2-11
 	//  * ff: START, WAIT, CYCLE
 
@@ -269,7 +272,7 @@ module pm(
 	);
 
 	wire M90_5;
-	univib #(.ticks(3'd7)) VIB_KC( // 7 ticks = 140ns @ 50MHz (100-200ns orig.)
+	univib #(.ticks(KC_TICKS)) VIB_KC(
 		.clk(__clk),
 		.a_(1'b0),
 		.b(M13_11),
@@ -277,7 +280,7 @@ module pm(
 	);
 
 	wire M90_13;
-	univib #(.ticks(3'd6)) VIB_PC( // 6 ticks = 120ns @ 50MHz (90-150ns orig.)
+	univib #(.ticks(PC_TICKS)) VIB_PC(
 		.clk(__clk),
 		.a_(M90_5),
 		.b(1'b1),

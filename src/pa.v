@@ -8,7 +8,6 @@
 */
 
 module pa(
-	input __clk,
 	// sheet 1
 	input [0:15] ir,
 	input [0:15] ki,

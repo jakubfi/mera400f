@@ -70,8 +70,8 @@ module pr(
 	output [0:15] ki	// B71, B77, B59, B67, A59, A65, A69, A55, B82, A79, A73, B73, A76, A88, A72, B58
 );
 
-	parameter CPU_NUMBER = 1'b0;
-	parameter AWP_PRESENT = 1'b1;
+	parameter CPU_NUMBER;
+	parameter AWP_PRESENT;
 
 	// sheet 1, page 2-58
 	// * user register control signals
