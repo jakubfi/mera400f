@@ -1,10 +1,9 @@
 /*
-	MERA-400 P-D unit (instruction decoder)
+	P-D unit (instruction decoder)
 
-	document:	12-006368-01-8A
-	unit:			P-D2-3
-	pages:		2-30..2-43
-	sheets:		14
+	document: 12-006368-01-8A
+	unit:     P-D2-3
+	pages:    2-30..2-43
 */
 
 module pd(

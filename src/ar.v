@@ -1,3 +1,11 @@
+/*
+	Address register (AR)
+
+	document: 12-006368-01-8A
+	unit:     P-A3-2
+	pages:    2-77
+*/
+
 module ar(
 	input p1,
 	input m4_,

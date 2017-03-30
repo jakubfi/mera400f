@@ -1,4 +1,12 @@
 /*
+	ALU
+
+	document: 12-006368-01-8A
+	unit:     P-A3-2
+	pages:    2-74..2-75
+*/
+
+/*
 
 0-7: {sd, ~scb_, sb, ~sab_}
 8-15: {sd, ~sca_, sb, ~saa_}

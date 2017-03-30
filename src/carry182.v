@@ -1,3 +1,7 @@
+/*
+	74182 Look-Ahead Carry Generator
+*/
+
 module carry182(
 	input [3:0] y, x,
 	input cn_,

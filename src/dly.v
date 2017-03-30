@@ -1,3 +1,7 @@
+/*
+	Delay line
+*/
+
 module dly(
 	input clk,
 	input i,

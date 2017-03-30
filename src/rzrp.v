@@ -1,3 +1,7 @@
+/*
+	Interrupt request and interrupt service register pair
+*/
+
 module rzrp(
 	input imask,		// interrupt mask
 	input irq_,			// async irq source

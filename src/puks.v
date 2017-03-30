@@ -1,9 +1,9 @@
 /*
-  MERA-400 PUKS-3 unit (power supply: reset circuit and voltage control)
+	PUKS-3 unit (power supply: reset circuit and voltage control)
 
-  document: 12-006383-01-9A
-  unit:     PUKS-3
-  pages:    1-9
+	document: 12-006383-01-9A
+	unit:     PUKS-3
+	pages:    1-9
 */
 
 module puks(

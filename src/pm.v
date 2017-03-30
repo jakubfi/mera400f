@@ -1,10 +1,9 @@
 /*
-	MERA-400 P-M unit (microinstructions)
+	P-M unit (microinstructions)
 
-	document:	12-006368-01-8A
-	unit:			P-M3-2
-	pages:		2-11..2-28
-	sheets:		19
+	document: 12-006368-01-8A
+	unit:     P-M3-2
+	pages:    2-11..2-28
 */
 
 module pm(

@@ -3,6 +3,7 @@
 /*.qsf
 /*.qpf
 /*.qws
+/*.ddb
 db/
 incremental_db/
 output_files/

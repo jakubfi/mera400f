@@ -1,3 +1,11 @@
+/*
+	Accumulator (AC register)
+
+	document: 12-006368-01-8A
+	unit:     P-A3-2
+	pages:    2-77
+*/
+
 module ac(
 	input c,
 	input [0:15] w,

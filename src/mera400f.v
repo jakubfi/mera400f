@@ -1,3 +1,6 @@
+/*
+	MERA-400 system
+*/
 
 // external board clock frequency in Hz
 `define CLK_EXT_HZ 50_000_000

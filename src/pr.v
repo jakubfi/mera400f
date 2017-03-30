@@ -1,10 +1,9 @@
 /*
-	MERA-400 P-R unit (registers)
+	P-R unit (registers)
 
-	document:	12-006368-01-8A
-	unit:			P-R2-3
-	pages:		2-58..2-68
-	sheets:		12
+	document: 12-006368-01-8A
+	unit:     P-R2-3
+	pages:    2-58..2-68
 */
 
 module pr(

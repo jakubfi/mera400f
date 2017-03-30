@@ -1,3 +1,8 @@
+/*
+	74181 4-bit alu
+*/
+
+
 module alu181(
 	input [3:0] a, b, s,
 	input m,

@@ -1,3 +1,10 @@
+/*
+	CPU
+
+	document: 12-006368-01-8A
+	pages:    2-1..2-84
+*/
+
 module cpu(
 	// from power supply (?)
 	input off_,

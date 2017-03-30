@@ -1,3 +1,11 @@
+/*
+	User registers
+
+	document: 12-006368-01-8A
+	unit:     P-R2-3
+	pages:    2-59..2-62
+*/
+
 module regs(
 	input [0:15] w,
 	input ra, rb,

@@ -1,10 +1,10 @@
 /*
-	MERA-400 P-A unit (ALU)
+	P-A unit (ALU)
 
-	document:	12-006368-01-8A
-	unit:			P-A3-2
-	pages:		2-70..2-84
-	sheets:		15
+	document: 12-006368-01-8A
+	unit:     P-A3-2
+	pages:    2-70..2-84
+	sheets:   15
 */
 
 module pa(

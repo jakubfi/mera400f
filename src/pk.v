@@ -1,10 +1,9 @@
 /*
-	MERA-400 P-K unit (control panel, heavily modified for the FPGA implementation)
+	P-K unit (control panel, heavily modified for the FPGA implementation)
 
-	document:	12-006368-01-8A
-	unit:			SM-PK11
-	pages:		2-103..2-108
-	sheets:		6
+	document: 12-006368-01-8A
+	unit:     SM-PK11
+	pages:    2-103..2-108
 */
 
 `define FN_START	4'b0000

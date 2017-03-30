@@ -1,3 +1,7 @@
+/*
+	Memory (software configurable, Elwro-like)
+*/
+
 module mem_elwro_sram(
 	input clk,
 	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,

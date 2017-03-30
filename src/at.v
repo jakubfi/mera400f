@@ -1,3 +1,11 @@
+/*
+	ALU output register (AT)
+
+	document: 12-006368-01-8A
+	unit:     P-A3-2
+	pages:    2-76
+*/
+
 module at(
 	input s0, s1,
 	input c,

@@ -1,10 +1,9 @@
 /*
-	MERA-400 P-X unit (state control)
+	P-X unit (state control)
 
-	document:	12-006368-01-8A
-	unit:			P-X3-2
-	pages:		2-1..2-10
-	sheets:		10
+	document: 12-006368-01-8A
+	unit:     P-X3-2
+	pages:    2-1..2-10
 */
 
 module px(

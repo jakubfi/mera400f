@@ -1,3 +1,7 @@
+/*
+	1-clock impulse generator
+*/
+
 module impulse(
 	input clk,
 	input in,

@@ -1,10 +1,9 @@
 /*
-	MERA-400 P-P unit (interrupts)
+	P-P unit (interrupts)
 
-	document:	12-006368-01-8A
-	unit:			P-P3-2
-	pages:		2-44..2-57
-	sheets:		14
+	document: 12-006368-01-8A
+	unit:     P-P3-2
+	pages:    2-44..2-57
 */
 
 module pp(

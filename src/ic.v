@@ -1,3 +1,11 @@
+/*
+	Instruction counter (IC register)
+
+	document: 12-006368-01-8A
+	unit:     P-A3-2
+	pages:    2-79
+*/
+
 module ic(
 	input cu_,
 	input l_,

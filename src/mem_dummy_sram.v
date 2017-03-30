@@ -1,3 +1,7 @@
+/*
+	Memory (dummy, not software configurable)
+*/
+
 module mem_dummy_sram(
 	input clk,
 	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,

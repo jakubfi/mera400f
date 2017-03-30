@@ -1,3 +1,7 @@
+/*
+	7442 BCD to Decimal Decoder
+*/
+
 module decoder_bcd(
 	input a, // LSB
 	input b,

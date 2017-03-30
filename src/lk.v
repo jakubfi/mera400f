@@ -1,3 +1,11 @@
+/*
+	Step counter (LK)
+
+	document: 12-006368-01-8A
+	unit:     P-M3-2
+	pages:    2-20
+*/
+
 module lk(
 	input cd,
 	input [0:3] i,

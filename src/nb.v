@@ -1,3 +1,11 @@
+/*
+	Block number register (NB)
+
+	document: 12-006368-01-8A
+	unit:     P-R3-2
+	pages:    2-63
+*/
+
 module nb(
 	input [12:15] w,
 	input cnb_,

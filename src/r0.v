@@ -1,3 +1,11 @@
+/*
+	State register (R0)
+
+	document: 12-006368-01-8A
+	unit:     P-R3-2
+	pages:    2-63..2-66
+*/
+
 module r0 (
 	// buses
 	input [0:15] w,
