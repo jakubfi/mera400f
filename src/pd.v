@@ -149,8 +149,15 @@ module pd(
 	ir REG_IR(
 		.d(w),
 		.c(strob1 & w_ir),
+		.invalidate_(si1_),
 		.q(ir)
 	);
+
+	// NOTE: in original design, -SI1 drives open-collector buffers which
+	// short ir[0:1] to ground, causing reset of two most significant bits of IR.
+	// This is a way of 'disabling' instruction decoder so it doesn't send -LIP/-SP
+	// signals to interrupt control loop when serving 'invalid instruction' caused
+	// by LIP/SP instructions executed in user program. Here we just reset two bits in IR.
 
 	assign c0 = ~(~ir[13] & ~ir[14] & ~ir[15]);
 	wire ir13_14 = ~(~ir[13] & ~ir[14]);
@@ -159,13 +166,11 @@ module pd(
 	// * decoder for 2-arg instructions with normal argument (opcodes 020-036 and 040-057)
 	// * decoder for KA1 instruction group (opcodes 060-067)
 
-	wire si11_ = si1_ & ir[0];
-	wire si12_ = si1_ & ir[1];
 	wire ir01 = ~(~ir[1] & ~ir[0]);
 
 	wire lw_, tw_, rw_, pw_, bb_, bm_, bc_, bn_, pufa_;
 	decoder16 DEC01(
-		.en1_(si11_),
+		.en1_(ir[0]),
 		.en2_(~ir[1]),
 		.d(ir[2]), .c(ir[3]), .b(ir[4]), .a(ir[5]),
 		.o_({lw_, tw_, ls_, ri_, rw_, pw_, rj_, is_, bb_, bm_, bs_, bc_, bn_, ou_, in_, pufa_})
@@ -175,7 +180,7 @@ module pd(
 	wire aw_, ac_, sw_, cw_, or_, om_, nr_, nm_, er_, em_, xr_, xm_, cl_, lb_, rb_;
 	decoder16 DEC10(
 		.en1_(~ir[0]),
-		.en2_(si12_),
+		.en2_(ir[1]),
 		.d(ir[2]), .c(ir[3]), .b(ir[4]), .a(ir[5]),
 		.o_({aw_, ac_, sw_, cw_, or_, om_, nr_, nm_, er_, em_, xr_, xm_, cl_, lb_, rb_, cb_})
 	);
@@ -432,7 +437,7 @@ module pd(
 	assign ssp$ = ~(is_ & bmib & M92_12 & bs_);
 	wire sew$ = ~(M92_12 & krb_ & ~nor$ & sl_ & sw_ & a_ & c$_);
 	wire llb_ = bs_ & ls_ & lwrs_;
-	assign ka1_ = ~(si11_ & si12_ & ~ir[2]) & js_;
+	assign ka1_ = ~(ir[0] & ir[1] & ~ir[2]) & js_;
 	wire uka = ~(ka1_ | ~ir[6]); // Ujemny Krótki Argument
 	assign na_ = ~(ka1_ & ka2_ & sc_ & ir01);
 	assign exl_ = ~(~ir[6] & ka2 & ir[7]);

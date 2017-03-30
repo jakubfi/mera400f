@@ -1,19 +1,18 @@
 
-About mera400f
+mera400f - MERA-400 in FPGA
 ============================================
 
 Mera400f is a reimplementation of MERA-400 CPU in Verilog.
-It aims to be 100% true to the original on functional and logical level:
-it uses the same signals running through the same functional blocks,
+It aims to be 100% true to the original on functional and signal level.
+The same signals run through the same functional blocks,
 yielding the same results. It does not try to redo the 74xx
 implementation, but rather reimplement the logical structure
 using current tools.
 
-
 Signal naming changes
 ============================================
 
-All names match those on original schematic, with the following 'cosmetic' changes:
+All names match those on original schematic, with the following cosmetic changes:
 
 * all signal names are lowercase instead of uppercase,
 * bus signals are grouped together (IR0..IR15 becomes ir[0:15]),
@@ -26,12 +25,18 @@ All names match those on original schematic, with the following 'cosmetic' chang
   * for complex names underscores are used as special characters replacements (eg. `I3/EX+PRZER/` becomes `i3_ex_przer`, `CK->RZ*W` becomes `ck_rz_w`),
 * signal names which start with a number are prefixed with an underscore (eg. `0->V` becomes `_0_v`),
 * polish diacritics are replaced with non-diacritics,
-* for a couple of signal names polarity (and also the name) has been changed to reflect the reality
+
+Other changes
+============================================
+
+In several cases schematic was wrong and Verilog implementation has been fixed to reflect the hardware.
+For all those cases appropriate comments were added in the code.
 
 Control Panel serial protocol
 ============================================
 
-Control Panel recognizes following serial commands (8N1):
+MERA-400 [control panel](http://mera400.pl/Pulpit_techniczny) is implemented as a simple serial protocol,
+running at 1Mbit 8N1 by default. It recognizes the following commands (each command is 8 bit long):
 
 * `001 FFFF V` - Set function key FFFF (see below) to position V (0-off, 1-on)
 * `01 KKKKKK` - Set data keys 10-15 to binary value K

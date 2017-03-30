@@ -1,11 +1,15 @@
 module ir(
 	input [0:15] d,
 	input c,
+	input invalidate_,
 	output reg [0:15] q
 );
 
-	always @ (c, d) begin
-		if (c) q <= d;
+	// NOTE: invalidate_ was originaly done by shorting 7475 outputs to ground
+	// through open-collector drivers
+	always @ (c, d, invalidate_) begin
+		if (~invalidate_) q[0:1] <= 2'd0;
+		else if (c) q <= d;
 	end
 
 endmodule
