@@ -10,12 +10,6 @@ set_location_assignment PIN_23 -to CLK_EXT
 set_location_assignment PIN_160 -to RXD
 set_location_assignment PIN_163 -to TXD
 
-# -- Keys ----------------------------------------------------------------
-set_location_assignment PIN_144 -to K1
-set_location_assignment PIN_145 -to K2
-set_location_assignment PIN_146 -to K3
-set_location_assignment PIN_147 -to K4
-
 # -- 7-seg: digits -------------------------------------------------------
 set_location_assignment PIN_106 -to DIG[0]
 set_location_assignment PIN_105 -to DIG[1]
