@@ -90,7 +90,7 @@ module pa(
 
 	reg [0:15] W;
 	assign w = W;
-	always @ (mwc_, mwb_, mwa_, bwb_, bwa_, ir, kl, rdt_, ki, at, ac, a) begin
+	always @ (*) begin
 
 		if (~bwb_) W[0:7] = 8'd0;
 		else case ({mwc_, mwb_, mwa_})
@@ -226,7 +226,7 @@ module pa(
 	// sheet 11, 12
 
 	reg [0:15] a;
-	always @ (ab_, aa_, bac_, bab_, baa_, l, ir, ic, ar) begin
+	always @ (*) begin
 
 		if (~bac_) a[0:7] <= 8'd0;
 		else case ({ab_, aa_})

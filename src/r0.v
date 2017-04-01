@@ -26,7 +26,7 @@ module r0 (
 
 	// --- R00, Z flag --------------------------------------------------------
 	wire c0 = ~(ust_z & strob1);
-	always @(posedge zer, posedge w_zmvc, posedge c0) begin
+	always @ (posedge zer, posedge w_zmvc, posedge c0) begin
 		if (zer) r0[0] <= 0;
 		else if (w_zmvc) r0[0] <= w[0];
 		else r0[0] <= zs;
@@ -34,7 +34,7 @@ module r0 (
 
 	// --- R01, M flag --------------------------------------------------------
 	wire c1 = ~(ust_mc & strob1);
-	always @(posedge zer, posedge w_zmvc, posedge c1) begin
+	always @ (posedge zer, posedge w_zmvc, posedge c1) begin
 		if (zer) r0[1] <= 0;
 		else if (w_zmvc) r0[1] <= w[1];
 		else r0[1] <= s_1;
@@ -43,7 +43,7 @@ module r0 (
 	// --- R02, V flag --------------------------------------------------------
 	wire c2 = ~(ust_v & strob1);
 	wire zer2 = _0_v ^ zer;
-	always @(posedge zer2, posedge w_zmvc, posedge c2) begin
+	always @ (posedge zer2, posedge w_zmvc, posedge c2) begin
 		if (zer2) r0[2] <= 0;
 		else if (w_zmvc) r0[2] <= w[2];
 		else if (s0 ^ s_1) r0[2] <= 1;
@@ -52,28 +52,28 @@ module r0 (
 	// --- R03, C flag --------------------------------------------------------
 	// FIX: +W2 instead of +W3 was on C (carry) flag input
 	wire c3 = ~(ust_mc & strob1);
-	always @(posedge zer, posedge w_zmvc, posedge c3) begin
+	always @ (posedge zer, posedge w_zmvc, posedge c3) begin
 		if (zer) r0[3] <= 0;
 		else if (w_zmvc) r0[3] <= w[3];
 		else r0[3] <= ~carry_;
 	end
 
 	// --- R04, L flag --------------------------------------------------------
-	always @(posedge zer, posedge w_legy, posedge cleg_) begin
+	always @ (posedge zer, posedge w_legy, posedge cleg_) begin
 		if (zer) r0[4] <= 0;
 		else if (w_legy) r0[4] <= w[4];
 		else r0[4] <= ~vl_;
 	end
 
 	// --- R05, E flag --------------------------------------------------------
-	always @(posedge zer, posedge w_legy, posedge cleg_) begin
+	always @ (posedge zer, posedge w_legy, posedge cleg_) begin
 		if (zer) r0[5] <= 0;
 		else if (w_legy) r0[5] <= w[5];
 		else r0[5] <= zs;
 	end
 
 	// --- R06, G flag --------------------------------------------------------
-	always @(posedge zer, posedge w_legy, posedge cleg_) begin
+	always @ (posedge zer, posedge w_legy, posedge cleg_) begin
 		if (zer) r0[6] <= 0;
 		else if (w_legy) r0[6] <= w[6];
 		else r0[6] <= ~vg_;
@@ -81,7 +81,7 @@ module r0 (
 
 	// --- R07, Y flag --------------------------------------------------------
 	wire c7 = ~(ust_y & strob1);
-	always @(posedge zer, posedge w_legy, posedge c7) begin
+	always @ (posedge zer, posedge w_legy, posedge c7) begin
 		if (zer) r0[7] <= 0;
 		else if (w_legy) r0[7] <= w[7];
 		else r0[7] <= ~exy_;
@@ -89,7 +89,7 @@ module r0 (
 
 	// --- R08, X flag --------------------------------------------------------
 	wire c8 = ~(ust_x & strob1);
-	always @(posedge zer, posedge w8_x, posedge c8) begin
+	always @ (posedge zer, posedge w8_x, posedge c8) begin
 		if (zer) r0[8] <= 0;
 		else if (w8_x) r0[8] <= w[8];
 		else r0[8] <= ~exx_;
