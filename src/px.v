@@ -460,7 +460,7 @@ module px(
 	wire oken = ~(ren_ & rok_);
 
 	// E-F: no AWP
-	wire EF = efp_ | ~AWP_PRESENT;
+	wire EF = efp_ | AWP_PRESENT;
 	wire M65_6 = ~EF;
 	wire M37_15;
 	ffjk JK37(
