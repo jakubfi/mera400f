@@ -1,8 +1,19 @@
 Bugs:
-* good/ops/em.asm fails on freshly started fpga with freshly uploaded core
+* good/ops/em.asm sometimes fails on freshly started fpga with freshly uploaded core (mem map issue?)
 
 Needs investigation:
 * IC is cleared on -OFF only? But DTR says 0->IC on CLO!
+
+Keep an eye on:
+* IR is loaded on STROB1*W->IR rising edge instead of a latching on high.
+  Data on RDT may be not ready then.
+* IR is unsafe when synthesized as a latch.
+* LF used to destroy registers >r3 (due to wrong register selection signals?).
+* Huge combinatorial loops through R0.
+
+Possible improvements:
+* Rewrite R0 to be more FPGA-friendly?
+* Clock everything on STROB1/2 and use microops as functions?
 
 Features:
 * Elwro needs to respond to 'clear'
