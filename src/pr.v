@@ -200,7 +200,7 @@ module pr(
 
 	wire zer = ~zer_;
 	r0 REG_R0(
-		.w(w),
+		.w(w[0:8]),
 		.r0(r0),
 		.zs(zs),
 		.s_1(s_1),

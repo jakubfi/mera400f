@@ -9,10 +9,10 @@ Keep an eye on:
   Data on RDT may be not ready then.
 * IR is unsafe when synthesized as a latch.
 * LF used to destroy registers >r3 (due to wrong register selection signals?).
-* Huge combinatorial loops through R0.
+* The huge combinatorial loop.
+* "UPLOAD FAILED" after compilation sometimes
 
 Possible improvements:
-* Rewrite R0 to be more FPGA-friendly?
 * Clock everything on STROB1/2 and use microops as functions?
 
 Features:
