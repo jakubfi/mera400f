@@ -380,7 +380,7 @@ module pm(
 	assign ek1 = ~(~(p0_k2 & bin) & ~(k1 & bin & ~lg_3));
 	wire lg_plus_1 = ~((bin & k2) | (k1 & rdt9));
 	// NOTE: not connected anywhere (on every schematic)
-	wire zero_lg = ~(~rdt9 & k1s1 & rok);
+	//wire zero_lg = ~(~rdt9 & k1s1 & rok);
 	wire rdt9 = ~rdt9_;
 
 	// sheet 5, page 2-15
