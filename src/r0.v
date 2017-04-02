@@ -102,12 +102,12 @@ module r0_9_15(
 	input [9:15] w,
 	input lrp,
 	input zer_,
-	output reg [9:15] r0_
+	output reg [9:15] r0
 );
 
 	always @ (posedge lrp, negedge zer_) begin
-		if (~zer_) r0_ <= 7'b1111111;
-		else r0_ <= ~w;
+		if (~zer_) r0 <= 7'b0000000;
+		else r0 <= w;
 	end
 
 endmodule

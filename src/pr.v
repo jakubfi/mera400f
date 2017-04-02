@@ -72,44 +72,43 @@ module pr(
 	parameter CPU_NUMBER;
 	parameter AWP_PRESENT;
 
-	// sheet 1, page 2-58
-	// * user register control signals
+	// sheets 1..5, pages 2-58..2-62
+	// * user registers control signals
+	// * user registers
 
-	wire M53_6 = ~(rb_ & ra_ & rc_);
-	wire M60_6 = ~(~wa_ & rpc);
-
-	wire rpp = ~blr_;
-	wire rpa = blr_ & ~(M53_6 & M60_6);
-	wire rpb = ~(M53_6 & M60_6) & blr_;
-
-	wire lr0 = ~(lpc & strob_a & ~wa_);
-	wire czytrw_ = ~(blr_ & M60_6 & ~rc_);
-	wire wr0 = rb_ & rc_ & ra_;
-	wire ra = ~ra_;
-	wire rb = ~rb_;
-	wire czytrn_ = ~(blr_ & M60_6 & M53_6 & rc_);
-	wire M63_12 = M53_6 & rc_ & ~w_r_;
-	wire piszrn_ = ~((strob_a & M63_12) | (strob_b & M63_12));
-	wire M64_6 = ~w_r_ & ~rc_;
-	wire piszrw_ = ~((M64_6 & strob_a) | (M64_6 & strob_b));
-
-	wire strob_a = ~(as2 | strob1_);
-	wire strob_b = ~(~as2 | strob2_);
+	// NOTE: 74170-specific control signals: -CZYTRN, -PISZRN, -CZYTRW, -PISZRW
+	// (sheet 1) are gone because registers don't use 74170 8x4x4bits layout anymore
 
 	wire w_r = ~w_r_;
 	wire strob1 = ~strob1_;
+	wire strob_a = ~(as2 | strob1_);
+	wire strob_b = ~(~as2 | strob2_);
 
-	// sheets 2..5, pages 2-59..2-62
-	// * R1-R7 user registers
+	wire M53_6 = ~(rb_ & ra_ & rc_); // r1-r7 selected
+	wire M60_6 = ~(~wa_ & rpc);
 
-	wire [0:15] __l_regs;
+	wire rpp = ~blr_; // R0>>8 -> L
+	wire rpa = blr_ & ~(M53_6 & M60_6); // R0 -> L
+	// NOTE: RPB = RPA
+	wire RPN = blr_ & M53_6 & M60_6; // R1-R7 -> L
+
+	wire lr0 = ~(lpc & strob_a & ~wa_);
+	wire wr0 = rb_ & rc_ & ra_; // R0 selected
+
+	wire [0:15] R1_7;
 	regs USER_REGS(
 		.w(w),
-		.l(__l_regs),
-		.czytrn_(czytrn_), .piszrn_(piszrn_),
-		.czytrw_(czytrw_), .piszrw_(piszrw_),
-		.ra(ra), .rb(rb)
+		.addr({~rc_, ~rb_, ~ra_}),
+		.we((strob_a | strob_b) & w_r & M53_6),
+		.l(R1_7)
 	);
+
+	// L bus final open-collector composition
+	assign l = 
+		(RPN ? R1_7 : 16'hffff) // user registers
+		& (rpa ? {r0, R0_9_15} : 16'hffff) // r0 at original position
+		& (rpp ? {8'd0, r0[0:7]} : 16'hffff) // r0 shifted right 8 bits
+	;
 
 	// sheet 6, page 2-63
 	// * RB register (binary load register)
@@ -134,15 +133,13 @@ module pr(
 	);
 	assign dnb_ = ~(nb & {4{~bar_nb_}});
 
-	wire [0:15] R0_;
-	r0_9_15 R0_9_15(
+	wire [9:15] R0_9_15;
+	r0_9_15 R0_LOW(
 		.w(w[9:15]),
 		.lrp(lrp),
 		.zer_(zer_),
-		.r0_(R0_[9:15])
+		.r0(R0_9_15)
 	);
-
-	wire [9:15] __l_r0 = ~(R0_[9:15] & {7{rpb}});
 
 	// sheet 7, page 2-64
 	// * Q and BS flag registers and system bus drivers
@@ -223,24 +220,6 @@ module pr(
 		._0_v(_0_v),
 		.zer(zer)
 	);
-
-	// assignments below are on pages 2-59..2-62
-	wire [0:8] __l_flags;
-	wire [8:15] __l_flags2;
-	assign __l_flags[0:3] = ~(~r0[0:3] & {4{rpa}});
-	assign __l_flags[4:7] = ~(~r0[4:7] & {4{rpa}});
-	assign __l_flags[8] = ~(~r0[8] & rpb);
-
-	assign __l_flags2[8:11] = ~(~r0[0:3] & {4{rpp}});
-	assign __l_flags2[12:15] = ~(~r0[4:7] & {4{rpp}});
-
-	// L bus final open-collector composition
-	assign l = 
-		__l_regs // user registers
-		& {9'b111111111, __l_r0} // user-settable r0 part
-		& {__l_flags, 7'b1111111} // r0 flags at original positions
-		& {8'b11111111, __l_flags2} // r0 flags shifted right 8 bits
-	;
 
 	// sheets 10..11, pages 2-67..2-68
 	// * KI bus
