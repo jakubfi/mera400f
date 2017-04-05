@@ -2,6 +2,7 @@ Bugs:
 * good/ops/em.asm sometimes fails on freshly started fpga with freshly uploaded core (mem map issue?)
 
 Needs investigation:
+* How to constrain an asynchronous design?
 * IC is cleared on -OFF only? But DTR says 0->IC on CLO!
 
 Keep an eye on:
