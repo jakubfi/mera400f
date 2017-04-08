@@ -129,7 +129,7 @@ module pk(
 
 	always @ (posedge CLK_EXT) begin
 		if (~action) begin
-			send_leds = 0;
+			send_leds <= 0;
 			// reset all monostable switches
 			fnkey[`FN_STOPN] <= 0;
 			fnkey[`FN_STEP] <= 0;

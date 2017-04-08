@@ -92,7 +92,7 @@ module pa(
 	assign w = W;
 	always @ (*) begin
 
-		if (~bwb_) W[0:7] = 8'd0;
+		if (~bwb_) W[0:7] <= 8'd0;
 		else case ({mwc_, mwb_, mwa_})
 			3'b111 : W[0:7] <= ir[0:7];
 			3'b110 : W[0:7] <= kl[0:7];
@@ -104,7 +104,7 @@ module pa(
 			3'b000 : W[0:7] <= a[0:7];
 		endcase
 
-		if (~bwa_) W[8:15] = 8'd0;
+		if (~bwa_) W[8:15] <= 8'd0;
 		else case ({mwc_, mwb_, mwa_})
 			3'b111 : W[8:15] <= ir[8:15];
 			3'b110 : W[8:15] <= kl[8:15];
