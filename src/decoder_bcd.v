@@ -10,16 +10,21 @@ module decoder_bcd(
 	output [0:9] o_
 );
 
-	assign o_[0] = ~(~d & ~c & ~b & ~a);
-	assign o_[1] = ~(~d & ~c & ~b &  a);
-	assign o_[2] = ~(~d & ~c &  b & ~a);
-	assign o_[3] = ~(~d & ~c &  b &  a);
-	assign o_[4] = ~(~d &  c & ~b & ~a);
-	assign o_[5] = ~(~d &  c & ~b &  a);
-	assign o_[6] = ~(~d &  c &  b & ~a);
-	assign o_[7] = ~(~d &  c &  b &  a);
-	assign o_[8] = ~( d & ~c & ~b & ~a);
-	assign o_[9] = ~( d & ~c & ~b &  a);
+	always @ (*) begin
+		case ({d, c, b, a})
+			4'h0: o_ <= ~10'b1000000000;
+			4'h1: o_ <= ~10'b0100000000;
+			4'h2: o_ <= ~10'b0010000000;
+			4'h3: o_ <= ~10'b0001000000;
+			4'h4: o_ <= ~10'b0000100000;
+			4'h5: o_ <= ~10'b0000010000;
+			4'h6: o_ <= ~10'b0000001000;
+			4'h7: o_ <= ~10'b0000000100;
+			4'h8: o_ <= ~10'b0000000010;
+			4'h9: o_ <= ~10'b0000000001;
+			default: o_ <= ~10'b0000000000;
+		endcase
+	end
 
 endmodule
 

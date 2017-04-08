@@ -11,8 +11,6 @@ Keep an eye on:
 * LF used to destroy registers >r3 (due to wrong register selection signals?).
 * The huge combinatorial loop.
 * "UPLOAD FAILED" after compilation sometimes
-* fitter operation takes ages when no logic analyzer is connected (combi loop?)
-* everything breaks when no logic analyzer is connected (combi loop?)
 
 Possible improvements:
 * Clock everything on STROB1/2 and use microops as functions?
@@ -20,5 +18,7 @@ Possible improvements:
 Features:
 * Elwro needs to respond to 'clear'
 * MEGA
+* DRAM driver
+* DRAM cache
 * serial system bus
 * bus reservation
