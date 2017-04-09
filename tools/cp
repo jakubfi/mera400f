@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+
+from cplib import *
+import readline
+from subprocess import Popen, PIPE, STDOUT
+
+# ------------------------------------------------------------------------
+def asm(l):
+    tab = []
+    print("running emas: %s" % l)
+    p = Popen(['emas', '-O', 'debug'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+    stdout_data = p.communicate(l.encode('ascii'))[0].decode('ascii').split("\n")
+    for line in stdout_data:
+        if len(line) > 0 and "none" not in line:
+            print("   %s" % line)
+            dls = line.split()
+            tab.append(int(dls[3], 0))
+    return tab
+
+# ------------------------------------------------------------------------
+def cmd_process(s, line):
+    a = line.lower().split()
+    try:
+        cmd = a[0]
+    except IndexError:
+        print(m.state())
+        return 0
+    if cmd == "help":
+        print(functions.keys())
+    elif cmd == "quit":
+        return 1
+    elif cmd == "asm":
+        t = asm(line[4:])
+        m.upload(0, t);
+    elif cmd == "upload":
+        m.upload_file(0, a[1]);
+    elif cmd == "s":
+        print(m.state())
+    else:
+        try:
+            m.cmds(cmd)
+        except Exception as e:
+            print(e)
+
+    return 0
+
+# ------------------------------------------------------------------------
+def input_process(m, line):
+    for cmd in line.split(";"):
+        quit = cmd_process(m, cmd)
+    return quit
+
+# ------------------------------------------------------------------------
+def cmd_loop(m):
+    quit = 0
+    while not quit:
+        try:
+            line = input("CPU> ")
+            quit = input_process(m, line)
+        except (EOFError, KeyboardInterrupt):
+            print("")
+            quit = 1
+
+# ------------------------------------------------------------------------
+# --- MAIN ---------------------------------------------------------------
+# ------------------------------------------------------------------------
+
+readline.set_history_length(1000)
+
+m = m4cp("/dev/ttyUSB0", 1000000)
+cmd_loop(m)
+m.close()
+
+# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

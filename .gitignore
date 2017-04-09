@@ -11,3 +11,4 @@ software_examples/
 software/
 /*.sopcinfo
 /tests/*.bin
+__pycache__

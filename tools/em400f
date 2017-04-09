@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+
+from cplib import *
+import re
+
+# ------------------------------------------------------------------------
+def eval(m, e):
+    if re.match("^(r[0-7])|(ir)|(ic)|(sr)$", e):
+        m.cmd(e)
+        state = m.state()
+        print("OK: %s" % state.data)
+    elif re.match("^\[[0-9]+:[0-9]+\]$", e):
+        rm = re.match("^\[([0-9]+):([0-9]+)\]$", e)
+        block = int(rm.group(1))
+        addr = int(rm.group(2))
+        m.cmds("sr;%i;load;ar;%i;load;ac;fetch" % (0x20|block, addr))
+        val = m.state().data
+        m.cmd("rz")
+        state = m.state()
+        if (state.data>>13) & 1:
+            print("ERR: no memory")
+        else:
+            print("OK: %s" % val)
+    elif re.match("^\[[x0-9]+\]$", e):
+        addr = e.strip("[]")
+        m.cmds("ar;%s;load;ac;fetch" % addr)
+        state = m.state()
+        print("OK: %s" % state.data)
+    elif re.match("^rz\[[0-9]+\]$", e):
+        rz = int(re.match("^rz\[([0-9]+)\]$", e).group(1))
+        if rz < 12:
+            pass
+        elif rz > 27:
+            rz = rz - 16
+        else:
+            print("ERR: cannot access interrupt: %i" % rz)
+            return
+        m.cmd("rz")
+        state = m.state()
+        intval = (state.data >> (15-rz)) & 1
+        print("OK: %s" % intval)
+    elif e == "mod":
+        state = m.state()
+        print("OK: %s" % state.mode)
+    elif e.upper() in "ZMVCLEGYX":
+        m.cmd("r0")
+        r0 = m.state().data
+        pos = "ZMVCLEGYX".index(e.upper())
+        f = (r0 >> (15-pos)) & 1
+        print("OK: %i" % f)
+    else:
+        print("ERR: cannot eval: %s" % e)
+
+# ------------------------------------------------------------------------
+def emu_process(m, line):
+    a = line.lower().split()
+    cmd = a[0]
+    if cmd == "reg":
+        try:
+            m.cmds("%s;%s;load" % (a[2], a[1]))
+            print("OK: %s" % a[2])
+        except IndexError:
+            m.cmd(a[1])
+            state = m.state()
+            print("OK: %s" % state.data)
+    elif cmd == "clock":
+        if a[1].lower() == "on":
+            m.cmd("clk1")
+            print("OK: CLOCK OK")
+        else:
+            m.cmd("clk0")
+            print("OK: CLOCK OFF")
+    elif cmd == "load":
+        m.upload_file(0, a[3])
+        print("OK: 1")
+    elif cmd == "ips":
+        print("OK: 0")
+    elif cmd == "state":
+        state = m.state()
+        s = 0
+        if state.wait: s |= 2
+        if not state.wait and not state.run: s |= 1
+        print("OK: %i" % s)
+        pass
+    elif cmd == "eval":
+        eval(m, ' '.join(a[1:]))
+    elif cmd == "clear":
+        m.cmd("clear")
+        print("OK: CLEAR")
+    elif cmd == "start":
+        m.cmd("start")
+        print("OK: START")
+    elif cmd == "stop":
+        m.cmd("stop")
+        print("OK: STOP")
+    elif cmd == "quit":
+        print("OK: QUIT")
+        return 1
+    else:
+        print("ERR: Unknown command: %s" % cmd)
+
+    return 0
+
+# ------------------------------------------------------------------------
+# --- MAIN ---------------------------------------------------------------
+# ------------------------------------------------------------------------
+
+m = m4cp("/dev/ttyUSB0", 1000000)
+
+quit = 0
+while not quit:
+    line = input()
+    quit = emu_process(m, line)
+
+m.close()
+
+# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
