@@ -21,7 +21,8 @@ SOURCES = mera400f.v \
 	isk.v \
 	cpu.v \
 	mem_dummy_sram.v \
-	mem_elwro_sram.v
+	mem_elwro_sram.v \
+	awp.v fps.v fpm.v fpa.v
 TESTS_DIR = tests
 TESTS = regs.v pd.v \
 	alu_add_16bit_182.v alu_add_16bit.v alu_fn.v \

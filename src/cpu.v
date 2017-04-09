@@ -792,10 +792,35 @@ generate
 		assign zp = 16'h0000;
 	end else begin
 		// TODO: instantiate the real AWP
-		assign {fi0_, fi1_, fi2_, fi3_} = 4'b1111;
-		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, ustr0_fp_, s_fp_} = 7'b1111111;
-		assign {f13_, lpa, lpb} = 3'b100;
-		assign zp = 16'h0000;
+		awp AWP(
+			.w(0),
+			.r03(0),
+			.r04(0),
+			.pufa(0),
+			.ir(0),
+			.nrf(0),
+			.mode_(0),
+			.step_(0),
+			.efp_(0),
+			.got_(0),
+			.ok$(0),
+			.oken(0),
+			.zp(zp),
+			.fi0_(fi0_),
+			.fi1_(fi1_),
+			.fi2_(fi2_),
+			.fi3_(fi3_),
+			.rlp_fp_(rlp_fp_),
+			.lpa(lpa),
+			.lpb(lpb),
+			.s_fp_(s_fp_),
+			.ustr0_fp_(ustr0_fp_),
+			.f13_(f13_),
+			.strob_fp_(strob_fp_),
+			.sr_fp_(sr_fp_),
+			.read_fp_(read_fp_),
+			.ekc_fp_(ekc_fp_)
+		);
 	end
 endgenerate
 
