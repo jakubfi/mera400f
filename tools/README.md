@@ -22,9 +22,9 @@ Available commands:
 * `mode0`, `mode1` - mode of operation
 * `clk0`, `clk1` - clock on/off
 
-Commands can be chained together using semicolon as a separator, eg.: `0;r1;load` or `clear,ar,10;load;0;kb;store`
+Commands can be chained together using semicolon as a separator, eg.: `0b10110;r1;load` or `clear;ar;0xbeef;load;0o7377;kb;store`
 
 There are also two macros available:
 
 * `upload FILENAME` - uploads contents of a file at address 0 in memory segment 0
-* `asm ASSEMBLER_CODE` - assembles the code and uploads it at address 0 (eg. `asm lwt r1,10 awt r1,20 hlt`)
+* `asm ASSEMBLER_CODE` - assembles the code and uploads it at address 0 (eg. `asm mcl lwt r1,10 awt r1,20 hlt`)
