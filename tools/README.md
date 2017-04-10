@@ -28,3 +28,4 @@ There are also two macros available:
 
 * `upload FILENAME` - uploads contents of a file at address 0 in memory segment 0
 * `asm ASSEMBLER_CODE` - assembles the code and uploads it at address 0 (eg. `asm mcl lwt r1,10 awt r1,20 hlt`)
+* `reset` - clear the CPU, switch clock and mode to 0 and set all registers to 0

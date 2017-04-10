@@ -34,6 +34,8 @@ def cmd_process(s, line):
         m.upload(0, t);
     elif cmd == "upload":
         m.upload_file(0, a[1]);
+    elif cmd == "reset":
+        m.cmds("stop;clear;clk0;mode0;0;r1;load;r2;load;r3;load;r4;load;r5;load;r6;load;r7;load;ar;load;ic;load;ac;load;ir;load;r1")
     elif cmd == "s":
         print(m.state())
     else:
