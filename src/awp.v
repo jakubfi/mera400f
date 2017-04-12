@@ -7,6 +7,7 @@
 */
 
 module awp(
+	input __clk,
 	input [0:15] w,
 	input r03,
 	input r04,

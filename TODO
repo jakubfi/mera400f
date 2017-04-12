@@ -14,6 +14,7 @@ Keep an eye on:
 
 Possible improvements:
 * Clock everything on STROB1/2 and use microops as functions?
+* Make the design synchronous?
 
 Features:
 * Elwro needs to respond to 'clear'

@@ -7,6 +7,7 @@
 */
 
 module fpm(
+	input __clk,
 	// sheet 1
 	input [8:15] w,
 	input l_d_,
