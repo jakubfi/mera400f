@@ -125,14 +125,14 @@ module fps(
 	output lpb
 );
 
-	parameter FP_STROB1_1_TICKS = 3'd6;
-	parameter FP_STROB1_2_TICKS = 3'd6;
-	parameter FP_STROB1_3_TICKS = 3'd6;
-	parameter FP_STROB1_4_TICKS = 3'd6;
-	parameter FP_STROB2_TICKS = 3'd6;
-	parameter FP_KC1_TICKS = 3'd6;
-	parameter FP_KC2_TICKS = 3'd6;
-	parameter FP_START_TICKS = 3'd6;
+	parameter FP_STROB1_1_TICKS;
+	parameter FP_STROB1_2_TICKS;
+	parameter FP_STROB1_3_TICKS;
+	parameter FP_STROB1_4_TICKS;
+	parameter FP_STROB2_TICKS;
+	parameter FP_KC1_TICKS;
+	parameter FP_KC2_TICKS;
+	parameter FP_START_TICKS;
 
 	// sheet 1
 

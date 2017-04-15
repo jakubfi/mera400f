@@ -8,7 +8,7 @@
 
 module fpa(
 	// sheet 1
-	input [0:15] w_, // also on sheets 2, 12, 13
+	input [0:15] w, // also on sheets 2, 12, 13
 	input taa,
 	// sheet 2
 	input t_1,
@@ -40,7 +40,7 @@ module fpa(
 	// sheet 6
 	input p_16_,
 	output m14_,
-	output m16_,
+	output m15_,
 	// sheet 7
 	// (nothing)
 	// sheet 8
@@ -74,7 +74,7 @@ module fpa(
 	// sheet 16
 	input clocktc_,
 	input trb_,
-	input _0_t_,
+	input _0_t,
 	output t39_,
 	// sheet 17
 	input f9_ka_,
@@ -111,7 +111,7 @@ module fpa(
 		case ({f9ka, lkb})
 			2'b00: k <= sum[0:39];
 			2'b01: k <= m[0:39];
-			2'b10: k <= {w_[0:15], w_[0:15], w_[0:7]};
+			2'b10: k <= {w[0:15], w[0:15], w[0:7]};
 			2'b11: k <= 40'd0;
 		endcase
 	end
@@ -284,7 +284,7 @@ module fpa(
 	);
 
 	assign m14_ = ~m[14];
-	assign m16_ = ~m[16];
+	assign m15_ = ~m[15];
 
 	// sheet 8
 
@@ -404,6 +404,7 @@ module fpa(
 
 	// sheet 16
 
+	wire _0_t_ = ~_0_t;
 	assign t39_ = ~t[39];
 
 	// sheet 18

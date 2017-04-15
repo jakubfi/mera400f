@@ -17,7 +17,7 @@ module fpm(
 	// sheet 2
 	input fcb_,
 	input scc_,
-	input pcb,
+	input pc8,
 	output d_1,
 	// sheet 3
 	input _0_f_,
@@ -129,6 +129,8 @@ module fpm(
 
 );
 
+	parameter FP_FI0_TICKS;
+
 	// sheet 1
 
 	wire lkb = ~lkb_;
@@ -178,7 +180,7 @@ module fpm(
 	wire [0:7] sum_c;
 	wire M29_14;
 	always @ (*) begin
-		{M29_14, sum_c} <= DSUM + D + pcb;
+		{M29_14, sum_c} <= DSUM + D + pc8;
 	end
 
 	wire M9_3 = fcb_ ^ scc_;
@@ -385,7 +387,7 @@ module fpm(
 	wire idi;
 	ffd REG_IDI(
 		.s_(1),
-		.ddw(),
+		.d(dw),
 		.c(f4),
 		.r_(M49_6),
 		.q(idi)
@@ -402,7 +404,7 @@ module fpm(
 	);
 
 	wire M20_13;
-	univib VIB_FI(
+	univib #(.ticks(FP_FI0_TICKS)) VIB_FI0(
 		.clk(__clk),
 		.a_(~M49_12),
 		.b(1),
