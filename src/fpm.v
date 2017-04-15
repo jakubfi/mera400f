@@ -187,12 +187,12 @@ module fpm(
 	wire M3_6 = ~((DL[0] & M9_3) | (~DL[0] & scc_));
 	wire M27_8 = M3_6 ^ d_1_;
 	wire sum_c_2 = ~((M29_14 & M3_6) | (M29_14 & d_1_) | (M3_6 & d_1_));
-	wire sum_c_1 = M29_14 & M27_8;
+	wire sum_c_1 = M29_14 ^ M27_8;
 
 	// sheet 3
 
 	wire M68_11 = sum_c_ge_40 & sum_c_1_;
-	wire M57_8 = (f5_af_sf & strob_fp);
+	wire M57_8 = ~(f5_af_sf & strob_fp);
 	wire M35_6 = ~(f2 & t_ & strob_fp & af_sf);
 
 	ffd REG_G(
@@ -205,7 +205,7 @@ module fpm(
 
 	ffd REG_WDT(
 		.s_(1),
-		.d(sum_c[1]),
+		.d(sum_c_1),
 		.c(M57_8),
 		.r_(_0_f_),
 		.q(wdt)
@@ -221,7 +221,7 @@ module fpm(
 	);
 
 	wire cda = ~(~wdt & strob_fp & f8);
-	wire cua_ = ~cda;
+	wire cua_ = ~(wdt & f8 & strob_fp);
 	wire f8_n_wdt = ~wdt & f8;
 	wire cd$_ = ~(f8 & strob_fp);
 	wire rab_ = ~(~(g & strob2_fp & ~f5_) & _0_f_);
@@ -245,7 +245,7 @@ module fpm(
 	wire M57_11 = ~(f4 & dw);
 
 	wire M54_8 = ~(M46_11 & M57_11 & M57_3);
-	wire M69_8 = ~(M57_11 & M46_8);
+	wire M69_8 = ~(M57_3 & M46_8);
 	wire M59_3 = ~(M57_3 & M46_6);
 	wire M59_6 = ~(M43_8 & M46_3);
 	wire M54_6 = ~(M57_11 & M43_3 & M57_6);
@@ -272,22 +272,22 @@ module fpm(
 	// sheet 5
 
 	assign c_f = (df_ & ff & m_1) | (r03 & mwdw) | (ad_sd & ci);
-	assign v_f = ((r02) | (t0_t1 & mwadsd));
+	assign v_f = (r02) | (t0_t1 & mwadsd);
 	assign m_f = ~((t_1_ & dw_) | (t16_ & dw));
 	wire M77_11 = t_24_31_ & t_16_23_;
 	assign z_f = (M77_11 & dw) | (mwadsd & t_) | (ff & fwz);
 	assign dw = ~dw_;
 
-	wire sum_c_1_ = ~sum_c[1];
+	wire sum_c_1_ = ~sum_c_1;
 
-	wire M44_6 = ~(~sum_c[1] & sum_c[4] & sum_c[2]);
-	wire M44_12 = ~(sum_c[2] & ~sum_c[1] & sum_c[3]);
-	wire M27_3 = ~sum_c[1] ^ sum_c[1];
-	wire M27_11 = ~sum_c[1] ^ sum_c[0];
+	wire M44_6 = ~(sum_c_1_ & sum_c[4] & sum_c[2]);
+	wire M44_12 = ~(sum_c[2] & sum_c_1_ & sum_c[3]);
+	wire M27_3 = sum_c_1_ ^ sum_c[1];
+	wire M27_11 = sum_c_1_ ^ sum_c[0];
 
-	wire M44_8 = ~(~(sum_c[7] | sum_c[6]) & ~(sum_c[5] | sum_c[2]) & sum_c[1]);
-	wire M17_3 = ~(~(sum_c[2] | sum_c[4]) & sum_c[1]);
-	wire M17_11 = ~(~(sum_c[2] | sum_c[3]) & sum_c[1]);
+	wire M44_8 = ~(~(sum_c[7] | sum_c[6]) & ~(sum_c[5] | sum_c[2]) & sum_c_1);
+	wire M17_3 = ~(~(sum_c[2] | sum_c[4]) & sum_c_1);
+	wire M17_11 = ~(~(sum_c[2] | sum_c[3]) & sum_c_1);
 
 	wire sum_c_ge_40 = ~(M44_6 & M44_12 & M27_3 & M27_11 & M44_8 & M17_3 & M17_11);
 
@@ -304,10 +304,10 @@ module fpm(
 		.b(ir[8]),
 		.c(ir[7]),
 		.d(~pufa),
-		.o_({ad_, sd$_, mw_, dw_, af_, sf_, mf_, df_})
+		.o_({ad_, sd$_, mw_, dw_, af_, sf_, mf_, df_, __NC, __NC})
 	);
 
-	wire f9df = (df & f9);
+	wire f9df = df & f9;
 	assign dw_df = ~(df_ & dw_);
 	assign mw_mf = ~(mf_ & mw_);
 	assign af_sf_ = sf_ & af_;
@@ -319,7 +319,7 @@ module fpm(
 	wire ff = ~ff_;
 	assign ff_ = ~(nrf | ir[7]);
 	assign ss = ~(ir[7] | ~pufa);
-	assign puf = ~(~pufa & ~nrf);
+	assign puf = ~(~pufa & nrf_);
 
 	// sheet 7
 
@@ -424,11 +424,11 @@ module fpm(
 	wire M3_8 = ~((fab_ & fc0_) | (faa_ & ~fc0_));
 	wire M53_6 = M3_8 ^ t_1;
 	wire M53_8 = fp0_ ^ M53_6;
-	wire M40_8 = ~((w0_ & lkb) | (sgn_ & f9df) | (t_1_t_1 & t_1) | (f6_f7 & M53_8));
+	wire M40_8 = ~((w0_ & lkb) | (sgn_ & f9df) | (t_1_t_1 & t_1_) | (f6_f7 & M53_8));
 	wire M52_8 = ~((mw_mf & mfwp) | (t0_t1 & dw_df));
 	wire M67_3 = ~(t1_ & t0_);
 	wire M12_8 = t_32_39_ & t_24_31_ & t_16_23_ & t_8_15_;
-	wire M25_6 = ~(t_8_15_ & t_2_7_ & t_0_1_ & t_8_15_);
+	wire M25_6 = ~(t_8_15_ & t_2_7_ & t_0_1_ & t_1_);
 	wire M24_8 = ~(t_1_ & t_0_1_ & t_2_7_ & t_8_15_ & t_16_23_ & t_24_31_ & t_32_39_ & m_1_);
 	wire M25_8 = ~(M12_8 & dw_df & M67_3 & t_2_7_);
 	wire M66_8 = ~(c0_eq_c1 & dw & M25_6);
@@ -452,7 +452,7 @@ module fpm(
 
 	// sheet 10
 
-	wire M22_8 = (~trb_ & ~t39_) | (~m0_ & ~mb) | (t_1 & f4) | (af & ~c39_ & f8_n_wdt) | (sf &f8_n_wdt & M9_6);
+	wire M22_8 = (~trb_ & ~t39_) | (~m0_ & ~mb) | (t_1 & f4) | (af & ~c39_ & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
 
 	wire m_1_ = ~m_1;
 	ffd REG_M_1(
@@ -472,7 +472,7 @@ module fpm(
 	ffd REG_CK(
 		.s_(M70_11),
 		.d(M77_6),
-		.c(M9_6),
+		.c(~clockm),
 		.r_(~_0_m),
 		.q(ck)
 	);
