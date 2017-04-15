@@ -3,18 +3,18 @@
 */
 
 module carry182(
-	input [3:0] y, x,
-	input cn_,
-	output ox, oy,
-	output cnx_, cny_, cnz_
+	input c_,
+	input [3:0] g, p,
+	output c1_, c2_, c3_,
+	output op, og
 );
 
-	assign cnx_ = ~(                                y[0] & (x[0] | ~cn_));
-	assign cny_ = ~(                y[1] & (x[1] | (y[0] & (x[0] | ~cn_))));
-	assign cnz_ = ~(y[2] & (x[2] | (y[1] & (x[1] | (y[0] & (x[0] | ~cn_))))));
+	assign c1_ = ~(                                g[0] & (p[0] | ~c_));
+	assign c2_ = ~(                g[1] & (p[1] | (g[0] & (p[0] | ~c_))));
+	assign c3_ = ~(g[2] & (p[2] | (g[1] & (p[1] | (g[0] & (p[0] | ~c_))))));
 
-	assign oy = y[3] & (x[3] | y[2]) & (x[3] | x[2] | y[1]) & (x[3] | x[2] | x[1] | y[0]);
-	assign ox = |x;
+	assign og = g[3] & (p[3] | g[2]) & (p[3] | p[2] | g[1]) & (p[3] | p[2] | p[1] | g[0]);
+	assign op = |p;
 
 endmodule
 
