@@ -128,6 +128,7 @@ module px(
 	input exl_,			// A78 - instruction EXL
 	output zg,			// B44 - request to use the system bus (ZGłoszenie)
 	output ok$,			// A80 - OK*
+	output oken,		// B17
 	// sheet 9
 	input stop_n,		// B55
 	input zga,			// B57
@@ -457,7 +458,7 @@ module px(
 		.q(ok$)
 	);
 	wire ok = ok$;
-	wire oken = ~(ren_ & rok_);
+	assign oken = ~(ren_ & rok_);
 
 	// E-F: no AWP
 	wire EF = efp_ | AWP_PRESENT;

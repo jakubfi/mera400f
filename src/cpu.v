@@ -104,7 +104,7 @@ module cpu(
 // --- P-X ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw_, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
+wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw_, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, oken, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
 
 px #(
 	.AWP_PRESENT(AWP_PRESENT),
@@ -233,6 +233,7 @@ px #(
 	.exl_(exl_),
 	.zg(zg),
 	.ok$(ok$),
+	.oken(oken),
 	.stop_n(stop_n),
 	.zga(zga),
 	.rpe_(rpe_),
@@ -791,20 +792,21 @@ generate
 		assign {f13_, lpa, lpb} = 3'b100;
 		assign zp = 16'h0000;
 	end else begin
-		// TODO: instantiate the real AWP
 		awp AWP(
-			.w(0),
-			.r03(0),
-			.r04(0),
-			.pufa(0),
-			.ir(0),
-			.nrf(0),
-			.mode_(0),
-			.step_(0),
-			.efp_(0),
-			.got_(0),
-			.ok$(0),
-			.oken(0),
+			.__clk(__clk),
+			.w(w),
+			.r02(r0[2]),
+			.r03(r0[3]),
+			.pufa(pufa),
+			.ir(ir[7:9]),
+			.nrf(nrf),
+			.mode(mode),
+			.step_(step_),
+			.efp_(efp_),
+			.got_(got_),
+			.ok$(ok$),
+			.oken(oken),
+			.zw1(zw),
 			.zp(zp),
 			.fi0_(fi0_),
 			.fi1_(fi1_),
