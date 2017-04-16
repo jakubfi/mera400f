@@ -253,14 +253,15 @@ module fpm(
 
 	wire M55_6 = ~((f4 & strob_fp) | (f5_af_sf & strob_fp));
 
-	wire [0:5] FIC_IN = {M58_12, M54_6, M59_6, M59_3, M69_8, M54_8};
-	reg [0:5] FIC;
-	always @(posedge rab_, negedge M55_6, posedge cda, posedge cua_) begin
-		if (rab_) FIC <= 0;
-		else if (~M55_6) FIC <= FIC_IN;
-		else if (cda) FIC <= FIC - 1'b1;
-		else FIC <= FIC + 1'b1;
-	end
+	wire [0:5] FIC;
+	fic CNT_FIC(
+		.cda(cda),
+		.cua_(cua_),
+		.rab_(rab_),
+		.load_(M55_6),
+		.in({M58_12, M54_6, M59_6, M59_3, M69_8, M54_8}),
+		.out(FIC)
+	);
 
 	wire M71_6 = ~(FIC[5] | FIC[4]);
 	wire M71_1 = ~(FIC[3] | FIC[2]);
