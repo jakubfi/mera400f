@@ -38,15 +38,15 @@ module awp(
 	output ekc_fp_		// FPU done
 );
 
-	parameter FP_STROB1_1_TICKS = 3'd6;
-	parameter FP_STROB1_2_TICKS = 3'd6;
-	parameter FP_STROB1_3_TICKS = 3'd6;
-	parameter FP_STROB1_4_TICKS = 3'd6;
-	parameter FP_STROB2_TICKS = 3'd6;
-	parameter FP_KC1_TICKS = 3'd6;
-	parameter FP_KC2_TICKS = 3'd6;
-	parameter FP_START_TICKS = 3'd6;
-	parameter FP_FI0_TICKS = 3'd6;
+	parameter FP_STROB1_1_TICKS = 3'd3;
+	parameter FP_STROB1_2_TICKS = 3'd3;
+	parameter FP_STROB1_3_TICKS = 3'd3;
+	parameter FP_STROB1_4_TICKS = 3'd3;
+	parameter FP_STROB2_TICKS = 3'd3;
+	parameter FP_KC1_TICKS = 3'd3;
+	parameter FP_KC2_TICKS = 3'd3;
+	parameter FP_START_TICKS = 3'd3;
+	parameter FP_FI0_TICKS = 3'd3;
 
 // -----------------------------------------------------------------------
 // --- F-PS --------------------------------------------------------------

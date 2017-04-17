@@ -255,6 +255,7 @@ module fpm(
 
 	wire [0:5] FIC;
 	fic CNT_FIC(
+		.clk(__clk),
 		.cda(cda),
 		.cua_(cua_),
 		.rab_(rab_),
