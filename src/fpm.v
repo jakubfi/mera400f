@@ -131,14 +131,14 @@ module fpm(
 	parameter FP_FI0_TICKS;
 
 	// sheet 1
+	// L bus
 
 	wire lkb = ~lkb_;
-	wire [2:1] D_SWM;
-	wire [0:7] D_SW;
+	wire [0:9] L;
 	always @ (*) begin
 		case (lkb)
-			0: {D_SWM, D_SW} <= {sum_c_2, sum_c_1, sum_c};
-			1: {D_SWM, D_SW} <= {w[8], w[8], w[8:15]};
+			0: L <= {sum_c_2, sum_c_1, sum_c};
+			1: L <= {w[8], w[8], w[8:15]};
 		endcase
 	end
 
@@ -147,7 +147,7 @@ module fpm(
 	wire _0_d_ = ~_0_d;
 	always @ (posedge l_d_, negedge _0_d_) begin
 		if (~_0_d_) {D_2, D_1, D} <= 10'd0;
-		else {D_2, D_1, D} <= {D_SWM, D_SW};
+		else {D_2, D_1, D} <= L;
 	end
 
 	wire d_2_ = ~D_2;
