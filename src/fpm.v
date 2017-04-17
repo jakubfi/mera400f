@@ -165,21 +165,21 @@ module fpm(
 		B <= D;
 	end
 
-	wire [0:7] DSUM;
+	wire [0:7] B_BUS;
 
 	always @ (*) begin
 		case ({~fcb_, ~scc_})
-			2'b00: DSUM <= ~B;
-			2'b01: DSUM <= B;
-			2'b10: DSUM <= 8'hff;
-			2'b11: DSUM <= 8'h00;
+			2'b00: B_BUS <= ~B;
+			2'b01: B_BUS <= B;
+			2'b10: B_BUS <= 8'hff;
+			2'b11: B_BUS <= 8'h00;
 		endcase
 	end
 
 	wire [0:7] sum_c;
 	wire M29_14;
 	always @ (*) begin
-		{M29_14, sum_c} <= DSUM + D + pc8;
+		{M29_14, sum_c} <= B_BUS + D + pc8;
 	end
 
 	wire M9_3 = fcb_ ^ scc_;
