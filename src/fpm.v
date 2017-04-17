@@ -158,18 +158,19 @@ module fpm(
 	assign d = D[0:7];
 
 	// sheet 2
+	// B register
 
-	reg [0:7] DL;
+	reg [0:7] B;
 	always @ (posedge f2strob) begin
-		DL <= D;
+		B <= D;
 	end
 
 	wire [0:7] DSUM;
 
 	always @ (*) begin
 		case ({~fcb_, ~scc_})
-			2'b00: DSUM <= ~DL;
-			2'b01: DSUM <= DL;
+			2'b00: DSUM <= ~B;
+			2'b01: DSUM <= B;
 			2'b10: DSUM <= 8'hff;
 			2'b11: DSUM <= 8'h00;
 		endcase
@@ -182,7 +183,7 @@ module fpm(
 	end
 
 	wire M9_3 = fcb_ ^ scc_;
-	wire M3_6 = ~((DL[0] & M9_3) | (~DL[0] & scc_));
+	wire M3_6 = ~((B[0] & M9_3) | (~B[0] & scc_));
 	wire M27_8 = M3_6 ^ d_1_;
 	wire sum_c_2 = ~((M29_14 & M3_6) | (M29_14 & d_1_) | (M3_6 & d_1_));
 	wire sum_c_1 = M29_14 ^ M27_8;
