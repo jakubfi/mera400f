@@ -171,7 +171,7 @@ fps #(
 // --- F-PM --------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire d, d_1, g, wdt, wt, fic_, fic, c_f, v_f, m_f, z_f, dw, ad, sd$_, mw_, dw_, af, sf, mf_, df_, dw_df, mw_mf, af_sf_, ad_sd, ff_, ss, puf, fwz, _end, ws_, di, wc_, d0, d_2, t_1, t0_t_1, ok, nz, opsu, ta, m_1, ck_, m_40, m_32, sgn_t0_c0, sgn_;
+wire d, d_1, g, wdt, wt, fic_, fic, c_f, v_f, m_f, z_f, dw, ad, sd$_, mw_, dw_, af, sf, mf_, df_, dw_df, mw_mf, af_sf_, ad_sd, ff_, ss, puf, fwz, _end, ws_, di, wc_, d_2, t_1, t0_t_1, ok, nz, opsu, ta, m_1, ck_, m_40, m_32, sgn_t0_c0, sgn_;
 
 fpm #(
 	.FP_FI0_TICKS(FP_FI0_TICKS)
@@ -238,7 +238,6 @@ fpm #(
 	.wc_(wc_),
 	.fi1_(fi1_),
 	.fi2_(fi2_),
-	.d0(d0),
 	.d_2(d_2),
 	.w0_(~w[0]),
 	.t_1_t_1(t_1_t_1),

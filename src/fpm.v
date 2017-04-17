@@ -13,7 +13,7 @@ module fpm(
 	input l_d_,
 	input _0_d,
 	input lkb_,
-	output [1:7] d,
+	output [0:7] d,
 	// sheet 2
 	input fcb_,
 	input scc_,
@@ -77,7 +77,6 @@ module fpm(
 	output wc_,
 	output fi1_,
 	output fi2_,
-	output d0,
 	output d_2,
 	// sheet 9
 	input w0_,
@@ -155,9 +154,8 @@ module fpm(
 	assign d_2 = D_2;
 	wire d_1_ = ~D_1;
 	assign d_1 = D_1;
-	assign d0 = D[0];
 	wire d0_ = ~D[0];
-	assign d = D[1:7];
+	assign d = D[0:7];
 
 	// sheet 2
 
@@ -418,7 +416,7 @@ module fpm(
 	wire t_ = ~t;
 	wire f8 = ~f8_;
 	wire M69_3 = ff & f13;
-	assign fi1_ = ~(M69_3 & d_2 & ~(d0 & d_1));
+	assign fi1_ = ~(M69_3 & d_2 & ~(d[0] & d_1));
 	assign fi2_ = ~(M69_3 & ~(d_1_ & d0_) & d_2_);
 
 	// sheet 9
