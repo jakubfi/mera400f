@@ -108,7 +108,7 @@ module fpa(
 	wire [0:39] k;
 
 	always @ (*) begin
-		case ({f9ka, lkb})
+		case ({lkb, f9ka})
 			2'b00: k <= sum[0:39];
 			2'b01: k <= m[0:39];
 			2'b10: k <= {w[0:15], w[0:15], w[0:7]};
