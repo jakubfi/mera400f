@@ -165,8 +165,8 @@ module fpa(
 	reg [0:39] m;
 
 	wire clockm_ = ~clockm;
-	wire ma_ = ~ma;
-	wire mb_ = ~mb;
+	wire ma_ /* synthesis keep */ = ~ma;
+	wire mb_ /* synthesis keep */ = ~mb;
 	wire _0_m_ = ~_0_m;
 
 	always @ (posedge clockm_, negedge _0_m_) begin
@@ -187,13 +187,12 @@ module fpa(
 
 	reg [0:39] c;
 
-	always @ (negedge t_c, negedge cp) begin
-		if (~t_c) begin
-			if (f2) c <= t;
-			else c <= c;
-		end else begin
-			c <= {c[0], c[0:38]};
-		end
+	// NOTE: T->C and CP sensitivities have changed (ops are front-edge sensitive now)
+	// NOTE: F2 as 7495's prallel load enable signal was dropped for the FPGA implementation
+	wire cclk = t_c | cp;
+	always @ (posedge cclk) begin
+		if (t_c) c <= t;
+		else if (cp) c <= {c[0], c[0:38]};
 	end
 
 	assign c0_eq_c1 = c[0] ^ ~c[1];

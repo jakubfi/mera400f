@@ -142,6 +142,8 @@ module fpm(
 		endcase
 	end
 
+	// D register
+
 	reg [0:7] D;
 	reg D_1, D_2;
 	wire _0_d_ = ~_0_d;
@@ -158,14 +160,14 @@ module fpm(
 	assign d = D[0:7];
 
 	// sheet 2
-	// B register
+	// B register and bus
 
 	reg [0:7] B;
 	always @ (posedge f2strob) begin
 		B <= D;
 	end
 
-	wire [0:7] B_BUS;
+	wire [0:7] B_BUS /* synthesis keep */;
 
 	always @ (*) begin
 		case ({~fcb_, ~scc_})
@@ -175,6 +177,8 @@ module fpm(
 			2'b11: B_BUS <= 8'h00;
 		endcase
 	end
+
+	// exponent adder
 
 	wire [0:7] sum_c;
 	wire M29_14;
