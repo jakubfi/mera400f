@@ -446,7 +446,8 @@ module fps(
 	wire M4_6 = ~(f12_ & f10_);
 	wire dp5 = ~(f11_ & f7_);
 
-	wire sa1f710 = (f11) | (f12 & ok & sgn_) | (df & f9) | k__;
+	// FIX: wrongly placed -SGN moved from F12 to F9 case
+	wire sa1f710 = (f11) | (f12 & ok) | (sgn_ & df & f9) | k__;
 
 	// sheet 12
 
