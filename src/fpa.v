@@ -105,7 +105,7 @@ module fpa(
 	wire f9ka = ~f9_ka_;
 	wire lkb = ~lkb_;
 
-	wire [0:39] k;
+	wire [0:39] k /* synthesis keep */;
 
 	always @ (*) begin
 		case ({lkb, f9ka})

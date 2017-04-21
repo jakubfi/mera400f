@@ -433,10 +433,10 @@ module fpm(
 	wire M52_8 = ~((mw_mf & mfwp) | (t0_t1 & dw_df));
 	wire M67_3 = ~(t1_ & t0_);
 	wire M12_8 = t_32_39_ & t_24_31_ & t_16_23_ & t_8_15_;
-	wire M25_6 = ~(t_8_15_ & t_2_7_ & t_0_1_ & t_1_);
-	wire M24_8 = ~(t_1_ & t_0_1_ & t_2_7_ & t_8_15_ & t_16_23_ & t_24_31_ & t_32_39_ & m_1_);
+	assign ta = ~(t_8_15_ & t_2_7_ & t_0_1_ & t_1_);
+	wire t = ~(t_1_ & t_0_1_ & t_2_7_ & t_8_15_ & t_16_23_ & t_24_31_ & t_32_39_ & m_1_);
 	wire M25_8 = ~(M12_8 & dw_df & M67_3 & t_2_7_);
-	wire M66_8 = ~(c0_eq_c1 & dw & M25_6);
+	wire M66_8 = ~(c0_eq_c1 & dw & ta);
 
 	wire t_1_ = ~t_1;
 	ffd REG_T_1(
@@ -452,8 +452,6 @@ module fpm(
 	assign ok = M53_3 & t0_t1 & t & ff;
 	assign nz = ~t0_t1 & M53_3 & ff & t;
 	assign opsu = ~(M52_8 & M25_8 & M66_8);
-	assign ta = M25_6;
-	wire t = M24_8;
 
 	// sheet 10
 
