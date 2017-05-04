@@ -53,6 +53,7 @@ module awp(
 // -----------------------------------------------------------------------
 
 wire strob2_fp, _0_f_, _0_t, lkb_, l_d_, clocktc_, clocktb_, clockta_, t_c_, fcb_, t_1_t_1, tab_, trb_, taa, cp_, frb_, p_16_, p_32_, p_40_, fab_, faa_, fra_, f5_, f6_, f2_, f4_, f13, f10_, f9, f8_, f7_, f9_ka_, scc_, pc8, _0_d, _0_m, mb, ma, clockm, zpa_, zpb_, _0_zp_, ustr0_fp, lp_;
+wire opta, optb, optc, opm;
 
 fps #(
 	.FP_STROB1_1_TICKS(FP_STROB1_1_TICKS),
@@ -65,6 +66,10 @@ fps #(
 	.FP_START_TICKS(FP_START_TICKS)
 ) FPS(
 	.__clk(__clk),
+	.opm(opm),
+	.opta(opta),
+	.optb(optb),
+	.optc(optc),
 	.mode(mode),
 	.step_(step_),
 	.strob_fp_(strob_fp_),
@@ -177,6 +182,8 @@ wire d_1, g, wdt, wt, fic_, fic, c_f, v_f, m_f, z_f, dw, ad, sd$_, mw_, dw_, af,
 fpm #(
 	.FP_FI0_TICKS(FP_FI0_TICKS)
 ) FPM(
+	.opta(opta),
+	.opm(opm),
 	.__clk(__clk),
 	.w(w),
 	.l_d_(l_d_),
@@ -293,6 +300,11 @@ fpm #(
 wire t_0_1_, t_2_7_, c0_eq_c1, c1_, fc0_, t1_, t0_eq_c0, t0_c0, t0_t1, m0_, t0_, fp0_, t_8_15_, m14_, m15_, fp16_, t16_, m32_, m38_, m39_, c39_, p32_, t39_, t_32_39_, t_16_23_, t_24_31_;
 
 fpa FPA(
+	.opta(opta),
+	.optb(optb),
+	.optc(optc),
+	.opm(opm),
+	.strob_fp_(strob_fp_),
 	.w(w),
 	.taa(taa),
 	.t_1(t_1),

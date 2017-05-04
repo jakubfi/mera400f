@@ -7,6 +7,7 @@
 */
 
 module fpm(
+	input opm, opta, optb, optc,
 	input __clk,
 	// sheet 1
 	input [8:15] w,
@@ -439,10 +440,11 @@ module fpm(
 	wire M66_8 = ~(c0_eq_c1 & dw & ta);
 
 	wire t_1_ = ~t_1;
-	ffd REG_T_1(
+	ffd_ena REG_T_1(
 		.s_(1),
 		.d(M40_8),
-		.c(clockta_),
+		.c(strob_fp_),
+		.ena(opta),
 		.r_(~_0_t),
 		.q(t_1)
 	);
@@ -458,10 +460,11 @@ module fpm(
 	wire M22_8 = (~trb_ & ~t39_) | (~m0_ & ~mb) | (t_1 & f4) | (af & ~c39_ & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
 
 	wire m_1_ = ~m_1;
-	ffd REG_M_1(
+	ffd_ena REG_M_1(
 			.s_(1),
 			.d(M22_8),
-			.c(~clockm),
+			.c(strob_fp_),
+			.ena(opm),
 			.r_(~_0_m),
 			.q(m_1)
 	);
@@ -472,10 +475,11 @@ module fpm(
 
 	wire ck;
 	assign ck_ = ~ck;
-	ffd REG_CK(
+	ffd_ena REG_CK(
 		.s_(M70_11),
 		.d(M77_6),
-		.c(~clockm),
+		.c(strob_fp),
+		.ena(opm),
 		.r_(~_0_m),
 		.q(ck)
 	);
@@ -487,10 +491,11 @@ module fpm(
 	wire M52_6 = ~((M13_6 & ~pm) | (M13_8 & mfwp));
 
 	wire pm;
-	ffd REG_PM(
+	ffd_ena REG_PM(
 		.s_(1),
 		.d(M52_6),
-		.c(~clockm),
+		.c(strob_fp_),
+		.ena(opm),
 		.r_(~_0_m),
 		.q(pm)
 	);

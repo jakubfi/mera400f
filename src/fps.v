@@ -34,6 +34,7 @@ module fps(
 	output clocktc_,
 	output clocktb_,
 	output clockta_,
+	output opta, optb, optc, opm,
 	output t_c_,
 	output fcb_,
 	// sheet 4
@@ -278,6 +279,12 @@ module fps(
 	wire M30_11 = ~(mw_ & lp1_);
 	wire M20_6 = ~((M30_11 & M30_6) | (f7 & ~ta_alpha_));
 
+	// WORKAROUND: opt[abc] and opm are a workaround for T and M
+	// clocks being misaligned causing various problems when
+	// values from one register are shifted into the other one.
+	assign optc = M9_3;
+	assign optb = M19_8;
+	assign opta = M19_6;
 	assign clocktc_ = ~(M9_3 & strob1);
 	assign clocktb_ = ~(M19_8 & strob1);
 	assign clockta_ = ~(strob1 & M19_6);
@@ -489,6 +496,8 @@ module fps(
 	assign mb = ~(f11_ & M18_6);
 	assign ma = ~(M28_6 & f12_);
 	assign clockm = M27_12 & strob1;
+	// WORKAROUND: for M/T registers
+	assign opm = M27_12;
 
 	// sheet 14
 

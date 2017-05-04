@@ -7,6 +7,8 @@
 */
 
 module fpa(
+	input opta, optb, optc, opm,
+	input strob_fp_,
 	// sheet 1
 	input [0:15] w, // also on sheets 2, 12, 13
 	input taa,
@@ -124,9 +126,9 @@ module fpa(
 
 	reg [0:39] t;
 
-	always @ (posedge clockta_, negedge _0_t_) begin
+	always @ (posedge strob_fp_, negedge _0_t_) begin
 		if (~_0_t_) t[0:15] <= 0;
-		else case ({tab_, taa_})
+		else if (opta) case ({tab_, taa_})
 			2'b00: t[0:15] <= t[0:15];
 			2'b01: t[0:15] <= {t_1, t[0:14]};
 			2'b10: t[0:15] <= {t[1:15], t[16]};
@@ -138,9 +140,9 @@ module fpa(
 	assign t_2_7_ = ~(t[2] | t[3]) & ~(t[4] | t[5]) & ~(t[6] | t[7]);
 	assign t_8_15_ = ~(t[8] | t[9]) & ~(t[10] | t[11]) & ~(t[12] | t[13]) & ~(t[14] | t[15]);
 
-	always @ (posedge clocktb_, negedge _0_t_) begin
+	always @ (posedge strob_fp_, negedge _0_t_) begin
 		if (~_0_t_) t[16:31] <= 0;
-		else case ({trb_, taa_})
+		else if (optb) case ({trb_, taa_})
 			2'b00: t[16:31] <= t[16:31];
 			2'b01: t[16:31] <= {t[15], t[16:30]};
 			2'b10: t[16:31] <= {t[17:31], t[32]};
@@ -148,9 +150,9 @@ module fpa(
 		endcase
 	end
 
-	always @ (posedge clocktc_, negedge _0_t_) begin
+	always @ (posedge strob_fp_, negedge _0_t_) begin
 		if (~_0_t_) t[32:39] <= 0;
-		else case ({trb_, taa_})
+		else if (optc) case ({trb_, taa_})
 			2'b00: t[32:39] <= t[32:39];
 			2'b01: t[32:39] <= {t[31], t[32:38]};
 			2'b10: t[32:39] <= {t[33:39], m_1};
@@ -169,9 +171,9 @@ module fpa(
 	wire mb_ /* synthesis keep */ = ~mb;
 	wire _0_m_ = ~_0_m;
 
-	always @ (posedge clockm_, negedge _0_m_) begin
+	always @ (posedge strob_fp_, negedge _0_m_) begin
 		if (~_0_m_) m[0:39] <= 0;
-		else case ({mb_, ma_})
+		else if (opm) case ({mb_, ma_})
 			2'b00: m[0:39] <= m[0:39];
 			2'b01: m[0:39] <= {m_1, m[0:38]};
 			2'b10: m[0:39] <= {m[1:31], m_32, m[33:39], m_40};
