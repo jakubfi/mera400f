@@ -58,11 +58,11 @@ def emu_process(m, line):
     if cmd == "reg":
         try:
             m.cmds("%s;%s;load" % (a[2], a[1]))
-            print("OK: %s" % a[2])
+            print("OK: 0x%04x" % int(a[2]))
         except IndexError:
             m.cmd(a[1])
             state = m.state()
-            print("OK: %s" % state.data)
+            print("OK: 0x%04x" % int(state.data))
     elif cmd == "clock":
         if a[1].lower() == "on":
             m.cmd("clk1")
