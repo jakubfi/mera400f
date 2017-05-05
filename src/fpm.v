@@ -278,7 +278,8 @@ module fpm(
 	// sheet 5
 
 	assign c_f = (df_ & ff & m_1) | (r03 & mwdw) | (ad_sd & ci);
-	assign v_f = (r02) | (t0_t1 & mwadsd);
+	// FIX: t0_t_1 instead of t0_t1
+	assign v_f = (r02) | (t0_t_1 & mwadsd);
 	assign m_f = ~((t_1_ & dw_) | (t16_ & dw));
 	wire M77_11 = t_24_31_ & t_16_23_;
 	assign z_f = (M77_11 & dw) | (mwadsd & t_) | (ff & fwz);
