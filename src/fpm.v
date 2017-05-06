@@ -479,7 +479,7 @@ module fpm(
 	ffd_ena REG_CK(
 		.s_(M70_11),
 		.d(M77_6),
-		.c(strob_fp),
+		.c(strob_fp_),
 		.ena(opm),
 		.r_(~_0_m),
 		.q(ck)
