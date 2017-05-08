@@ -131,6 +131,8 @@ module fpm(
 
 	parameter FP_FI0_TICKS;
 
+	wor __NC;
+
 	// sheet 1
 	// L bus
 

@@ -166,7 +166,8 @@ module fpa(
 
 	reg [0:39] m;
 
-	wire clockm_ = ~clockm;
+	// NOTE: unused due to M clock/op split
+	// wire clockm_ = ~clockm;
 	wire ma_ /* synthesis keep */ = ~ma;
 	wire mb_ /* synthesis keep */ = ~mb;
 	wire _0_m_ = ~_0_m;
@@ -183,7 +184,8 @@ module fpa(
 
 	// C register
 
-	wire f2 = ~f2_;
+	// NOTE: unused in FPGA
+	// wire f2 = ~f2_;
 	wire t_c = ~t_c_;
 	wire cp = ~cp_;
 
