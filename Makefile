@@ -62,7 +62,7 @@ QSYS_GEN = $(Q_LIB_PREFIX) SOPC_KIT_NIOS2=$(NIOSDEV) $(ALTERA_ROOT)/quartus/sopc
 
 # --- Tool arguments -----------------------------------------------------
 
-COMMON_ARGS = --no_banner --64bit
+COMMON_ARGS = --no_banner
 SETTINGS_ARGS = --write_settings_files=off --read_settings_files=on
 MAP_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS) --family=$(FAMILY)
 FIT_ARGS = $(COMMON_ARGS) $(SETTINGS_ARGS) --part=$(DEVICE)
