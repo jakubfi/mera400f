@@ -4,11 +4,9 @@
 /*.qpf
 /*.qws
 /*.ddb
-db/
-incremental_db/
-output_files/
-software_examples/
-software/
-/*.sopcinfo
+/db/
+/incremental_db/
+/output_files/
 /tests/*.bin
 __pycache__
+/tools/tests
