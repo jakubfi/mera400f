@@ -227,101 +227,37 @@ module px(
 	wire M16_8 = ~(wz_ & stp0$_ & p3_ & wa_);
 	wire M15_8 = ~(p2_ & wp_ & wx_);
 
-	wire sgot = ~(M19_6 | M18_8);
-
-	wire STROB1_1_, STROB1_2_, STROB1_3_, STROB1_4_, STROB1_5_;
-	univib #(.ticks(STROB1_1_TICKS)) VIB_STROB1_1(
-		.clk(__clk),
-		.a_(got$),
-		.b(M19_6),
-		.q_(STROB1_1_)
-	);
-	univib #(.ticks(STROB1_2_TICKS)) VIB_STROB1_2(
-		.clk(__clk),
-		.a_(got$),
-		.b(M18_8 & ok),
-		.q_(STROB1_2_)
-	);
-	univib #(.ticks(STROB1_3_TICKS)) VIB_STROB1_3(
-		.clk(__clk),
-		.a_(got$),
-		.b(M20_8 & ok),
-		.q_(STROB1_3_)
-	);
-	univib #(.ticks(STROB1_4_TICKS)) VIB_STROB1_4(
-		.clk(__clk),
-		.a_(got$),
-		.b(M16_8),
-		.q_(STROB1_4_)
-	);
-	univib #(.ticks(STROB1_5_TICKS)) VIB_STROB1_5(
-		.clk(__clk),
-		.a_(got$),
-		.b(M15_8),
-		.q_(STROB1_5_)
-	);
-
-	wire st56_ = STROB1_1_ & STROB1_2_;
-	wire st812_ = STROB1_3_ & STROB1_4_ & STROB1_5_;
-	wire sts = ~(st56_ & st812_);
-
-	// sheet 4, page 2-4
-	// * got, strob2, step register
-
-	// NOTE: 33pF cap to ground on M15_6
-	wire M15_12 = ~(M15_6 & zw & oken);
-	wire M52_6 = M15_12 & M53_6;
-	wire M53_6 = ~(sgot & M21_5);
-	wire M15_6 = ~(M52_6 & st812_ & strob2_);
-
-	wire got$;
-	univib #(.ticks(GOT_TICKS)) VIB_GOT(
-		.clk(__clk),
-		.a_(M15_6),
-		.b(1'b1),
-		.q(got$)
-	);
-	assign got_ = ~got$;
-	wire got = got$;
-
-	wire M53_11 = ~(M21_5 & ~sgot);
-	wire M53_8 = ~(M53_11 & st56_);
-
-	// NOTE: strob2 needs to be triggered with 1-cycle delay
-	// to set it apart from strob1 falling edge. This is needed
-	// for cycles where one action is taken on strob1 falling
-	// edge, and another on the strob2 rising edge.
-	reg strob2_trig = 1;
-	always @ (posedge __clk) begin
-		strob2_trig <= M53_8;
-	end
-
-	wire strob2;
-	univib #(.ticks(STROB2_TICKS)) VIB_STROB2(
-		.clk(__clk),
-		.a_(strob2_trig),
-		.b(1'b1),
-		.q(strob2)
-	);
-	assign strob2_ = ~strob2;
+  wire got, strob2;
+  strobgen #(
+    .STROB1_1_TICKS(STROB1_1_TICKS),
+    .STROB1_2_TICKS(STROB1_2_TICKS),
+    .STROB1_3_TICKS(STROB1_3_TICKS),
+    .STROB1_4_TICKS(STROB1_4_TICKS),
+    .STROB1_5_TICKS(STROB1_5_TICKS),
+    .GOT_TICKS(GOT_TICKS),
+    .STROB2_TICKS(STROB2_TICKS)
+  ) STROBGEN(
+    .__clk(__clk),
+    .ok(ok),
+    .zw(zw),
+		.oken(oken),
+    .mode(mode),
+    .step_(step_),
+    .strob_fp_(strob_fp_),
+    .ss11(M19_6),
+    .ss12(M18_8),
+    .ss13(M20_8),
+    .ss14(M16_8),
+		.ss15(M15_8),
+    .strob1(strob1),
+    .strob1_(strob1_),
+    .strob2(strob2),
+    .strob2_(strob2_),
+    .got(got),
+    .got_(got_)
+  );
 
 	wire gotst1_ = ~(got_ & strob1_);
-
-	// FIX: +MODE was labeled -MODE
-	wire M21_5;
-	ffd REG_STEP(
-		.s_(~(mode & sts)),
-		.d(1'b0),
-		.c(step_),
-		.r_(mode),
-		.q(M21_5)
-	);
-
-	// NOTE: Workaround for Error (35000) 
-	// https://www.altera.com/support/support-resources/knowledge-base/solutions/rd06192013_268.html
-	wire strob1_int_ = st812_ & st56_ & strob_fp_ & ~M21_5;
-	assign strob1_ = strob1_int_;
-	assign strob1 = ~strob1_;
 
 	// sheet 5, page 2-5
 	// interrupt phase control signals
