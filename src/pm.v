@@ -402,18 +402,16 @@ module pm(
 
 	wire p2 = ~p2_;
 	wire setwp_ = ~(strob1 & wx & md);
-
-	reg [1:0] __mc;
-	always @ (negedge setwp_, negedge M77_6) begin
-		if (~M77_6) __mc <= 2'd0;
-		else __mc <= __mc + 1'b1;
-	end
-	assign mc_3 = &__mc;
-	assign mc_ = &(~__mc);
-
+	wire reswp_ = M43_8 & ~(sc$ & strob2 & ~p1_);
 	wire M77_6 = reswp_ & ~(~md & p4);
 
-	wire reswp_ = M43_8 & ~(sc$ & strob2 & ~p1_);
+	mc MC(
+		.inc_(setwp_),
+		.reset_(M77_6),
+		.mc_3(mc_3),
+		.mc_0(mc_)
+	);
+
 	assign xi$_ = ~(p_ & p1 & strob2 & xi);
 	wire xi_ = xi$_;
 	wire p1 = ~p1_;
