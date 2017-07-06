@@ -88,35 +88,21 @@ module pa(
 
 	wire w_dt = ~w_dt_;
 
-	reg [0:15] W;
-	assign w = W;
-	always @ (*) begin
-
-		if (~bwb_) W[0:7] <= 8'd0;
-		else case ({mwc_, mwb_, mwa_})
-			3'b111 : W[0:7] <= ir[0:7];
-			3'b110 : W[0:7] <= kl[0:7];
-			3'b101 : W[0:7] <= ~rdt_[0:7];
-			3'b100 : W[0:7] <= 8'd0;
-			3'b011 : W[0:7] <= ki[0:7];
-			3'b010 : W[0:7] <= at[0:7];
-			3'b001 : W[0:7] <= ac[0:7];
-			3'b000 : W[0:7] <= a[0:7];
-		endcase
-
-		if (~bwa_) W[8:15] <= 8'd0;
-		else case ({mwc_, mwb_, mwa_})
-			3'b111 : W[8:15] <= ir[8:15];
-			3'b110 : W[8:15] <= kl[8:15];
-			3'b101 : W[8:15] <= ~rdt_[8:15];
-			3'b100 : W[8:15] <= ac[0:7];
-			3'b011 : W[8:15] <= ki[8:15];
-			3'b010 : W[8:15] <= at[8:15];
-			3'b001 : W[8:15] <= ac[8:15];
-			3'b000 : W[8:15] <= a[8:15];
-		endcase
-
-	end
+	bus_w BUS_W(
+		.mwc_(mwc_),
+		.mwb_(mwb_),
+		.mwa_(mwa_),
+		.bwa_(bwa_),
+		.bwb_(bwb_),
+		.ir(ir),
+		.kl(kl),
+		.rdt_(rdt_),
+		.ki(ki),
+		.at(at),
+		.ac(ac),
+		.a(a),
+		.w(w)
+	);
 
 	assign ddt_ = ~(w & {16{w_dt}});
 
