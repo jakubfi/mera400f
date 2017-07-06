@@ -502,10 +502,7 @@ module pm(
 	wire lipsp = ~lipsp$_;
 	wire strob1 = ~strob1_;
 	wire str1wx_ = ~(strob1 & wx);
-	wire slg1 = p1 & exl_ & strob2 & ~(lipsp | gr);
-	wire slg2_ = ~(strob1 & gr & wx);
-	wire slg2 = ~slg2_;
-	wire lolk_ = slg2_ & ~(p1 & strob2 & shc) & ~(wm & strob1 & inou);
+	wire lolk_ = ~slg2 & ~(p1 & strob2 & shc) & ~(wm & strob1 & inou);
 
 	wire M98_11 = ~(shc_ & inou_);
 	wire M97_8 = ~(M98_11 & wx);
@@ -521,43 +518,32 @@ module pm(
 
 	assign arp1 = ~(ar_1 & read_fp_ & i3_ & wrwwgr_);
 
+	// LG clock
 	wire M62_3 = ~(wrwwgr_ & i3_ & lg_plus_1) & strob1;
+	// LG reset
 	wire M62_11 = zerstan_ & i1_;
-	wire M78_8 = ~((slg2) | (slg1 & ir9));
-	wire M94_6 = ~(slg1 & ir8);
-	wire M78_6 = ~((slg2 & (ir8 & ir9)) | (slg1 & ir7));
-	wire M80_12 = lgb & lga & gr;
 
+	// LG preload triggers
+	wire slg1 = p1 & exl_ & strob2 & ~(lipsp | gr); // "common" preload at P1
+	wire slg2 = strob1 & gr & wx; // preload for register group operations (at WX)
+
+	wire lg_2, lg_1;
 	wire lga, lgb, lgc;
-	ffjk __lga(
-		.s_(M78_8),
-		.j(1'b1),
-		.c_(M62_3),
-		.k(1'b1),
-		.r_(M62_11),
-		.q(lga)
+	lg LG(
+		.clk_(M62_3),
+		.reset_(M62_11),
+		.gr(gr),
+		.slg1(slg1),
+		.slg2(slg2),
+		.ir({ir7, ir8, ir9}),
+		.lg_0(lg_0),
+		.lg_1(lg_1),
+		.lg_2(lg_2),
+		.lg_3(lg_3),
+		.lga(lga),
+		.lgb(lgb),
+		.lgc(lgc)
 	);
-	ffjk __lgb(
-		.s_(M94_6),
-		.j(lga),
-		.c_(M62_3),
-		.k(lga),
-		.r_(M62_11),
-		.q(lgb)
-	);
-	ffjk __lgc(
-		.s_(M78_6),
-		.j(M80_12),
-		.c_(M62_3),
-		.k(M80_12),
-		.r_(M62_11),
-		.q(lgc)
-	);
-
-	assign lg_3 = lgb & lga;
-	wire lg_2 = lgb & ~lga;
-	wire lg_1 = lga & ~lgb;
-	assign lg_0 = ~lga & ~lgb;
 
 	wire ic_1_ = ~(wx & inou);
 	wire inou_ = inou$_;
