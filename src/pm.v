@@ -387,27 +387,27 @@ module pm(
 	//  * P - wskaźnik przeskoku (branch indicator)
 	//  * MC - premodification counter
 
-	wire M31_6 = ~((~j$ & bcoc$) | (zs));
-	wire M43_8 = ~(~p2_ & strob1) & clm_;
+	wire M31_6 = ~((~j$ & bcoc$) | zs);
+	wire M43_8 = (p2 & strob1) | ~clm_;
 	wire M46_8 = ~(ssp$ & strob1 & w$);
-	wire M45_8 = ~(strob1 & rok & inou_ & wm$);
+	wire M45_8 = strob1 & rok & inou_ & wm$;
 
-	ffd __p(
-		.s_(M43_8),
+	ffd WSK_P(
+		.s_(~M43_8),
 		.d(M31_6),
 		.c(M46_8),
-		.r_(M45_8),
+		.r_(~M45_8),
 		.q(p_)
 	);
 
 	wire p2 = ~p2_;
-	wire setwp_ = ~(strob1 & wx & md);
-	wire reswp_ = M43_8 & ~(sc$ & strob2 & ~p1_);
-	wire M77_6 = reswp_ & ~(~md & p4);
+	wire setwp = strob1 & wx & md;
+	wire reswp = M43_8 | (sc$ & strob2 & p1);
+	wire reset_mc = reswp | (~md & p4);
 
 	mc MC(
-		.inc_(setwp_),
-		.reset_(M77_6),
+		.inc(setwp),
+		.reset(reset_mc),
 		.mc_3(mc_3),
 		.mc_0(mc_)
 	);
@@ -446,11 +446,11 @@ module pm(
 
 	wire wpp;
 	ffjk REG_WP(
-		.s_(setwp_),
+		.s_(~setwp),
 		.j(1'b0),
 		.c_(strob1),
 		.k(p4),
-		.r_(reswp_),
+		.r_(~reswp),
 		.q(wpp)
 	);
 	wire wpp_ = ~wpp;
