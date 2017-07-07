@@ -258,7 +258,7 @@ px #(
 // --- P-M ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa_, bab_, bac_, aa_, ab_, wpb_, bwb_, bwa_, kia_, kib_, w_ir, mwa_, mwb_, mwc_;
+wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa, bab, bac, aa, ab, wpb_, bwb_, bwa_, kia_, kib_, w_ir, mwa_, mwb_, mwc_;
 
 pm #(
 	.KC_TICKS(KC_TICKS),
@@ -423,11 +423,11 @@ pm #(
 	.rb$_(rb$_),
 	.w$_(w$_),
 	.i3_ex_prz_(i3_ex_przer_),
-	.baa_(baa_),
-	.bab_(bab_),
-	.bac_(bac_),
-	.aa_(aa_),
-	.ab_(ab_),
+	.baa(baa),
+	.bab(bab),
+	.bac(bac),
+	.aa(aa),
+	.ab(ab),
 	.at15_(at15_),
 	.srez$(srez$),
 	.rz_(rz_),
@@ -762,11 +762,11 @@ pa PA(
 	.icp1(icp1),
 	.w_ic(w_ic),
 	.off_(off_),
-	.baa_(baa_),
-	.bab_(bab_),
-	.bac_(bac_),
-	.ab_(ab_),
-	.aa_(aa_),
+	.baa(baa),
+	.bab(bab),
+	.bac(bac),
+	.ab(ab),
+	.aa(aa),
 	.l(l),
 	.barnb(barnb),
 	.kl(kl),

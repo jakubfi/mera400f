@@ -66,11 +66,11 @@ module pa(
 	input w_ic,
 	input off_,
 	// sheet 11, 12
-	input baa_,
-	input bab_,
-	input bac_,
-	input ab_,
-	input aa_,
+	input baa,
+	input bab,
+	input bac,
+	input ab,
+	input aa,
 	input [0:15] l,
 	// sheet 13, 14
 	input barnb,
@@ -212,12 +212,12 @@ module pa(
 	// sheet 11, 12
 
 	wire [0:15] a;
-	a_bus A_BUS(
-		.bac_(bac_),
-		.bab_(bab_),
-		.baa_(baa_),
-		.aa_(aa_),
-		.ab_(ab_),
+	bus_a BUS_A(
+		.bac(bac),
+		.bab(bab),
+		.baa(baa),
+		.aa(aa),
+		.ab(ab),
 		.l(l),
 		.ir(ir),
 		.ar(ar),

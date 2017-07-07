@@ -182,11 +182,11 @@ module pm(
 	input rb$_,
 	input w$_,
 	input i3_ex_prz_,
-	output baa_,
-	output bab_,
-	output bac_,
-	output aa_,
-	output ab_,
+	output baa,
+	output bab,
+	output bac,
+	output aa,
+	output ab,
 	// sheet 17
 	input at15_,
 	input srez$,
@@ -456,7 +456,7 @@ module pm(
 
 	wire p4wp_ = ~(p4 & wpp);
 	wire wpb = ~(~wb & wpp_);
-	wire bla = ~(p4 & ka1ir6 & wpp_);
+	wire bla = p4 & ka1ir6 & wpp_;
 	// FIX: +NAIR6 was -NAIR6
 	wire nair6 = ~na_ & ir6;
 	wire ka12x = ~(~(~na_ & c0) & ka2_ & ka1_);
@@ -652,8 +652,8 @@ module pm(
 	wire M9_6 = ~(~ir6 | zb_) ^ lj;
 	wire M9_3 = ~(zb_ | ir6) ^ lj;
 	wire M8_6 = ~(cb_ & oc_);
-	wire M67_8 = ~((we & M9_6) | (w$ & M8_8));
-	wire M72_8 = ~((M8_8 & w$) | (M8_6 & w$) | (we & M9_3) | (na_ & p3));
+	wire M67_8 = (we & M9_6) | (w$ & M8_8);
+	wire M72_8 = (M8_8 & w$) | (M8_6 & w$) | (we & M9_3) | (na_ & p3);
 	wire M71_8 = ~((w$ & ls) | (psr & war));
 	wire M89_4 = ~(pb | rb$_);
 	wire M71_6 = ~((na_ & p3) | (w$ & M89_4));
@@ -662,11 +662,11 @@ module pm(
 	wire M55_8 = ~((M10_4 & wa) | (lg_0 & i3_ex_prz));
 
 	wire we = ~we_;
-	assign baa_ = M67_8 & bla;
-	assign bab_ = M67_8 & bla & ~(ka1 & p3);
-	assign bac_ = bla & M72_8;
-	assign aa_ = ~(i5_ & p4wp_ & M71_8 & M71_6);
-	assign ab_ = ~(M71_6 & M55_8 & abx);
+	assign baa = bla | M67_8;
+	assign bab = bla | M67_8 | (ka1 & p3);
+	assign bac = bla | M72_8;
+	assign aa = M71_6 & i5_ & p4wp_ & M71_8;
+	assign ab = M71_6 & M55_8 & abx;
 
 	wire w$ = ~w$_;
 	wire i3_ex_prz = ~i3_ex_prz_;
