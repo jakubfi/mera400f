@@ -245,9 +245,8 @@ module pm(
 		.q(__cycle_q)
 	);
 
-	wire run_ = ~(start & wait_);
-	assign run = ~run_;
-	wire dpr_ = run_ & ~__cycle_q;
+	assign run = start & wait_;
+	wire dpr_ = ~run & ~__cycle_q;
 	wire dprzerw_ = ~(~(~__cycle_q & ~start) & irq & p_ & mc_);
 	wire stpc = ~(dpr_ & dprzerw_);
 
@@ -351,10 +350,10 @@ module pm(
 	);
 
 	assign laduj = load;
-	wire sfl = ~(~store & ~load & ~fetch);
+	wire sfl = store | fetch | load;
 	wire k2 = ~k2_;
 	// FIX: +UR was a NAND output on schematic, instead of AND
-	wire ur = k2 & ~(~load & ~fetch);
+	wire ur = k2 & (load | fetch);
 	wire ar_1 = ~(k2 & ~load);
 	wire k2store_ = ~(k2 & store);
 	assign k2_bin_store_ = ~(k2 & ~(~store & ~bin));
@@ -378,7 +377,7 @@ module pm(
 	assign stp0 = ~(bin_ & ~stpc & ~sfl);
 	assign ek2 = ~(~(~p0_ & sfl) & ~(bin & lg_3 & k1));
 	assign ek1 = ~(~(p0_k2 & bin) & ~(k1 & bin & ~lg_3));
-	wire lg_plus_1 = ~((bin & k2) | (k1 & rdt9));
+	wire lg_plus_1 = (bin & k2) | (k1 & rdt9);
 	// NOTE: not connected anywhere (on every schematic)
 	//wire zero_lg = ~(~rdt9 & k1s1 & rok);
 	wire rdt9 = ~rdt9_;
@@ -433,7 +432,7 @@ module pm(
 	);
 
 	wire M86_12 = pr & b0_ & ~na_;
-	wire M103_3 = ~(~(p4 & wpp_) & p2_);
+	wire M103_3 = (p4 & wpp_) | p2;
 	wire wb;
 	ffjk REG_WB(
 		.s_(1'b1),
@@ -501,14 +500,11 @@ module pm(
 
 	wire lipsp = ~lipsp$_;
 	wire strob1 = ~strob1_;
-	wire str1wx_ = ~(strob1 & wx);
-	wire lolk_ = ~slg2 & ~(p1 & strob2 & shc) & ~(wm & strob1 & inou);
+	wire str1wx = strob1 & wx;
+	wire lolk = slg2 | (strob2 & p1 & shc) | (strob1 & wm & inou);
 
-	wire M98_11 = ~(shc_ & inou_);
-	wire M97_8 = ~(M98_11 & wx);
-	wire M97_3 = ~(M97_8 & wrwwgr_);
-	wire downlk_ = strob1 & M97_3;
-	wire wrwwgr_ = ~(gr & wrww);
+	wire downlk = strob1 & (wrwwgr | ((~shc_ | ~inou_) & wx));
+	wire wrwwgr = gr & wrww;
 	wire wx = ~wx_;
 	wire gr = ~gr$_;
 	wire shc = ~shc_;
@@ -516,10 +512,10 @@ module pm(
 	// sheet 9, page 2-19
 	//  * group counter (licznik grupowy)
 
-	assign arp1 = ~(ar_1 & read_fp_ & i3_ & wrwwgr_);
+	assign arp1 = ~(ar_1 & read_fp_ & i3_ & ~wrwwgr);
 
 	// LG clock
-	wire M62_3 = ~(wrwwgr_ & i3_ & lg_plus_1) & strob1;
+	wire M62_3 = strob1 & (i3 | wrwwgr | lg_plus_1);
 	// LG reset
 	wire M62_11 = zerstan_ & i1_;
 
@@ -571,9 +567,9 @@ module pm(
 	wire M85_11 = shc & ir6;
 
 	lk CNT_LK(
-		.cd(downlk_),
+		.cd(downlk),
 		.i({M85_11, M49_8, M94_8, M64_8}),
-		.l_(lolk_),
+		.l_(~lolk),
 		.r(~zerstan_),
 		.o({lk0, lk1, lk2, lk3})
 	);
@@ -686,7 +682,7 @@ module pm(
 	ffd REG_PB(
 		.s_(lrcb),
 		.d(at15_),
-		.c(str1wx_),
+		.c(~str1wx),
 		.r_(1'b1),
 		.q(pb_)
 	);
@@ -695,9 +691,9 @@ module pm(
 
 	wire mwax_ = ~((i3_ex_prz & lg_3) | (wp & pac_) | (ri & ww) | (wac & psr));
 	wire mwbx_ = ~((pat_ & wp) | (srez$ & ww));
-	wire M23_3 = ~(ww & ~rz_);
-	assign bwb_ = ~(M10_10 & wr) & blw_pw_ & M23_3;
-	assign bwa_ = M23_3 & blw_pw_;
+	wire M23_3 = ww & ~rz_;
+	assign bwb_ = ~(M10_10 & wr) & blw_pw_ & ~M23_3;
+	assign bwa_ = ~M23_3 & blw_pw_;
 	assign kia_ = ~(psr & wrs) & i3_ex_prz_ & f13_;
 	assign kib_ = f13_ & bin_;
 	assign w_ir = ~(~(wir & ur) & pr_);
@@ -706,11 +702,11 @@ module pm(
 	// sheet 18, page 2-28
 	//  * W bus control signals
 
-	wire M56_8 = ~((wrsz & psr) | (i3_ex_prz & lg_2) | (bin & k2) | (ww & ~ki_));
-	wire M73_8 = ~((k2 & load) | (psr & wkb) | (ir6 & wa & ~rc$_));
-	assign mwa_ = ~(M56_8 & mwax_ & dt_w_ & wirpsr_ & f13_);
-	assign mwb_ = ~(M56_8 & f13_ & wirpsr_ & mwbx_ & we_ & w$_ & p4_ & M73_8);
-	assign mwc_ = ~(wirpsr_ & dt_w_ & M73_8 & ~(wa & lrcb));
+	wire M56_8 = (wrsz & psr) | (i3_ex_prz & lg_2) | (bin & k2) | (ww & ~ki_);
+	wire M73_8 = (k2 & load) | (psr & wkb) | (ir6 & wa & ~rc$_);
+	assign mwa_ = ~(~M56_8 & mwax_ & dt_w_ & wirpsr_ & f13_);
+	assign mwb_ = ~(~M56_8 & f13_ & wirpsr_ & mwbx_ & we_ & w$_ & p4_ & ~M73_8);
+	assign mwc_ = ~(wirpsr_ & dt_w_ & ~M73_8 & ~(wa & lrcb));
 
 endmodule
 
