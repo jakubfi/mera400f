@@ -74,7 +74,7 @@ module px(
 	input pp_,			// A64
 	input lg_3,			// A68 - LG=3 (Licznik Grupowy)
 	output arm4_,		// B79
-	output blw_pw_,	// B85
+	output blw_pw,	// B85
 	output ekc_i_,	// A76 - EKC*I - Enter state KC (Koniec Cyklu)
 	output zer_sp_,	// A73
 	output lipsp$_,	// A66
@@ -263,7 +263,7 @@ module px(
 	// interrupt phase control signals
 
 	assign arm4_ = ~(strob2 & i1 & ~lip_);
-	assign blw_pw_ = ~(~przerw_z & lg_3 & i3 & ~przerw_);
+	assign blw_pw = ~przerw_z & lg_3 & i3 & ~przerw_;
 	// FIX: -I4 was +I4
 	wire ei5 = ~(i4_ & ~(~lip_ & i1));
 	wire exrprzerw = ~(przerw_ & exr_);
@@ -332,7 +332,7 @@ module px(
 	wire rw = r ^ w;
 	// FIX: -K2FBS was labeled +K2FBS
 	wire k2fbs_ = k2_bin_store_ & k2fetch_;
-	assign ck_rz_w = ~(~(wr & ~fi_) & lrz_ & blw_pw_);
+	assign ck_rz_w = ~(~(wr & ~fi_) & lrz_ & ~blw_pw);
 
 	wire __ck_rz_w_dly;
 	dly #(.ticks(2'd2)) DLY_ZERZ( // 2 ticks @50MHz = 40ns (~25ns orig.)
@@ -342,7 +342,7 @@ module px(
 	);
 	wire __ck_rz_w_dly_ = ~__ck_rz_w_dly;
 
-	assign zerz_ = ~(__ck_rz_w_dly_ & ck_rz_w & blw_pw_);
+	assign zerz_ = ~(__ck_rz_w_dly_ & ck_rz_w & ~blw_pw);
 
 	// sheet 8, page 2-8
 

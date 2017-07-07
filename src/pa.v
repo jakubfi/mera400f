@@ -13,11 +13,11 @@ module pa(
 	input [0:15] ki,
 	input [0:15] rdt_,
 	input w_dt_,
-	input mwa_,
-	input mwb_,
-	input mwc_,
-	input bwa_,
-	input bwb_,
+	input mwa,
+	input mwb,
+	input mwc,
+	input bwa,
+	input bwb,
 	output [0:15] ddt_,
 	output [0:15] w,
 	// sheet 2
@@ -89,11 +89,11 @@ module pa(
 	wire w_dt = ~w_dt_;
 
 	bus_w BUS_W(
-		.mwc_(mwc_),
-		.mwb_(mwb_),
-		.mwa_(mwa_),
-		.bwa_(bwa_),
-		.bwb_(bwb_),
+		.mwc(mwc),
+		.mwb(mwb),
+		.mwa(mwa),
+		.bwa(bwa),
+		.bwb(bwb),
 		.ir(ir),
 		.kl(kl),
 		.rdt_(rdt_),

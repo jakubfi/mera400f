@@ -192,10 +192,10 @@ module pm(
 	input srez$,
 	input rz_,
 	input wir,
-	input blw_pw_,
+	input blw_pw,
 	output wpb_, // WPB - Wskaźnik Prawego Bajtu
-	output bwb_,
-	output bwa_,
+	output bwb,
+	output bwa,
 	output kia_,
 	output kib_,
 	output w_ir,
@@ -204,9 +204,9 @@ module pm(
 	input dt_w_,
 	input f13_,
 	input wkb,
-	output mwa_,
-	output mwb_,
-	output mwc_
+	output mwa,
+	output mwb,
+	output mwc
 );
 
 	parameter KC_TICKS;
@@ -672,11 +672,7 @@ module pm(
 	wire i3_ex_prz = ~i3_ex_prz_;
 
 	// sheet 17, page 2-27
-	//  * W bus control signals
-	//  * KI bus control signals
 	//  * left/right byte selection signals
-
-	wire M10_10 = ~(cb_ | pb_);
 
 	wire pb_;
 	ffd REG_PB(
@@ -689,24 +685,27 @@ module pm(
 	wire pb = ~pb_;
 	assign wpb_ = ~pb;
 
-	wire mwax_ = ~((i3_ex_prz & lg_3) | (wp & pac_) | (ri & ww) | (wac & psr));
-	wire mwbx_ = ~((pat_ & wp) | (srez$ & ww));
-	wire M23_3 = ww & ~rz_;
-	assign bwb_ = ~(M10_10 & wr) & blw_pw_ & ~M23_3;
-	assign bwa_ = ~M23_3 & blw_pw_;
+	assign w_ir = (wir & ur) | pr;
+
+	//  * KI bus control signals
+
 	assign kia_ = ~(psr & wrs) & i3_ex_prz_ & f13_;
 	assign kib_ = f13_ & bin_;
-	assign w_ir = ~(~(wir & ur) & pr_);
-	wire wirpsr_ = ~(psr & wir);
 
-	// sheet 18, page 2-28
 	//  * W bus control signals
 
+	wire bw = blw_pw | (ww & ~rz_);
+	assign bwa = bw;
+	assign bwb = bw | (~cb_ & pb & wr);
+
+	wire wirpsr = wir & psr;
+	wire mwax_ = ~((i3_ex_prz & lg_3) | (wp & pac_) | (ri & ww) | (wac & psr));
+	wire mwbx_ = ~((pat_ & wp) | (srez$ & ww));
 	wire M56_8 = (wrsz & psr) | (i3_ex_prz & lg_2) | (bin & k2) | (ww & ~ki_);
 	wire M73_8 = (k2 & load) | (psr & wkb) | (ir6 & wa & ~rc$_);
-	assign mwa_ = ~(~M56_8 & mwax_ & dt_w_ & wirpsr_ & f13_);
-	assign mwb_ = ~(~M56_8 & f13_ & wirpsr_ & mwbx_ & we_ & w$_ & p4_ & ~M73_8);
-	assign mwc_ = ~(wirpsr_ & dt_w_ & ~M73_8 & ~(wa & lrcb));
+	assign mwa = ~wirpsr & mwax_ & ~M56_8 & f13_ & dt_w_;
+	assign mwb = ~wirpsr & mwbx_ & ~M56_8 & f13_ & we_ & w$_ & p4_ & ~M73_8;
+	assign mwc = ~wirpsr & dt_w_ & ~M73_8 & ~(wa & lrcb);
 
 endmodule
 

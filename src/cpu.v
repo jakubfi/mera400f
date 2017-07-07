@@ -104,7 +104,7 @@ module cpu(
 // --- P-X ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw_, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, oken, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
+wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, oken, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
 
 px #(
 	.AWP_PRESENT(AWP_PRESENT),
@@ -182,7 +182,7 @@ px #(
 	.pp_(pp_),
 	.lg_3(lg_3),
 	.arm4_(arm4_),
-	.blw_pw_(blw_pw_),
+	.blw_pw(blw_pw),
 	.ekc_i_(ekc_i_),
 	.zer_sp_(zer_sp_),
 	.lipsp$_(lipsp$_),
@@ -258,7 +258,7 @@ px #(
 // --- P-M ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa, bab, bac, aa, ab, wpb_, bwb_, bwa_, kia_, kib_, w_ir, mwa_, mwb_, mwc_;
+wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa, bab, bac, aa, ab, wpb_, bwb, bwa, kia_, kib_, w_ir, mwa, mwb, mwc;
 
 pm #(
 	.KC_TICKS(KC_TICKS),
@@ -432,10 +432,10 @@ pm #(
 	.srez$(srez$),
 	.rz_(rz_),
 	.wir(wir),
-	.blw_pw_(blw_pw_),
+	.blw_pw(blw_pw),
 	.wpb_(wpb_),
-	.bwb_(bwb_),
-	.bwa_(bwa_),
+	.bwb(bwb),
+	.bwa(bwa),
 	.kia_(kia_),
 	.kib_(kib_),
 	.w_ir(w_ir),
@@ -443,9 +443,9 @@ pm #(
 	.dt_w_(dt_w_),
 	.f13_(f13_),
 	.wkb(wkb),
-	.mwa_(mwa_),
-	.mwb_(mwb_),
-	.mwc_(mwc_)
+	.mwa(mwa),
+	.mwb(mwb),
+	.mwc(mwc)
 );
 
 // -----------------------------------------------------------------------
@@ -719,11 +719,11 @@ pa PA(
 	.ki(ki),
 	.rdt_(rdt_),
 	.w_dt_(w_dt_),
-	.mwa_(mwa_),
-	.mwb_(mwb_),
-	.mwc_(mwc_),
-	.bwa_(bwa_),
-	.bwb_(bwb_),
+	.mwa(mwa),
+	.mwb(mwb),
+	.mwc(mwc),
+	.bwa(bwa),
+	.bwb(bwb),
 	.ddt_(pa_ddt_),
 	.w(w),
 	.saryt(saryt),
