@@ -104,7 +104,7 @@ module cpu(
 // --- P-X ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4_, blw_pw, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, oken, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
+wire k1_, wp_, k2_, wa_, wz_, w$_, wr_, we_, p1_, p2_, p5_, p4_, p3_, i5_, i4_, i3_, i2_, i1_, ww_, wm_, wx_, as2, got_, strob2_, strob1_, strob1, arm4, blw_pw, ekc_i_, zer_sp_, lipsp$_, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerz_, ok$, oken, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
 
 px #(
 	.AWP_PRESENT(AWP_PRESENT),
@@ -181,7 +181,7 @@ px #(
 	.lg_0(lg_0),
 	.pp_(pp_),
 	.lg_3(lg_3),
-	.arm4_(arm4_),
+	.arm4(arm4),
 	.blw_pw(blw_pw),
 	.ekc_i_(ekc_i_),
 	.zer_sp_(zer_sp_),
@@ -755,7 +755,7 @@ pa PA(
 	.s_1(s_1),
 	.wzi(wzi),
 	.zs(zs),
-	.arm4_(arm4_),
+	.arm4(arm4),
 	.w_ar(w_ar),
 	.arp1(arp1),
 	.arz(arz),

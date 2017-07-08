@@ -57,7 +57,7 @@ module pa(
 	output wzi,
 	output zs,
 	// sheet 9
-	input arm4_,
+	input arm4,
 	input w_ar,
 	input arp1,
 	output arz,
@@ -181,14 +181,14 @@ module pa(
 
 	// sheet 9
 
-	wire M51_6 = ~((w_ar & strobb) | (w_ar & stroba));
+	wire M51_6 = (w_ar & strobb) | (w_ar & stroba);
 	wire M79_3 = stroba & arp1;
 
 	wire [0:15] ar;
 	ar REG_AR(
-		.l_(M51_6),
+		.l(M51_6),
 		.p1(M79_3),
-		.m4_(arm4_),
+		.m4(arm4),
 		.w(w),
 		.ar(ar)
 	);

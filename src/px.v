@@ -73,7 +73,7 @@ module px(
 	input lg_0,			// B67
 	input pp_,			// A64
 	input lg_3,			// A68 - LG=3 (Licznik Grupowy)
-	output arm4_,		// B79
+	output arm4,		// B79
 	output blw_pw,	// B85
 	output ekc_i_,	// A76 - EKC*I - Enter state KC (Koniec Cyklu)
 	output zer_sp_,	// A73
@@ -262,7 +262,7 @@ module px(
 	// sheet 5, page 2-5
 	// interrupt phase control signals
 
-	assign arm4_ = ~(strob2 & i1 & ~lip_);
+	assign arm4 = strob2 & i1 & ~lip_;
 	assign blw_pw = ~przerw_z & lg_3 & i3 & ~przerw_;
 	// FIX: -I4 was +I4
 	wire ei5 = ~(i4_ & ~(~lip_ & i1));
