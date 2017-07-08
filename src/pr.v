@@ -60,8 +60,8 @@ module pr(
 	input exx_,				// A38
 	input ust_x,			// B41
 	// sheet 10-11
-	input kia_,				// B81
-	input kib_,				// A91
+	input kia,				// B81
+	input kib,				// A91
 	input [0:15] rz,	// B70, B76, B60, B66, A60, A64, A68, A56, B80, A80, A74, A84, A77, B74, A71, B57
 										// NOTE: rz[14] is rz30, rz[15] is rz31
 	input [0:15] zp,	// B68, B72, B62, B64, A62, B63, A66, A58, B78, A82, A75, A85, A78, A83, A70, A54
@@ -224,16 +224,15 @@ module pr(
 	// sheets 10..11, pages 2-67..2-68
 	// * KI bus
 
-	reg [0:15] KI;
-	assign ki = KI;
-	always @ (*) begin
-		case ({~kib_, ~kia_})
-			2'b00 : KI <= rz;
-			2'b01 : KI <= {rs[0:9], q, bs, nb[0:3]};
-			2'b10 : KI <= rRB;
-			2'b11 : KI <= zp;
-		endcase
-	end
+	bus_ki BUS_KI(
+		.kia(kia),
+		.kib(kib),
+		.rz(rz),
+		.sr({rs[0:9], q, bs, nb[0:3]}),
+		.rb(rRB),
+		.zp(zp),
+		.ki(ki)
+	);
 
 endmodule
 

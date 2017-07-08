@@ -258,7 +258,7 @@ px #(
 // --- P-M ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa, bab, bac, aa, ab, wpb_, bwb, bwa, kia_, kib_, w_ir, mwa, mwb, mwc;
+wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa, bab, bac, aa, ab, wpb_, bwb, bwa, kia, kib, w_ir, mwa, mwb, mwc;
 
 pm #(
 	.KC_TICKS(KC_TICKS),
@@ -436,8 +436,8 @@ pm #(
 	.wpb_(wpb_),
 	.bwb(bwb),
 	.bwa(bwa),
-	.kia_(kia_),
-	.kib_(kib_),
+	.kia(kia),
+	.kib(kib),
 	.w_ir(w_ir),
 	.ki_(ki_),
 	.dt_w_(dt_w_),
@@ -635,8 +635,8 @@ pr #(
 	.ust_y(ust_y),
 	.exx_(exx_),
 	.ust_x(ust_x),
-	.kia_(kia_),
-	.kib_(kib_),
+	.kia(kia),
+	.kib(kib),
 	.rz(rz),
 	.zp(zp),
 	.rs(rs),

@@ -196,8 +196,8 @@ module pm(
 	output wpb_, // WPB - Wskaźnik Prawego Bajtu
 	output bwb,
 	output bwa,
-	output kia_,
-	output kib_,
+	output kia,
+	output kib,
 	output w_ir,
 	// sheet 18
 	input ki_,
@@ -687,12 +687,12 @@ module pm(
 
 	assign w_ir = (wir & ur) | pr;
 
-	//  * KI bus control signals
+	// KI bus control signals
 
-	assign kia_ = ~(psr & wrs) & i3_ex_prz_ & f13_;
-	assign kib_ = f13_ & bin_;
+	assign kia = ~f13_ | (psr & wrs) | i3_ex_prz;
+	assign kib = ~f13_ | bin;
 
-	//  * W bus control signals
+	// W bus control signals
 
 	wire bw = blw_pw | (ww & ~rz_);
 	assign bwa = bw;
