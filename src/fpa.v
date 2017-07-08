@@ -136,10 +136,6 @@ module fpa(
 		endcase
 	end
 
-	assign t_0_1_ = ~(t[0] | t[1]);
-	assign t_2_7_ = ~(t[2] | t[3]) & ~(t[4] | t[5]) & ~(t[6] | t[7]);
-	assign t_8_15_ = ~(t[8] | t[9]) & ~(t[10] | t[11]) & ~(t[12] | t[13]) & ~(t[14] | t[15]);
-
 	always @ (posedge strob_fp_, negedge _0_t_) begin
 		if (~_0_t_) t[16:31] <= 0;
 		else if (optb) case ({trb_, taa_})
@@ -426,12 +422,12 @@ module fpa(
 		endcase
 	end
 
-	assign t_16_23_ = ~(t[16] | t[17]) & ~(t[18] | t[19]) & ~(t[20] | t[21]) & ~(t[22] | t[23]);
-	assign t_32_39_ = ~(t[32] | t[33]) & ~(t[34] | t[35]) & ~(t[36] | t[37]) & ~(t[38] | t[39]);
-
-	// sheet 19
-
-	assign t_24_31_ = ~(t[24] | t[25]) & ~(t[26] | t[27]) & ~(t[28] | t[29]) & ~(t[30] | t[31]);
+	assign t_0_1_ = ~|t[0:1];
+	assign t_2_7_ = ~|t[2:7];
+	assign t_8_15_ = ~|t[8:15];
+	assign t_16_23_ = ~|t[16:23];
+	assign t_24_31_ = ~|t[24:31];
+	assign t_32_39_ = ~|t[32:39];
 
 endmodule
 
