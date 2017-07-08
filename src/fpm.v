@@ -226,11 +226,11 @@ module fpm(
 		.q(wt)
 	);
 
-	wire cda = ~(~wdt & strob_fp & f8);
-	wire cua_ = ~(wdt & f8 & strob_fp);
+	wire cda = ~wdt & strob_fp & f8;
+	wire cua = wdt & f8 & strob_fp;
 	wire f8_n_wdt = ~wdt & f8;
 	wire cd$_ = ~(f8 & strob_fp);
-	wire rab_ = ~(~(g & strob2_fp & ~f5_) & _0_f_);
+	wire rab = (g & strob2_fp & ~f5_) | ~_0_f_;
 
 	wire f5_af_sf = af_sf & ~f5_;
 	wire f2 = ~f2_;
@@ -257,25 +257,20 @@ module fpm(
 	wire M54_6 = ~(M57_11 & M43_3 & M57_6);
 	wire M58_12 = ~(M57_3 & M43_6 & M43_8);
 
-	wire M55_6 = ~((f4 & strob_fp) | (f5_af_sf & strob_fp));
+	wire fic_load = (f4 & strob_fp) | (f5_af_sf & strob_fp);
 
 	wire [0:5] FIC;
 	fic CNT_FIC(
 		.clk(__clk),
 		.cda(cda),
-		.cua_(cua_),
-		.rab_(rab_),
-		.load_(M55_6),
+		.cua(cua),
+		.rab(rab),
+		.load(fic_load),
 		.in({M58_12, M54_6, M59_6, M59_3, M69_8, M54_8}),
-		.out(FIC)
+		.out(FIC),
+		.fic(fic),
 	);
-
-	wire M71_6 = ~(FIC[5] | FIC[4]);
-	wire M71_1 = ~(FIC[3] | FIC[2]);
-	wire M75_1 = ~(FIC[1] | FIC[0]);
-
-	assign fic_ = M71_1 & M71_6 & M75_1;
-	assign fic = ~fic_;
+	assign fic_ = ~fic;
 
 	// sheet 5
 
