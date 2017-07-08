@@ -165,7 +165,7 @@ module pa(
 
 	// WZI
 
-	wire M65_11 = ~(as2 & strob1);
+	wire M65_11 = as2 & strob1;
 	assign s_1 = M7_8 ^ carry_;
 	assign zs = ~(s_1 | zsum_);
 
@@ -173,7 +173,7 @@ module pa(
 	ffd REG_WZI(
 		.s_(1'b1),
 		.d(zs),
-		.c(M65_11),
+		.c(~M65_11),
 		.r_(1'b1),
 		.q(wzi_)
 	);
@@ -181,8 +181,8 @@ module pa(
 
 	// sheet 9
 
-	wire M51_6 = (w_ar & strobb) | (w_ar & stroba);
-	wire M79_3 = stroba & arp1;
+	wire M51_6 = w_ar & (stroba | strobb);
+	wire M79_3 = arp1 & stroba;
 
 	wire [0:15] ar;
 	ar REG_AR(
@@ -192,7 +192,8 @@ module pa(
 		.w(w),
 		.ar(ar)
 	);
-	assign arz = ~(&(~ar[0:7]));
+
+	assign arz = |ar[0:7];
 
 	// sheet 10
 
