@@ -42,7 +42,7 @@ module px(
 	output p4_,	// A26 - state P5
 	output p3_,	// A17 - state P3
 	// sheet 2
-	input si1_,	// B52 - Set state I1
+	input si1,	// B52 - Set state I1
 	input ewx,	// B50 - Enter state WX
 	input ewm,	// B49 - Enter state WM
 	input eww,	// A46 - Enter state WW
@@ -209,7 +209,7 @@ module px(
 
 	wire i1;
 	ffd REG_I1(
-		.s_(si1_),
+		.s_(~si1),
 		.d(ei1),
 		.c(got),
 		.r_(clo_),
@@ -346,7 +346,7 @@ module px(
 
 	// sheet 8, page 2-8
 
-	wire M64_8 = sr_fp_ & si1_ & sp1_;
+	wire M64_8 = sr_fp_ & ~si1 & sp1_;
 	wire M12_6 = wm_ & i2_ & wr_ & ww_;
 	wire M12_8 = i1_ & i3_ & i4_ & i5_;
 	wire M17_8 = k2fbs_ & p1_ & p5_ & k1_;

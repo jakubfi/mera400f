@@ -9,14 +9,14 @@
 module ir(
 	input [0:15] d,
 	input c,
-	input invalidate_,
+	input invalidate,
 	output reg [0:15] q
 );
 
 	// NOTE: invalidate_ was originaly done by shorting 7475 outputs to ground
 	// through open-collector drivers
-	always @ (posedge c, negedge invalidate_) begin
-		if (~invalidate_) q[0:1] <= 2'd0;
+	always @ (posedge c, posedge invalidate) begin
+		if (invalidate) q[0:1] <= 2'd0;
 		else q <= d;
 	end
 

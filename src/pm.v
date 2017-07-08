@@ -31,7 +31,7 @@ module pm(
 	input strob2_,
 	output sp0_,
 	output przerw_,
-	output si1_,
+	output si1,
 	output sp1_,
 	// sheet 3
 	input k2_,
@@ -225,7 +225,7 @@ module pm(
 		.q(start)
 	);
 
-	wire M43_3 = M76_12 & si1_;
+	wire M43_3 = M76_12 & ~si1;
 	wire __wait_q;
 	ffd REG_WAIT(
 		.s_(1'b1),
@@ -285,7 +285,7 @@ module pm(
 		.q(M90_13)
 	);
 
-	wire rescyc_ = clm_ & strob2_ & si1_;
+	wire rescyc_ = clm_ & strob2_ & ~si1;
 
 	wire pr_;
 	ffd REG_PR(
@@ -307,7 +307,7 @@ module pm(
 		.q(przerw_)
 	);
 
-	assign si1_ = ~(M90_13 & ~przerw_);
+	assign si1 = M90_13 & ~przerw_;
 	assign sp1_ = ~(przerw_ & pr & M90_13);
 	wire zerstan_ = ~M90_5 & clm_ & p0_;
 	wire strob2 = ~strob2_;

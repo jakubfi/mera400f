@@ -153,7 +153,7 @@ px #(
 	.p5_(p5_),
 	.p4_(p4_),
 	.p3_(p3_),
-	.si1_(si1_),
+	.si1(si1),
 	.ewx(ewx),
 	.ewm(ewm),
 	.eww(eww),
@@ -258,7 +258,7 @@ px #(
 // --- P-M ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire start, sp0_, przerw_, si1_, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa, bab, bac, aa, ab, wpb_, bwb, bwa, kia, kib, w_ir, mwa, mwb, mwc;
+wire start, sp0_, przerw_, si1, sp1_, laduj, k2_bin_store_, k2fetch_, w_rbc$_, w_rba$_, w_rbb$_, ep0, stp0, ek2, ek1, mc_3, xi$_, pp_, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc_, rb_, ra_, lk, wls, w_r_, w_ic, w_ac, w_ar, lrz_, w_bar, w_rm, baa, bab, bac, aa, ab, wpb_, bwb, bwa, kia, kib, w_ir, mwa, mwb, mwc;
 
 pm #(
 	.KC_TICKS(KC_TICKS),
@@ -286,7 +286,7 @@ pm #(
 	.strob2_(strob2_),
 	.sp0_(sp0_),
 	.przerw_(przerw_),
-	.si1_(si1_),
+	.si1(si1),
 	.sp1_(sp1_),
 	.k2_(k2_),
 	.panel_store_(panel_store_),
@@ -463,7 +463,7 @@ pd #(
 	.w_ir(w_ir),
 	.ir(ir),
 	.c0(c0),
-	.si1_(si1_),
+	.si1(si1),
 	.ls_(ls_),
 	.rj_(rj_),
 	.bs_(bs_),

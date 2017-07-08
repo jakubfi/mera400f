@@ -14,7 +14,7 @@ module pd(
 	output [0:15] ir,	// A78, A79, B75, B74, A19, A18, A21, A22, B17, A33, A31, A32, B30, B27, B06, B07 - IR register
 	output c0,				// B05 - C=0 (opcode field C is 0 - instruction argument is stored in the next word)
 	// sheet 2
-	input si1_,				// B79
+	input si1,				// B79
 	output ls_,				// A91 - LS
 	output rj_,				// B92 - RJ
 	output bs_,				// A93 - BS
@@ -148,7 +148,7 @@ module pd(
 	ir REG_IR(
 		.d(w),
 		.c(strob1 & w_ir),
-		.invalidate_(si1_),
+		.invalidate(si1),
 		.q(ir)
 	);
 
