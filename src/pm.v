@@ -558,24 +558,21 @@ module pm(
 	// sheet 11, page 2-21
 	//  * step counter (licznik kroków)
 
-	wire lk0, lk1, lk2, lk3;
+	wire [0:3] lk_in;
 
-	wire M64_8 = (ir9 & gr) | (ir8 & gr) | (inou & bod) | (ir15 & shc);
-	wire M65_6 = ~((shc & ir14) | (gr));
-	wire M94_8 = ~(M65_6 & okinou_);
-	wire M49_8 = (shc & ir13) | (gr & (~ir9 & ir8));
-	wire M85_11 = shc & ir6;
+	assign lk_in[3] = (shc & ir15) | (gr & (ir9 | ir8)) | (inou & bod);
+	assign lk_in[2] = (shc & ir14) | (gr) | ~okinou_;
+	assign lk_in[1] = (shc & ir13) | (gr & (~ir9 & ir8));
+	assign lk_in[0] = (shc & ir6);
 
 	lk CNT_LK(
 		.cd(downlk),
-		.i({M85_11, M49_8, M94_8, M64_8}),
-		.l_(~lolk),
+		.i(lk_in),
+		.l(lolk),
 		.r(~zerstan_),
-		.o({lk0, lk1, lk2, lk3})
+		.lk(lk)
 	);
 	
-	assign lk = ~(~(lk0 | lk1) & ~(lk2 | lk3));
-
 	// sheet 12, page 2-22
 
 	wire rj = ~rj_;

@@ -9,16 +9,20 @@
 module lk(
 	input cd,
 	input [0:3] i,
-	output reg [0:3] o,
 	input r,
-	input l_
+	input l,
+	output lk
 );
 
-	always @ (posedge cd, negedge l_, posedge r) begin
-		if (r) o <= 4'd0;
-		else if (~l_) o <= i;
-		else o <= o - 1'b1;
+	reg [0:3] cnt;
+
+	always @ (posedge cd, posedge l, posedge r) begin
+		if (r) cnt <= 4'd0;
+		else if (l) cnt <= i;
+		else cnt <= cnt - 1'b1;
 	end
+
+	assign lk = |cnt;
 
 endmodule
 
