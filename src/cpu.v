@@ -453,7 +453,7 @@ pm #(
 // -----------------------------------------------------------------------
 
 wire [0:15] ir;
-wire c0, ls_, rj_, bs_, ou_, in_, is_, ri_, pufa, rb$_, cb_, sc$, oc$_, ka2_, gr$_, hlt, mcl_, sin_, gi_, lip_, mb_, im_, ki_, fi_, sp_, rz_, ib_, lpc, rpc, shc_, rc$_, ng$_, zb$_, b0_, _0_v, md, xi, nef, amb, apb, jkrb_, lwrs$_, saryt, ap1, am1, bcoc$, sd_, scb_, sca_, sb_, sab_, saa_, lrcb$_, aryt, sbar$, nrf, ust_z, ust_v, ust_mc, ust_leg, eat0, sr$_, ust_y, ust_x, blr_, ewa, ewp, uj$_, lwt$_, lj_, ewe, ekc_1_, ewz, ew$, lar$, ssp$, ka1_, na_, exl_, p16_, ewr, ewm, efp_, sar$, eww, srez$, ewx, axy, inou$_, ekc_2_, lac$_;
+wire c0, ls_, rj_, bs_, ou_, in_, is_, ri_, pufa, rb$_, cb_, sc$, oc$_, ka2_, gr$_, hlt, mcl_, sin_, gi_, lip_, mb_, im_, ki_, fi_, sp_, rz_, ib_, lpc, rpc, shc_, rc$_, ng$_, zb$_, b0_, _0_v, md, xi, nef, amb, apb, jkrb_, lwrs$_, saryt, ap1, am1, bcoc$, sd, scb, sca, sb, sab, saa, lrcb$_, aryt, sbar$, nrf, ust_z, ust_v, ust_mc, ust_leg, eat0, sr$_, ust_y, ust_x, blr_, ewa, ewp, uj$_, lwt$_, lj_, ewe, ekc_1_, ewz, ew$, lar$, ssp$, ka1_, na_, exl_, p16_, ewr, ewm, efp_, sar$, eww, srez$, ewx, axy, inou$_, ekc_2_, lac$_;
 
 pd #(
 	.INOU_USER_ILLEGAL(INOU_USER_ILLEGAL)
@@ -518,12 +518,12 @@ pd #(
 	.wz_(wz_),
 	.wls(wls),
 	.bcoc$(bcoc$),
-	.sd_(sd_),
-	.scb_(scb_),
-	.sca_(sca_),
-	.sb_(sb_),
-	.sab_(sab_),
-	.saa_(saa_),
+	.sd(sd),
+	.scb(scb),
+	.sca(sca),
+	.sb(sb),
+	.sab(sab),
+	.saa(saa),
 	.lrcb$_(lrcb$_),
 	.aryt(aryt),
 	.sbar$(sbar$),
@@ -727,15 +727,15 @@ pa PA(
 	.ddt_(pa_ddt_),
 	.w(w),
 	.saryt(saryt),
-	.sab_(sab_),
-	.scb_(scb_),
-	.sb_(sb_),
-	.sd_(sd_),
+	.sab(sab),
+	.scb(scb),
+	.sb(sb),
+	.sd(sd),
 	.s0(s0),
 	.carry_(carry_),
 	.p16_(p16_),
-	.saa_(saa_),
-	.sca_(sca_),
+	.saa(saa),
+	.sca(sca),
 	.j$(j$),
 	.exx_(exx_),
 	.wx_(wx_),

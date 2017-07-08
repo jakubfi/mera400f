@@ -8,8 +8,8 @@
 
 /*
 
-0-7: {sd, ~scb_, sb, ~sab_}
-8-15: {sd, ~sca_, sb, ~saa_}
+0-7: {sd, scb, sb, sab}
+8-15: {sd, sca, sb, saa}
 
 			.-> saryt
 			| .-> sd, sca, sb, saa (s[3:0])
@@ -37,9 +37,9 @@ module alu(
 	input [0:15] a,
 	input [0:15] ac,
 	input saryt,
-	input sd_, sb_,
-	input scb_, sab_,
-	input sca_, saa_,
+	input sd, sb,
+	input scb, sab,
+	input sca, saa,
 	output [0:15] f,
 	output j$,
 	output carry_,
@@ -60,53 +60,41 @@ module alu(
 		.b(ac[0:3]),
 		.m(~saryt),
 		.c_(c_[3]),
-		.s({sd, ~scb_, sb, ~sab_}),
+		.s({sd, scb, sb, sab}),
 		.f(f[0:3]),
 		.g(g[3]),
 		.p(p[3]),
 		.co_(carry_),
 		.eq(j$1[3])
 	);
-	wire z1_ = ~(f[0] | f[1]);
-	wire z2_ = ~(f[2] | f[3]);
 
 	alu181 ALU_4_7(
 		.a(a[4:7]),
 		.b(ac[4:7]),
 		.m(~saryt),
 		.c_(c_[2]),
-		.s({sd, ~scb_, sb, ~sab_}),
+		.s({sd, scb, sb, sab}),
 		.f(f[4:7]),
 		.p(p[2]),
 		.g(g[2]),
 		.co_(__NC),
 		.eq(j$1[2])
 	);
-	wire z3_ = ~(f[4] | f[5]);
-	wire z4_ = ~(f[6] | f[7]);
-	wire sb = ~sb_;
-	wire sd = ~sd_;
 
 	// sheet 6
-
-	assign j$ = &j$1;
 
 	alu181 ALU_8_11(
 		.a(a[8:11]),
 		.b(ac[8:11]),
 		.m(~saryt),
 		.c_(c_[1]),
-		.s({sd, ~sca_, sb, ~saa_}),
+		.s({sd, sca, sb, saa}),
 		.f(f[8:11]),
 		.p(p[1]),
 		.g(g[1]),
 		.co_(__NC),
 		.eq(j$1[1])
 	);
-	wire z5_ = ~(f[8] | f[9]);
-	wire z6_ = ~(f[10] | f[11]);
-	wire z7_ = ~(f[12] | f[13]);
-	wire z8_ = ~(f[14] | f[15]);
 
 	// least significant
 	alu181 ALU_12_15(
@@ -114,7 +102,7 @@ module alu(
 		.b(ac[12:15]),
 		.m(~saryt),
 		.c_(p16_),
-		.s({sd, ~sca_, sb, ~saa_}),
+		.s({sd, sca, sb, saa}),
 		.f(f[12:15]),
 		.p(p[0]),
 		.g(g[0]),
@@ -134,9 +122,8 @@ module alu(
 		.og(__NC)
 	);
 
-	// on sheet 8
-
-	assign zsum_ = ~(z1_ & z2_ & z3_ & z4_ & z5_ & z6_ & z7_ & z8_);
+	assign zsum_ = |f;
+	assign j$ = &j$1;
 
 endmodule
 

@@ -25,16 +25,16 @@ module pa(
 	// sheet 4
 	// sheet 5
 	input saryt,
-	input sab_,
-	input scb_,
-	input sb_,
-	input sd_,
+	input sab,
+	input scb,
+	input sb,
+	input sd,
 	output s0,
 	output carry_,
 	// sheet 6
 	input p16_,
-	input saa_,
-	input sca_,
+	input saa,
+	input sca,
 	output j$,
 	output exx_,
 	// sheet 7
@@ -115,12 +115,12 @@ module pa(
 		.a(a),
 		.ac(ac),
 		.saryt(saryt),
-		.sd_(sd_),
-		.sb_(sb_),
-		.scb_(scb_),
-		.sab_(sab_),
-		.sca_(sca_),
-		.saa_(saa_),
+		.sd(sd),
+		.sb(sb),
+		.scb(scb),
+		.sab(sab),
+		.sca(sca),
+		.saa(saa),
 		.f(f),
 		.j$(j$),
 		.carry_(carry_),
@@ -167,8 +167,7 @@ module pa(
 
 	wire M65_11 = ~(as2 & strob1);
 	assign s_1 = M7_8 ^ carry_;
-	wire M42_8 = zsum_;
-	assign zs = ~(s_1 | M42_8);
+	assign zs = ~(s_1 | zsum_);
 
 	wire wzi_;
 	ffd REG_WZI(

@@ -74,12 +74,12 @@ module pd(
 	input wls,				// A70
 	output bcoc$,			// A89
 	// sheet 7
-	output sd_,				// A69 - ALU function select
-	output scb_,			// A82 - ALU function select
-	output sca_,			// A71 - ALU function select
-	output sb_,				// A74 - ALU function select
-	output sab_,			// A73 - ALU function select
-	output saa_,			// A72 - ALU function select
+	output sd,				// A69 - ALU function select
+	output scb,				// A82 - ALU function select
+	output sca,				// A71 - ALU function select
+	output sb,				// A74 - ALU function select
+	output sab,				// A73 - ALU function select
+	output saa,				// A72 - ALU function select
 	output lrcb$_,		// A45
 	output aryt,			// A68
 	output sbar$,			// B91
@@ -319,7 +319,7 @@ module pd(
 	wire apb_ = ~((~uka & p4) | (M90_12 & w$) | (M49_6 & we));
 	assign apb = ~apb_;
 	wire ans = ~(sw_ & ng_ & a_);
-	assign jkrb_ = ~(~(js_ & krb_));
+	assign jkrb_ = js_ & krb_;
 	wire M90_8 = ~(sl_ & ri_ & krb_);
 	assign saryt = (we & M49_6) | (p4) | (w$ & M90_8) | ((cns ^ M90_12) & w$);
 	wire riirb = ~(ri_ & irb_);
@@ -335,34 +335,37 @@ module pd(
 	// sheet 6, page 2-35
 	// * control signals
 
+	wire nglbb = ~(ngl_ & bb_);
+	assign bcoc$ = ~(bc_ & oc_);
+	wire wls_ = ~wls;
+	wire wlsbs = ~(wls_ & bs_);
+	wire ls = ~ls_;
+	wire emnm_ = em_ & nm_;
+
+	// sheet 7, page 2-36
+	// * ALU control signals
+
 	// FIX: -WZ on <A66> was labeled as +WZ
 	wire wz = ~wz_;
 	wire M84_8 = riirb ^ nglbb;
 	wire M67_8 = ~(bm_ & is_ & er_ & xr_);
 	wire sds_ = ~((wz & ~(xm_ & em_)) | (M67_8 & w$) | (w$ & M84_8) | (we & wlsbs));
 	wire ssb_ = ~(w$ & ~(ngl_ & oc_ & bc_));
-	wire nglbb = ~(bb_ & ngl_);
-	assign bcoc$ = ~(oc_ & bc_);
-	wire wls_ = ~wls;
-	wire wlsbs = ~(wls_ & bs_);
-	wire ssca_ = ~((M84_8 & w$) | (w$ & ~(bs_ & bn_ & nr_)) | (wz & ~(emnm_ & lrcb_)) | (we & ls));
-	wire ls = ~ls_;
-	wire emnm_ = em_ & nm_;
-	wire ssab_ = ~(~rb_ & w$ & wpb);
-	wire ssaa_ = ~((~(rb_ | wpb) & w$) | (w$ & ~lb_));
 
-	// sheet 7, page 2-36
-	// * ALU control signals
+	assign sd = sds_ & amb_;
+	assign sb = apb_ & ssb_ & sl_ & ap1_;
 
 	wire M93_12 = ~(sl_ & ls_ & orxr_);
 	wire M50_8 = ~((M93_12 & w$) | (w$ & nglbb) | (wlsbs & we) | (wz & nm_ & ~(mis_ & lrcb_)));
+	wire ssab_ = ~(~rb_ & w$ & wpb);
+	wire ssaa_ = ~((~(rb_ | wpb) & w$) | (w$ & ~lb_));
+	wire ssca_ = ~((M84_8 & w$) | (w$ & ~(bs_ & bn_ & nr_)) | (wz & ~(emnm_ & lrcb_)) | (we & ls));
 
-	assign sd_ = ~(sds_ & amb_);
-	assign scb_ = ~(apb_ & ssca_ & ssab_);
-	assign sca_ = ~(ssca_ & apb_ & ssaa_);
-	assign sb_ = ~(apb_ & ssb_ & sl_ & ap1_);
-	assign sab_ = ~(ssab_ & amb_ & M50_8 & ap1_);
-	assign saa_ = ~(ap1_ & M50_8 & amb_ & ssaa_);
+	assign sca = ssca_ & apb_ & ssaa_;
+	assign scb = ssca_ & apb_ & ssab_;
+	assign saa = ssaa_ & amb_ & ap1_ & M50_8;
+	assign sab = ssab_ & amb_ & ap1_ & M50_8;
+
 	wire orxr_ = or_ & xr_;
 	wire lrcb_ = lbcb_ & rb_;
 	assign lrcb$_ = lrcb_;
