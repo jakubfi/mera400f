@@ -127,8 +127,8 @@ module pr(
 	wire [0:3] nb;
 	nb REG_NB(
 		.w(w[12:15]),
-		.cnb_(cnb0_3_),
-		.clm_(clm_),
+		.cnb(cnb0_3),
+		.clm(~clm_),
 		.nb(nb)
 	);
 	assign dnb_ = ~(nb & {4{~bar_nb_}});
@@ -157,17 +157,17 @@ module pr(
 	ffd REG_BS(
 		.s_(1'b1),
 		.d(w[11]),
-		.c(cnb0_3_),
+		.c(~cnb0_3),
 		.r_(clm_),
 		.q(bs)
 	);
 
-	wire cnb0_3_ = ~(w_bar & strob1);
+	wire cnb0_3 = w_bar & strob1;
 
 	ffd REG_Q(
 		.s_(1'b1),
 		.d(w[10]),
-		.c(cnb0_3_),
+		.c(~cnb0_3),
 		.r_(zer_),
 		.q(q)
 	);
