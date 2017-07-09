@@ -214,7 +214,7 @@ module pd(
 		.d(1'b0),
 		.o_({__NC, a_eq_, __NC, __NC})
 	);
-	wire snef = ~(a_eq_[5] & a_eq_[6] & a_eq_[7]);
+	wire snef = ~&a_eq_[5:7];
 
 	wire hlt_;
 	decoder_bcd DEC_S(
@@ -238,7 +238,7 @@ module pd(
 	);
 	wire fimb_ = fi_ & im_ & mb_;
 
-	wire b_1 = ~ir[10] & ~ir[11] & ir[12];
+	wire b_1 = (ir[10:12] == 1);
 
 	wire ngl_, srz_, lpc_, rpc_;
 	decoder_bcd DEC_D(
@@ -270,7 +270,7 @@ module pd(
 	wire sly = ~sly_;
 	wire slx = ~slx_;
 	wire sx = ~sx_;
-	assign b0_ = ~(~ir[10] & ~ir[11] & ~ir[12]);
+	assign b0_ = (ir[10:12] != 0);
 
 	// sheet 4, page 2-33
 	// * ineffective instructions
@@ -279,7 +279,7 @@ module pd(
 	assign md = ~a_eq_[5] & ~b_n_;
 	assign _0_v = ~js_ & ~a_eq_[4] & we;
 
-	wire M85_11 = ~(~ir[10] & ~(ir[11] & ir[12]));
+	wire M85_11 = ir[10] | (ir[11] & ir[12]);
 	// jumper a on 1-3 : IN/OU illegal for user
 	// jupmer a on 2-3 : IN/OU legal for user
 	wire M27_8 = ~((INOU_USER_ILLEGAL & inou & q) | (M85_11 & c) | (q & ~s_) | (q & ~snef & ~b_n_));
@@ -309,15 +309,15 @@ module pd(
 	// sheet 5, page 2-34
 
 	wire cns = ~(~ccb & ng_ & sw_);
-	wire amb_ = ~((uka & p4) | (cns & w$));
-	assign amb = ~amb_;
 	wire a_ = aw_ & ac_ & awt_;
-	wire M90_12 = ~(a_ & trb_ & ib_);
 	assign lwrs$_ = lws_ & rws_;
 	wire lwrs_ = lwrs$_;
+
+	wire M90_12 = ~(a_ & trb_ & ib_);
 	wire M49_6 = ~(lwrs_ & lj_ & js_ & krb_);
-	wire apb_ = ~((~uka & p4) | (M90_12 & w$) | (M49_6 & we));
-	assign apb = ~apb_;
+	assign apb = (~uka & p4) | (M90_12 & w$) | (M49_6 & we);
+	assign amb = (uka & p4) | (cns & w$);
+
 	wire ans = ~(sw_ & ng_ & a_);
 	assign jkrb_ = js_ & krb_;
 	wire M90_8 = ~(sl_ & ri_ & krb_);
@@ -352,8 +352,8 @@ module pd(
 	wire sds_ = ~((wz & ~(xm_ & em_)) | (M67_8 & w$) | (w$ & M84_8) | (we & wlsbs));
 	wire ssb_ = ~(w$ & ~(ngl_ & oc_ & bc_));
 
-	assign sd = sds_ & amb_;
-	assign sb = apb_ & ssb_ & sl_ & ap1_;
+	assign sd = sds_ & ~amb;
+	assign sb = ~apb & ssb_ & sl_ & ap1_;
 
 	wire M93_12 = ~(sl_ & ls_ & orxr_);
 	wire M50_8 = ~((M93_12 & w$) | (w$ & nglbb) | (wlsbs & we) | (wz & nm_ & ~(mis_ & lrcb_)));
@@ -361,10 +361,10 @@ module pd(
 	wire ssaa_ = ~((~(rb_ | wpb) & w$) | (w$ & ~lb_));
 	wire ssca_ = ~((M84_8 & w$) | (w$ & ~(bs_ & bn_ & nr_)) | (wz & ~(emnm_ & lrcb_)) | (we & ls));
 
-	assign sca = ssca_ & apb_ & ssaa_;
-	assign scb = ssca_ & apb_ & ssab_;
-	assign saa = ssaa_ & amb_ & ap1_ & M50_8;
-	assign sab = ssab_ & amb_ & ap1_ & M50_8;
+	assign sca = ssca_ & ~apb & ssaa_;
+	assign scb = ssca_ & ~apb & ssab_;
+	assign saa = ssaa_ & ~amb & ap1_ & M50_8;
+	assign sab = ssab_ & ~amb & ap1_ & M50_8;
 
 	wire orxr_ = or_ & xr_;
 	wire lrcb_ = lbcb_ & rb_;
@@ -475,7 +475,7 @@ module pd(
 	wire inou = ~(in_ & ou_);
 	wire inou_ = ~inou;
 	assign inou$_ = inou_;
-	assign ekc_2_ = ~((wx & hsm) | (wm & inou_) | ((grlk_ & lj_) & ri_ & ww) | (pcrs & wa));
+	assign ekc_2_ = ~((wx & hsm) | (wm & inou_) | (grlk_ & lj_ & ri_ & ww) | (pcrs & wa));
 	wire rbib = ~(rb_ & ib_);
 	wire bmib = ib_ & bm_;
 	wire lac_ = bmib & mis_;
