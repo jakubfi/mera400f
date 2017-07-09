@@ -147,14 +147,16 @@ module pa(
 
 	// sheet 8
 
-	wire M49_6 = ~((w_ac & strobb) | (w_ac & stroba));
-	wire strobb = ~(as2_ | strob2_);
 	wire as2_ = ~as2;
-	wire stroba = ~(as2 | strob1_);
+	wire strob2 = ~strob2_;
+	wire strobb = as2 & strob2;
+	wire stroba = ~as2 & strob1;
+
+	wire ac_clk = w_ac & (stroba | strobb);
 
 	wire [0:15] ac;
 	ac REG_AC(
-		.c(M49_6),
+		.c(~ac_clk),
 		.w(w),
 		.ac(ac)
 	);
@@ -162,18 +164,18 @@ module pa(
 	wire M8_11 = ac[0] ^ a[0];
 	wire M8_3 = ~ac[0] ^ a[0];
 	wire M7_8 = ~((~a[0] & am1) | (M8_11 & apb) | (M8_3 & amb) | (a[0] & ap1));
+	assign s_1 = M7_8 ^ carry_;
+	assign zs = ~(s_1 | zsum_);
 
 	// WZI
 
-	wire M65_11 = as2 & strob1;
-	assign s_1 = M7_8 ^ carry_;
-	assign zs = ~(s_1 | zsum_);
+	wire wzi_clk = as2 & strob1;
 
 	wire wzi_;
 	ffd REG_WZI(
 		.s_(1'b1),
 		.d(zs),
-		.c(~M65_11),
+		.c(~wzi_clk),
 		.r_(1'b1),
 		.q(wzi_)
 	);
@@ -181,13 +183,13 @@ module pa(
 
 	// sheet 9
 
-	wire M51_6 = w_ar & (stroba | strobb);
-	wire M79_3 = arp1 & stroba;
+	wire ar_load = w_ar & (stroba | strobb);
+	wire ar_plus1 = arp1 & stroba;
 
 	wire [0:15] ar;
 	ar REG_AR(
-		.l(M51_6),
-		.p1(M79_3),
+		.l(ar_load),
+		.p1(ar_plus1),
 		.m4(arm4),
 		.w(w),
 		.ar(ar)
@@ -197,13 +199,13 @@ module pa(
 
 	// sheet 10
 
-	wire M56_3 = icp1 & strob1;
-	wire M51_8 = w_ic & (stroba | strobb);
+	wire ic_plus1 = icp1 & strob1;
+	wire ic_load = w_ic & (stroba | strobb);
 
 	wire [0:15] ic;
 	ic REG_IC(
-		.cu(M56_3),
-		.l(M51_8),
+		.cu(ic_plus1),
+		.l(ic_load),
 		.r(~off_),
 		.w(w),
 		.ic(ic)
