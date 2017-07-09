@@ -25,7 +25,6 @@ module fpa(
 	input clockm,
 	input _0_m,
 	output c0_eq_c1,
-	output c1_,
 	output fc0_,
 	output t1_,
 	output t0_eq_c0,
@@ -196,7 +195,6 @@ module fpa(
 	end
 
 	assign c0_eq_c1 = c[0] ^ ~c[1];
-	assign c1_ = ~c[1];
 	assign fc0_ = ~c[0];
 	assign t1_ = ~t[1];
 	assign t0_eq_c0 = fc0_ ^ t[0];
@@ -218,7 +216,7 @@ module fpa(
 	alu181 M52(
 		.a(t[0:3]),
 		.b(c[0:3]),
-		.m(0),
+		.m(1'b0),
 		.c_(p4_),
 		.s({faa, fab, fab, faa}),
 		.f(sum[0:3]),
@@ -231,7 +229,7 @@ module fpa(
 	alu181 M53(
 		.a(t[4:7]),
 		.b(c[4:7]),
-		.m(0),
+		.m(1'b0),
 		.c_(p8_),
 		.s({faa, fab, fab, faa}),
 		.f(sum[4:7]),
@@ -259,7 +257,7 @@ module fpa(
 	alu181 M54(
 		.a(t[8:11]),
 		.b(c[8:11]),
-		.m(0),
+		.m(1'b0),
 		.c_(p12_),
 		.s({faa, fab, fab, faa}),
 		.f(sum[8:11]),
@@ -272,7 +270,7 @@ module fpa(
 	alu181 M55(
 		.a(t[12:15]),
 		.b(c[12:15]),
-		.m(0),
+		.m(1'b0),
 		.c_(p_16_),
 		.s({faa, fab, fab, faa}),
 		.f(sum[12:15]),
@@ -290,7 +288,7 @@ module fpa(
 	alu181 M56(
 		.a(t[16:19]),
 		.b(c[16:19]),
-		.m(0),
+		.m(1'b0),
 		.c_(p21_),
 		.s({fra1, frb, frb, fra1}),
 		.f(sum[16:19]),
@@ -303,7 +301,7 @@ module fpa(
 	alu181 M57(
 		.a(t[20:23]),
 		.b(c[20:23]),
-		.m(0),
+		.m(1'b0),
 		.c_(p24_),
 		.s({fra1, frb, frb, fra1}),
 		.f(sum[20:23]),
@@ -338,7 +336,7 @@ module fpa(
 	alu181 M58(
 		.a(t[24:27]),
 		.b(c[24:27]),
-		.m(0),
+		.m(1'b0),
 		.c_(p28_),
 		.s({fra1, frb, frb, fra1}),
 		.f(sum[24:27]),
@@ -351,7 +349,7 @@ module fpa(
 	alu181 M59(
 		.a(t[28:31]),
 		.b(c[28:31]),
-		.m(0),
+		.m(1'b0),
 		.c_(p_32_),
 		.s({fra1, frb, frb, fra1}),
 		.f(sum[28:31]),
@@ -378,7 +376,7 @@ module fpa(
 	alu181 M60(
 		.a(t[32:35]),
 		.b(c[32:35]),
-		.m(0),
+		.m(1'b0),
 		.c_(p36_),
 		.s({fra, frb, frb, fra}),
 		.f(sum[32:35]),
@@ -391,7 +389,7 @@ module fpa(
 	alu181 M61(
 		.a(t[36:39]),
 		.b(c[36:39]),
-		.m(0),
+		.m(1'b0),
 		.c_(p_40_),
 		.s({fra, frb, frb, fra}),
 		.f(sum[36:39]),

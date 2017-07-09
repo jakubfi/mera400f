@@ -18,7 +18,6 @@ module pm(
 	input hlt,
 	input cycle_,
 	input irq,
-	output start,
 	output wait_,
 	output run,
 	// sheet 2
@@ -217,9 +216,10 @@ module pm(
 
 	wire start_reset_ = hlt_n_ & stop$_ & clo_;
 	wire start_clk = ~(~pon_ & work);
+	wire start;
 	ffd REG_START(
 		.s_(start$_),
-		.d(1),
+		.d(1'b1),
 		.c(start_clk),
 		.r_(start_reset_),
 		.q(start)
@@ -228,7 +228,7 @@ module pm(
 	wire M43_3 = start_reset_ & ~si1;
 	wire __wait_q;
 	ffd REG_WAIT(
-		.s_(1),
+		.s_(1'b1),
 		.d(hlt),
 		.c(wx),
 		.r_(M43_3),
@@ -239,8 +239,8 @@ module pm(
 	wire __cycle_q;
 	ffd REG_CYCLE(
 		.s_(cycle_),
-		.d(0),
-		.c(1),
+		.d(1'b0),
+		.c(1'b1),
 		.r_(~rescyc),
 		.q(__cycle_q)
 	);
@@ -264,7 +264,7 @@ module pm(
 		.s_(ekc_fp_),
 		.j(ekc),
 		.c_(got_),
-		.k(0),
+		.k(1'b0),
 		.r_(~kc_reset),
 		.q(trig_kc)
 	);
@@ -272,7 +272,7 @@ module pm(
 	wire kc;
 	univib #(.ticks(KC_TICKS)) VIB_KC(
 		.clk(__clk),
-		.a_(0),
+		.a_(1'b0),
 		.b(trig_kc),
 		.q(kc)
 	);
@@ -281,7 +281,7 @@ module pm(
 	univib #(.ticks(PC_TICKS)) VIB_PC(
 		.clk(__clk),
 		.a_(kc),
-		.b(1),
+		.b(1'b1),
 		.q(pc)
 	);
 
@@ -292,7 +292,7 @@ module pm(
 		.s_(~rescyc),
 		.d(~dpr),
 		.c(kc),
-		.r_(1),
+		.r_(1'b1),
 		.q(pr_)
 	);
 	wire pr = ~pr_;
@@ -303,7 +303,7 @@ module pm(
 		.s_(clm_),
 		.d(~dprzerw),
 		.c(kc),
-		.r_(1),
+		.r_(1'b1),
 		.q(przerw_)
 	);
 
@@ -436,7 +436,7 @@ module pm(
 	wire wb_k = (p4 & wpp_) | p2;
 	wire wb;
 	ffjk REG_WBI(
-		.s_(1),
+		.s_(1'b1),
 		.j(wb_j),
 		.c_(strob1),
 		.k(wb_k),
@@ -447,7 +447,7 @@ module pm(
 	wire wpp;
 	ffjk REG_WPI(
 		.s_(~setwp),
-		.j(0),
+		.j(1'b0),
 		.c_(strob1),
 		.k(p4),
 		.r_(~reswp),

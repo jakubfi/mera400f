@@ -13,7 +13,6 @@ module fic(
 	input rab,
 	input load,
 	input [0:5] in,
-	output reg [0:5] out,
 	output fic
 );
 
@@ -22,14 +21,16 @@ module fic(
 		op <= load | cda | cua | rab;
 	end
 
+	reg [0:5] cnt;
+
 	always @ (posedge op) begin
-		if (rab) out <= 0;
-		else if (load) out <= in;
-		else if (cda) out <= out - 1'd1;
-		else if (cua) out <= out + 1'd1;
+		if (rab) cnt <= 0;
+		else if (load) cnt <= in;
+		else if (cda) cnt <= cnt - 1'd1;
+		else if (cua) cnt <= cnt + 1'd1;
 	end
 
-	assign fic = |out;
+	assign fic = |cnt;
 
 endmodule
 

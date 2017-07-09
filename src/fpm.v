@@ -7,7 +7,7 @@
 */
 
 module fpm(
-	input opm, opta, optb, optc,
+	input opm, opta,
 	input __clk,
 	// sheet 1
 	input [8:15] w,
@@ -19,7 +19,6 @@ module fpm(
 	input fcb_,
 	input scc_,
 	input pc8,
-	output d_1,
 	// sheet 3
 	input _0_f_,
 	input f2_,
@@ -66,7 +65,6 @@ module fpm(
 	input f7_,
 	input f6_,
 	output fwz,
-	output _end,
 	output ws_,
 	// sheet 8
 	input lp_,
@@ -78,7 +76,6 @@ module fpm(
 	output wc_,
 	output fi1_,
 	output fi2_,
-	output d_2,
 	// sheet 9
 	input w0_,
 	input t_1_t_1,
@@ -156,9 +153,9 @@ module fpm(
 	end
 
 	wire d_2_ = ~D_2;
-	assign d_2 = D_2;
+	wire d_2 = D_2;
 	wire d_1_ = ~D_1;
-	assign d_1 = D_1;
+	wire d_1 = D_1;
 	wire d0_ = ~D[0];
 	assign d = D[0:7];
 
@@ -202,7 +199,7 @@ module fpm(
 	wire M35_6 = ~(f2 & t_ & strob_fp & af_sf);
 
 	ffd REG_G(
-		.s_(1),
+		.s_(1'b1),
 		.d(sum_c_ge_40),
 		.c(M57_8),
 		.r_(_0_f_),
@@ -210,7 +207,7 @@ module fpm(
 	);
 
 	ffd REG_WDT(
-		.s_(1),
+		.s_(1'b1),
 		.d(sum_c_1),
 		.c(M57_8),
 		.r_(_0_f_),
@@ -259,7 +256,6 @@ module fpm(
 
 	wire fic_load = (f4 & strob_fp) | (f5_af_sf & strob_fp);
 
-	wire [0:5] FIC;
 	fic CNT_FIC(
 		.clk(__clk),
 		.cda(cda),
@@ -267,8 +263,7 @@ module fpm(
 		.rab(rab),
 		.load(fic_load),
 		.in({M58_12, M54_6, M59_6, M59_3, M69_8, M54_8}),
-		.out(FIC),
-		.fic(fic),
+		.fic(fic)
 	);
 	assign fic_ = ~fic;
 
@@ -336,7 +331,7 @@ module fpm(
 	wire M47_6 = ok & df_ & m_1 & ~_end;
 
 	ffd REG_FWZ(
-		.s_(1),
+		.s_(1'b1),
 		.d(t_),
 		.c(M68_8),
 		.r_(_0_f_),
@@ -345,15 +340,16 @@ module fpm(
 
 	wire ci;
 	ffd REG_CI(
-		.s_(1),
+		.s_(1'b1),
 		.d(~fp0_),
 		.c(M49_8),
 		.r_(_0_f_),
 		.q(ci)
 	);
 
+	wire _end;
 	ffd REG_END(
-		.s_(1),
+		.s_(1'b1),
 		.d(ws),
 		.c(~f7_),
 		.r_(_0_f_),
@@ -363,7 +359,7 @@ module fpm(
 	wire ws;
 	assign ws_ = ~ws;
 	ffd REG_WS(
-		.s_(1),
+		.s_(1'b1),
 		.d(M47_6),
 		.c(M72_8),
 		.r_(_0_f_),
@@ -390,7 +386,7 @@ module fpm(
 
 	wire idi;
 	ffd REG_IDI(
-		.s_(1),
+		.s_(1'b1),
 		.d(dw),
 		.c(f4),
 		.r_(M49_6),
@@ -401,8 +397,8 @@ module fpm(
 	assign wc_ = ~wc;
 	ffd REG_WC(
 		.s_(M35_8),
-		.d(1),
-		.c(1),
+		.d(1'b1),
+		.c(1'b1),
 		.r_(_0_f_),
 		.q(wc)
 	);
@@ -411,7 +407,7 @@ module fpm(
 	univib #(.ticks(FP_FI0_TICKS)) VIB_FI0(
 		.clk(__clk),
 		.a_(~M49_12),
-		.b(1),
+		.b(1'b1),
 		.q(M20_13)
 	);
 
@@ -439,7 +435,7 @@ module fpm(
 
 	wire t_1_ = ~t_1;
 	ffd_ena REG_T_1(
-		.s_(1),
+		.s_(1'b1),
 		.d(M40_8),
 		.c(strob_fp_),
 		.ena(opta),
@@ -459,7 +455,7 @@ module fpm(
 
 	wire m_1_ = ~m_1;
 	ffd_ena REG_M_1(
-			.s_(1),
+			.s_(1'b1),
 			.d(M22_8),
 			.c(strob_fp_),
 			.ena(opm),
@@ -490,7 +486,7 @@ module fpm(
 
 	wire pm;
 	ffd_ena REG_PM(
-		.s_(1),
+		.s_(1'b1),
 		.d(M52_6),
 		.c(strob_fp_),
 		.ena(opm),
@@ -507,7 +503,7 @@ module fpm(
 	wire d$;
 	ffd REG_D$(
 		.s_(~f6_f7),
-		.d(0),
+		.d(1'b0),
 		.c(cd$_),
 		.r_(_0_f_),
 		.q(d$)
@@ -522,7 +518,7 @@ module fpm(
 	wire sgn;
 	assign sgn_ = ~sgn;
 	ffd REG_SGN(
-		.s_(1),
+		.s_(1'b1),
 		.d(t0_c0),
 		.c(f4),
 		.r_(_0_f_),

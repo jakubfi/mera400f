@@ -83,8 +83,7 @@ module pk(
 	output wir,
 	output wrs,
 	output wrz,
-	output wkb,
-	input ir0 // buzzer?
+	output wkb
 );
 
   parameter TIMER_CYCLE_MS;
@@ -230,7 +229,7 @@ module pk(
 	// --- FPGA: 7-segment display
 
 	wire [7:0] dots;
-	wire [7:0] digs [7:0];
+	wire [6:0] digs [7:0];
 	sevenseg_drv DRV(
 		.clk(CLK_EXT),
 		.seg(SEG),

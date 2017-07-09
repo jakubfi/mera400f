@@ -170,7 +170,7 @@ module fps(
 	wire M55_5;
 	ffd REG_STEP(
 		.s_(M56_8),
-		.d(0),
+		.d(1'b0),
 		.c(step_),
 		.r_(mode),
 		.q(M55_5)
@@ -188,7 +188,7 @@ module fps(
 	univib #(.ticks(FP_STROB2_TICKS)) VIB_STROB2(
 		.clk(__clk),
 		.a_(M54_6),
-		.b(1),
+		.b(1'b1),
 		.q(strob2)
 	);
 
@@ -215,7 +215,7 @@ module fps(
 
 	wire M55_9;
 	ffd REG_KC(
-		.s_(1),
+		.s_(1'b1),
 		.d(M57_6),
 		.c(M71_5),
 		.r_(puf),
@@ -224,7 +224,7 @@ module fps(
 
 	univib #(.ticks(FP_KC2_TICKS)) VIB_KC2(
 		.clk(__clk),
-		.a_(0),
+		.a_(1'b0),
 		.b(M55_9),
 		.q_(ekc_fp_)
 	);
@@ -235,10 +235,10 @@ module fps(
 
 	wire M73_15;
 	ffjk REG_START(
-		.s_(1),
+		.s_(1'b1),
 		.j(~efp_),
 		.c_(got_),
-		.k(1),
+		.k(1'b1),
 		.r_(_0_f_),
 		.q(M73_15)
 	);
@@ -528,9 +528,9 @@ module fps(
 	wire lpa_ = ~lpa;
 	ffjk REG_LPA(
 		.s_(M40_6),
-		.j(1),
+		.j(1'b1),
 		.c_(M16_3),
-		.k(1),
+		.k(1'b1),
 		.r_(M51_6),
 		.q(lpa)
 	);

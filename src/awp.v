@@ -177,7 +177,7 @@ fps #(
 // -----------------------------------------------------------------------
 
 wire [0:7] d;
-wire d_1, g, wdt, wt, fic_, fic, c_f, v_f, m_f, z_f, dw, ad, sd$_, mw_, dw_, af, sf, mf_, df_, dw_df, mw_mf, af_sf_, ad_sd, ff_, ss, puf, fwz, _end, ws_, di, wc_, d_2, t_1, t0_t_1, ok, nz, opsu, ta, m_1, ck_, m_40, m_32, sgn_t0_c0, sgn_;
+wire g, wdt, wt, fic_, fic, c_f, v_f, m_f, z_f, dw, ad, sd$_, mw_, dw_, af, sf, mf_, df_, dw_df, mw_mf, af_sf_, ad_sd, ff_, ss, puf, fwz, ws_, di, wc_, t_1, t0_t_1, ok, nz, opsu, ta, m_1, ck_, m_40, m_32, sgn_t0_c0, sgn_;
 
 fpm #(
 	.FP_FI0_TICKS(FP_FI0_TICKS)
@@ -185,7 +185,7 @@ fpm #(
 	.opta(opta),
 	.opm(opm),
 	.__clk(__clk),
-	.w(w),
+	.w(w[8:15]),
 	.l_d_(l_d_),
 	._0_d(_0_d),
 	.lkb_(lkb_),
@@ -193,7 +193,6 @@ fpm #(
 	.fcb_(fcb_),
 	.scc_(scc_),
 	.pc8(pc8),
-	.d_1(d_1),
 	._0_f_(_0_f_),
 	.f2_(f2_),
 	.strob2_fp(strob2_fp),
@@ -235,7 +234,6 @@ fpm #(
 	.f7_(f7_),
 	.f6_(f6_),
 	.fwz(fwz),
-	._end(_end),
 	.ws_(ws_),
 	.lp_(lp_),
 	.f8_(f8_),
@@ -246,7 +244,6 @@ fpm #(
 	.wc_(wc_),
 	.fi1_(fi1_),
 	.fi2_(fi2_),
-	.d_2(d_2),
 	.w0_(~w[0]),
 	.t_1_t_1(t_1_t_1),
 	.fp0_(fp0_),
@@ -297,7 +294,7 @@ fpm #(
 // --- F-PA --------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire t_0_1_, t_2_7_, c0_eq_c1, c1_, fc0_, t1_, t0_eq_c0, t0_c0, t0_t1, m0_, t0_, fp0_, t_8_15_, m14_, m15_, fp16_, t16_, m32_, m38_, m39_, c39_, p32_, t39_, t_32_39_, t_16_23_, t_24_31_;
+wire t_0_1_, t_2_7_, c0_eq_c1, fc0_, t1_, t0_eq_c0, t0_c0, t0_t1, m0_, t0_, fp0_, t_8_15_, m14_, m15_, fp16_, t16_, m32_, m38_, m39_, c39_, p32_, t39_, t_32_39_, t_16_23_, t_24_31_;
 
 fpa FPA(
 	.opta(opta),
@@ -318,7 +315,6 @@ fpa FPA(
 	.clockm(clockm),
 	._0_m(_0_m),
 	.c0_eq_c1(c0_eq_c1),
-	.c1_(c1_),
 	.fc0_(fc0_),
 	.t1_(t1_),
 	.t0_eq_c0(t0_eq_c0),
