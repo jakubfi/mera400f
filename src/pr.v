@@ -81,8 +81,9 @@ module pr(
 
 	wire w_r = ~w_r_;
 	wire strob1 = ~strob1_;
-	wire strob_a = ~(as2 | strob1_);
-	wire strob_b = ~(~as2 | strob2_);
+	wire strob2 = ~strob2_;
+	wire strob_a = ~as2 & strob1;
+	wire strob_b =  as2 & strob2;
 
 	wire M53_6 = ~(rb_ & ra_ & rc_); // r1-r7 selected
 	wire M60_6 = ~(~wa_ & rpc);
@@ -137,7 +138,7 @@ module pr(
 	r0_9_15 R0_LOW(
 		.w(w[9:15]),
 		.lrp(lrp),
-		.zer_(zer_),
+		.zer(zer),
 		.r0(R0_9_15)
 	);
 
@@ -187,10 +188,10 @@ module pr(
 	wire w_legy = ~(M62_6 & lr0 & M62_8);
 	wire lrp = lr0 & M61_8 & M61_12;
 	wire w8_x = ~(M61_12 & lr0 & M61_8);
-	wire cleg_ = ~(strob_b & ust_leg);
+	wire cleg = strob_b & ust_leg;
 
-	wire vg_ = ~((~aryt & ~(zs | carry_)) | (~(zs | s_1) & aryt));
-	wire vl_ = ~((~aryt & carry_) | (aryt & s_1));
+	wire vg = (~aryt & ~(zs | carry_)) | (~(zs | s_1) & aryt);
+	wire vl = (~aryt & carry_) | (aryt & s_1);
 
 	// sheets 8..9, pages 2-65..2-66
 	// * R0 register positions 0-9: CPU flags: ZMVCLEGYX
@@ -202,18 +203,18 @@ module pr(
 		.zs(zs),
 		.s_1(s_1),
 		.s0(s0),
-		.carry_(carry_),
-		.vl_(vl_),
-		.vg_(vg_),
-		.exy_(exy_),
-		.exx_(exx_),
+		.carry(~carry_),
+		.vl(vl),
+		.vg(vg),
+		.exy(~exy_),
+		.exx(~exx_),
 		.strob1(strob1),
 		.ust_z(ust_z),
 		.ust_v(ust_v),
 		.ust_mc(ust_mc),
 		.ust_y(ust_y),
 		.ust_x(ust_x),
-		.cleg_(cleg_),
+		.cleg(cleg),
 		.w_zmvc(w_zmvc),
 		.w_legy(w_legy),
 		.w8_x(w8_x),
