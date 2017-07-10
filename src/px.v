@@ -81,8 +81,8 @@ module px(
 	// sheet 6
 	input sbar$,		// A53
 	input q,				// A55 - Q system flag
-	input in_,			// A03 - instruction IN
-	input ou_,			// B19 - instruction OU
+	input in,			// A03 - instruction IN
+	input ou,			// B19 - instruction OU
 	input k2fetch_,	// B41
 	input red_fp_,	// A39
 	output pn_nb,		// B94 - PN->NB
@@ -121,7 +121,7 @@ module px(
 	input zw1_,			// A85 - module 1 allowed to use the system bus (CPU) (ZezWolenie 1)
 	input srez$,		// B76
 	input wzi,			// A60
-	input is_,			// A84
+	input is,			// A84
 	input ren_,			// B74
 	input rok_,			// A89
 	input efp_,			// B09
@@ -295,10 +295,10 @@ module px(
 	assign bar_nb_ = ~(barnb & zwzg);
 	assign barnb = (i3 & sp) | (ww & sbar$) | (sbar$ & wr) | (q & M28_8);
 	assign q_nb = zwzg & i2_;
-	wire inou = ~(in_ & ou_);
-	wire M40_8 = ~(i2_ & (in_ | wm_) & k1_);
+	wire inou = ~(~in & ~ou);
+	wire M40_8 = ~(i2_ & (~in | wm_) & k1_);
 	assign df_ = ~(M40_8 & zwzg);
-	wire M49_3 = ~(ou_ | wm_) ^ w;
+	wire M49_3 = ~(~ou | wm_) ^ w;
 	assign w_dt_ = ~(M49_3 & zwzg);
 	assign dr_ = ~(r & zwzg);
 	// FIX: -K2FETCH was labeled +K2FETCH
@@ -306,7 +306,7 @@ module px(
 	assign dt_w_ = ~(M40_8 | r);
 	assign ar_ad_ = ~(M30_8 & zwzg);
 	// FIX: -DS was missing on schematic (together with its driver gate)
-	assign ds_ = ~(~(ou_ | wm_) & zwzg);
+	assign ds_ = ~(~(~ou | wm_) & zwzg);
 
 	// sheet 7, page 2-7
 	// * system bus drivers
@@ -367,7 +367,7 @@ module px(
 	assign zg = ~(zgi_ & ~M47_15 & ~(zw & oken));
 	wire zw = ~zw1_;
 
-	wire M46_8 = clo_ & ~(strob2 & w$ & wzi & ~is_);
+	wire M46_8 = clo_ & ~(strob2 & w$ & wzi & is);
 	wire M47_15;
 	ffjk JK47(
 		.s_(1'b1),

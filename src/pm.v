@@ -71,7 +71,7 @@ module pm(
 	input b0_,
 	input na_,
 	input c0,
-	input ka2_,
+	input ka2,
 	input ka1_,
 	// sheet 7
 	input p3_,
@@ -123,7 +123,7 @@ module pm(
 	input ir8,
 	output lk,
 	// sheet 12
-	input rj_,
+	input rj,
 	input uj$_,
 	input lwt$_,
 	input sr$_,
@@ -132,7 +132,7 @@ module pm(
 	input rpc,
 	input rc$_,
 	input ng$_,
-	input ls_,
+	input ls,
 	input oc$_,
 	input wa_,
 	input wm_,
@@ -142,15 +142,15 @@ module pm(
 	input wp_,
 	output wls,
 	// sheet 13
-	input ri_,
+	input ri,
 	input war,
 	input wre,
 	input i3_,
 	input s_fp_,
 	input sar$,
 	input lar$,
-	input in_,
-	input bs_,
+	input in,
+	input bs,
 	input zb$_,
 	output w_r_,
 	// sheet 14
@@ -176,9 +176,9 @@ module pm(
 	input we_,
 	input ib_,
 	input ir6,
-	input cb_,
+	input cb,
 	input i5_,
-	input rb$_,
+	input rb$,
 	input w$_,
 	input i3_ex_prz_,
 	output baa,
@@ -461,7 +461,7 @@ module pm(
 	wire bla = p4 & ka1ir6 & wpp_;
 	// FIX: +NAIR6 was -NAIR6
 	wire nair6 = ~na_ & ir6;
-	wire ka12x = ~(~(~na_ & c0) & ka2_ & ka1_);
+	wire ka12x = ~(~(~na_ & c0) & ~ka2 & ka1_);
 	wire ka1ir6 = ka1 & ir6;
 	wire ka1 = ~ka1_;
 
@@ -577,27 +577,25 @@ module pm(
 	
 	// sheet 12, page 2-22
 
-	wire rj = ~rj_;
-	wire ruj = ~(rj_ & uj$_);
-	wire pac_ = ~(uj$_ & rj_ & lwt$_);
+	wire ruj = ~(~rj & uj$_);
+	wire pac_ = ~(uj$_ & ~rj & lwt$_);
 	wire lwtsr = ~(lwt$_ & sr$_);
 	wire lrcblac = ~(lac$_ & lrcb_);
 	wire lrcb_ = lrcb$_;
 	wire pat_ = ~(lrcb_ & sr$_);
 	// name conflict: wire rc_ = rc$_;
-	wire rjcpc = ~(rj_ & ~rpc & rc$_);
+	wire rjcpc = ~(~rj & ~rpc & rc$_);
 	wire ng_ = ng$_;
-	wire lrcbngls$ = ~(lrcb_ & ng_ & ls_);
-	wire ls = ~ls_;
+	wire lrcbngls$ = ~(lrcb_ & ng_ & ~ls);
 	// NOTE: Reset condition was "~-LS" on original schematic and "~(-WE|-LS)" in DTR
 	// Both were wrong. Fixed to what was done in hardware: ~(W&|-LS).
-	wire M95_10 = ~(w$ | ls_);
+	wire M95_10 = ~(w$ | ~ls);
 	wire wls_ = ~(M95_10 & wls);
 	assign wls = ~(wls_ & wa_);
 	wire wa = ~wa_;
 	wire oc_ = oc$_;
-	wire M24_8 = ~(oc_ & bs_ & w$);
-	wire M36_3 = ~(ls_ & we);
+	wire M24_8 = ~(oc_ & ~bs & w$);
+	wire M36_3 = ~(~ls & we);
 	wire w = ~(wa_ & M24_8 & M36_3 & wm_ & wz_ & ww_ & wr_ & wp_);
 	wire wr = ~wr_;
 	wire wrww = ~(wr_ & ww_);
@@ -605,13 +603,12 @@ module pm(
 	// sheet 13, page 2-23
 	//  * W bus to Rx microoperation
 
-	wire ri = ~ri_;
 	wire warx_ = ~((p1 & wpp_) | (wpp_ & p3) | (ri & wa) | (war & ur));
 	wire M50_8 = ~((ur & wre) | (lipsp & lg_1 & i3) | (lwtsr & wp) | (wa & rjcpc));
-	wire M66_8 = ~((wr & sar$) | (~zb_ & we) | (lar$ & w$) | (wm & ~in_ & rok));
+	wire M66_8 = ~((wr & sar$) | (~zb_ & we) | (lar$ & w$) | (wm & in & rok));
 	assign w_r_ = M50_8 & s_fp_ & M66_8;
 	// FIX: -7->RKOD was a active-high output of a 7451, which has active-low outputs
-	wire _7_rkod = (w$ & ~bs_) | (ls & we);
+	wire _7_rkod = (w$ & bs) | (ls & we);
 	wire wm = ~wm_;
 	wire wm$ = ~wm_;
 	wire wp = ~wp_;
@@ -622,7 +619,7 @@ module pm(
 	//  * W bus to IC, AC, AR microoperations
 
 	wire M53_8 = ~((lg_0 & lipsp & i3) | (ljkrb & we) | (wp & ruj) | (ur & wic));
-	wire M36_6 = ~(bs_ & wls_);
+	wire M36_6 = ~(~bs & wls_);
 	wire M52_8 = ~((M36_6 & we) | (ur & wac) | (wa & lrcbngls$) | (wr & lrcblac));
 	wire M68_8 = ~((wls_ & ls & we) | (we & ~lwrs_) | (wp & ~lrcb_));
 	wire M23_8 = ~(inou & wr);
@@ -650,11 +647,11 @@ module pm(
 	wire M8_8 = ~(ib_ & ng_);
 	wire M9_6 = ~(~ir6 | zb_) ^ lj;
 	wire M9_3 = ~(zb_ | ir6) ^ lj;
-	wire M8_6 = ~(cb_ & oc_);
+	wire M8_6 = ~(~cb & oc_);
 	wire M67_8 = (we & M9_6) | (w$ & M8_8);
 	wire M72_8 = (M8_8 & w$) | (M8_6 & w$) | (we & M9_3) | (na_ & p3);
 	wire M71_8 = ~((w$ & ls) | (psr & war));
-	wire M89_4 = ~(wpb | rb$_);
+	wire M89_4 = ~(wpb | ~rb$);
 	wire M71_6 = ~((na_ & p3) | (w$ & M89_4));
 	// FIX: M10_4 was labeled as a NAND gate, instead of NOR
 	wire M10_4 = ~(ir6 | rc$_);
@@ -694,7 +691,7 @@ module pm(
 
 	wire bw = blw_pw | (ww & ~rz_);
 	assign bwa = bw;
-	assign bwb = bw | (~cb_ & wpb & wr);
+	assign bwb = bw | (cb & wpb & wr);
 
 	wire wirpsr = wir & psr;
 	wire mwax_ = ~((i3_ex_prz & lg_3) | (wp & pac_) | (ri & ww) | (wac & psr));
