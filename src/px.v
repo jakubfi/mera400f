@@ -68,8 +68,8 @@ module px(
 	// sheet 5
 	input przerw_z,	// A61
 	input przerw_,	// A24
-	input lip_,			// B77
-	input sp_,			// A67
+	input lip,			// B77
+	input sp,			// A67
 	input lg_0,			// B67
 	input pp_,			// A64
 	input lg_3,			// A68 - LG=3 (Licznik Grupowy)
@@ -97,10 +97,10 @@ module px(
 	output ar_ad_,	// B63 - AR->AD
 	output ds_,			// A88 - DS: "Send" Driver // NOTE: missing on original schematic
 	// sheet 7
-	input mcl_,			// A43 - instruction MCL
-	input gi_,			// A47
+	input mcl,			// A43 - instruction MCL
+	input gi,			// A47
 	input ir6,			// B58
-	input fi_,			// A10
+	input fi,			// A10
 	input arz,			// B56
 	input k2_bin_store_,	// A31
 	input lrz_,			// B78
@@ -262,24 +262,23 @@ module px(
 	// sheet 5, page 2-5
 	// interrupt phase control signals
 
-	assign arm4 = strob2 & i1 & ~lip_;
+	assign arm4 = strob2 & i1 & lip;
 	assign blw_pw = ~przerw_z & lg_3 & i3 & ~przerw_;
 	// FIX: -I4 was +I4
-	wire ei5 = ~(i4_ & ~(~lip_ & i1));
+	wire ei5 = ~(i4_ & ~(lip & i1));
 	wire exrprzerw = ~(przerw_ & exr_);
 	wire ei2 = i1 & przerw_z;
 	wire exr = ~exr_;
 	wire ei4 = i3 & lg_0;
 	wire i3lips_ = ~(lipsp$ & i3);
 	// FIX: -EKC*I was labeled -EKC*1
-	assign ekc_i_ = ~((lg_3 & ~i3lips_) | (i5 & lip_));
-	assign zer_sp_ = ~(lip_ & i5);
-	wire lipsp$ = ~(lip_ & sp_);
+	assign ekc_i_ = ~((lg_3 & ~i3lips_) | (i5 & ~lip));
+	assign zer_sp_ = ~(~lip & i5);
+	wire lipsp$ = ~(~lip & ~sp);
 	assign lipsp$_ = ~lipsp$;
-	wire ei1 = ~(exr_ & lip_) & ~pp_;
-	wire sp = ~sp_;
+	wire ei1 = ~(exr_ & ~lip) & ~pp_;
 	wire ei3 = (~przerw_z & ~przerw_ & i1) | (i1 & ~exr_) | (sp & ~pp_) | (i2) | M25;
-	wire M25 = (i5 & ~lip_) | (lipsp$_ & ~lg_0 & i3) | (i3 & lipsp$ & ~lg_3);
+	wire M25 = (i5 & lip) | (lipsp$_ & ~lg_0 & i3) | (i3 & lipsp$ & ~lg_3);
 
 	// sheet 6, page 2-6
 
@@ -312,8 +311,8 @@ module px(
 	// * system bus drivers
 
 	assign ic_ad_ = ~(zwzg & ~(k1_ & p1_ & ~(inou & wr)));
-	assign dmcl_ = ~(zwzg & ~(mcl_ | wm_));
-	wire M44_1 = ~(wm_ | gi_);
+	assign dmcl_ = ~(zwzg & ~(~mcl | wm_));
+	wire M44_1 = ~(wm_ | ~gi);
 	assign ddt15_ = ~(zwzg & M44_1);
 	assign ddt0_ = ~(zwzg & (M44_1 & ir6));
 	assign din_ = ~(zwzg & M44_1);
@@ -332,7 +331,7 @@ module px(
 	wire rw = r ^ w;
 	// FIX: -K2FBS was labeled +K2FBS
 	wire k2fbs_ = k2_bin_store_ & k2fetch_;
-	assign ck_rz_w = ~(~(wr & ~fi_) & lrz_ & ~blw_pw);
+	assign ck_rz_w = ~(~(wr & fi) & lrz_ & ~blw_pw);
 
 	wire __ck_rz_w_dly;
 	dly #(.ticks(2'd2)) DLY_ZERZ( // 2 ticks @50MHz = 40ns (~25ns orig.)

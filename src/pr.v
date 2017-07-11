@@ -62,11 +62,11 @@ module pr(
 	// sheet 10-11
 	input kia,				// B81
 	input kib,				// A91
-	input [0:15] rz,	// B70, B76, B60, B66, A60, A64, A68, A56, B80, A80, A74, A84, A77, B74, A71, B57
+	input [0:15] bus_rz,	// B70, B76, B60, B66, A60, A64, A68, A56, B80, A80, A74, A84, A77, B74, A71, B57
 										// NOTE: rz[14] is rz30, rz[15] is rz31
 	input [0:15] zp,	// B68, B72, B62, B64, A62, B63, A66, A58, B78, A82, A75, A85, A78, A83, A70, A54
 	input [0:9] rs,		// B69, B75, B61, B65, A61, A63, A67, A57, B79, A81
-	output [0:15] ki	// B71, B77, B59, B67, A59, A65, A69, A55, B82, A79, A73, B73, A76, A88, A72, B58
+	output [0:15] bus_ki	// B71, B77, B59, B67, A59, A65, A69, A55, B82, A79, A73, B73, A76, A88, A72, B58
 );
 
 	parameter CPU_NUMBER;
@@ -228,11 +228,11 @@ module pr(
 	bus_ki BUS_KI(
 		.kia(kia),
 		.kib(kib),
-		.rz(rz),
+		.rz(bus_rz),
 		.sr({rs[0:9], q, bs, nb[0:3]}),
 		.rb(rRB),
 		.zp(zp),
-		.ki(ki)
+		.ki(bus_ki)
 	);
 
 endmodule

@@ -10,7 +10,7 @@
 module pa(
 	// sheet 1
 	input [0:15] ir,
-	input [0:15] ki,
+	input [0:15] bus_ki,
 	input [0:15] rdt_,
 	input w_dt_,
 	input mwa,
@@ -97,7 +97,7 @@ module pa(
 		.ir(ir),
 		.kl(kl),
 		.rdt_(rdt_),
-		.ki(ki),
+		.ki(bus_ki),
 		.at(at),
 		.ac(ac),
 		.a(a),

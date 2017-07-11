@@ -176,8 +176,8 @@ px #(
 	.strob1(strob1),
 	.przerw_z(przerw_z),
 	.przerw_(przerw_),
-	.lip_(lip_),
-	.sp_(sp_),
+	.lip(lip),
+	.sp(sp),
 	.lg_0(lg_0),
 	.pp_(pp_),
 	.lg_3(lg_3),
@@ -203,10 +203,10 @@ px #(
 	.dt_w_(dt_w_),
 	.ar_ad_(ar_ad_),
 	.ds_(ds_),
-	.mcl_(mcl_),
-	.gi_(gi_),
+	.mcl(mcl),
+	.gi(gi),
 	.ir6(ir[6]),
-	.fi_(fi_),
+	.fi(fi),
 	.arz(arz),
 	.k2_bin_store_(k2_bin_store_),
 	.lrz_(lrz_),
@@ -341,7 +341,7 @@ pm #(
 	.lipsp$_(lipsp$_),
 	.gr$_(gr$_),
 	.wx_(wx_),
-	.shc_(shc_),
+	.shc(shc),
 	.read_fp_(read_fp_),
 	.ir7(ir[7]),
 	.inou$_(inou$_),
@@ -375,8 +375,8 @@ pm #(
 	.lac$_(lac$_),
 	.lrcb$_(lrcb$_),
 	.rpc(rpc),
-	.rc$_(rc$_),
-	.ng$_(ng$_),
+	.rc$(rc$),
+	.ng$(ng$),
 	.ls(ls),
 	.oc$_(oc$_),
 	.wa_(wa_),
@@ -395,7 +395,7 @@ pm #(
 	.lar$(lar$),
 	.in(in),
 	.bs(bs),
-	.zb$_(zb$_),
+	.zb$(zb$),
 	.w_r_(w_r_),
 	.wic(wic),
 	.i4_(i4_),
@@ -406,8 +406,8 @@ pm #(
 	.w_ar(w_ar),
 	.wrz(wrz),
 	.wrs(wrs),
-	.mb_(mb_),
-	.im_(im_),
+	.mb(mb),
+	.im(im),
 	.lj_(lj_),
 	.lwrs$_(lwrs$_),
 	.jkrb$_(jkrb_),
@@ -415,7 +415,7 @@ pm #(
 	.w_bar(w_bar),
 	.w_rm(w_rm),
 	.we_(we_),
-	.ib_(ib_),
+	.ib(ib),
 	.ir6(ir[6]),
 	.cb(cb),
 	.i5_(i5_),
@@ -429,7 +429,7 @@ pm #(
 	.ab(ab),
 	.at15_(at15_),
 	.srez$(srez$),
-	.rz_(rz_),
+	.rz(rz),
 	.wir(wir),
 	.blw_pw(blw_pw),
 	.wpb_(wpb_),
@@ -438,7 +438,7 @@ pm #(
 	.kia(kia),
 	.kib(kib),
 	.w_ir(w_ir),
-	.ki_(ki_),
+	.ki(ki),
 	.dt_w_(dt_w_),
 	.f13_(f13_),
 	.wkb(wkb),
@@ -452,7 +452,7 @@ pm #(
 // -----------------------------------------------------------------------
 
 wire [0:15] ir;
-wire c0, ls, rj, bs, ou, in, is, ri, pufa, rb$, cb, sc$, oc$_, ka2, gr$_, hlt, mcl_, sin_, gi_, lip_, mb_, im_, ki_, fi_, sp_, rz_, ib_, lpc, rpc, shc_, rc$_, ng$_, zb$_, b0_, _0_v, md, xi, nef, amb, apb, jkrb_, lwrs$_, saryt, ap1, am1, bcoc$, sd, scb, sca, sb, sab, saa, lrcb$_, aryt, sbar$, nrf, ust_z, ust_v, ust_mc, ust_leg, eat0, sr$_, ust_y, ust_x, blr_, ewa, ewp, uj$_, lwt$_, lj_, ewe, ekc_1_, ewz, ew$, lar$, ssp$, ka1_, na_, exl_, p16_, ewr, ewm, efp_, sar$, eww, srez$, ewx, axy, inou$_, ekc_2_, lac$_;
+wire c0, ls, rj, bs, ou, in, is, ri, pufa, rb$, cb, sc$, oc$_, ka2, gr$_, hlt, mcl, sin, gi, lip, mb, im, ki, fi, sp, rz, ib, lpc, rpc, shc, rc$, ng$, zb$, b0_, _0_v, md, xi, nef, amb, apb, jkrb_, lwrs$_, saryt, ap1, am1, bcoc$, sd, scb, sca, sb, sab, saa, lrcb$_, aryt, sbar$, nrf, ust_z, ust_v, ust_mc, ust_leg, eat0, sr$_, ust_y, ust_x, blr_, ewa, ewp, uj$_, lwt$_, lj_, ewe, ekc_1_, ewz, ew$, lar$, ssp$, ka1_, na_, exl_, p16_, ewr, ewm, efp_, sar$, eww, srez$, ewx, axy, inou$_, ekc_2_, lac$_;
 
 pd #(
 	.INOU_USER_ILLEGAL(INOU_USER_ILLEGAL)
@@ -478,23 +478,23 @@ pd #(
 	.ka2(ka2),
 	.gr$_(gr$_),
 	.hlt(hlt),
-	.mcl_(mcl_),
-	.sin_(sin_),
-	.gi_(gi_),
-	.lip_(lip_),
-	.mb_(mb_),
-	.im_(im_),
-	.ki_(ki_),
-	.fi_(fi_),
-	.sp_(sp_),
-	.rz_(rz_),
-	.ib_(ib_),
+	.mcl(mcl),
+	.sin(sin),
+	.gi(gi),
+	.lip(lip),
+	.mb(mb),
+	.im(im),
+	.ki(ki),
+	.fi(fi),
+	.sp(sp),
+	.rz(rz),
+	.ib(ib),
 	.lpc(lpc),
 	.rpc(rpc),
-	.shc_(shc_),
-	.rc$_(rc$_),
-	.ng$_(ng$_),
-	.zb$_(zb$_),
+	.shc(shc),
+	.rc$(rc$),
+	.ng$(ng$),
+	.zb$(zb$),
 	.b0_(b0_),
 	.q(q),
 	.mc_3(mc_3),
@@ -582,7 +582,7 @@ pd #(
 wire [0:15] l;
 wire zgpn, zer_;
 wire [0:8] r0;
-wire [0:15] ki;
+wire [0:15] bus_ki;
 
 pr #(
 	.CPU_NUMBER(CPU_NUMBER),
@@ -636,10 +636,10 @@ pr #(
 	.ust_x(ust_x),
 	.kia(kia),
 	.kib(kib),
-	.rz(rz),
+	.bus_rz(bus_rz),
 	.zp(zp),
 	.rs(rs),
-	.ki(ki)
+	.bus_ki(bus_ki)
 );
 
 // -----------------------------------------------------------------------
@@ -647,7 +647,7 @@ pr #(
 // -----------------------------------------------------------------------
 
 wire [0:9] rs;
-wire [0:15] rz;
+wire [0:15] bus_rz;
 wire przerw_z, pp_dad11_, pp_dad12_, pp_dad13_, pp_dad14_, pp_dad4_, pp_dad15_;
 
 pp #(
@@ -669,7 +669,7 @@ pp #(
 	.zerrz_(zerz_),
 	.i1_(i1_),
 	.przerw_(przerw_),
-	.rz(rz),
+	.bus_rz(bus_rz),
 	.rpa_(rpa_),
 	.zegar_(zegar_),
 	.xi_(xi$_),
@@ -683,7 +683,7 @@ pp #(
 	.oprq_(oprq_),
 	.ir14(ir[14]),
 	.wx_(wx_),
-	.sin_(sin_),
+	.sin(sin),
 	.ir15(ir[15]),
 	.rin_(rin_),
 	.zw(zw),
@@ -715,7 +715,7 @@ wire [0:15] pa_dad_;
 
 pa PA(
 	.ir(ir),
-	.ki(ki),
+	.bus_ki(bus_ki),
 	.rdt_(rdt_),
 	.w_dt_(w_dt_),
 	.mwa(mwa),

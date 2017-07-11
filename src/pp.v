@@ -24,7 +24,7 @@ module pp(
 	input zerrz_,
 	input i1_,
 	input przerw_,
-	output [0:15] rz,
+	output [0:15] bus_rz,
 	// sheet 4
 	input rpa_,
 	input zegar_,
@@ -47,7 +47,7 @@ module pp(
 	// sheet 10
 	input ir14,
 	input wx_,
-	input sin_,
+	input sin,
 	input ir15,
 	// sheet 11
 	input rin_,
@@ -130,7 +130,7 @@ module pp(
 	// FIX: missing connection from M104.12 to M89.5, M70.2
 
 	// RZ input: software interrupt drivers (sheet 10)
-	wire M104_12 = ~wx_ & ~sin_ & strob1;
+	wire M104_12 = ~wx_ & sin & strob1;
 	wire M89_6 = ~(ir14 & M104_12);
 	wire M70_3 = ~(ir15 & M104_12);
 
@@ -205,7 +205,7 @@ module pp(
 
 	// RZ output: only non-channel interrupts are available to the user
 	wire [0:31] __rz;
-	assign rz = {
+	assign bus_rz = {
 		__rz[0:11],
 		__rz[28:31]
 	};
