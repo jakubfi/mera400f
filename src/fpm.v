@@ -298,12 +298,10 @@ module fpm(
 	assign af = ~af_;
 	assign sf = ~sf_;
 	wire df = ~df_;
-	decoder_bcd ID(
-		.a(ir[9]),
-		.b(ir[8]),
-		.c(ir[7]),
-		.d(~pufa),
-		.o_({ad_, sd$_, mw_, dw_, af_, sf_, mf_, df_, __NC, __NC})
+	decoder8 ID(
+		.i(ir[7:9]),
+		.ena_(~pufa),
+		.o_({ad_, sd$_, mw_, dw_, af_, sf_, mf_, df_})
 	);
 
 	wire f9df = df & f9;

@@ -188,47 +188,39 @@ module pd(
 	// * B/N opcode group decoder
 	// * C opcode group decoder
 
-	wire [1:7] a_eq_;
-	decoder_bcd DEC_A_EQ(
-		.a(ir[9]),
-		.b(ir[8]),
-		.c(ir[7]),
-		.d(1'b0),
-		.o_({__NC, a_eq_, __NC, __NC})
+	wire [0:7] a_eq_;
+	decoder8 DEC_A_EQ(
+		.i(ir[7:9]),
+		.ena_(1'b0),
+		.o_({a_eq_})
 	);
 	wire snef = ~&a_eq_[5:7];
 
 	wire hlt_;
-	decoder_bcd DEC_S(
-		.a(ir[9]),
-		.b(ir[8]),
-		.c(ir[7]),
-		.d(~s),
-		.o_({hlt_, mcl_, sin_, gi_, lip_, __NC, __NC, __NC, __NC, __NC})
+	decoder8 DEC_S(
+		.i(ir[7:9]),
+		.ena_(~s),
+		.o_({hlt_, mcl_, sin_, gi_, lip_, __NC, __NC, __NC})
 	);
 	assign hlt = ~hlt_;
 	wire gmio_ = ~(mcl_ & gi_ & ~inou);
 	wire hsm = ~(hlt_ & sin_ & __bn5_);
 
 	wire __bn5_;
-	decoder_bcd DEC_BN(
-		.a(ir[9]),
-		.b(ir[8]),
-		.c(ir[7]),
-		.d(~b_n),
-		.o_({mb_, im_, ki_, fi_, sp_, __bn5_, rz_, ib_, __NC, __NC})
+	decoder8 DEC_BN(
+		.i(ir[7:9]),
+		.ena_(~b_n),
+		.o_({mb_, im_, ki_, fi_, sp_, __bn5_, rz_, ib_})
 	);
 	wire fimb_ = fi_ & im_ & mb_;
 
 	wire b_1 = (ir[10:12] == 1);
 
 	wire ngl_, srz_, lpc_, rpc_;
-	decoder_bcd DEC_D(
-		.a(ir[6]),
-		.b(ir[15]),
-		.c(b_1),
-		.d(~c),
-		.o_({__NC, __NC, __NC, __NC, ngl_, srz_, rpc_, lpc_, __NC, __NC})
+	decoder8 DEC_D(
+		.i({b_1, ir[15], ir[6]}),
+		.ena_(~c),
+		.o_({__NC, __NC, __NC, __NC, ngl_, srz_, rpc_, lpc_})
 	);
 	assign lpc = ~lpc_;
 	assign rpc = ~rpc_;
@@ -238,12 +230,10 @@ module pd(
 
 	wire sx_, __oth4_, sly_, slx_, srxy_;
 	wire M85_3 = ~(c & ~b0_);
-	decoder_bcd DEC_OTHER(
-		.a(ir[15]),
-		.b(ir[14]),
-		.c(ir[13]),
-		.d(M85_3),
-		.o_({rc$_, zb$_, sx_, ng$_, __oth4_, sly_, slx_, srxy_, __NC, __NC})
+	decoder8 DEC_OTHER(
+		.i(ir[13:15]),
+		.ena_(M85_3),
+		.o_({rc$_, zb$_, sx_, ng$_, __oth4_, sly_, slx_, srxy_})
 	);
 	wire ng_ = ng$_;
 	wire zb_ = zb$_;
