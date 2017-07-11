@@ -168,24 +168,11 @@ module pd(
 	wire ir01 = |ir[0:1];
 
 	wire lw, tw, rw, pw, bb, bm, bc, bn;
-	decoder16pos DEC01(
-		.ena({~ir[0], ir[1]}),
-		.i(ir[2:5]),
-		.o({lw, tw, ls, ri, rw, pw, rj, is, bb, bm, bs, bc, bn, ou, in, pufa})
-	);
-
 	wire aw, ac, sw, cw, _or, om, nr, nm, er, em, xr, xm, cl, lb;
-	decoder16pos DEC10(
-		.ena({ir[0], ~ir[1]}),
-		.i(ir[2:5]),
-		.o({aw, ac, sw, cw, _or, om, nr, nm, er, em, xr, xm, cl, lb, rb$, cb})
-	);
-
 	wire awt, trb, irb, drb, cwt, lwt, lws, rws, js, c, s, j, l, g, b_n;
-	decoder16pos DEC11(
-		.ena({ir[0], ir[1]}),
-		.i(ir[2:5]),
-		.o({awt, trb, irb, drb, cwt, lwt, lws, rws, js, ka2, c, s, j, l, g, b_n})
+	idec1 IDEC1(
+		.i(ir[0:5]),
+		.o({lw, tw, ls, ri, rw, pw, rj, is, bb, bm, bs, bc, bn, ou, in, pufa, aw, ac, sw, cw, _or, om, nr, nm, er, em, xr, xm, cl, lb, rb$, cb, awt, trb, irb, drb, cwt, lwt, lws, rws, js, ka2, c, s, j, l, g, b_n})
 	);
 
 	assign sc$ = s | c;

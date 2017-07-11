@@ -11,7 +11,7 @@ SOURCES = mera400f.v \
 	alu181.v carry182.v \
 	dly.v \
 	pr.v regs.v r0.v rb.v nb.v ki.v \
-	pd.v ir.v \
+	pd.v ir.v idec1.v \
 	px.v strobgen.v \
 	pm.v lk.v mc.v lg.v \
 	pp.v rzrp.v \
