@@ -246,29 +246,28 @@ module pd(
 	wire M85_11 = ir[10] | (ir[11] & ir[12]);
 	// jumper a on 1-3 : IN/OU illegal for user
 	// jupmer a on 2-3 : IN/OU legal for user
-	wire M27_8 = ~((INOU_USER_ILLEGAL & inou & q) | (M85_11 & c) | (q & s) | (q & ~snef & b_n));
-	wire M40_8 = ~((md & mc_3) | (c & ir13_14 & b_1) | (snef & s));
+	wire M27_8 = (INOU_USER_ILLEGAL & inou & q) | (M85_11 & c) | (q & s) | (q & ~snef & b_n);
+	wire M40_8 = (md & mc_3) | (c & ir13_14 & b_1) | (snef & s);
 
-	wire M28_6 = ~(~(r0[3] | ~a_eq[7]) & js); // nef JCS
+	wire jjs = j | js;
 
-	wire M2_4 = ~(r0[7] | ~a_eq[6]); // nef JYS
-	wire M2_1 = ~(r0[8] | ~a_eq[5]); // nef JXS
-	wire M2_13 = ~(r0[2] | ~a_eq[4]); // nef JVS
-	wire M2_10 = ~(r0[1] | ~j); // nef JM
-	wire M16_8 = ~((M2_4 & js) | (M2_1 & js) | (M2_13 & js) | (a_eq[5] & M2_10)); // nef J1
+	wire nef_jcs = a_eq[7] & ~r0[3];
+	wire nef_jys = a_eq[6] & ~r0[7];
+	wire nef_jxs = a_eq[5] & ~r0[8];
+	wire nef_jvs = a_eq[4] & ~r0[2];
+	wire nef_js = js & (nef_jcs | nef_jys | nef_jxs | nef_jvs);
 
-	wire M28_11 = ~(~(~a_eq[6] | ~j) & r0[5]); // nef JN
-	wire M1_4 = ~(~j | r0[0]); // nef JZ
-	wire M28_3 = j | js;
-	wire M15_8 = ~(
-		(a_eq[4] & M1_4) |
-		(M28_3 & ~(r0[6] | ~a_eq[3])) | // nef JG
-		(M28_3 & ~(r0[5] | ~a_eq[2])) | // nef JE
-		(M28_3 & ~(r0[4] | ~a_eq[1])) // nef JL
-	);
+	wire nef_jg = a_eq[3] & ~r0[6];
+	wire nef_je = a_eq[2] & ~r0[5];
+	wire nef_jl = a_eq[1] & ~r0[4];
+	wire nef_jjs = jjs & (nef_jg | nef_je | nef_jl);
 
-	assign nef = ~(M27_8 & ir01 & M40_8 & M28_6 & M16_8 & M28_11 & p_ & M15_8);
-	assign xi = ~(M27_8 & M40_8 & ir01);
+	wire nef_jn = j & a_eq[6] & r0[5];
+	wire nef_jm = j & a_eq[5] & ~r0[1];
+	wire nef_jz = j & a_eq[4] & ~r0[0];
+
+	assign xi = ~(~M27_8 & ~M40_8 & ir01);
+	assign nef = ~(~M27_8 & ir01 & ~M40_8 & p_ & ~nef_js & ~nef_jjs & ~nef_jm & ~nef_jn & ~nef_jz);
 
 	// sheet 5, page 2-34
 
