@@ -66,9 +66,9 @@ module pk(
 	// sheet 4
 	input [0:15] w,
 	input p_,
-	input mc_,
-	input alarm_,
-	input wait_,
+	input mc_0,
+	input alarm,
+	input _wait,
 	input irq,
 	input q,
 	input run,
@@ -184,8 +184,8 @@ module pk(
 	wire [7:0] data [3:0];
 	assign data[0] = w[0:7];
 	assign data[1] = w[8:15];
-	assign data[2] = {mode, stop_n, zeg, q, ~p_, ~mc_, irq, run};
-	assign data[3] = {rotary_pos, 2'd0, ~wait_, ~alarm_};
+	assign data[2] = {mode, stop_n, zeg, q, ~p_, ~mc_0, irq, run};
+	assign data[3] = {rotary_pos, 2'd0, _wait, alarm};
 
 	wire send_leds;
 	reg [1:0] snd_state = 0;
@@ -310,9 +310,9 @@ module pk(
 	hex2seg d2(.hex(w[4:7]), .seg(digs[2]));
 	hex2seg d3(.hex(w[0:3]), .seg(digs[3]));
 	assign digs[7][0] = ~p_;
-	assign digs[7][6] = ~mc_;
+	assign digs[7][6] = ~mc_0;
 	assign digs[7][5:1] = 0;
-	assign dots = {run, ~wait_, ~alarm_, irq, mode, stop_n, zeg, q};
+	assign dots = {run, _wait, alarm, irq, mode, stop_n, zeg, q};
 
 	// sheet 5
 

@@ -163,8 +163,8 @@ module pa(
 
 	wire M8_11 = ac[0] ^ a[0];
 	wire M8_3 = ~ac[0] ^ a[0];
-	wire M7_8 = ~((~a[0] & am1) | (M8_11 & apb) | (M8_3 & amb) | (a[0] & ap1));
-	assign s_1 = M7_8 ^ carry_;
+	wire M7_8 = (~a[0] & am1) | (M8_11 & apb) | (M8_3 & amb) | (a[0] & ap1);
+	assign s_1 = ~M7_8 ^ carry_;
 	assign zs = ~(s_1 | zsum_);
 
 	// WZI

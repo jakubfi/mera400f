@@ -55,7 +55,7 @@ module mera400f(
 	// output: to control panel
 	wire p0_;
 	wire [0:15] w;
-	wire hlt_n_, p_, run, wait_, irq, q, mc_, awaria_;
+	wire hlt_n_, p_, run, _wait, irq, q, mc_0, awaria;
 
 	cpu #(
 		.CPU_NUMBER(1'b0),
@@ -117,11 +117,11 @@ module mera400f(
 		.hlt_n_(hlt_n_),
 		.p_(p_),
 		.run(run),
-		.wait_(wait_),
+		._wait(_wait),
 		.irq(irq),
 		.q(q),
-		.mc_(mc_),
-		.awaria_(awaria_),
+		.mc_0(mc_0),
+		.awaria(awaria),
 		// system bus
 		.rpa_(rpa_),
 		.dw_(dw_),
@@ -189,9 +189,9 @@ module mera400f(
 		.zegar_(zegar_),
 		.w(w),
 		.p_(p_),
-		.mc_(mc_),
-		.alarm_(awaria_),
-		.wait_(wait_),
+		.mc_0(mc_0),
+		.alarm(awaria),
+		._wait(_wait),
 		.irq(irq),
 		.q(q),
 		.run(run),

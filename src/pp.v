@@ -21,14 +21,14 @@ module pp(
 	input b_parz_,
 	input ck_rz_w,
 	input b_p0_,
-	input zerrz_,
+	input zerrz,
 	input i1_,
-	input przerw_,
+	input przerw,
 	output [0:15] bus_rz,
 	// sheet 4
 	input rpa_,
 	input zegar_,
-	input xi_,
+	input xi,
 	input fi0_,
 	// sheet 5
 	input fi1_,
@@ -81,25 +81,22 @@ module pp(
 	// sheet 1, 2
 	// * RM - interrupt mask register
 
-	wire clm$ = ~(clm_ & ~(strob1 & i4$));
-	wire clrs_ = ~(strob1 & w_rm); // M44_8 = M44_11 = -CLRS5-9
+	wire clm$ = clm_ & ~(strob1 & i4$);
+	wire clrs = strob1 & w_rm;
 	wire strob1 = ~strob1_;
 	wire i4$ = ~i4_;
-
-  wire [0:9] zi_ = {~zi, 1'b1};
 
 	genvar num;
 	generate
 		for (num=0 ; num<10 ; num=num+1) begin : GEN_REG_RM
-			wire rm_reset_ = ~(zi_[num] & clm$);
+			wire rm_reset_ = zi[num] | clm$;
 			ffd REG_RM(
 				.s_(1'b1),
 				.d(w[num]),
-				.c(clrs_),
+				.c(~clrs),
 				.r_(rm_reset_),
 				.q(rs[num])
 			);
-			// NOTE: Ix = RS[x] (Ix's not included due to name collisions)
 		end
 	endgenerate
 
@@ -111,10 +108,10 @@ module pp(
 		pout_,		// 0 power out (NMI)
 		b_parz_,	// 1 memory parity error
 		b_p0_,		// 2 no memory
-		rz4_,			// 3 other CPU, high priority
+		~rz4,			// 3 other CPU, high priority
 		rpa_,			// 4 interface power out
 		zegar_,		// 5 timer
-		xi_,			// 6 illegal instruction
+		~xi,			// 6 illegal instruction
 		fi0_,			// 7 div overflow (fixed point)
 		fi1_,			// 8 floating point underflow
 		fi2_,			// 9 floating point overflow
@@ -122,29 +119,28 @@ module pp(
 		1'b1,			// 11 unused
 		zk_[0:15],// 12-27 channel interrupts
 		oprq_,		// 28 operator request
-		rz29_,		// 29 other CPU, low priority
-		M89_6,		// 30 software interrupt high
-		M70_3			// 31 software interrupt low
+		~rz29,		// 29 other CPU, low priority
+		~soft_high,	// 30 software interrupt high
+		~soft_low		// 31 software interrupt low
 	};
 
 	// FIX: missing connection from M104.12 to M89.5, M70.2
 
 	// RZ input: software interrupt drivers (sheet 10)
 	wire M104_12 = ~wx_ & sin & strob1;
-	wire M89_6 = ~(ir14 & M104_12);
-	wire M70_3 = ~(ir15 & M104_12);
+	wire soft_high = ir14 & M104_12;
+	wire soft_low = ir15 & M104_12;
 
 	// RZ input: W bus, synchronous (software-set) interrupt sources
 	wire [0:31] INT_SYNC = {
 		w[0:11],		// software-settable interrupts
-		{16{1'b0}}, // channel interrupts cannot be set synchronously
+		16'b0, 			// channel interrupts cannot be set synchronously
 		w[12:15]		// software-settable interrupts
 	};
 
 	// RZ input: clocks
-	wire ck_rzwm = ~(strob1 & ck_rz_w);
-	wire ck_rzwm_ = ~ck_rzwm;
-	wire ck_rzz_ = ~(~(strob1 & ~i2_));
+	wire ck_rzwm_ = strob1 & ck_rz_w;
+	wire ck_rzz_ = strob1 & ~i2_;
 	wire [0:31] RZ_CLK = {
 		{12{ck_rzwm_}},
 		{16{ck_rzz_}},
@@ -152,8 +148,8 @@ module pp(
 	};
 
 	// RZ input: resets
-	wire _0_rzw_ = ~(~(clm_ & zerrz_));
-	wire _0_rzz_ = ~(~(clm_ & k1_));
+	wire _0_rzw_ = clm_ & ~zerrz;
+	wire _0_rzz_ = clm_ & k1_;
 	wire M94_3 = _0_rzw_ & ~(M104_12 & (~ir14 & ~ir15));
 	wire [0:31] RZ_RESET = {
 		{12{_0_rzw_}},
@@ -175,16 +171,10 @@ module pp(
 	};
 
 	// RP input: clocks
-	wire ez_rpz = ~(~i1_ & ~przerw_);
-	wire ez_rpw_ = ~ez_rpz;
-	wire ez_rpz_ = ~ez_rpz;
-	wire [0:31] RP_CLK = {
-		{16{ez_rpw_}},
-		{16{ez_rpz_}}
-	};
+	wire ez_rpz = ~i1_ & przerw;
 
 	// RP output: interrupt mask drivers (to RM)
-	wire [0:8] zi = {
+	wire [0:9] zi = {
 		PRIO_OUT[1],
 		PRIO_OUT[2],
 		PRIO_OUT[3],
@@ -193,7 +183,8 @@ module pp(
 		PRIO_OUT[13],
 		PRIO_OUT[15],
 		PRIO_OUT[21],
-		PRIO_OUT[27]
+		PRIO_OUT[27],
+		1'b0
 	};
 
 	// RP input/output: interrupt priority chain
@@ -225,7 +216,7 @@ module pp(
 				.w(INT_SYNC[j]),					// synchronous interrupt set
 				.rz_c_(RZ_CLK[j]),				// RZ clock
 				.rz_r_(RZ_RESET[j]),			// RZ reset
-				.rp_c(RP_CLK[j]),					// RP clock
+				.rp_c(ez_rpz),						// RP clock
 				.prio_in_(PRIO_IN[j]),		// priority chain input
 				.rz(__rz[j]),							// RZ content
 				.sz(sz[j]),								// RZ & mask
@@ -235,14 +226,7 @@ module pp(
 		end
 	endgenerate
 
-	assign __NC = rp_[0];
-	assign __NC = rp_[16];
-	assign __NC = PRIO_OUT[31];
-	assign __NC = |__rz[12:27];
-
 	// sheet 3
-
-	wire przerw = ~przerw_;
 
 	// sheet 5
 
@@ -290,8 +274,8 @@ module pp(
 	);
 	assign dok_ = ~(~rin_ & M9_5);
 
-	wire rz29_ = ~(M14_6 & ~rdt15_ & ~rdt0_);
-	wire rz4_ = ~(M14_6 & ~rdt15_ & rdt0_);
+	wire rz29 = M14_6 & ~rdt15_ & ~rdt0_;
+	wire rz4 = M14_6 & ~rdt15_ & rdt0_;
 
 	assign irq = ~(&sz);
 

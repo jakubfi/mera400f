@@ -26,9 +26,9 @@ module px(
 	output w$_,	// B43 - state W&
 	output wr_,	// B42 - state WR
 	output we_,	// B45 - state WE
-	input sp1_,	// A11 - Set state P1
+	input sp1,	// A11 - Set state P1
 	input ep1,	// A12 - Enter state P1
-	input sp0_,	// A79 - Set state P0
+	input sp0,	// A79 - Set state P0
 	input ep0,	// A09 - Enter state P0
 	input stp0,	// B48
 	input ep2,	// A21 - Enter state P2
@@ -67,23 +67,23 @@ module px(
 	output strob1,	// A22 A90
 	// sheet 5
 	input przerw_z,	// A61
-	input przerw_,	// A24
+	input przerw,	// A24
 	input lip,			// B77
 	input sp,			// A67
 	input lg_0,			// B67
-	input pp_,			// A64
+	input pp,			// A64
 	input lg_3,			// A68 - LG=3 (Licznik Grupowy)
 	output arm4,		// B79
 	output blw_pw,	// B85
-	output ekc_i_,	// A76 - EKC*I - Enter state KC (Koniec Cyklu)
-	output zer_sp_,	// A73
-	output lipsp$_,	// A66
+	output ekc_i,	// A76 - EKC*I - Enter state KC (Koniec Cyklu)
+	output zer_sp,	// A73
+	output lipsp,	// A66
 	// sheet 6
 	input sbar$,		// A53
 	input q,				// A55 - Q system flag
 	input in,			// A03 - instruction IN
 	input ou,			// B19 - instruction OU
-	input k2fetch_,	// B41
+	input k2fetch,	// B41
 	input red_fp_,	// A39
 	output pn_nb,		// B94 - PN->NB
 	output bp_nb,		// B93 - BP->NB
@@ -102,8 +102,8 @@ module px(
 	input ir6,			// B58
 	input fi,			// A10
 	input arz,			// B56
-	input k2_bin_store_,	// A31
-	input lrz_,			// B78
+	input k2_bin_store,	// A31
+	input lrz,			// B78
 	output ic_ad_,	// B87
 	output dmcl_,		// B88
 	output ddt15_,	// A92
@@ -115,7 +115,7 @@ module px(
 	output dw_,			// A93
 	output i3_ex_przer_,	// A52
 	output ck_rz_w,	// B91
-	output zerz_,		// B85
+	output zerrz,		// B85
 	// sheet 8
 	input sr_fp_,		// B53
 	input zw1_,			// A85 - module 1 allowed to use the system bus (CPU) (ZezWolenie 1)
@@ -142,7 +142,7 @@ module px(
 	output bod,			// A77
 	output b_parz_,	// A56
 	output b_p0_,		// B84
-	output awaria_,	// B90
+	output awaria,	// B90
 	output zz1_,		// A51 - module 1 in this rack is present (CPU)
 	output dad15_ir9_,// B07
 	output dad12_,	// A08
@@ -177,7 +177,7 @@ module px(
 
 	wire p1;
 	ffd REG_P1(
-		.s_(sp1_),
+		.s_(~sp1),
 		.d(ep1),
 		.c(got),
 		.r_(clo_),
@@ -187,7 +187,7 @@ module px(
 
 	wire p0;
 	ffd REG_P0(
-		.s_(clo_ & sp0_),
+		.s_(clo_ & ~sp0),
 		.d(ep0),
 		.c(got),
 		.r_(1'b1),
@@ -263,22 +263,21 @@ module px(
 	// interrupt phase control signals
 
 	assign arm4 = strob2 & i1 & lip;
-	assign blw_pw = ~przerw_z & lg_3 & i3 & ~przerw_;
+	assign blw_pw = ~przerw_z & lg_3 & i3 & przerw;
 	// FIX: -I4 was +I4
 	wire ei5 = ~(i4_ & ~(lip & i1));
-	wire exrprzerw = ~(przerw_ & exr_);
+	wire exrprzerw = ~(~przerw & exr_);
 	wire ei2 = i1 & przerw_z;
 	wire exr = ~exr_;
 	wire ei4 = i3 & lg_0;
-	wire i3lips_ = ~(lipsp$ & i3);
+	wire i3lips_ = ~(lipsp & i3);
 	// FIX: -EKC*I was labeled -EKC*1
-	assign ekc_i_ = ~((lg_3 & ~i3lips_) | (i5 & ~lip));
-	assign zer_sp_ = ~(~lip & i5);
-	wire lipsp$ = ~(~lip & ~sp);
-	assign lipsp$_ = ~lipsp$;
-	wire ei1 = ~(exr_ & ~lip) & ~pp_;
-	wire ei3 = (~przerw_z & ~przerw_ & i1) | (i1 & ~exr_) | (sp & ~pp_) | (i2) | M25;
-	wire M25 = (i5 & lip) | (lipsp$_ & ~lg_0 & i3) | (i3 & lipsp$ & ~lg_3);
+	assign ekc_i = (lg_3 & ~i3lips_) | (i5 & ~lip);
+	assign zer_sp = ~lip & i5;
+	assign lipsp = ~(~lip & ~sp);
+	wire ei1 = ~(exr_ & ~lip) & pp;
+	wire ei3 = (~przerw_z & przerw & i1) | (i1 & ~exr_) | (sp & pp) | (i2) | M25;
+	wire M25 = (i5 & lip) | (~lipsp & ~lg_0 & i3) | (i3 & lipsp & ~lg_3);
 
 	// sheet 6, page 2-6
 
@@ -301,7 +300,7 @@ module px(
 	assign w_dt_ = ~(M49_3 & zwzg);
 	assign dr_ = ~(r & zwzg);
 	// FIX: -K2FETCH was labeled +K2FETCH
-	wire r = ~(k2fetch_ & p5_ & i4_ & i1_ & i3lips_ & wr_ & p1_ & red_fp_);
+	wire r = ~(~k2fetch & p5_ & i4_ & i1_ & i3lips_ & wr_ & p1_ & red_fp_);
 	assign dt_w_ = ~(M40_8 | r);
 	assign ar_ad_ = ~(M30_8 & zwzg);
 	// FIX: -DS was missing on schematic (together with its driver gate)
@@ -325,13 +324,13 @@ module px(
 	wire ABC_A = M40_12 | ~LOW_MEM_WRITE_DENY;
 	wire M59_3 = w & ABC_A;
 	assign dw_ = ~(zwzg & M59_3);
-	wire w = ~(i5_ & i3_ex_przer_ & ww_ & k2_bin_store_);
+	wire w = ~(i5_ & i3_ex_przer_ & ww_ & ~k2_bin_store);
 	// FIX: -I3/EX+PRZERW/ was labeled +I3/EX+PRZERW/
 	assign i3_ex_przer_ = ~(exrprzerw & i3);
 	wire rw = r ^ w;
 	// FIX: -K2FBS was labeled +K2FBS
-	wire k2fbs_ = k2_bin_store_ & k2fetch_;
-	assign ck_rz_w = ~(~(wr & fi) & lrz_ & ~blw_pw);
+	wire k2fbs_ = ~k2_bin_store & ~k2fetch;
+	assign ck_rz_w = ~(~(wr & fi) & ~lrz & ~blw_pw);
 
 	wire __ck_rz_w_dly;
 	dly #(.ticks(2'd2)) DLY_ZERZ( // 2 ticks @50MHz = 40ns (~25ns orig.)
@@ -341,11 +340,11 @@ module px(
 	);
 	wire __ck_rz_w_dly_ = ~__ck_rz_w_dly;
 
-	assign zerz_ = ~(__ck_rz_w_dly_ & ck_rz_w & ~blw_pw);
+	assign zerrz = __ck_rz_w_dly_ & ck_rz_w & ~blw_pw;
 
 	// sheet 8, page 2-8
 
-	wire M64_8 = sr_fp_ & ~si1 & sp1_;
+	wire M64_8 = sr_fp_ & ~si1 & ~sp1;
 	wire M12_6 = wm_ & i2_ & wr_ & ww_;
 	wire M12_8 = i1_ & i3_ & i4_ & i5_;
 	wire M17_8 = k2fbs_ & p1_ & p5_ & k1_;
@@ -431,7 +430,6 @@ module px(
 	assign b_p0_ = ~(rw & talarm);
 
 	wire M55_11 = ~(~(b_parz_ & b_p0_) & bar_nb_);
-	wire awaria;
 	ffd REG_AWARIA(
 		.s_(M55_11),
 		.d(1'b0),
@@ -439,7 +437,6 @@ module px(
 		.r_(stop_),
 		.q(awaria)
 	);
-	assign awaria_ = ~awaria;
 
 	assign zz1_ = 1'b0;
 

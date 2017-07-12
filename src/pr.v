@@ -12,11 +12,11 @@ module pr(
 	input lpc,				// A94 - LPC instruction
 	input wa_,				// B94 - state WA
 	input rpc,				// B03 - RPC instruction
-	input ra_,				// B48 - user register address
-	input rb_,				// B49 - user register address
+	input ra,				// B48 - user register address
+	input rb,				// B49 - user register address
+	input rc,				// A49
 	input as2,				// B43
-	input rc_,				// A49
-	input w_r_,				// B47
+	input w_r,				// B47
 	input strob1_,		// B32
 	input strob2_,		// B42
 	// sheet 2-5
@@ -24,9 +24,9 @@ module pr(
 	output [0:15] l,	// A04, A03, A28, A27, A09, A10, A26, A25, A07, A08, A16, A17, A06, A05, A18, A19 - bus L
 	// sheet 6
 	input bar_nb_,		// B83 - BAR->NB: output BAR register to system bus
-	input w_rbb_,			// A51 - RB[4:9] clock in
-	input w_rbc_,			// B46 - RB[0:3] clock in
-	input w_rba_,			// B50 - RB[10:15] clock in
+	input w_rbb,			// A51 - RB[4:9] clock in
+	input w_rbc,			// B46 - RB[0:3] clock in
+	input w_rba,			// B50 - RB[10:15] clock in
 	output [0:3] dnb_,// A86,  A90, A87, B84 - DNB: NB system bus driver
 	// sheet 7
 	input rpn_,				// B85
@@ -34,7 +34,7 @@ module pr(
 	input pn_nb,			// A92
 	input q_nb,				// B90
 	input w_bar,			// B56 - W->BAR: send W bus to {BAR, Q, BS} registers
-	input zer_sp_,		// A89
+	input zer_sp,		// A89
 	input clm_,				// B93
 	input ustr0_fp_,	// A11
 	input ust_leg,		// B39
@@ -72,41 +72,43 @@ module pr(
 	parameter CPU_NUMBER;
 	parameter AWP_PRESENT;
 
-	// sheets 1..5, pages 2-58..2-62
-	// * user registers control signals
-	// * user registers
-
-	// NOTE: 74170-specific control signals: -CZYTRN, -PISZRN, -CZYTRW, -PISZRW
-	// (sheet 1) are gone because registers don't use 74170 8x4x4bits layout anymore
-
-	wire w_r = ~w_r_;
 	wire strob1 = ~strob1_;
 	wire strob2 = ~strob2_;
 	wire strob_a = ~as2 & strob1;
 	wire strob_b =  as2 & strob2;
 
-	wire M53_6 = ~(rb_ & ra_ & rc_); // r1-r7 selected
+	wire sel_r1_r7 = rb | ra | rc; // r1-r7 selected
+	wire wr0 = ~sel_r1_r7; // R0 selected
+
 	wire M60_6 = ~(~wa_ & rpc);
 
 	wire rpp = blr; // R0>>8 -> L
-	wire rpa = ~blr & ~(M53_6 & M60_6); // R0 -> L
-	// NOTE: RPB = RPA
-	wire RPN = ~blr & M53_6 & M60_6; // R1-R7 -> L
+	wire rpa = ~blr & ~(sel_r1_r7 & M60_6); // R0 -> L
+	wire rpn = ~blr & sel_r1_r7 & M60_6; // R1-R7 -> L
 
-	wire lr0 = ~(lpc & strob_a & ~wa_);
-	wire wr0 = rb_ & rc_ & ra_; // R0 selected
+	wire lr0 = lpc & strob_a & ~wa_;
 
 	wire [0:15] R1_7;
 	regs USER_REGS(
 		.w(w),
-		.addr({~rc_, ~rb_, ~ra_}),
-		.we((strob_a | strob_b) & w_r & M53_6),
+		.addr({rc, rb, ra}),
+		.we((strob_a | strob_b) & w_r & sel_r1_r7),
 		.l(R1_7)
 	);
-
+/*
+	// Nice L bus that upsets the AWP
+	always @ (*) begin
+		case ({blr, sel_r1_r7 & M60_6})
+			2'b00: l = {r0, R0_9_15};
+			2'b01: l = R1_7;
+			2'b10: l = {8'd0, r0[0:7]};
+			2'b11: l = {8'd0, r0[0:7]};
+		endcase
+	end
+*/
 	// L bus final open-collector composition
 	assign l = 
-		(RPN ? R1_7 : 16'hffff) // user registers
+		(rpn ? R1_7 : 16'hffff) // user registers
 		& (rpa ? {r0, R0_9_15} : 16'hffff) // r0 at original position
 		& (rpp ? {8'd0, r0[0:7]} : 16'hffff) // r0 shifted right 8 bits
 	;
@@ -119,9 +121,9 @@ module pr(
 	wire [0:15] rRB;
 	rb REG_RB(
 		.w(w[10:15]),
-		.w_rba_(w_rba_),
-		.w_rbb_(w_rbb_),
-		.w_rbc_(w_rbc_),
+		.w_rba(w_rba),
+		.w_rbb(w_rbb),
+		.w_rbc(w_rbc),
 		.rb(rRB)
 	);
 
@@ -137,7 +139,7 @@ module pr(
 	wire [9:15] R0_9_15;
 	r0_9_15 R0_LOW(
 		.w(w[9:15]),
-		.lrp(lrp),
+		.lrp(~lrp),
 		.zer(zer),
 		.r0(R0_9_15)
 	);
@@ -174,20 +176,22 @@ module pr(
 	);
 
 	// FIX: -ZER*SP on <A89> was labeled as -ZER*FP
-	assign zer_ = zer_sp_ & clm_;
+	assign zer_ = ~zer_sp & clm_;
 
 	// jumper on C-D: no AWP
-	wire M60_3 = ~(AWP_PRESENT & ustr0_fp_ & strob_a);
+	wire M60_3 = strob_a & AWP_PRESENT & ustr0_fp_;
 	// FIX: missing connection from +W->R to M62.2, M62.12, M61.10
-	wire M62_6 = ~(strob_a & w_r & wr0 & ~q);
-	wire M62_8 = ~(~q & wr0 & w_r & strob_b);
-	wire M61_12 = ~(wr0 & w_r & strob_b);
-	wire M61_8 = ~(wr0 & w_r & strob_a);
+	wire M62_6  = strob_a & w_r & wr0 & ~q;
+	wire M62_8  = strob_b & w_r & wr0 & ~q;
+	wire M61_8  = strob_a & w_r & wr0;
+	wire M61_12 = strob_b & w_r & wr0;
 
-	wire w_zmvc = ~(M60_3 & lr0 & M62_8 & M62_6);
-	wire w_legy = ~(M62_6 & lr0 & M62_8);
-	wire lrp = lr0 & M61_8 & M61_12;
-	wire w8_x = ~(M61_12 & lr0 & M61_8);
+	wire w_zmvc = lr0 | M62_8 | M62_6 | M60_3;
+	wire w_legy = lr0 | M62_8 | M62_6;
+
+	wire lrp  = lr0 | M61_8 | M61_12;
+	wire w8_x = lr0 | M61_8 | M61_12;
+
 	wire cleg = strob_b & ust_leg;
 
 	wire vg = (~aryt & ~(zs | carry_)) | (~(zs | s_1) & aryt);

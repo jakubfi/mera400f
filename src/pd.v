@@ -98,9 +98,9 @@ module pd(
 	output ust_x,			// A47
 	output blr,			// A87
 	// sheet 9
-	input wpb_,				// A58
+	input wpb,				// A58
 	input wr_,				// A60
-	input pp_,				// A62
+	input pp,				// A62
 	input ww_,				// B60
 	input wzi,				// A59
 	output ewa,				// A55 - Enter WA
@@ -222,10 +222,10 @@ module pd(
 	assign shc = c & ir[11];
 
 	wire sx, __oth4, sly, slx, srxy;
-	wire M85_3 = c & b0;
+	wire c_b0 = c & b0;
 	decoder8pos DEC_OTHER(
 		.i(ir[13:15]),
-		.ena(M85_3),
+		.ena(c_b0),
 		.o({rc$, zb$, sx, ng$, __oth4, sly, slx, srxy})
 	);
 
@@ -296,7 +296,7 @@ module pd(
 	// * ALU control signals
 
 	wire M90_12 = a | trb | ib;
-	wire M49_6 = ~(~lwrs & ~lj & ~js & ~krb);
+	wire M49_6 = ~(~lwrs & ~lj & ~js & ~krb); // changing this to ORs upsets the CPU
 	assign apb = (~uka & p4) | (M90_12 & w$) | (M49_6 & we);
 	assign amb = (uka & p4) | (cns & w$);
 
@@ -341,8 +341,8 @@ module pd(
 	assign ust_v = (ans ^ (ir[6] & sl)) & w$;
 	assign ust_mc = ans & w$;
 	assign ust_leg = ccb & w$;
-	wire M59_8 = ~((ir[6] & r0[8]) | (~ir[6] & r0[7]));
-	assign eat0 = ~(~srxy | M59_8) ^ ~(~shc | at15_);
+	wire M59_8 = (ir[6] & r0[8]) | (~ir[6] & r0[7]);
+	assign eat0 = ~(~srxy | ~M59_8) ^ ~(~shc | at15_);
 	assign sr = srxy | srz | shc;
 	assign ust_y = (w$ & sl) | (sr & ~shc & wx);
 	wire wx = ~wx_;
@@ -354,16 +354,14 @@ module pd(
 	// * execution phase control signals
 
 	wire M77_8 = ng$ | ri | rj;
-	assign ewa = (pcrs & ~pp_) | (M77_8 & ~pp_) | (we & (~wls & ls)) | (wpb_ & lbcb & wr);
+	assign ewa = (pcrs & pp) | (M77_8 & pp) | (we & (~wls & ls)) | (~wpb & lbcb & wr);
 	wire wr = ~wr_;
 	wire prawy = lbcb & wpb;
-	wire pp = ~pp_;
-	wire wpb = ~wpb_;
-	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & wa) | (~pp_ & ~(~uj & ~lwlwt));
+	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & wa) | (pp & ~(~uj & ~lwlwt));
 	assign uj = j & ~a_eq[7];
 	assign lwlwt = lwt | lw;
 	assign lj = ~(~a_eq[7] | ~j);
-	assign ewe = (lj & ww) | (ls & wa) | (~pp_ & ~(~llb & ~zb$ & ~js)) | (~wzi & krb & w$);
+	assign ewe = (lj & ww) | (ls & wa) | (pp & ~(~llb & ~zb$ & ~js)) | (~wzi & krb & w$);
 	wire ww = ~ww_;
 
 	// sheet 10, page 2-39
