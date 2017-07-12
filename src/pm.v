@@ -21,9 +21,9 @@ module pm(
 	output wait_,
 	output run,
 	// sheet 2
-	input ekc_1_,
+	input ekc_1,
 	input ekc_i_,
-	input ekc_2_,
+	input ekc_2,
 	input got_,
 	input ekc_fp_,
 	input clm_,
@@ -68,11 +68,11 @@ module pm(
 	output xi$_,
 	// sheet 6
 	input p4_,
-	input b0_,
-	input na_,
+	input b0,
+	input na,
 	input c0,
 	input ka2,
-	input ka1_,
+	input ka1,
 	// sheet 7
 	input p3_,
 	input p1_,
@@ -88,15 +88,15 @@ module pm(
 	output icp1,
 	// sheet 8
 	input strob1_,
-	input exl_,
+	input exl,
 	input lipsp$_,
-	input gr$_,
+	input gr,
 	input wx_,
 	input shc,
 	// sheet 9
 	input read_fp_,
 	input ir7,
-	input inou$_,
+	input inou,
 	input rok_,
 	output arp1,
 	output lg_3,
@@ -124,16 +124,16 @@ module pm(
 	output lk,
 	// sheet 12
 	input rj,
-	input uj$_,
-	input lwt$_,
-	input sr$_,
-	input lac$_,
-	input lrcb$_,
+	input uj,
+	input lwlwt,
+	input sr,
+	input lac,
+	input lrcb,
 	input rpc,
 	input rc$,
 	input ng$,
 	input ls,
-	input oc$_,
+	input oc,
 	input wa_,
 	input wm_,
 	input wz_,
@@ -166,9 +166,9 @@ module pm(
 	input wrs,
 	input mb,
 	input im,
-	input lj_,
-	input lwrs$_,
-	input jkrb$_,
+	input lj,
+	input lwrs,
+	input jkrb,
 	output lrz_,
 	output w_bar,
 	output w_rm,
@@ -256,7 +256,7 @@ module pm(
 	//  * univib: KC (koniec cyklu - cycle end)
 	//  * univib: PC (początek cyklu - cycle start)
 
-	wire ekc = ~(ekc_1_ & ekc_i_ & ekc_2_ & p2_ & p0stpc_);
+	wire ekc = ~(~ekc_1 & ekc_i_ & ~ekc_2 & p2_ & p0stpc_);
 	wire kc_reset = ~clo_ | pc;
 
 	wire trig_kc;
@@ -389,7 +389,7 @@ module pm(
 	wire p_d = (~j$ & bcoc$) | zs;
 	wire p_set = (p2 & strob1) | ~clm_;
 	wire p_clk = ~(ssp$ & strob1 & w$);
-	wire p_reset = strob1 & rok & inou_ & wm$;
+	wire p_reset = strob1 & rok & ~inou & wm$;
 
 	ffd WSK_P(
 		.s_(~p_set),
@@ -423,7 +423,7 @@ module pm(
 	wire p4 = ~p4_;
 
 	wire wm_q;
-	wire wm_d = pr & ~c0 & ~na_;
+	wire wm_d = pr & ~c0 & na;
 	ffd REG_WMI(
 		.s_(1'b1),
 		.d(wm_d),
@@ -432,7 +432,7 @@ module pm(
 		.q(wm_q)
 	);
 
-	wire wb_j = pr & b0_ & ~na_;
+	wire wb_j = pr & ~b0 & na;
 	wire wb_k = (p4 & wpp_) | p2;
 	wire wb;
 	ffjk REG_WBI(
@@ -460,10 +460,9 @@ module pm(
 	wire wpbmod = ~(~wb & wpp_);
 	wire bla = p4 & ka1ir6 & wpp_;
 	// FIX: +NAIR6 was -NAIR6
-	wire nair6 = ~na_ & ir6;
-	wire ka12x = ~(~(~na_ & c0) & ~ka2 & ka1_);
+	wire nair6 = na & ir6;
+	wire ka12x = ~(~(na & c0) & ~ka2 & ~ka1);
 	wire ka1ir6 = ka1 & ir6;
-	wire ka1 = ~ka1_;
 
 	// sheet 7, page 2-17
 	//  * main loop state transition signals
@@ -492,7 +491,7 @@ module pm(
 	assign ep1 = M89_13 & wm_q;
 	assign ep2 = nef & p1;
 	wire p5_p4_ = p5_ & p4_;
-	wire lac_ = p5_p4_ & p1_ & p3_ & i2_;
+	wire load_ac_ = p5_p4_ & p1_ & p3_ & i2_;
 
 	wire M98_6 = ~(wm_q & p2);
 
@@ -505,10 +504,9 @@ module pm(
 	wire str1wx = strob1 & wx;
 	wire lolk = slg2 | (strob2 & p1 & shc) | (strob1 & wm & inou);
 
-	wire downlk = strob1 & (wrwwgr | ((shc | ~inou_) & wx));
+	wire downlk = strob1 & (wrwwgr | ((shc | inou) & wx));
 	wire wrwwgr = gr & wrww;
 	wire wx = ~wx_;
-	wire gr = ~gr$_;
 
 	// sheet 9, page 2-19
 	//  * group counter (licznik grupowy)
@@ -521,7 +519,7 @@ module pm(
 	wire M62_11 = zerstan_ & i1_;
 
 	// LG preload triggers
-	wire slg1 = p1 & exl_ & strob2 & ~(lipsp | gr); // "common" preload at P1
+	wire slg1 = p1 & ~exl & strob2 & ~(lipsp | gr); // "common" preload at P1
 	wire slg2 = strob1 & gr & wx; // preload for register group operations (at WX)
 
 	wire lg_2, lg_1;
@@ -543,8 +541,6 @@ module pm(
 	);
 
 	wire ic_1_ = ~(wx & inou);
-	wire inou_ = inou$_;
-	wire inou = ~inou_;
 	wire rok = ~rok_;
 	wire okinou_ = ~(inou & rok);
 
@@ -576,24 +572,22 @@ module pm(
 	
 	// sheet 12, page 2-22
 
-	wire ruj = ~(~rj & uj$_);
-	wire pac_ = ~(uj$_ & ~rj & lwt$_);
-	wire lwtsr = ~(lwt$_ & sr$_);
-	wire lrcblac = ~(lac$_ & lrcb_);
-	wire lrcb_ = lrcb$_;
-	wire pat_ = ~(lrcb_ & sr$_);
+	wire ruj = ~(~rj & ~uj);
+	wire pac_ = ~(~uj & ~rj & ~lwlwt);
+	wire lwtsr = ~(~lwlwt & ~sr);
+	wire lrcblac = ~(~lac & ~lrcb);
+	wire pat_ = ~(~lrcb & ~sr);
 	// name conflict: wire rc_ = ~rc$;
 	wire rjcpc = ~(~rj & ~rpc & ~rc$);
 	wire ng_ = ~ng$;
-	wire lrcbngls$ = ~(lrcb_ & ng_ & ~ls);
+	wire lrcbngls$ = ~(~lrcb & ng_ & ~ls);
 	// NOTE: Reset condition was "~-LS" on original schematic and "~(-WE|-LS)" in DTR
 	// Both were wrong. Fixed to what was done in hardware: ~(W&|-LS).
 	wire M95_10 = ~(w$ | ~ls);
 	wire wls_ = ~(M95_10 & wls);
 	assign wls = ~(wls_ & wa_);
 	wire wa = ~wa_;
-	wire oc_ = oc$_;
-	wire M24_8 = ~(oc_ & ~bs & w$);
+	wire M24_8 = ~(~oc & ~bs & w$);
 	wire M36_3 = ~(~ls & we);
 	wire w = ~(wa_ & M24_8 & M36_3 & wm_ & wz_ & ww_ & wr_ & wp_);
 	wire wr = ~wr_;
@@ -620,12 +614,11 @@ module pm(
 	wire M53_8 = ~((lg_0 & lipsp & i3) | (ljkrb & we) | (wp & ruj) | (ur & wic));
 	wire M36_6 = ~(~bs & wls_);
 	wire M52_8 = ~((M36_6 & we) | (ur & wac) | (wa & lrcbngls$) | (wr & lrcblac));
-	wire M68_8 = ~((wls_ & ls & we) | (we & ~lwrs_) | (wp & ~lrcb_));
+	wire M68_8 = ~((wls_ & ls & we) | (we & lwrs) | (wp & lrcb));
 	wire M23_8 = ~(inou & wr);
 	assign w_ic = ~(M53_8 & M23_8 & i4_);
-	assign w_ac = ~(M52_8 & lac_);
+	assign w_ac = ~(M52_8 & load_ac_);
 	assign w_ar = ~(M68_8 & warx_ & i1_ & p5_p4_);
-	wire lrcb = ~lrcb_;
 
 	// sheet 15, page 2-25
 	//  * W bus to block number (NB) and interrupt mask (RM)
@@ -635,10 +628,8 @@ module pm(
 	assign w_bar = (wrs & ur) | (mb & wr) | (i3 & lipsp & lg_2);
 	assign w_rm = (wrs & ur) | (wr & im) | (lg_2 & lipsp & i3);
 	wire ww = ~ww_;
-	wire lwrs_ = lwrs$_;
-	wire abx = ~((psr & wic) | (wa & rj) | (we & ~(lwrs_ & jkrb$_)) | (~lj_ & ww));
-	wire lj = ~lj_;
-	wire ljkrb = ~(lj_ & jkrb$_);
+	wire abx = ~((psr & wic) | (wa & rj) | (we & ~(~lwrs & ~jkrb)) | (lj & ww));
+	wire ljkrb = ~(~lj & ~jkrb);
 
 	// sheet 16, page 2-26
 	//  * A bus control signals
@@ -646,12 +637,12 @@ module pm(
 	wire M8_8 = ~(~ib & ng_);
 	wire M9_6 = ~(~ir6 | zb_) ^ lj;
 	wire M9_3 = ~(zb_ | ir6) ^ lj;
-	wire M8_6 = ~(~cb & oc_);
+	wire M8_6 = ~(~cb & ~oc);
 	wire M67_8 = (we & M9_6) | (w$ & M8_8);
-	wire M72_8 = (M8_8 & w$) | (M8_6 & w$) | (we & M9_3) | (na_ & p3);
+	wire M72_8 = (M8_8 & w$) | (M8_6 & w$) | (we & M9_3) | (~na & p3);
 	wire M71_8 = ~((w$ & ls) | (psr & war));
 	wire M89_4 = ~(wpb | ~rb$);
-	wire M71_6 = ~((na_ & p3) | (w$ & M89_4));
+	wire M71_6 = ~((~na & p3) | (w$ & M89_4));
 	// FIX: M10_4 was labeled as a NAND gate, instead of NOR
 	wire M10_4 = ~(ir6 | ~rc$);
 	wire M55_8 = ~((M10_4 & wa) | (lg_0 & i3_ex_prz));

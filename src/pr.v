@@ -8,7 +8,7 @@
 
 module pr(
 	// sheet 1
-	input blr_,				// A50 - BLokuj Rejestry
+	input blr,				// A50 - BLokuj Rejestry
 	input lpc,				// A94 - LPC instruction
 	input wa_,				// B94 - state WA
 	input rpc,				// B03 - RPC instruction
@@ -88,10 +88,10 @@ module pr(
 	wire M53_6 = ~(rb_ & ra_ & rc_); // r1-r7 selected
 	wire M60_6 = ~(~wa_ & rpc);
 
-	wire rpp = ~blr_; // R0>>8 -> L
-	wire rpa = blr_ & ~(M53_6 & M60_6); // R0 -> L
+	wire rpp = blr; // R0>>8 -> L
+	wire rpa = ~blr & ~(M53_6 & M60_6); // R0 -> L
 	// NOTE: RPB = RPA
-	wire RPN = blr_ & M53_6 & M60_6; // R1-R7 -> L
+	wire RPN = ~blr & M53_6 & M60_6; // R1-R7 -> L
 
 	wire lr0 = ~(lpc & strob_a & ~wa_);
 	wire wr0 = rb_ & rc_ & ra_; // R0 selected

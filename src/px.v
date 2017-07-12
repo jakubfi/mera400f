@@ -124,8 +124,8 @@ module px(
 	input is,			// A84
 	input ren_,			// B74
 	input rok_,			// A89
-	input efp_,			// B09
-	input exl_,			// A78 - instruction EXL
+	input efp,			// B09
+	input exl,			// A78 - instruction EXL
 	output zg,			// B44 - request to use the system bus (ZGłoszenie)
 	output ok$,			// A80 - OK*
 	output oken,		// B17
@@ -396,7 +396,7 @@ module px(
 	assign oken = ~(ren_ & rok_);
 
 	// E-F: no AWP
-	wire EF = efp_ | AWP_PRESENT;
+	wire EF = ~efp | AWP_PRESENT;
 	wire M65_6 = ~EF;
 	wire M37_15;
 	ffjk JK37(
@@ -407,7 +407,7 @@ module px(
 		.r_(clo_),
 		.q(M37_15)
 	);
-	wire exr_ = ~M37_15 & EF & exl_;
+	wire exr_ = ~M37_15 & EF & ~exl;
 
 	// sheet 9, page 2-9
 

@@ -26,9 +26,9 @@ module pd(
 	output rb$,			// A15 - RB*: RB instruction
 	output cb,				// B89 - CB
 	output sc$,				// B90 - SC*: S|C opcode group
-	output oc$_,			// B88 - OC*: BRC, BLC
+	output oc,			// B88 - OC*: BRC, BLC
 	output ka2,			// A83 - KA2 opcode group
-	output gr$_,			// B47 - GR*: G|L opcode group
+	output gr,			// B47 - GR*: G|L opcode group
 	// sheet 3
 	output hlt,				// A34 - HLT
 	output mcl,			// B34 - MCL
@@ -48,7 +48,7 @@ module pd(
 	output rc$,			// B04 - RC*: RIC, RKY
 	output ng$,			// B03 - NG*: NGA, NGC
 	output zb$,			// B20
-	output b0_,				// A25 - B=0 (opcode field B is 0 - no B-modification)
+	output b0,				// A25 - B=0 (opcode field B is 0 - no B-modification)
 	// sheet 4
 	input q,					// B19 - Q: system flag
 	input mc_3,				// B10 - MC=3: three consecutive pre-modifications
@@ -64,8 +64,8 @@ module pd(
 	input we_,				// A65 - WE state
 	output amb,				// A75
 	output apb,				// B65
-	output jkrb_,			// A86
-	output lwrs$_,		// A67
+	output jkrb,			// A86
+	output lwrs,		// A67
 	output saryt,			// B62 - SARYT: ALU operation mode (0 - logic, 1 - arythmetic)
 	output ap1,				// A76 - AP1: register A plus 1 (for IRB)
 	output am1,				// A90 - AM1: register A minus 1 (for DRB)
@@ -80,7 +80,7 @@ module pd(
 	output sb,				// A74 - ALU function select
 	output sab,				// A73 - ALU function select
 	output saa,				// A72 - ALU function select
-	output lrcb$_,		// A45
+	output lrcb,		// A45
 	output aryt,			// A68
 	output sbar$,			// B91
 	output nrf,				// A12
@@ -93,10 +93,10 @@ module pd(
 	output ust_mc,		// B80
 	output ust_leg,		// B93
 	output eat0,			// A13
-	output sr$_,			// B46
+	output sr,			// B46
 	output ust_y,			// A53
 	output ust_x,			// A47
-	output blr_,			// A87
+	output blr,			// A87
 	// sheet 9
 	input wpb_,				// A58
 	input wr_,				// A60
@@ -105,37 +105,37 @@ module pd(
 	input wzi,				// A59
 	output ewa,				// A55 - Enter WA
 	output ewp,				// A56 - Enter WP
-	output uj$_,			// B18
-	output lwt$_,			// B94
-	output lj_,				// B50
+	output uj,			// B18
+	output lwlwt,			// B94
+	output lj,				// B50
 	output ewe,				// A54 - Enter WE
 	// sheet 10
 	input wp_,				// A37
-	output ekc_1_,		// A42
+	output ekc_1,		// A42
 	output ewz,				// A49 - Enter WZ
 	output ew$,				// A50 - Enter W&
 	// sheet 11
 	output lar$,			// B82
 	output ssp$,			// B81
-	output ka1_,			// A94
-	output na_,				// A84 - Normalny Argument
-	output exl_,			// A06
-	output p16_,			// A36
+	output ka1,			// A94
+	output na,				// A84 - Normalny Argument
+	output exl,			// A06
+	output p16,			// A36
 	// sheet 12
 	input lk,					// A52
 	input wm_,				// A38
 	output ewr,				// A51 - Enter WR
 	output ewm,				// A48 - Enter WM
-	output efp_,			// A11
+	output efp,			// A11
 	output sar$,			// A05
 	output eww,				// A41 - Enter WW
 	output srez$,			// A17
 	// sheet 13
 	output ewx,				// A43 - Enter WX
 	output axy,				// A46
-	output inou$_,		// A39 - INOU* - IN or OU instruction
-	output ekc_2_,		// A40 - EKC*2 - Enter cycle end (Koniec Cyklu)
-	output lac$_			// B43
+	output inou,		// A39 - INOU* - IN or OU instruction
+	output ekc_2,		// A40 - EKC*2 - Enter cycle end (Koniec Cyklu)
+	output lac			// B43
 );
 
 	parameter INOU_USER_ILLEGAL;
@@ -177,10 +177,8 @@ module pd(
 	);
 
 	assign sc$ = s | c;
-	assign oc$_ = ~(ka2 & ~ir[7]);
-	wire oc = ~oc$_;
-	wire gr = l | g;
-	assign gr$_ = ~gr;
+	assign oc = ka2 & ~ir[7];
+	assign gr = l | g;
 
 	// sheet 3, page 2-32
 	// * opcode field A register number decoder
@@ -224,17 +222,15 @@ module pd(
 	assign shc = c & ir[11];
 
 	wire sx, __oth4, sly, slx, srxy;
-	wire M85_3 = c & ~b0_;
+	wire M85_3 = c & b0;
 	decoder8pos DEC_OTHER(
 		.i(ir[13:15]),
 		.ena(M85_3),
 		.o({rc$, zb$, sx, ng$, __oth4, sly, slx, srxy})
 	);
 
-	wire ng_ = ~ng$;
-	wire zb_ = ~zb$;
 	wire sl = slx | __oth4 | sly;
-	assign b0_ = (ir[10:12] != 0);
+	assign b0 = (ir[10:12] == 0);
 
 	// sheet 4, page 2-33
 	// * ineffective instructions
@@ -271,24 +267,18 @@ module pd(
 
 	// sheet 5, page 2-34
 
-	wire cns = ~(~ccb & ng_ & ~sw);
+	wire cns = ccb | ng$ | sw;
 	wire a = aw | ac | awt;
-	assign lwrs$_ = ~lws & ~rws;
-	wire lwrs_ = lwrs$_;
+	assign lwrs = lws | rws;
 
-	wire M90_12 = a | trb | ib;
-	wire M49_6 = ~(lwrs_ & lj_ & ~js & krb_);
-	assign apb = (~uka & p4) | (M90_12 & w$) | (M49_6 & we);
-	assign amb = (uka & p4) | (cns & w$);
 
-	wire ans = ~(~sw & ng_ & ~a);
-	assign jkrb_ = ~js & krb_;
-	wire M90_8 = ~(~sl & ~ri & krb_);
+	wire ans = sw | ng$ | a;
+	assign jkrb = js | krb;
+	wire M90_8 = sl | ri | krb;
 	assign saryt = (we & M49_6) | (p4) | (w$ & M90_8) | ((cns ^ M90_12) & w$);
 	wire riirb = ri | irb;
 	assign ap1 = riirb & w$;
 	wire krb = irb | drb;
-	wire krb_ = ~krb;
 	assign am1 = drb & w$;
 	wire w$ = ~w$_;
 	wire p4 = ~p4_;
@@ -298,43 +288,47 @@ module pd(
 	// * control signals
 
 	wire nglbb = ngl | bb;
-	assign bcoc$ = ~(~bc & ~oc);
+	assign bcoc$ = bc | oc;
 	wire wlsbs = wls | bs;
 	wire emnm = em | nm;
 
 	// sheet 7, page 2-36
 	// * ALU control signals
 
+	wire M90_12 = a | trb | ib;
+	wire M49_6 = ~(~lwrs & ~lj & ~js & ~krb);
+	assign apb = (~uka & p4) | (M90_12 & w$) | (M49_6 & we);
+	assign amb = (uka & p4) | (cns & w$);
+
 	// FIX: -WZ on <A66> was labeled as +WZ
 	wire wz = ~wz_;
 	wire M84_8 = riirb ^ nglbb;
 	wire M67_8 = bm | is | er | xr;
-	wire sds_ = ~((wz & (xm | em)) | (M67_8 & w$) | (w$ & M84_8) | (we & wlsbs));
-	wire ssb_ = ~(w$ & ~(~ngl & ~oc & ~bc));
+	wire sds = (wz & (xm | em)) | (M67_8 & w$) | (w$ & M84_8) | (we & wlsbs);
+	wire ssb = w$ & (ngl | oc | bc);
 
-	assign sd = sds_ & ~amb;
-	assign sb = ~apb & ssb_ & ~sl & ~ap1;
+	assign sd = ~sds & ~amb;
+	assign sb = ~apb & ~ssb & ~sl & ~ap1;
 
 	wire M93_12 = sl | ls | orxr;
-	wire M50_8 = ~((M93_12 & w$) | (w$ & nglbb) | (wlsbs & we) | (wz & ~nm & ~(~mis & ~lrcb)));
-	wire ssab_ = ~(rb$ & w$ & wpb);
-	wire ssaa_ = ~((~(~rb$ | wpb) & w$) | (w$ & lb));
-	wire ssca_ = ~((M84_8 & w$) | (w$ & (bs | bn | nr)) | (wz & ~(~emnm & ~lrcb)) | (we & ls));
+	wire M50_8 = (M93_12 & w$) | (w$ & nglbb) | (wlsbs & we) | (wz & ~nm & (mis | lrcb));
+	wire ssab = rb$ & w$ & wpb;
+	wire ssaa = (rb$ & w$ & ~wpb) | (w$ & lb);
+	wire ssca = (M84_8 & w$) | (w$ & (bs | bn | nr)) | (wz & (emnm | lrcb)) | (we & ls);
 
-	assign sca = ssca_ & ~apb & ssaa_;
-	assign scb = ssca_ & ~apb & ssab_;
-	assign saa = ssaa_ & ~amb & ~ap1 & M50_8;
-	assign sab = ssab_ & ~amb & ~ap1 & M50_8;
+	assign sca = ~ssca & ~apb & ~ssaa;
+	assign scb = ~ssca & ~apb & ~ssab;
+	assign saa = ~ssaa & ~amb & ~ap1 & ~M50_8;
+	assign sab = ~ssab & ~amb & ~ap1 & ~M50_8;
 
 	wire orxr = _or | xr;
-	wire lrcb = lbcb | rb$;
-	assign lrcb$_ = ~lrcb;
+	assign lrcb = lbcb | rb$;
 	wire mis = m | is;
 	wire lbcb = lb | cb;
 	assign aryt = cw | cwt;
 	wire c$ = cw | cwt | cl;
 	wire ccb = c$ | cb;
-	assign sbar$ = ~(~lrcb & ~mis & ~(gr & ir[7]) & ~bm & ~pw & ~tw);
+	assign sbar$ = lrcb | mis | (gr & ir[7]) | bm | pw | tw;
 	assign nrf = ir[7] & ka2 & ir[6];
 	wire fppn = pufa ^ nrf;
 
@@ -349,58 +343,55 @@ module pd(
 	assign ust_leg = ccb & w$;
 	wire M59_8 = ~((ir[6] & r0[8]) | (~ir[6] & r0[7]));
 	assign eat0 = ~(~srxy | M59_8) ^ ~(~shc | at15_);
-	wire sr = srxy | srz | shc;
-	assign sr$_ = ~sr;
+	assign sr = srxy | srz | shc;
 	assign ust_y = (w$ & sl) | (sr & ~shc & wx);
 	wire wx = ~wx_;
 	assign ust_x = ~wa_ & sx;
 	wire wa = ~wa_;
-	assign blr_ = ~(w$ & oc & ~ir[6]);
+	assign blr = w$ & oc & ~ir[6];
 
 	// sheet 9, page 2-38
 	// * execution phase control signals
 
-	wire M77_8 = ~(ng_ & ~ri & ~rj);
+	wire M77_8 = ng$ | ri | rj;
 	assign ewa = (pcrs & ~pp_) | (M77_8 & ~pp_) | (we & (~wls & ls)) | (wpb_ & lbcb & wr);
 	wire wr = ~wr_;
 	wire prawy = lbcb & wpb;
 	wire pp = ~pp_;
 	wire wpb = ~wpb_;
-	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & wa) | (~pp_ & ~(uj$_ & lwt$_));
-	assign uj$_ = ~(j & ~a_eq[7]);
-	assign lwt$_ = ~lwt & ~lw;
-	wire lj = ~(~a_eq[7] | ~j);
-	assign lj_ = ~lj;
-	wire wzi_ = ~wzi;
-	assign ewe = (lj & ww) | (ls & wa) | (~pp_ & ~(llb_ & zb_ & ~js)) | (~wzi & krb & w$);
+	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & wa) | (~pp_ & ~(~uj & ~lwlwt));
+	assign uj = j & ~a_eq[7];
+	assign lwlwt = lwt | lw;
+	assign lj = ~(~a_eq[7] | ~j);
+	assign ewe = (lj & ww) | (ls & wa) | (~pp_ & ~(~llb & ~zb$ & ~js)) | (~wzi & krb & w$);
 	wire ww = ~ww_;
 
 	// sheet 10, page 2-39
 	// * execution phase control signals
 	// * instruction cycle end signal
 
-	wire M59_6 = ~(rbib | (wzi_ & ~(krb_ & ~is)));
-	assign ekc_1_ = ~((~lac & wr & (~grlk & ~lrcb)) | (~lrcb & wp) | (llb_ & we) | (M59_6 & w$));
+	wire M59_6 = ~(rbib | (~wzi & ~(~krb & ~is)));
+	assign ekc_1 = (~lac & wr & (~grlk & ~lrcb)) | (~lrcb & wp) | (~llb & we) | (M59_6 & w$);
 	wire wp = ~wp_;
-	assign ewz = (w$ & wzi_ & is) | (wr & m) | (pp & lrcbsr);
+	assign ewz = (w$ & ~wzi & is) | (wr & m) | (pp & lrcbsr);
 	wire lrcbsr = lrcb | sr;
 	wire M88_6 = is | rb$ | bmib | prawy;
-	assign ew$ = (wr & M88_6) | (we & wlsbs) | (ri & ww) | (~(ng_ & ~lbcb) & wa) | (pp & sew$);
+	assign ew$ = (wr & M88_6) | (we & wlsbs) | (ri & ww) | (~(~ng$ & ~lbcb) & wa) | (pp & sew$);
 
 	// sheet 11, page 2-40
 	// * control signals
 
-	assign lar$ = lb | ri | ans | trb | ls | sl | nor$ | ~krb_;
+	assign lar$ = lb | ri | ans | trb | ls | sl | nor$ | krb;
 	wire M92_12 = bc | bn | bb | trb | oc;
-	assign ssp$ = ~(~is & ~bmib & ~M92_12 & ~bs);
-	wire sew$ = ~(~M92_12 & krb_ & ~nor$ & ~sl & ~sw & ~a & ~c$);
-	wire llb_ = ~bs & ~ls & lwrs_;
-	assign ka1_ = ~(ir[0] & ir[1] & ~ir[2]) & ~js;
-	wire uka = ~ka1_ & ir[6]; // Ujemny Krótki Argument
-	assign na_ = ~(ka1_ & ~ka2 & ~sc$ & ir01);
-	assign exl_ = ~(~ir[6] & ka2 & ir[7]);
-	wire M63_3 = ~(~ng_ & ir[6]);
-	assign p16_ = ~((M63_3 & w$ & cns) | (riirb & w$) | (ib & w$) | (slx & r0[8]) | M31_6);
+	assign ssp$ = is | bmib | M92_12 | bs;
+	wire sew$ = M92_12 | krb | nor$ | sl | sw | a | c$;
+	wire llb = bs | ls | lwrs;
+	assign ka1 = (ir[0] & ir[1] & ~ir[2]) | js;
+	wire uka = ka1 & ir[6]; // Ujemny Krótki Argument
+	assign na = ~ka1 & ~ka2 & ~sc$ & ir01;
+	assign exl = ~ir[6] & ka2 & ir[7];
+	wire M63_3 = ~(ng$ & ir[6]);
+	assign p16 = (M63_3 & w$ & cns) | (riirb & w$) | (ib & w$) | (slx & r0[8]) | M31_6;
 	wire M31_6 = (~(~ac & M63_3) & w$ & r0[3]) | (r0[7] & sly) | (uka & p4) | (lj & we);
 
 	// sheet 12, page 2-41
@@ -413,7 +404,7 @@ module pd(
 	wire M20_9 = M60_8 & wm;
 	wire M20_10 = (fimb | lac | tw) & pp;
 	assign ewm = gmio & pp;
-	assign efp_ = ~(fppn & pp);
+	assign efp = fppn & pp;
 	assign sar$ = l | lws | tw;
 	wire M75_6 = pw | rw | lj | rz | ki;
 	assign eww = (we & rws) | (pp & M75_6) | (ri & wa) | (lk & ww & g) | M33_8_9_10;
@@ -427,13 +418,11 @@ module pd(
 	assign ewx = (lrcbsr & wz) | (pp & (gr ^ hsm)) | ((inou & lk) & wm) | (lk & (inou | sr) & wx);
 	assign axy = sr | (ir[6] & rbib);
 	wire grlk = gr & lk;
-	wire inou = in | ou;
-	assign inou$_ = ~inou;
-	assign ekc_2_ = ~((wx & hsm) | (wm & ~inou) | (~grlk & lj_ & ~ri & ww) | (pcrs & wa));
+	assign inou = in | ou;
+	assign ekc_2 = (wx & hsm) | (wm & ~inou) | (~grlk & ~lj & ~ri & ww) | (pcrs & wa);
 	wire rbib = rb$ | ib;
 	wire bmib = ib | bm;
-	wire lac = bmib | mis;
-	assign lac$_ = ~lac;
+	assign lac = bmib | mis;
 
 endmodule
 

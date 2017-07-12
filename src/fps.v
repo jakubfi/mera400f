@@ -17,7 +17,7 @@ module fps(
 	input oken,
 	input zw1,
 	input di,
-	input efp_,
+	input efp,
 	input puf,
 	input got_,
 	output sr_fp_,
@@ -236,7 +236,7 @@ module fps(
 	wire M73_15;
 	ffjk REG_START(
 		.s_(1'b1),
-		.j(~efp_),
+		.j(efp),
 		.c_(got_),
 		.k(1'b1),
 		.r_(_0_f_),

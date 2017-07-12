@@ -32,7 +32,7 @@ module pa(
 	output s0,
 	output carry_,
 	// sheet 6
-	input p16_,
+	input p16,
 	input saa,
 	input sca,
 	output j$,
@@ -111,7 +111,7 @@ module pa(
 	wire [0:15] f;
 	wire zsum_;
 	alu ALU(
-		.p16_(p16_),
+		.p16_(~p16),
 		.a(a),
 		.ac(ac),
 		.saryt(saryt),
