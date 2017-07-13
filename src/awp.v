@@ -20,7 +20,7 @@ module awp(
 	input got_,
 	input ok$,
 	input oken,
-	input zw1,
+	input zw,
 	output [0:15] zp,	// bus
 	output fi0_,			// fixed point overflow
 	output fi1_,			// floating point underflow
@@ -75,7 +75,7 @@ fps #(
 	.strob_fp_(strob_fp_),
 	.strob2_fp(strob2_fp),
 	.oken(oken),
-	.zw1(zw1),
+	.zw(zw),
 	.di(di),
 	.efp(efp),
 	.puf(puf),

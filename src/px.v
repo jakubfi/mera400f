@@ -119,7 +119,7 @@ module px(
 	output zerrz,		// B85
 	// sheet 8
 	input sr_fp_,		// B53
-	input zw1_,			// A85 - module 1 allowed to use the system bus (CPU) (ZezWolenie 1)
+	input zw,			// A85 - module allowed to use the system bus (CPU) (ZezWolenie 1)
 	input srez$,		// B76
 	input wzi,			// A60
 	input is,			// A84
@@ -346,11 +346,9 @@ module px(
 		.r_(clo_),
 		.q(zgi)
 	);
-	wire zgi_ = ~zgi;
 
-	wire zwzg = ~(zgi_ | zw1_);
-	assign zg = ~(zgi_ & ~M47_15 & ~(zw & oken));
-	wire zw = ~zw1_;
+	wire zwzg = ~(~zgi | ~zw);
+	assign zg = ~(~zgi & ~M47_15 & ~(zw & oken));
 
 	wire M46_8 = clo_ & ~(strob2 & w$ & wzi & is);
 	wire M47_15;

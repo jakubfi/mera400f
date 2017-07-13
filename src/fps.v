@@ -15,7 +15,7 @@ module fps(
 	output strob2_fp,
 	// sheet 2
 	input oken,
-	input zw1,
+	input zw,
 	input di,
 	input efp,
 	input puf,
@@ -200,7 +200,7 @@ module fps(
 	wire sr = ~(start_ & M57_8);
 	assign sr_fp_ = ~(sr & f1);
 
-	wire M43_6 = ~(oken & f1 & zw1);
+	wire M43_6 = ~(oken & f1 & zw);
 
 	wire M71_5;
 	univib #(.ticks(FP_KC1_TICKS)) VIB_KC1(
