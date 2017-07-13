@@ -17,74 +17,58 @@ module strobgen(
   parameter GOT_TICKS;
   parameter STROB2_TICKS;
 
-  localparam TICK_NONE = 3'd0;
-  localparam TICK_GOT = 3'd1;
-  localparam TICK_S1S = 3'd2;
-  localparam TICK_S1L = 3'd3;
-  localparam TICK_S1LB = 3'd4;
-  localparam TICK_S2 = 3'd5;
-
   // sheet 3, page 2-3
   // * strob signals
 
-  wire sgot = ~(ss11 | ss12);
-
-  wire STROB1_1_, STROB1_2_, STROB1_3_, STROB1_4_, STROB1_5_;
+  wire strob1_1, strob1_2, strob1_3, strob1_4, strob1_5;
   univib #(.ticks(STROB1_1_TICKS)) VIB_STROB1_1(
     .clk(__clk),
-    .a_(got$),
+    .a_(got),
     .b(ss11),
-    .q_(STROB1_1_)
+    .q(strob1_1)
   );
   univib #(.ticks(STROB1_2_TICKS)) VIB_STROB1_2(
     .clk(__clk),
-    .a_(got$),
+    .a_(got),
     .b(ss12 & ok),
-    .q_(STROB1_2_)
+    .q(strob1_2)
   );
   univib #(.ticks(STROB1_3_TICKS)) VIB_STROB1_3(
     .clk(__clk),
-    .a_(got$),
+    .a_(got),
     .b(ss13 & ok),
-    .q_(STROB1_3_)
+    .q(strob1_3)
   );
   univib #(.ticks(STROB1_4_TICKS)) VIB_STROB1_4(
     .clk(__clk),
-    .a_(got$),
+    .a_(got),
     .b(ss14),
-    .q_(STROB1_4_)
+    .q(strob1_4)
   );
   univib #(.ticks(STROB1_5_TICKS)) VIB_STROB1_5(
     .clk(__clk),
-    .a_(got$),
+    .a_(got),
     .b(ss15),
-    .q_(STROB1_5_)
+    .q(strob1_5)
   );
 
-  wire st56_ = STROB1_1_ & STROB1_2_;
-  wire st812_ = STROB1_3_ & STROB1_4_ & STROB1_5_;
-  wire sts = ~(st56_ & st812_);
+  wire strob1_st2 = strob1_1 | strob1_2;
+  wire strob1_only = strob1_3 | strob1_4 | strob1_5;
+  wire strob1_any = strob1_st2 | strob1_only;
 
   // sheet 4, page 2-4
   // * got, strob2, step register
 
-  // NOTE: 33pF cap to ground on M15_6
-  wire M15_12 = ~(M15_6 & zw & oken);
-  wire M52_6 = M15_12 & M53_6;
-  wire M53_6 = ~(sgot & M21_5);
-  wire M15_6 = ~(M52_6 & st812_ & ~strob2);
+  wire sgot = ~ss11 & ~ss12;
+  wire M52_6 = (got_trig & zw & oken) | (sgot & strob_step);
+  wire got_trig = ~(~M52_6 & ~strob1_only & ~strob2);
 
-  wire got$;
   univib #(.ticks(GOT_TICKS)) VIB_GOT(
     .clk(__clk),
-    .a_(M15_6),
+    .a_(got_trig),
     .b(1'b1),
-    .q(got$)
+    .q(got)
   );
-  assign got = got$;
-
-  wire M53_11 = ~(M21_5 & ~sgot);
-  wire M53_8 = ~(M53_11 & st56_);
 
   // NOTE: strob2 needs to be triggered with 1-cycle delay
   // to set it apart from strob1 falling edge. This is needed
@@ -92,7 +76,7 @@ module strobgen(
   // edge, and another on the strob2 rising edge.
   reg strob2_trig = 1;
   always @ (posedge __clk) begin
-    strob2_trig <= M53_8;
+    strob2_trig <= (strob_step & ~sgot) | strob1_st2;
   end
 
   univib #(.ticks(STROB2_TICKS)) VIB_STROB2(
@@ -102,17 +86,17 @@ module strobgen(
     .q(strob2)
   );
 
-  // FIX: +MODE was labeled -MODE
-  wire M21_5;
+	wire step_set = mode & strob1_any;
+  wire strob_step;
   ffd REG_STEP(
-    .s_(~(mode & sts)),
+    .s_(~step_set),
     .d(1'b0),
     .c(~step),
     .r_(mode),
-    .q(M21_5)
+    .q(strob_step)
   );
 
-  assign strob1 = ~st812_ | ~st56_ | strob_fp | M21_5;
+  assign strob1 = strob1_only | strob1_st2 | strob_fp | strob_step;
 
 endmodule
 
