@@ -50,7 +50,7 @@ module mera400f(
 	wire [0:15] rdt_;
 	wire zg;
 	wire zw = zg;
-	wire zz_ = 0;
+	wire zz;
 
 	// output: to control panel
 	wire p0_;
@@ -144,7 +144,7 @@ module mera400f(
 		// ssytem bus reservation
 		.zg(zg),
 		.zw(zw),
-		.zz_(zz_)
+		.zz(zz)
 	);
 
 // -----------------------------------------------------------------------

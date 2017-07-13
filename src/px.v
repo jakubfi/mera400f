@@ -143,7 +143,6 @@ module px(
 	output b_parz_,	// A56
 	output b_p0_,		// B84
 	output awaria,	// B90
-	output zz1_,		// A51 - module 1 in this rack is present (CPU)
 	output dad15_ir9_,// B07
 	output dad12_,	// A08
 	output dad13_,	// A07
@@ -437,8 +436,6 @@ module px(
 		.r_(stop_),
 		.q(awaria)
 	);
-
-	assign zz1_ = 1'b0;
 
 	wire alarm_dly;
 	dly #(.ticks(ALARM_DLY_TICKS)) DLY_ALARM(

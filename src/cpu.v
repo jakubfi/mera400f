@@ -50,10 +50,12 @@ module cpu(
 	output [0:15] ddt_,	input [0:15] rdt_,
 	output zg,
 											input zw,
-	output zz_,
+	output zz,
 
 	input __clk
 );
+
+	assign zz = 1'b1;
 
 	// --- CPU FEATURES-----------------------------------------------------
 
@@ -247,7 +249,6 @@ px #(
 	.b_parz_(b_parz_),
 	.b_p0_(b_p0_),
 	.awaria(awaria),
-	.zz1_(zz_),
 	.dad15_ir9_(px_dad15_ir9_),
 	.dad12_(px_dad12_),
 	.dad13_(px_dad13_),
