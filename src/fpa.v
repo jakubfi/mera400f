@@ -8,16 +8,22 @@
 
 module fpa(
 	input opta, optb, optc, opm,
-	input strob_fp_,
+	input strob_fp,
 	// sheet 1
 	input [0:15] w, // also on sheets 2, 12, 13
 	input taa,
 	// sheet 2
 	input t_1,
-	input tab_,
-	input clockta_,
-	output t_0_1_,
-	output t_2_7_,
+	input tab,
+	input clockta,
+	input clocktb,
+	input clocktc,
+	output t_0_1,
+	output t_2_7,
+	output t_8_15,
+	output t_16_23,
+	output t_24_31,
+	output t_32_39,
 	// sheet 3
 	input m_1,
 	input ma,
@@ -37,9 +43,8 @@ module fpa(
 	input faa_,
 	output fp0_,
 	// sheet 5
-	output t_8_15_,
 	// sheet 6
-	input p_16_,
+	input p_16,
 	output m14_,
 	output m15_,
 	// sheet 7
@@ -52,9 +57,8 @@ module fpa(
 	// (nothing)
 	// sheet 11
 	input m_32,
-	input p_32_,
+	input p_32,
 	// sheet 12
-	input clocktb_,
 	// also w[8:11]
 	// sheet 13
 	// w[12:15]
@@ -70,30 +74,26 @@ module fpa(
 	// sheet 15
 	input fra_,
 	input frb_,
-	input p_40_,
+	input p_40,
 	output p32_,
 	// sheet 16
-	input clocktc_,
-	input trb_,
+	input trb,
 	input _0_t,
 	output t39_,
 	// sheet 17
-	input f9_ka_,
-	input lkb_,
+	input f9_ka,
+	input lkb,
 	// sheet 18
 	input z_f,
 	input m_f,
 	input v_f,
 	input c_f,
 	output [0:15] zp,
-	output t_32_39_,
-	output t_16_23_,
 	// sheet 19
 	input [0:7] d,
-	input _0_zp_,
-	input zpb_,
-	input zpa_,
-	output t_24_31_
+	input _0_zp,
+	input zpb,
+	input zpa
 
 );
 
@@ -103,13 +103,10 @@ module fpa(
 
 	// K bus
 
-	wire f9ka = ~f9_ka_;
-	wire lkb = ~lkb_;
-
 	wire [0:39] k /* synthesis keep */;
 
 	always @ (*) begin
-		case ({lkb, f9ka})
+		case ({lkb, f9_ka})
 			2'b00: k <= sum[0:39];
 			2'b01: k <= m[0:39];
 			2'b10: k <= {w[0:15], w[0:15], w[0:7]};
@@ -117,17 +114,15 @@ module fpa(
 		endcase
 	end
 
-	wire taa_ = ~taa;
-
 	// sheet 2
 
 	// T register
 
 	reg [0:39] t;
 
-	always @ (posedge strob_fp_, negedge _0_t_) begin
-		if (~_0_t_) t[0:15] <= 0;
-		else if (opta) case ({tab_, taa_})
+	always @ (negedge strob_fp, posedge _0_t) begin
+		if (_0_t) t[0:15] <= 0;
+		else if (opta) case ({~tab, ~taa})
 			2'b00: t[0:15] <= t[0:15];
 			2'b01: t[0:15] <= {t_1, t[0:14]};
 			2'b10: t[0:15] <= {t[1:15], t[16]};
@@ -135,9 +130,9 @@ module fpa(
 		endcase
 	end
 
-	always @ (posedge strob_fp_, negedge _0_t_) begin
-		if (~_0_t_) t[16:31] <= 0;
-		else if (optb) case ({trb_, taa_})
+	always @ (negedge strob_fp, posedge _0_t) begin
+		if (_0_t) t[16:31] <= 0;
+		else if (optb) case ({~trb, ~taa})
 			2'b00: t[16:31] <= t[16:31];
 			2'b01: t[16:31] <= {t[15], t[16:30]};
 			2'b10: t[16:31] <= {t[17:31], t[32]};
@@ -145,9 +140,9 @@ module fpa(
 		endcase
 	end
 
-	always @ (posedge strob_fp_, negedge _0_t_) begin
-		if (~_0_t_) t[32:39] <= 0;
-		else if (optc) case ({trb_, taa_})
+	always @ (negedge strob_fp, posedge _0_t) begin
+		if (_0_t) t[32:39] <= 0;
+		else if (optc) case ({~trb, ~taa})
 			2'b00: t[32:39] <= t[32:39];
 			2'b01: t[32:39] <= {t[31], t[32:38]};
 			2'b10: t[32:39] <= {t[33:39], m_1};
@@ -167,7 +162,7 @@ module fpa(
 	wire mb_ /* synthesis keep */ = ~mb;
 	wire _0_m_ = ~_0_m;
 
-	always @ (posedge strob_fp_, negedge _0_m_) begin
+	always @ (negedge strob_fp, negedge _0_m_) begin
 		if (~_0_m_) m[0:39] <= 0;
 		else if (opm) case ({mb_, ma_})
 			2'b00: m[0:39] <= m[0:39];
@@ -242,7 +237,7 @@ module fpa(
 	wire p12_, p8_, p4_;
 
 	carry182 M42(
-		.c_(p_16_),
+		.c_(~p_16),
 		.g({g3a, g2a, g1a, g0a}),
 		.p({p3a, p2a, p1a, p0a}),
 		.c1_(p12_),
@@ -271,7 +266,7 @@ module fpa(
 		.a(t[12:15]),
 		.b(c[12:15]),
 		.m(1'b0),
-		.c_(p_16_),
+		.c_(~p_16),
 		.s({faa, fab, fab, faa}),
 		.f(sum[12:15]),
 		.g(g0a),
@@ -321,7 +316,7 @@ module fpa(
 	wire g3b, g2b, g1b, g0b;
 	wire p3b, p2b, p1b, p0b;
 	carry182 M47(
-		.c_(p_32_),
+		.c_(~p_32),
 		.g({g3b, g2b, g1b, g0b}),
 		.p({p3b, p2b, p1b, p0b}),
 		.c1_(p28_),
@@ -350,7 +345,7 @@ module fpa(
 		.a(t[28:31]),
 		.b(c[28:31]),
 		.m(1'b0),
-		.c_(p_32_),
+		.c_(~p_32),
 		.s({fra1, frb, frb, fra1}),
 		.f(sum[28:31]),
 		.g(g0b),
@@ -390,7 +385,7 @@ module fpa(
 		.a(t[36:39]),
 		.b(c[36:39]),
 		.m(1'b0),
-		.c_(p_40_),
+		.c_(~p_40),
 		.s({fra, frb, frb, fra}),
 		.f(sum[36:39]),
 		.g(__NC),
@@ -401,14 +396,9 @@ module fpa(
 
 	// sheet 16
 
-	wire _0_t_ = ~_0_t;
 	assign t39_ = ~t[39];
 
 	// sheet 18
-
-	wire zpa = ~zpa_;
-	wire zpb = ~zpb_;
-	wire _0_zp = ~_0_zp_;
 
 	always @ (*) begin
 		if (_0_zp) zp <= 16'd0;
@@ -420,12 +410,12 @@ module fpa(
 		endcase
 	end
 
-	assign t_0_1_ = ~|t[0:1];
-	assign t_2_7_ = ~|t[2:7];
-	assign t_8_15_ = ~|t[8:15];
-	assign t_16_23_ = ~|t[16:23];
-	assign t_24_31_ = ~|t[24:31];
-	assign t_32_39_ = ~|t[32:39];
+	assign t_0_1 = |t[0:1];
+	assign t_2_7 = |t[2:7];
+	assign t_8_15 = |t[8:15];
+	assign t_16_23 = |t[16:23];
+	assign t_24_31 = |t[24:31];
+	assign t_32_39 = |t[32:39];
 
 endmodule
 

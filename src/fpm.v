@@ -13,23 +13,22 @@ module fpm(
 	input [8:15] w,
 	input l_d_,
 	input _0_d,
-	input lkb_,
+	input lkb,
 	output [0:7] d,
 	// sheet 2
 	input fcb_,
-	input scc_,
+	input scc,
 	input pc8,
 	// sheet 3
-	input _0_f_,
+	input _0_f,
 	input f2_,
 	input strob2_fp,
 	input f5_,
-	input strob_fp_,
+	input strob_fp,
 	output g,
 	output wdt,
 	output wt,
 	// sheet 4
-	output fic_,
 	output fic,
 	// sheet 5
 	input r03,
@@ -55,7 +54,7 @@ module fpm(
 	output df_,
 	output dw_df,
 	output mw_mf,
-	output af_sf_,
+	output af_sf,
 	output ad_sd,
 	output ff_,
 	output ss,
@@ -70,12 +69,12 @@ module fpm(
 	input lp_,
 	input f8_,
 	input f13,
-	output fi3_,
 	output di,
-	output fi0_,
 	output wc_,
-	output fi1_,
-	output fi2_,
+	output fi0,
+	output fi1,
+	output fi2,
+	output fi3,
 	// sheet 9
 	input w0_,
 	input t_1_t_1,
@@ -88,13 +87,13 @@ module fpm(
 	input c0_eq_c1,
 	input t1_,
 	input t0_,
-	input clockta_,
-	input t_0_1_,
-	input t_2_7_,
-	input t_8_15_,
-	input t_16_23_,
-	input t_24_31_,
-	input t_32_39_,
+	input clockta,
+	input t_0_1,
+	input t_2_7,
+	input t_8_15,
+	input t_16_23,
+	input t_24_31,
+	input t_32_39,
 	output t_1,
 	output t0_t_1,
 	output ok,
@@ -102,7 +101,7 @@ module fpm(
 	output opsu,
 	output ta,
 	// sheet 10
-	input trb_,
+	input trb,
 	input t39_,
 	input m0_,
 	input mb,
@@ -133,7 +132,6 @@ module fpm(
 	// sheet 1
 	// L bus
 
-	wire lkb = ~lkb_;
 	wire [0:9] L;
 	always @ (*) begin
 		case (lkb)
@@ -170,7 +168,7 @@ module fpm(
 	wire [0:7] B_BUS /* synthesis keep */;
 
 	always @ (*) begin
-		case ({~fcb_, ~scc_})
+		case ({~fcb_, scc})
 			2'b00: B_BUS <= ~B;
 			2'b01: B_BUS <= B;
 			2'b10: B_BUS <= 8'hff;
@@ -186,8 +184,8 @@ module fpm(
 		{M29_14, sum_c} <= B_BUS + D + pc8;
 	end
 
-	wire M9_3 = fcb_ ^ scc_;
-	wire M3_6 = ~((B[0] & M9_3) | (~B[0] & scc_));
+	wire M9_3 = fcb_ ^ ~scc;
+	wire M3_6 = ~((B[0] & M9_3) | (~B[0] & ~scc));
 	wire M27_8 = M3_6 ^ d_1_;
 	wire sum_c_2 = ~((M29_14 & M3_6) | (M29_14 & d_1_) | (M3_6 & d_1_));
 	wire sum_c_1 = M29_14 ^ M27_8;
@@ -202,7 +200,7 @@ module fpm(
 		.s_(1'b1),
 		.d(sum_c_ge_40),
 		.c(M57_8),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(g)
 	);
 
@@ -210,7 +208,7 @@ module fpm(
 		.s_(1'b1),
 		.d(sum_c_1),
 		.c(M57_8),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(wdt)
 	);
 
@@ -219,7 +217,7 @@ module fpm(
 		.s_(M35_6),
 		.d(M68_11),
 		.c(M57_8),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(wt)
 	);
 
@@ -227,12 +225,11 @@ module fpm(
 	wire cua = wdt & f8 & strob_fp;
 	wire f8_n_wdt = ~wdt & f8;
 	wire cd$_ = ~(f8 & strob_fp);
-	wire rab = (g & strob2_fp & ~f5_) | ~_0_f_;
+	wire rab = (g & strob2_fp & ~f5_) | _0_f;
 
 	wire f5_af_sf = af_sf & ~f5_;
 	wire f2 = ~f2_;
 	wire f2strob = f2 & strob_fp;
-	wire strob_fp = ~strob_fp_;
 
 	// sheet 4
 
@@ -265,7 +262,6 @@ module fpm(
 		.in({M58_12, M54_6, M59_6, M59_3, M69_8, M54_8}),
 		.fic(fic)
 	);
-	assign fic_ = ~fic;
 
 	// sheet 5
 
@@ -273,7 +269,7 @@ module fpm(
 	// FIX: t0_t_1 instead of t0_t1
 	assign v_f = (r02) | (t0_t_1 & mwadsd);
 	assign m_f = ~((t_1_ & dw_) | (t16_ & dw));
-	wire M77_11 = t_24_31_ & t_16_23_;
+	wire M77_11 = ~t_24_31 & ~t_16_23;
 	assign z_f = (M77_11 & dw) | (mwadsd & t_) | (ff & fwz);
 	assign dw = ~dw_;
 
@@ -307,7 +303,7 @@ module fpm(
 	wire f9df = df & f9;
 	assign dw_df = ~(df_ & dw_);
 	assign mw_mf = ~(mf_ & mw_);
-	assign af_sf_ = sf_ & af_;
+	assign af_sf = ~(sf_ & af_);
 	wire mwdw = ~(dw_ & mw_);
 	assign ad_sd = ~(sd$_ & ad_);
 	wire mwadsd = ~(mw_ & sd$_ & ad_);
@@ -320,9 +316,7 @@ module fpm(
 
 	// sheet 7
 
-	wire af_sf = ~af_sf_;
-
-	wire M63_8 = (mw_mf & f2) | (~f10_) | (af_sf_ & f4) | (f4 & wt);
+	wire M63_8 = (mw_mf & f2) | (~f10_) | (~af_sf & f4) | (f4 & wt);
 	wire M68_8 = M63_8 & strob_fp;
 	wire M49_8 = ~(strob_fp & ~f7_ & ad_sd);
 	wire M72_8 = ~f10_ & strob_fp;
@@ -332,7 +326,7 @@ module fpm(
 		.s_(1'b1),
 		.d(t_),
 		.c(M68_8),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(fwz)
 	);
 
@@ -341,7 +335,7 @@ module fpm(
 		.s_(1'b1),
 		.d(~fp0_),
 		.c(M49_8),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(ci)
 	);
 
@@ -350,7 +344,7 @@ module fpm(
 		.s_(1'b1),
 		.d(ws),
 		.c(~f7_),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(_end)
 	);
 
@@ -360,7 +354,7 @@ module fpm(
 		.s_(1'b1),
 		.d(M47_6),
 		.c(M72_8),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(ws)
 	);
 
@@ -369,16 +363,16 @@ module fpm(
 	// sheet 8
 
 	wire M64_8 = (nrf_ & nz & f4) | (f2 & (dw_df & ~t)) | (nz & f2);
-	assign fi3_ = ~(strob_fp & M64_8);
+	assign fi3 = strob_fp & M64_8;
 	wire M49_12 = ~(idi & ~f6_ & strob2_fp);
 	wire M49_6 = ~(strob_fp & lp_ & f8);
 	wire M35_8 = ~(f4 & af_sf & wt_ & t_);
 
 	ffd REG_DI(
-		.s_(fi3_),
+		.s_(~fi3),
 		.d(beta),
 		.c(M49_12),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(di)
 	);
 
@@ -397,7 +391,7 @@ module fpm(
 		.s_(M35_8),
 		.d(1'b1),
 		.c(1'b1),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(wc)
 	);
 
@@ -409,13 +403,13 @@ module fpm(
 		.q(M20_13)
 	);
 
-	assign fi0_ = ~(di & M20_13);
+	assign fi0 = di & M20_13;
 
 	wire t_ = ~t;
 	wire f8 = ~f8_;
 	wire M69_3 = ff & f13;
-	assign fi1_ = ~(M69_3 & d_2 & ~(d[0] & d_1));
-	assign fi2_ = ~(M69_3 & ~(d_1_ & d0_) & d_2_);
+	assign fi1 = M69_3 & d_2 & ~(d[0] & d_1);
+	assign fi2 = M69_3 & ~(d_1_ & d0_) & d_2_;
 
 	// sheet 9
 
@@ -425,17 +419,17 @@ module fpm(
 	wire M40_8 = ~((w0_ & lkb) | (sgn_ & f9df) | (t_1_t_1 & t_1_) | (f6_f7 & M53_8));
 	wire M52_8 = ~((mw_mf & mfwp) | (t0_t1 & dw_df));
 	wire M67_3 = ~(t1_ & t0_);
-	wire M12_8 = t_32_39_ & t_24_31_ & t_16_23_ & t_8_15_;
-	assign ta = ~(t_8_15_ & t_2_7_ & t_0_1_ & t_1_);
-	wire t = ~(t_1_ & t_0_1_ & t_2_7_ & t_8_15_ & t_16_23_ & t_24_31_ & t_32_39_ & m_1_);
-	wire M25_8 = ~(M12_8 & dw_df & M67_3 & t_2_7_);
+	wire M12_8 = ~t_32_39 & ~t_24_31 & ~t_16_23 & ~t_8_15;
+	assign ta = ~(~t_8_15 & ~t_2_7 & ~t_0_1 & t_1_);
+	wire t = ~(t_1_ & ~t_0_1 & ~t_2_7 & ~t_8_15 & ~t_16_23 & ~t_24_31 & ~t_32_39 & m_1_);
+	wire M25_8 = ~(M12_8 & dw_df & M67_3 & ~t_2_7);
 	wire M66_8 = ~(c0_eq_c1 & dw & ta);
 
 	wire t_1_ = ~t_1;
 	ffd_ena REG_T_1(
 		.s_(1'b1),
 		.d(M40_8),
-		.c(strob_fp_),
+		.c(~strob_fp),
 		.ena(opta),
 		.r_(~_0_t),
 		.q(t_1)
@@ -449,13 +443,13 @@ module fpm(
 
 	// sheet 10
 
-	wire M22_8 = (~trb_ & ~t39_) | (~m0_ & ~mb) | (t_1 & f4) | (af & ~c39_ & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
+	wire M22_8 = (trb & ~t39_) | (~m0_ & ~mb) | (t_1 & f4) | (af & ~c39_ & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
 
 	wire m_1_ = ~m_1;
 	ffd_ena REG_M_1(
 			.s_(1'b1),
 			.d(M22_8),
-			.c(strob_fp_),
+			.c(~strob_fp),
 			.ena(opm),
 			.r_(~_0_m),
 			.q(m_1)
@@ -470,7 +464,7 @@ module fpm(
 	ffd_ena REG_CK(
 		.s_(M70_11),
 		.d(M77_6),
-		.c(strob_fp_),
+		.c(~strob_fp),
 		.ena(opm),
 		.r_(~_0_m),
 		.q(ck)
@@ -486,7 +480,7 @@ module fpm(
 	ffd_ena REG_PM(
 		.s_(1'b1),
 		.d(M52_6),
-		.c(strob_fp_),
+		.c(~strob_fp),
 		.ena(opm),
 		.r_(~_0_m),
 		.q(pm)
@@ -503,7 +497,7 @@ module fpm(
 		.s_(~f6_f7),
 		.d(1'b0),
 		.c(cd$_),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(d$)
 	);
 
@@ -519,7 +513,7 @@ module fpm(
 		.s_(1'b1),
 		.d(t0_c0),
 		.c(f4),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(sgn)
 	);
 

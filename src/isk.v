@@ -7,16 +7,16 @@
 */
 
 module isk(
-	input dmcl_,
-	input dcl_,
-	input off_, // not implemented in FPGA
+	input dmcl,
+	input dcl,
+	input off, // not implemented in FPGA
 	output rcl_,
-	output zoff_ // not implemented in FPGA
+	output zoff // not implemented in FPGA
 );
 
-	assign zoff_ = 1'b1;
+	assign zoff = 1'b0;
 
-	assign rcl_ = dcl_ & dmcl_;
+	assign rcl_ = ~dcl & ~dmcl;
 
 endmodule
 

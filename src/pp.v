@@ -10,30 +10,30 @@ module pp(
 	input __clk,
 	// sheet 1, 2
 	input [0:15] w,
-	input clm_,
+	input clm,
 	input w_rm,
-	input strob1_,
+	input strob1,
 	input i4,
 	output [0:9] rs,
 	// sheet 3
-	input pout_,
-	input zer_,
-	input b_parz_,
+	input pout,
+	input zer,
+	input b_parz,
 	input ck_rz_w,
-	input b_p0_,
+	input b_p0,
 	input zerrz,
 	input i1,
 	input przerw,
 	output [0:15] bus_rz,
 	// sheet 4
 	input rpa_,
-	input zegar_,
+	input zegar,
 	input xi,
-	input fi0_,
 	// sheet 5
-	input fi1_,
-	input fi2_,
-	input fi3_,
+	input fi0,
+	input fi1,
+	input fi2,
+	input fi3,
 	output przerw_z,
 	// sheet 6
 	input k1,
@@ -43,7 +43,7 @@ module pp(
 	// sheet 8
 	// --
 	// sheet 9
-	input oprq_,
+	input oprq,
 	// sheet 10
 	input ir14,
 	input wx,
@@ -64,12 +64,12 @@ module pp(
 	// sheet 12
 	// --
 	// sheet 13
-	output dad11_,
-	output dad12_,
-	output dad13_,
-	output dad14_,
-	output dad4_,
-	output dad15_
+	output dad4,
+	output dad11,
+	output dad12,
+	output dad13,
+	output dad14,
+	output dad15
 
 );
 
@@ -81,9 +81,8 @@ module pp(
 	// sheet 1, 2
 	// * RM - interrupt mask register
 
-	wire clm$ = clm_ & ~(strob1 & i4);
+	wire clm$ = ~clm & ~(strob1 & i4);
 	wire clrs = strob1 & w_rm;
-	wire strob1 = ~strob1_;
 
 	genvar num;
 	generate
@@ -104,20 +103,20 @@ module pp(
 
 	// RZ input: async interrupt signals bus
 	wire [0:31] IRQ_ = {
-		pout_,		// 0 power out (NMI)
-		b_parz_,	// 1 memory parity error
-		b_p0_,		// 2 no memory
+		~pout,		// 0 power out (NMI)
+		~b_parz,	// 1 memory parity error
+		~b_p0,		// 2 no memory
 		~rz4,			// 3 other CPU, high priority
 		rpa_,			// 4 interface power out
-		zegar_,		// 5 timer
+		~zegar,		// 5 timer
 		~xi,			// 6 illegal instruction
-		fi0_,			// 7 div overflow (fixed point)
-		fi1_,			// 8 floating point underflow
-		fi2_,			// 9 floating point overflow
-		fi3_,			// 10 div/0 or floating point error
+		~fi0,			// 7 div overflow (fixed point)
+		~fi1,			// 8 floating point underflow
+		~fi2,			// 9 floating point overflow
+		~fi3,			// 10 div/0 or floating point error
 		1'b1,			// 11 unused
 		zk_[0:15],// 12-27 channel interrupts
-		oprq_,		// 28 operator request
+		~oprq,		// 28 operator request
 		~rz29,		// 29 other CPU, low priority
 		~soft_high,	// 30 software interrupt high
 		~soft_low		// 31 software interrupt low
@@ -147,8 +146,8 @@ module pp(
 	};
 
 	// RZ input: resets
-	wire _0_rzw_ = clm_ & ~zerrz;
-	wire _0_rzz_ = clm_ & ~k1;
+	wire _0_rzw_ = ~clm & ~zerrz;
+	wire _0_rzz_ = ~clm & ~k1;
 	wire M94_3 = _0_rzw_ & ~(M104_12 & (~ir14 & ~ir15));
 	wire [0:31] RZ_RESET = {
 		{12{_0_rzw_}},
@@ -189,7 +188,7 @@ module pp(
 	// RP input/output: interrupt priority chain
 	wire [0:31] PRIO_OUT;
 	wire [0:31] PRIO_IN = {
-		zer_,
+		~zer,
 		PRIO_OUT[0:30]
 	};
 
@@ -303,7 +302,7 @@ module pp(
 	wire npab = ~(rp_[ 2] & rp_[ 3] & rp_[ 6] & rp_[ 7] & rp_[10] & rp_[11] & rp_[14] & rp_[15]);
 	wire npaa = ~(rp_[ 1] & rp_[ 3] & rp_[ 5] & rp_[ 7] & rp_[ 9] & rp_[11] & rp_[13] & rp_[15]);
 
-	assign dad4_ = ~nk_ad;
+	assign dad4 = nk_ad;
 
 	wire M85_11 = npbd ^ npad;
 	wire M85_8  = npbc ^ npac;
@@ -313,11 +312,11 @@ module pp(
 
 	wire M4_8 = przerw & zw & i4;
 
-	assign dad11_ = ~(M4_8 & zi[6])  & ~(nk_ad & M99_6);
-	assign dad12_ = ~(M4_8 & M85_11) & ~(nk_ad & ~M85_8);
-	assign dad13_ = ~(M4_8 & M85_8)  & ~(nk_ad & M85_6);
-	assign dad14_ = ~(M4_8 & M85_6)  & ~(nk_ad & M85_3);
-	assign dad15_ = ~(M4_8 & M85_3);
+	assign dad11 = (M4_8 & zi[6])  | (nk_ad & M99_6);
+	assign dad12 = (M4_8 & M85_11) | (nk_ad & ~M85_8);
+	assign dad13 = (M4_8 & M85_8)  | (nk_ad & M85_6);
+	assign dad14 = (M4_8 & M85_6)  | (nk_ad & M85_3);
+	assign dad15 = M4_8 & M85_3;
 
 endmodule
 

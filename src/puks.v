@@ -8,25 +8,25 @@
 
 module puks(
 	input clk,
-	input zoff_, // not implemented for FPGA
+	input zoff, // not implemented for FPGA
 	input rcl_,
-	input dcl_,
-	output reg off_, // not implemented for FPGA
-	output pout_,
-	output pon_,
-	output reg clo_,
-	output reg clm_
+	input dcl,
+	output reg off, // not implemented for FPGA
+	output pout,
+	output pon,
+	output reg clo,
+	output reg clm
 );
 
 	// -POUT: power out (0.2-2us strob, not implemented)
-	assign pout_ = 1'b1;
+	assign pout = 1'b0;
 
 	// -OFF: power lines not ready (in real hardware: goes high 0.5-2s after the power is switched on)
-	initial off_ = 0;
+	initial off = 1;
 	reg [2:0] power_ok_cnt = 3'd7;
 	always @ (posedge clk) begin
 		if (power_ok_cnt == 0) begin
-			off_ <= 1;
+			off <= 0;
 		end else begin
 			power_ok_cnt <= power_ok_cnt - 1'b1;
 		end
@@ -36,14 +36,14 @@ module puks(
 	univib #(.ticks(3'd7)) PON(
 		.clk(clk),
 		.a_(1'b0),
-		.b(off_),
-		.q_(pon_)
+		.b(~off),
+		.q(pon)
 	);
 
 	// -CLO: general reset
 	// -CLM: module reset
-	assign clm_ = off_ & dcl_ & rcl_;
-	assign clo_ = off_ & dcl_;
+	assign clm = ~(~off & ~dcl & rcl_);
+	assign clo = ~(~off & ~dcl);
 
 endmodule
 

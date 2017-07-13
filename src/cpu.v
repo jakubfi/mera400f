@@ -7,23 +7,23 @@
 
 module cpu(
 	// from power supply (?)
-	input off_,
-	input pon_,
-	input pout_,
-	input clm_, clo_,
+	input off,
+	input pon,
+	input pout,
+	input clm, clo,
 
 	// from control panel
 	input [0:15] kl,
-	input panel_store_, panel_fetch_, panel_load_, panel_bin_,
-	input oprq_, stop$_, start$_, work, mode, step_, stop_n, cycle_,
+	input panel_store, panel_fetch, panel_load, panel_bin,
+	input oprq, stop, start, work, mode, step, stop_n, cycle,
 	input wre, rsa, rsb, rsc,
 	input wic, wac, war, wir, wrs, wrz, wkb,
-	input zegar_,
+	input zegar,
 	// to control panel
 	output p0,
 	output [0:15] w,
 	output hlt_n,
-	output p_,
+	output p,
 	output run,
 	output _wait,
 	output irq,
@@ -33,7 +33,7 @@ module cpu(
 
 	// system bus
 											input rpa_,
-	output dmcl_,
+	output dmcl,
 	// -OFF
 	output dw_,
 	output dr_,
@@ -86,27 +86,27 @@ module cpu(
 
 
 	// -DDT open-collector composition
-	assign ddt_[0] = pa_ddt_[0] & px_ddt0_;
+	assign ddt_[0] = pa_ddt_[0] & ~px_ddt0;
 	assign ddt_[1:14] = pa_ddt_[1:14];
-	assign ddt_[15] = pa_ddt_[15] & px_ddt15_;
+	assign ddt_[15] = pa_ddt_[15] & ~px_ddt15;
 
 	// -DAD open-collector composition
 	assign dad_[0:3] = pa_dad_[0:3];
-	assign dad_[4] = pa_dad_[4] & pp_dad4_;
+	assign dad_[4] = pa_dad_[4] & ~pp_dad4;
 	assign dad_[5:8] = pa_dad_[5:8];
-	assign dad_[9] = pa_dad_[9] & px_dad9_;
-	assign dad_[10] = pa_dad_[10] & px_dad10_;
-	assign dad_[11] = pa_dad_[11] & pp_dad11_;
-	assign dad_[12] = pa_dad_[12] & px_dad12_ & pp_dad12_;
-	assign dad_[13] = pa_dad_[13] & px_dad13_ & pp_dad13_;
-	assign dad_[14] = pa_dad_[14] & px_dad14_ & pp_dad14_;
-	assign dad_[15] = pa_dad_[15] & px_dad15_ir9_ & px_dad15_i_ & pp_dad15_;
+	assign dad_[9] = pa_dad_[9] & ~px_dad9;
+	assign dad_[10] = pa_dad_[10] & ~px_dad10;
+	assign dad_[11] = pa_dad_[11] & ~pp_dad11;
+	assign dad_[12] = pa_dad_[12] & ~px_dad12 & ~pp_dad12;
+	assign dad_[13] = pa_dad_[13] & ~px_dad13 & ~pp_dad13;
+	assign dad_[14] = pa_dad_[14] & ~px_dad14 & ~pp_dad14;
+	assign dad_[15] = pa_dad_[15] & ~px_dad15_ir9 & ~px_dad15_i & ~pp_dad15;
 
 // -----------------------------------------------------------------------
 // --- P-X ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire k1, wp, k2, wa, wz, w$, wr, we, p1, p2, p5, p4, p3, i5, i4, i3, i2, i1, ww, wm, wx, as2, got_, strob2_, strob1_, strob1, arm4, blw_pw, ekc_i, zer_sp, lipsp, pn_nb, bp_nb, bar_nb_, barnb, q_nb, w_dt_, dt_w_, ar_ad_, ic_ad_, px_ddt15_, px_ddt0_, px_dad15_i_, px_dad10_, px_dad9_, i3_ex_przer_, ck_rz_w, zerrz, ok$, oken, bod, b_parz_, b_p0_, px_dad15_ir9_, px_dad12_, px_dad13_, px_dad14_;
+wire k1, wp, k2, wa, wz, w$, wr, we, p1, p2, p5, p4, p3, i5, i4, i3, i2, i1, ww, wm, wx, as2, got, strob2, strob1, arm4, blw_pw, ekc_i, zer_sp, lipsp, pn_nb, bp_nb, bar_nb, barnb, q_nb, w_dt, dt_w, ar_ad, ic_ad, px_ddt15, px_ddt0, px_dad15_i, px_dad10, px_dad9, i3_ex_przer, ck_rz_w, zerrz, ok$, oken, bod, b_parz, b_p0, px_dad15_ir9, px_dad12, px_dad13, px_dad14;
 
 px #(
 	.AWP_PRESENT(AWP_PRESENT),
@@ -127,7 +127,7 @@ px #(
 	.ewp(ewp),
 	.ek2(ek2),
 	.ewa(ewa),
-	.clo_(clo_),
+	.clo(clo),
 	.ewe(ewe),
 	.ewr(ewr),
 	.ew$(ew$),
@@ -169,12 +169,11 @@ px #(
 	.wx(wx),
 	.laduj(laduj),
 	.as2_sum_at(as2),
-	.strob_fp_(strob_fp_),
+	.strob_fp(strob_fp),
 	.mode(mode),
-	.step_(step_),
-	.got_(got_),
-	.strob2_(strob2_),
-	.strob1_(strob1_),
+	.step(step),
+	.got(got),
+	.strob2(strob2),
 	.strob1(strob1),
 	.przerw_z(przerw_z),
 	.przerw(przerw),
@@ -193,17 +192,17 @@ px #(
 	.in(in),
 	.ou(ou),
 	.k2fetch(k2fetch),
-	.red_fp_(read_fp_),
+	.read_fp(read_fp),
 	.pn_nb(pn_nb),
 	.bp_nb(bp_nb),
-	.bar_nb_(bar_nb_),
+	.bar_nb(bar_nb),
 	.barnb(barnb),
 	.q_nb(q_nb),
 	.df_(df_),
-	.w_dt_(w_dt_),
+	.w_dt(w_dt),
 	.dr_(dr_),
-	.dt_w_(dt_w_),
-	.ar_ad_(ar_ad_),
+	.dt_w(dt_w),
+	.ar_ad(ar_ad),
 	.ds_(ds_),
 	.mcl(mcl),
 	.gi(gi),
@@ -212,19 +211,19 @@ px #(
 	.arz(arz),
 	.k2_bin_store(k2_bin_store),
 	.lrz(lrz),
-	.ic_ad_(ic_ad_),
-	.dmcl_(dmcl_),
-	.ddt15_(px_ddt15_),
-	.ddt0_(px_ddt0_),
+	.ic_ad(ic_ad),
+	.dmcl(dmcl),
+	.ddt15(px_ddt15),
+	.ddt0(px_ddt0),
 	.din_(din_),
-	.dad15_i_(px_dad15_i_),
-	.dad10_(px_dad10_),
-	.dad9_(px_dad9_),
+	.dad15_i(px_dad15_i),
+	.dad10(px_dad10),
+	.dad9(px_dad9),
 	.dw_(dw_),
-	.i3_ex_przer_(i3_ex_przer_),
+	.i3_ex_przer(i3_ex_przer),
 	.ck_rz_w(ck_rz_w),
 	.zerrz(zerrz),
-	.sr_fp_(sr_fp_),
+	.sr_fp(sr_fp),
 	.zw(zw),
 	.srez$(srez$),
 	.wzi(wzi),
@@ -239,20 +238,20 @@ px #(
 	.stop_n(stop_n),
 	.zga(zga),
 	.rpe_(rpe_),
-	.stop_(stop$_),
+	.stop(stop),
 	.ir9(ir[9]),
 	.pufa(pufa),
 	.ir7(ir[7]),
 	.ir8(ir[8]),
 	.hlt_n(hlt_n),
 	.bod(bod),
-	.b_parz_(b_parz_),
-	.b_p0_(b_p0_),
+	.b_parz(b_parz),
+	.b_p0(b_p0),
 	.awaria(awaria),
-	.dad15_ir9_(px_dad15_ir9_),
-	.dad12_(px_dad12_),
-	.dad13_(px_dad13_),
-	.dad14_(px_dad14_)
+	.dad15_ir9(px_dad15_ir9),
+	.dad12(px_dad12),
+	.dad13(px_dad13),
+	.dad14(px_dad14)
 );
 
 // -----------------------------------------------------------------------
@@ -266,33 +265,33 @@ pm #(
 	.PC_TICKS(PC_TICKS)
 )PM(
 	.__clk(__clk),
-	.start$_(start$_),
-	.pon_(pon_),
+	.start(start),
+	.pon(pon),
 	.work(work),
 	.hlt_n(hlt_n),
-	.stop$_(stop$_),
-	.clo_(clo_),
+	.stop(stop),
+	.clo(clo),
 	.hlt(hlt),
-	.cycle_(cycle_),
+	.cycle(cycle),
 	.irq(irq),
 	._wait(_wait),
 	.run(run),
 	.ekc_1(ekc_1),
 	.ekc_i(ekc_i),
 	.ekc_2(ekc_2),
-	.got_(got_),
-	.ekc_fp_(ekc_fp_),
-	.clm_(clm_),
-	.strob2_(strob2_),
+	.got(got),
+	.ekc_fp(ekc_fp),
+	.clm(clm),
+	.strob2(strob2),
 	.sp0(sp0),
 	.przerw(przerw),
 	.si1(si1),
 	.sp1(sp1),
 	.k2(k2),
-	.panel_store_(panel_store_),
-	.panel_fetch_(panel_fetch_),
-	.panel_load_(panel_load_),
-	.panel_bin_(panel_bin_),
+	.panel_store(panel_store),
+	.panel_fetch(panel_fetch),
+	.panel_load(panel_load),
+	.panel_bin(panel_bin),
 	.rdt11_(rdt_[11]),
 	.k1(k1),
 	.laduj(laduj),
@@ -315,7 +314,7 @@ pm #(
 	.sc$(sc$),
 	.md(md),
 	.xi(xi),
-	.p_(p_),
+	.p(p),
 	.mc_3(mc_3),
 	.mc_0(mc_0),
 	.xi$(xi$),
@@ -337,13 +336,13 @@ pm #(
 	.ep1(ep1),
 	.ep2(ep2),
 	.icp1(icp1),
-	.strob1_(strob1_),
+	.strob1(strob1),
 	.exl(exl),
 	.lipsp(lipsp),
 	.gr(gr),
 	.wx(wx),
 	.shc(shc),
-	.read_fp_(read_fp_),
+	.read_fp(read_fp),
 	.ir7(ir[7]),
 	.inou(inou),
 	.rok_(rok_),
@@ -358,7 +357,7 @@ pm #(
 	.ir12(ir[12]),
 	.rsa(rsa),
 	.lpa(lpa),
-	.rlp_fp_(rlp_fp_),
+	.rlp_fp(rlp_fp),
 	.rc(rc),
 	.rb(rb),
 	.ra(ra),
@@ -391,7 +390,7 @@ pm #(
 	.war(war),
 	.wre(wre),
 	.i3(i3),
-	.s_fp_(s_fp_),
+	.s_fp(s_fp),
 	.sar$(sar$),
 	.lar$(lar$),
 	.in(in),
@@ -422,13 +421,13 @@ pm #(
 	.i5(i5),
 	.rb$(rb$),
 	.w$(w$),
-	.i3_ex_prz_(i3_ex_przer_),
+	.i3_ex_przer(i3_ex_przer),
 	.baa(baa),
 	.bab(bab),
 	.bac(bac),
 	.aa(aa),
 	.ab(ab),
-	.at15_(at15_),
+	.at15(at15),
 	.srez$(srez$),
 	.rz(rz),
 	.wir(wir),
@@ -440,8 +439,8 @@ pm #(
 	.kib(kib),
 	.w_ir(w_ir),
 	.ki(ki),
-	.dt_w_(dt_w_),
-	.f13_(f13_),
+	.dt_w(dt_w),
+	.f13(f13),
 	.wkb(wkb),
 	.mwa(mwa),
 	.mwb(mwb),
@@ -501,7 +500,7 @@ pd #(
 	.mc_3(mc_3),
 	.r0(r0),
 	._0_v(_0_v),
-	.p_(p_),
+	.p(p),
 	.md(md),
 	.xi(xi),
 	.nef(nef),
@@ -528,7 +527,7 @@ pd #(
 	.aryt(aryt),
 	.sbar$(sbar$),
 	.nrf(nrf),
-	.at15_(at15_),
+	.at15(at15),
 	.wx(wx),
 	.wa(wa),
 	.ust_z(ust_z),
@@ -581,7 +580,7 @@ pd #(
 // -----------------------------------------------------------------------
 
 wire [0:15] l;
-wire zgpn, zer_;
+wire zgpn, zer;
 wire [0:8] r0;
 wire [0:15] bus_ki;
 
@@ -598,11 +597,11 @@ pr #(
 	.ra(ra),
 	.as2(as2),
 	.w_r(w_r),
-	.strob1_(strob1_),
-	.strob2_(strob2_),
+	.strob1(strob1),
+	.strob2(strob2),
 	.w(w),
 	.l(l),
-	.bar_nb_(bar_nb_),
+	.bar_nb(bar_nb),
 	.w_rbb(w_rbb),
 	.w_rbc(w_rbc),
 	.w_rba(w_rba),
@@ -613,27 +612,27 @@ pr #(
 	.q_nb(q_nb),
 	.w_bar(w_bar),
 	.zer_sp(zer_sp),
-	.clm_(clm_),
-	.ustr0_fp_(ustr0_fp_),
+	.clm(clm),
+	.ustr0_fp(ustr0_fp),
 	.ust_leg(ust_leg),
 	.aryt(aryt),
 	.zs(zs),
-	.carry_(carry_),
+	.carry(carry),
 	.s_1(s_1),
 	.zgpn(zgpn),
 	.dpn_(dpn_),
 	.dqb_(dqb_),
 	.q(q),
-	.zer_(zer_),
+	.zer(zer),
 	.ust_z(ust_z),
 	.ust_mc(ust_mc),
 	.s0(s0),
 	.ust_v(ust_v),
 	._0_v(_0_v),
 	.r0(r0),
-	.exy_(exy_),
+	.exy(exy),
 	.ust_y(ust_y),
-	.exx_(exx_),
+	.exx(exx),
 	.ust_x(ust_x),
 	.kia(kia),
 	.kib(kib),
@@ -649,7 +648,7 @@ pr #(
 
 wire [0:9] rs;
 wire [0:15] bus_rz;
-wire przerw_z, pp_dad11_, pp_dad12_, pp_dad13_, pp_dad14_, pp_dad4_, pp_dad15_;
+wire przerw_z, pp_dad11, pp_dad12, pp_dad13, pp_dad14, pp_dad4, pp_dad15;
 
 pp #(
 	.DOK_DLY_TICKS(DOK_DLY_TICKS),
@@ -657,31 +656,31 @@ pp #(
 ) PP(
 	.__clk(__clk),
 	.w(w),
-	.clm_(clm_),
+	.clm(clm),
 	.w_rm(w_rm),
-	.strob1_(strob1_),
+	.strob1(strob1),
 	.i4(i4),
 	.rs(rs),
-	.pout_(pout_),
-	.zer_(zer_),
-	.b_parz_(b_parz_),
+	.pout(pout),
+	.zer(zer),
+	.b_parz(b_parz),
 	.ck_rz_w(ck_rz_w),
-	.b_p0_(b_p0_),
+	.b_p0(b_p0),
 	.zerrz(zerrz),
 	.i1(i1),
 	.przerw(przerw),
 	.bus_rz(bus_rz),
 	.rpa_(rpa_),
-	.zegar_(zegar_),
+	.zegar(zegar),
 	.xi(xi$),
-	.fi0_(fi0_),
-	.fi1_(fi1_),
-	.fi2_(fi2_),
-	.fi3_(fi3_),
+	.fi0(fi0),
+	.fi1(fi1),
+	.fi2(fi2),
+	.fi3(fi3),
 	.przerw_z(przerw_z),
 	.k1(k1),
 	.i2(i2),
-	.oprq_(oprq_),
+	.oprq(oprq),
 	.ir14(ir[14]),
 	.wx(wx),
 	.sin(sin),
@@ -697,19 +696,19 @@ pp #(
 	.rdt11_(rdt_[11]),
 	.dok_(dok_),
 	.irq(irq),
-	.dad11_(pp_dad11_),
-	.dad12_(pp_dad12_),
-	.dad13_(pp_dad13_),
-	.dad14_(pp_dad14_),
-	.dad4_(pp_dad4_),
-	.dad15_(pp_dad15_)
+	.dad4(pp_dad4),
+	.dad11(pp_dad11),
+	.dad12(pp_dad12),
+	.dad13(pp_dad13),
+	.dad14(pp_dad14),
+	.dad15(pp_dad15)
 );
 
 // -----------------------------------------------------------------------
 // --- P-A ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire s0, carry_, j$, exx_, at15_, exy_, s_1, wzi, zs, arz;
+wire s0, carry, j$, exx, at15, exy, s_1, wzi, zs, arz;
 wire zga;
 wire [0:15] pa_ddt_;
 wire [0:15] pa_dad_;
@@ -718,7 +717,7 @@ pa PA(
 	.ir(ir),
 	.bus_ki(bus_ki),
 	.rdt_(rdt_),
-	.w_dt_(w_dt_),
+	.w_dt(w_dt),
 	.mwa(mwa),
 	.mwb(mwb),
 	.mwc(mwc),
@@ -732,21 +731,20 @@ pa PA(
 	.sb(sb),
 	.sd(sd),
 	.s0(s0),
-	.carry_(carry_),
+	.carry(carry),
 	.p16(p16),
 	.saa(saa),
 	.sca(sca),
 	.j$(j$),
-	.exx_(exx_),
+	.exx(exx),
 	.wx(wx),
 	.eat0(eat0),
 	.axy(axy),
-	.at15_(at15_),
-	.exy_(exy_),
+	.at15(at15),
+	.exy(exy),
 	.w_ac(w_ac),
-	.strob2_(strob2_),
+	.strob2(strob2),
 	.as2(as2),
-	.strob1_(strob1_),
 	.am1(am1),
 	.apb(apb),
 	.amb(amb),
@@ -761,7 +759,7 @@ pa PA(
 	.arz(arz),
 	.icp1(icp1),
 	.w_ic(w_ic),
-	.off_(off_),
+	.off(off),
 	.baa(baa),
 	.bab(bab),
 	.bac(bac),
@@ -770,9 +768,9 @@ pa PA(
 	.l(l),
 	.barnb(barnb),
 	.kl(kl),
-	.ic_ad_(ic_ad_),
+	.ic_ad(ic_ad),
 	.dad_(pa_dad_),
-	.ar_ad_(ar_ad_),
+	.ar_ad(ar_ad),
 	.zga(zga)
 );
 
@@ -780,16 +778,16 @@ pa PA(
 // --- AWP ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire fi0_, fi1_, fi2_, fi3_;
-wire read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, ustr0_fp_, s_fp_;
-wire f13_, lpa, lpb;
+wire fi0, fi1, fi2, fi3;
+wire read_fp, strob_fp, sr_fp, ekc_fp, rlp_fp, ustr0_fp, s_fp;
+wire f13, lpa, lpb;
 wire [0:15] zp;
 
 generate
 	if (~AWP_PRESENT) begin
-		assign {fi0_, fi1_, fi2_, fi3_} = 4'b1111;
-		assign {read_fp_, strob_fp_, sr_fp_, ekc_fp_, rlp_fp_, ustr0_fp_, s_fp_} = 7'b1111111;
-		assign {f13_, lpa, lpb} = 3'b100;
+		assign {fi0, fi1, fi2, fi3} = 4'b0000;
+		assign {read_fp, strob_fp, sr_fp, ekc_fp, rlp_fp, ustr0_fp, s_fp} = 7'b0100100;
+		assign {f13, lpa, lpb} = 3'b000;
 		assign zp = 16'h0000;
 	end else begin
 		awp AWP(
@@ -801,27 +799,27 @@ generate
 			.ir(ir[7:9]),
 			.nrf(nrf),
 			.mode(mode),
-			.step_(step_),
+			.step(step),
 			.efp(efp),
-			.got_(got_),
+			.got(got),
 			.ok$(ok$),
 			.oken(oken),
 			.zw(zw),
 			.zp(zp),
-			.fi0_(fi0_),
-			.fi1_(fi1_),
-			.fi2_(fi2_),
-			.fi3_(fi3_),
-			.rlp_fp_(rlp_fp_),
+			.fi0(fi0),
+			.fi1(fi1),
+			.fi2(fi2),
+			.fi3(fi3),
+			.rlp_fp(rlp_fp),
 			.lpa(lpa),
 			.lpb(lpb),
-			.s_fp_(s_fp_),
-			.ustr0_fp_(ustr0_fp_),
-			.f13_(f13_),
-			.strob_fp_(strob_fp_),
-			.sr_fp_(sr_fp_),
-			.read_fp_(read_fp_),
-			.ekc_fp_(ekc_fp_)
+			.s_fp(s_fp),
+			.ustr0_fp(ustr0_fp),
+			.f13(f13),
+			.strob_fp(strob_fp),
+			.sr_fp(sr_fp),
+			.read_fp(read_fp),
+			.ekc_fp(ekc_fp)
 		);
 	end
 endgenerate

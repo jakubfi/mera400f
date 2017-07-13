@@ -9,16 +9,30 @@
 module px(
 	input __clk, // clock for "univibrators"
 	// sheet 1
-	input clo_,	// A62 - general clear (reset)
+	input clo,	// A62 - general clear (reset)
 
 	input ek1,	// A32 - Enter state K1
 	input ek2,	// A29 - Enter state K2
+	input ep0,	// A09 - Enter state P0
+	input sp0,	// A79 - Set state P0
+	input ep1,	// A12 - Enter state P1
+	input sp1,	// A11 - Set state P1
+	input ep2,	// A21 - Enter state P2
+	input ep3,	// A18 - Enter state P3
+	input ep4,	// A19 - Enter state P4
+	input ep5,	// A20 - Enter state P5
 	input ewp,	// A34 - Enter state WP
 	input ewa,	// A30 - Enter state WA
 	input ewe,	// B40 - Enter state WE
 	input ewr,	// A41 - Enter state WR
 	input ew$,	// A36 - Enter state W&
 	input ewz,	// A37 - Enter state WZ
+	input ewx,	// B50 - Enter state WX
+	input ewm,	// B49 - Enter state WM
+	input eww,	// A46 - Enter state WW
+	input si1,	// B52 - Set state I1
+	output ekc_i,	// A76 - EKC*I - Enter state KC (Koniec Cyklu)
+
 	output reg k1,	// A23 - state K1
 	output reg k2,	// A27 - state K2
 	output reg p0,	// A14 - state P0
@@ -41,30 +55,17 @@ module px(
 	output reg i3,	// B60 - state I3
 	output reg i4,	// A51 - state I4
 	output reg i5,	// B61 - state I5
-	input sp1,	// A11 - Set state P1
-	input ep1,	// A12 - Enter state P1
-	input sp0,	// A79 - Set state P0
-	input ep0,	// A09 - Enter state P0
+
 	input stp0,	// B48
-	input ep2,	// A21 - Enter state P2
-	input ep5,	// A20 - Enter state P5
-	input ep4,	// A19 - Enter state P4
-	input ep3,	// A18 - Enter state P3
-	// sheet 2
-	input si1,	// B52 - Set state I1
-	input ewx,	// B50 - Enter state WX
-	input ewm,	// B49 - Enter state WM
-	input eww,	// A46 - Enter state WW
 	// sheet 3
 	input laduj,				// A38
 	output as2_sum_at,	// A13
 	// sheet 4
-	input strob_fp_,// A28
+	input strob_fp,
 	input mode,		// B54
-	input step_,		// A48
-	output got_,		// A83
-	output strob2_,	// A49
-	output strob1_,	// A22 A90
+	input step,		// A48
+	output got,		// A83
+	output strob2,	// A49
 	output strob1,	// A22 A90
 	// sheet 5
 	input przerw_z,	// A61
@@ -76,7 +77,6 @@ module px(
 	input lg_3,			// A68 - LG=3 (Licznik Grupowy)
 	output arm4,		// B79
 	output blw_pw,	// B85
-	output ekc_i,	// A76 - EKC*I - Enter state KC (Koniec Cyklu)
 	output zer_sp,	// A73
 	output lipsp,	// A66
 	// sheet 6
@@ -85,17 +85,17 @@ module px(
 	input in,			// A03 - instruction IN
 	input ou,			// B19 - instruction OU
 	input k2fetch,	// B41
-	input red_fp_,	// A39
+	input read_fp,	// A39
 	output pn_nb,		// B94 - PN->NB
 	output bp_nb,		// B93 - BP->NB
-	output bar_nb_,	// A75 - BAR->NB
+	output bar_nb,	// A75 - BAR->NB
 	output barnb,		// A72
 	output q_nb,		// A74 - Q->NB
 	output df_,			// B92
-	output w_dt_,		// A81 - W->DT
+	output w_dt,		// A81 - W->DT
 	output dr_,			// A87
-	output dt_w_,		// A65 - DT->W
-	output ar_ad_,	// B63 - AR->AD
+	output dt_w,		// A65 - DT->W
+	output ar_ad,	// B63 - AR->AD
 	output ds_,			// A88 - DS: "Send" Driver // NOTE: missing on original schematic
 	// sheet 7
 	input mcl,			// A43 - instruction MCL
@@ -105,20 +105,20 @@ module px(
 	input arz,			// B56
 	input k2_bin_store,	// A31
 	input lrz,			// B78
-	output ic_ad_,	// B87
-	output dmcl_,		// B88
-	output ddt15_,	// A92
-	output ddt0_,		// B89
+	output ic_ad,	// B87
+	output dmcl,		// B88
+	output ddt15,	// A92
+	output ddt0,		// B89
 	output din_,		// A91
-	output dad15_i_,// B81
-	output dad10_,	// B82
-	output dad9_,		// A86
+	output dad15_i,// B81
+	output dad10,	// B82
+	output dad9,		// A86
 	output dw_,			// A93
-	output i3_ex_przer_,	// A52
+	output i3_ex_przer,	// A52
 	output ck_rz_w,	// B91
 	output zerrz,		// B85
 	// sheet 8
-	input sr_fp_,		// B53
+	input sr_fp,		// B53
 	input zw,			// A85 - module allowed to use the system bus (CPU) (ZezWolenie 1)
 	input srez$,		// B76
 	input wzi,			// A60
@@ -134,20 +134,20 @@ module px(
 	input stop_n,		// B55
 	input zga,			// B57
 	input rpe_,			// A82
-	input stop_,		// B51
+	input stop,		// B51
 	input ir9,			// B06
 	input pufa,			// B08 - any of the wide or floating point instructions
 	input ir7,			// A06
 	input ir8,			// A04
 	output hlt_n,	// A94
 	output bod,			// A77
-	output b_parz_,	// A56
-	output b_p0_,		// B84
+	output b_parz,	// A56
+	output b_p0,		// B84
 	output awaria,	// B90
-	output dad15_ir9_,// B07
-	output dad12_,	// A08
-	output dad13_,	// A07
-	output dad14_		// A05
+	output dad15_ir9,// B07
+	output dad12,	// A08
+	output dad13,	// A07
+	output dad14		// A05
 );
 
 	parameter AWP_PRESENT;
@@ -167,8 +167,8 @@ module px(
 	// sheet 1, page 2-1
 	// * state registers
 
-	always @ (posedge got, negedge clo_) begin
-		if (~clo_) begin
+	always @ (posedge got, posedge clo) begin
+		if (clo) begin
 			{k1, wp, k2, wa, we, wr, w$, wz, p2, p5, p4, p3} <= 'b0;
 			{i2, i3, i4, i5, wx, wm, ww} <= 'b0;
 		end else begin
@@ -181,12 +181,12 @@ module px(
 		.s_(~sp1),
 		.d(ep1),
 		.c(got),
-		.r_(clo_),
+		.r_(~clo),
 		.q(p1)
 	);
 
 	ffd REG_P0(
-		.s_(clo_ & ~sp0),
+		.s_(~clo & ~sp0),
 		.d(ep0),
 		.c(got),
 		.r_(1'b1),
@@ -197,7 +197,7 @@ module px(
 		.s_(~si1),
 		.d(ei1),
 		.c(got),
-		.r_(clo_),
+		.r_(~clo),
 		.q(i1)
 	);
 
@@ -212,7 +212,6 @@ module px(
 	wire M16_8 = wz | stp0$ | p3 | wa;
 	wire M15_8 = p2 | wp | wx;
 
-  wire got, strob2;
   strobgen #(
     .STROB1_1_TICKS(STROB1_1_TICKS),
     .STROB1_2_TICKS(STROB1_2_TICKS),
@@ -227,88 +226,78 @@ module px(
     .zw(zw),
 		.oken(oken),
     .mode(mode),
-    .step_(step_),
-    .strob_fp_(strob_fp_),
+    .step(step),
+    .strob_fp(strob_fp),
     .ss11(M19_6),
     .ss12(M18_8),
     .ss13(M20_8),
     .ss14(M16_8),
 		.ss15(M15_8),
     .strob1(strob1),
-    .strob1_(strob1_),
     .strob2(strob2),
-    .strob2_(strob2_),
-    .got(got),
-    .got_(got_)
+    .got(got)
   );
 
-	wire gotst1_ = ~(got_ & strob1_);
+	wire gotst1 = ~got & ~strob1;
 
 	// sheet 5, page 2-5
 	// interrupt phase control signals
 
 	assign arm4 = strob2 & i1 & lip;
 	assign blw_pw = ~przerw_z & lg_3 & i3 & przerw;
-	// FIX: -I4 was +I4
-	wire ei5 = ~(~i4 & ~(lip & i1));
-	wire exrprzerw = ~(~przerw & exr_);
+	wire ei5 = i4 | (lip & i1);
+	wire exrprzerw = przerw | exr;
 	wire ei2 = i1 & przerw_z;
-	wire exr = ~exr_;
 	wire ei4 = i3 & lg_0;
-	wire i3lips_ = ~(lipsp & i3);
-	// FIX: -EKC*I was labeled -EKC*1
-	assign ekc_i = (lg_3 & ~i3lips_) | (i5 & ~lip);
+	wire i3lips = i3 & lipsp;
+	assign ekc_i = (lg_3 & i3lips) | (i5 & ~lip);
 	assign zer_sp = ~lip & i5;
-	assign lipsp = ~(~lip & ~sp);
-	wire ei1 = ~(exr_ & ~lip) & pp;
-	wire ei3 = (~przerw_z & przerw & i1) | (i1 & ~exr_) | (sp & pp) | (i2) | M25;
+	assign lipsp = lip | sp;
+	wire ei1 = (exr | lip) & pp;
+	wire ei3 = (~przerw_z & przerw & i1) | (i1 & exr) | (sp & pp) | (i2) | M25;
 	wire M25 = (i5 & lip) | (~lipsp & ~lg_0 & i3) | (i3 & lipsp & ~lg_3);
 
 	// sheet 6, page 2-6
 
-	wire read_fp_;
-	assign read_fp_ = red_fp_;
-
-	wire M28_8 = wr | p1 | p5 | wm | k2fbs | ww | ~red_fp_;
-	wire M30_8 = ~(~i3 & red_fp_ & ~wm & ~p5 & ~ww & ~k2fbs & ~(wr & ~inou));
+	wire M28_8 = wr | p1 | p5 | wm | k2fbs | ww | read_fp;
+	wire M30_8 = i3 | read_fp | wm | p5 | ww | k2fbs | (wr & ~inou);
 
 	assign pn_nb = ~(barnb & ~wm) & zwzg;
 	assign bp_nb = (barnb & ~wm) & zwzg;
-	assign bar_nb_ = ~(barnb & zwzg);
+	assign bar_nb = barnb & zwzg;
 	assign barnb = (i3 & sp) | (ww & sbar$) | (sbar$ & wr) | (q & M28_8);
 	assign q_nb = zwzg & ~i2;
 	wire inou = in | ou;
 	wire M40_8 = i2 | (in & wm) | k1;
 	assign df_ = ~(M40_8 & zwzg);
 	wire M49_3 = (ou & wm) ^ w;
-	assign w_dt_ = ~(M49_3 & zwzg);
+	assign w_dt = M49_3 & zwzg;
 	assign dr_ = ~(r & zwzg);
-	wire r = ~(~k2fetch & ~p5 & ~i4 & ~i1 & i3lips_ & ~wr & ~p1 & red_fp_);
-	assign dt_w_ = ~(M40_8 | r);
-	assign ar_ad_ = ~(M30_8 & zwzg);
+	wire r = k2fetch | p5 | i4 | i1 | i3lips | wr | p1 | read_fp;
+	assign dt_w = M40_8 | r;
+	assign ar_ad = M30_8 & zwzg;
 	assign ds_ = ~(~(~ou | ~wm) & zwzg);
 
 	// sheet 7, page 2-7
 	// * system bus drivers
 
-	assign ic_ad_ = ~(zwzg & ~(~k1 & ~p1 & ~(inou & wr)));
-	assign dmcl_ = ~(zwzg & ~(~mcl | ~wm));
-	wire M44_1 = wm & gi;
-	assign ddt15_ = ~(zwzg & M44_1);
-	assign ddt0_ = ~(zwzg & (M44_1 & ir6));
-	assign din_ = ~(zwzg & M44_1);
-	assign dad15_i_ = ~(zwzg & ~(~i5 & ~i1));
-	assign dad10_ = ~(zwzg & ~(~i1 & ~(i4 & exr) & ~i5));
-	assign dad9_ = ~(zwzg & ~(~i1 & ~i4 & ~i5));
-	wire M40_12 = ~(~arz & q & ~exrprzerw);
+	assign ic_ad = zwzg & (k1 | p1 | (inou & wr));
+	assign dmcl = zwzg & mcl & wm;
+	wire wmgi = wm & gi;
+	assign ddt15 = zwzg & wmgi;
+	assign ddt0 = zwzg & (wmgi & ir6);
+	assign din_ = ~(zwzg & wmgi);
+	assign dad15_i = zwzg & (i5 | i1);
+	assign dad10 = zwzg & (i1 | (i4 & exr) | i5);
+	assign dad9 = zwzg & (i1 | i4 | i5);
+	wire M40_12 = arz | ~q | exrprzerw;
 	// A-C : 0-256 write deny
 	// B-A : no write deny
 	wire ABC_A = M40_12 | ~LOW_MEM_WRITE_DENY;
 	wire M59_3 = w & ABC_A;
 	assign dw_ = ~(zwzg & M59_3);
-	wire w = ~(~i5 & i3_ex_przer_ & ~ww & ~k2_bin_store);
-	// FIX: -I3/EX+PRZERW/ was labeled +I3/EX+PRZERW/
-	assign i3_ex_przer_ = ~(exrprzerw & i3);
+	wire w = i5 | i3_ex_przer | ww | k2_bin_store;
+	assign i3_ex_przer = i3 & exrprzerw;
 	wire rw = r ^ w;
 	// FIX: -K2FBS was labeled +K2FBS
 	wire k2fbs = k2_bin_store | k2fetch;
@@ -326,26 +315,26 @@ module px(
 
 	// sheet 8, page 2-8
 
-	wire M64_8 = sr_fp_ & ~si1 & ~sp1;
-	wire M12_6 = ~wm & ~i2 & ~wr & ~ww;
-	wire M12_8 = ~i1 & ~i3 & ~i4 & ~i5;
-	wire M17_8 = ~k2fbs & ~p1 & ~p5 & ~k1;
-	wire M16_6 = ~(M12_6 & read_fp_ & M12_8 & M17_8);
+	wire M12_6 = wm | i2 | wr | ww;
+	wire M12_8 = i1 | i3 | i4 | i5;
+	wire M17_8 = k2fbs | p1 | p5 | k1;
+	wire M16_6 = M12_6 | read_fp | M12_8 | M17_8;
 
+	wire zgi_set = ~sr_fp & ~si1 & ~sp1;
 	wire zgi;
 	ffjk REG_ZGI(
-		.s_(M64_8),
+		.s_(zgi_set),
 		.j(M16_6),
-		.c_(gotst1_),
+		.c_(~gotst1),
 		.k(zgi),
-		.r_(clo_),
+		.r_(~clo),
 		.q(zgi)
 	);
 
-	wire zwzg = ~(~zgi | ~zw);
-	assign zg = ~(~zgi & ~M47_15 & ~(zw & oken));
+	wire zwzg = zgi & zw;
+	assign zg = zgi | M47_15 | (zw & oken);
 
-	wire M46_8 = clo_ & ~(strob2 & w$ & wzi & is);
+	wire M46_8 = ~clo & ~(strob2 & w$ & wzi & is);
 	wire M47_15;
 	ffjk JK47(
 		.s_(1'b1),
@@ -381,38 +370,39 @@ module px(
 	ffjk JK37(
 		.s_(1'b1),
 		.j(M65_6),
-		.c_(got_),
+		.c_(~got),
 		.k(i5),
-		.r_(clo_),
+		.r_(~clo),
 		.q(M37_15)
 	);
-	wire exr_ = ~M37_15 & EF & ~exl;
+	wire exr = ~(~M37_15 & EF & ~exl);
 
 	// sheet 9, page 2-9
 
-	wire M59_11 = zwzg & rw;
-	wire M64_5 = stop_n & zga & M59_11;
+	wire hltn_reset = zwzg & rw;
+	wire hltn_d = stop_n & zga & hltn_reset;
+	wire hltn_set = awaria_set & STOP_ON_NOMEM;
 
 	ffd REG_HLTN(
 		// S-R : stop on segfault in mem block 0
-		.s_(M55_11 | ~STOP_ON_NOMEM),
-		.d(M64_5),
+		.s_(~hltn_set),
+		.d(hltn_d),
 		.c(strob1),
-		.r_(M59_11),
+		.r_(hltn_reset),
 		.q(hlt_n)
 	);
 
 	assign bod = ~(rpe_ & ren_);
 
-	assign b_parz_ = ~(strob1 & ~rpe_ & r);
-	assign b_p0_ = ~(rw & talarm);
+	assign b_parz = strob1 & ~rpe_ & r;
+	assign b_p0 = rw & talarm;
 
-	wire M55_11 = ~(~(b_parz_ & b_p0_) & bar_nb_);
+	wire awaria_set = (b_parz | b_p0) & ~bar_nb;
 	ffd REG_AWARIA(
-		.s_(M55_11),
+		.s_(~awaria_set),
 		.d(1'b0),
-		.c(clo_),
-		.r_(stop_),
+		.c(~clo),
+		.r_(~stop),
 		.q(awaria)
 	);
 
@@ -432,10 +422,10 @@ module px(
 	);
 	wire talarm_ = ~talarm;
 
-	assign dad15_ir9_ = ~(ad_ad & ir9);
-	assign dad12_ = ~(ad_ad & pufa);
-	assign dad13_ = ~(ad_ad & ir7);
-	assign dad14_ = ~(ad_ad & ir8);
+	assign dad15_ir9 = ad_ad & ir9;
+	assign dad12 = ad_ad & pufa;
+	assign dad13 = ad_ad & ir7;
+	assign dad14 = ad_ad & ir8;
 
 endmodule
 

@@ -10,8 +10,8 @@ module fps(
 	input __clk,
 	// sheet 1
 	input mode,
-	input step_,
-	output strob_fp_,
+	input step,
+	output strob_fp,
 	output strob2_fp,
 	// sheet 2
 	input oken,
@@ -19,21 +19,21 @@ module fps(
 	input di,
 	input efp,
 	input puf,
-	input got_,
-	output sr_fp_,
-	output ekc_fp_,
-	output _0_f_,
+	input got,
+	output sr_fp,
+	output ekc_fp,
+	output _0_f,
 	// sheet 3
 	input g,
 	input wdt,
-	input af_sf_,
+	input af_sf,
 	input mw_,
 	output _0_t,
-	output lkb_,
+	output lkb,
 	output l_d_,
-	output clocktc_,
-	output clocktb_,
-	output clockta_,
+	output clocktc,
+	output clocktb,
+	output clockta,
 	output opta, optb, optc, opm,
 	output t_c_,
 	output fcb_,
@@ -41,8 +41,8 @@ module fps(
 	input mf_,
 	input fp16_,
 	output t_1_t_1,
-	output tab_,
-	output trb_,
+	output tab,
+	output trb,
 	output taa,
 	output cp_,
 	// sheet 5
@@ -59,14 +59,13 @@ module fps(
 	input af,
 	input ad,
 	output frb_,
-	output p_16_,
-	output p_32_,
-	output p_40_,
+	output p_16,
+	output p_32,
+	output p_40,
 	output fab_,
 	output faa_,
 	output fra_,
 	// sheet 6
-	input fic_,
 	input fic,
 	input ad_sd,
 	input ta,
@@ -86,7 +85,7 @@ module fps(
 	// sheet 9
 	input ok$,
 	input ff_,
-	output read_fp_,
+	output read_fp,
 	// sheet 10
 	input sgn_,
 	input fwz,
@@ -96,17 +95,16 @@ module fps(
 	input t0_t_1,
 	input ok,
 	output f13,
-	output f13_,
 	// sheet 12
 	output f10_,
 	output f9,
 	output f8_,
 	output f7_,
-	output f9_ka_,
+	output f9_ka,
 	// sheet 13
 	input dw_df,
 	input mw_mf,
-	output scc_,
+	output scc,
 	output pc8,
 	output _0_d,
 	output _0_m,
@@ -114,13 +112,13 @@ module fps(
 	output ma,
 	output clockm,
 	// sheet 14
-	output rlp_fp_,
+	output rlp_fp,
 	output lpa,
 	// sheet 15
-	output zpa_,
-	output zpb_,
-	output _0_zp_,
-	output s_fp_,
+	output zpa,
+	output zpb,
+	output _0_zp,
+	output s_fp,
 	output ustr0_fp,
 	output lp_,
 	output lpb
@@ -171,13 +169,13 @@ module fps(
 	ffd REG_STEP(
 		.s_(M56_8),
 		.d(1'b0),
-		.c(step_),
+		.c(~step),
 		.r_(mode),
 		.q(M55_5)
 	);
 
 	wire strob1 = ~(M79_11 & ~M55_5 & M59_8);
-	assign strob_fp_ = M79_11 & ~M55_5 & M59_8;
+	assign strob_fp = ~(M79_11 & ~M55_5 & M59_8);
 
 	wire M49_4 = ~(dp8 | dp2);
 	wire M54_11 = ~(M49_4 & M55_5);
@@ -192,20 +190,20 @@ module fps(
 		.q(strob2)
 	);
 
-	wire stgot_ = ~(M54_11 & M79_11 & ~strob2);
+	wire stgot = M54_11 & M79_11 & ~strob2;
 	assign strob2_fp = strob2;
 
 	// sheet 2
 
 	wire sr = ~(start_ & M57_8);
-	assign sr_fp_ = ~(sr & f1);
+	assign sr_fp = sr & f1;
 
 	wire M43_6 = ~(oken & f1 & zw);
 
 	wire M71_5;
 	univib #(.ticks(FP_KC1_TICKS)) VIB_KC1(
 		.clk(__clk),
-		.a_(stgot_),
+		.a_(~stgot),
 		.b(M43_6),
 		.q(M71_5)
 	);
@@ -226,27 +224,27 @@ module fps(
 		.clk(__clk),
 		.a_(1'b0),
 		.b(M55_9),
-		.q_(ekc_fp_)
+		.q(ekc_fp)
 	);
 
 	wire got_fp = ~M57_8;
 
-	assign _0_f_ = ekc_fp_ & puf;
+	assign _0_f = ~(~ekc_fp & puf);
 
 	wire M73_15;
 	ffjk REG_START(
 		.s_(1'b1),
 		.j(efp),
-		.c_(got_),
+		.c_(~got),
 		.k(1'b1),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(M73_15)
 	);
 
 	wire start;
 	univib #(.ticks(FP_START_TICKS)) VIB_START(
 		.clk(__clk),
-		.a_(~got_),
+		.a_(got),
 		.b(M73_15),
 		.q(start)
 	);
@@ -257,13 +255,12 @@ module fps(
 	wire M29_8 = (g & wdt & f5) | (wc & f4) | (~mw_ & f4) | (f4 & mf);
 	assign _0_t = ~(start_ & ~(strob2 & M29_8));
 	wire M30_6 = ~(f3_ & f1_);
-	assign lkb_ = ~M30_6;
-	wire af_sf = ~af_sf_;
+	assign lkb = M30_6;
 	wire mw = ~mw_;
 	wire wdt_ = ~wdt;
 
 	wire M56_6 = ~(wdt_ & wc_);
-	wire M31_8 = ~(f5 & af_sf_);
+	wire M31_8 = ~(f5 & ~af_sf);
 	wire M31_6 = ~(lp3 & M30_6);
 	wire M43_8 = ~(M56_6 & ws_ & f7);
 	wire M31_11 = ~(sgn & f7);
@@ -285,9 +282,9 @@ module fps(
 	assign optc = M9_3;
 	assign optb = M19_8;
 	assign opta = M19_6;
-	assign clocktc_ = ~(M9_3 & strob1);
-	assign clocktb_ = ~(M19_8 & strob1);
-	assign clockta_ = ~(strob1 & M19_6);
+	assign clocktc = strob1 & M9_3;
+	assign clocktb = strob1 & M19_8;
+	assign clockta = strob1 & M19_6;
 	assign t_c_ = ~(strob1 & f2);
 	assign fcb_ = ~M31_3;
 
@@ -303,8 +300,8 @@ module fps(
 
 	wire f7_f12_ = f9_ & f12_ & f11_ & M20_8;
 	assign t_1_t_1 = ~(f8_ & f12_ & f11_ & M30_8);
-	assign tab_ = M30_8 & f11_ & M53_3;
-	assign trb_ = M53_3 &f11_;
+	assign tab = ~(M30_8 & f11_ & M53_3);
+	assign trb = ~(M53_3 &f11_);
 	assign taa = ~(~(dw_df & f8) & f12_);
 	assign cp_ = ~(strob1 & f8 & af_sf & wdt_);
 	wire dw_p16 = ~(dwsgnf7_ & fp16_ & mw_p16_);
@@ -318,7 +315,7 @@ module fps(
 	wire M76_6 = mf & ws_;
 
 	wire M67_8 = ~(f7 & sgn_ & dw);
-	wire M77_6 = ~((M54_8 & M76_8) | (fic_ & df));
+	wire M77_6 = ~((M54_8 & M76_8) | (~fic & df));
 	wire M65_6 = ~((mw & m14_) | (dw & t0_c0));
 	wire M77_8 = ~((t0_eq_c0 & M76_3) | (M76_6 & ~m38_));
 	wire M78_8 = ~((m38_ & M76_6) | (ad) | (df & fic & t0_c0) | (ws_ & af));
@@ -332,10 +329,10 @@ module fps(
 
 	wire df = ~df_;
 	assign frb_ = M66_6;
-	assign p_16_ = ~(dw_p16 & M67_8 & M52_3);
-	assign p_32_ = ~(M80_6 & ~ad);
+	assign p_16 = dw_p16 & M67_8 & M52_3;
+	assign p_32 = M80_6 & ~ad;
 	wire mw_p16_ = M52_6;
-	assign p_40_ = M66_8;
+	assign p_40 = ~M66_8;
 	assign fab_ = dwsgnf7_ & M66_6;
 	assign faa_ = M67_8 & M52_3 & fra_;
 	assign fra_ = M52_3 & M78_8;
@@ -351,7 +348,7 @@ module fps(
 	wire ta_alpha_ = ~(ta & sgn_t0_c0);
 	wire f9dw = dw & f9;
 
-	wire M35 = (M36_8 & opsu & M22_8) | (M45_6 & fic_ & wt_) | (f3 & lp3 & ad_sd);
+	wire M35 = (M36_8 & opsu & M22_8) | (M45_6 & ~fic & wt_) | (f3 & lp3 & ad_sd);
 	wire ef7 = (ws & f10) | (sgn_t0_c0 & ta & f9dw) | (f4 & wc) | (f9 & sgn) | M35;
 	wire sgn = ~sgn_;
 
@@ -373,8 +370,8 @@ module fps(
 	reg f5, f6, f2, f4;
 	assign {f5_, f6_, f2_, f4_} = ~{f5, f6, f2, f4};
 	wire f6a_ = f6_;
-	always @ (posedge got_fp, negedge _0_f_) begin
-		if (~_0_f_) {f5, f6, f2, f4} <= 4'd0;
+	always @ (posedge got_fp, posedge _0_f) begin
+		if (_0_f) {f5, f6, f2, f4} <= 4'd0;
 		else {f5, f6, f2, f4} <= {sa1f26, sb1f26, sc1, sd1};
 	end
 
@@ -388,7 +385,7 @@ module fps(
 	wire f3_;
 	wire f3 = ~f3_;
 	ffd REG_F3(
-		.s_(_0_f_),
+		.s_(~_0_f),
 		.d(M47_6),
 		.c(got_fp),
 		.r_(~(nrf & start)),
@@ -403,9 +400,9 @@ module fps(
 	wire M61_3 = ~(ok$ & f1);
 	wire M46_8 = ~((dw_ & lp2) | (lp & ff));
 
-	wire dp8 = ~(f4_ & f8_ & f3_ & M61_3 & f9_ & f13_);
+	wire dp8 = ~(f4_ & f8_ & f3_ & M61_3 & f9_ & ~f13);
 	wire sc1 = M46_8 & f1;
-	assign read_fp_ = ~f1;
+	assign read_fp = f1;
 
 	wire M61_8 = ~(start & nrf_);
 	wire M49_10 = ~(f1_ | M46_8);
@@ -415,7 +412,7 @@ module fps(
 		.s_(M61_8),
 		.d(M49_10),
 		.c(got_fp),
-		.r_(_0_f_),
+		.r_(~_0_f),
 		.q(f1)
 	);
 	wire f1_ = ~f1;
@@ -426,13 +423,13 @@ module fps(
 	// sheet 10
 
 	wire M52_8 = ~(f6a_ & ~(opsu_ & f8));
-	wire M14 = (M52_8 & mw & fic_) | (sgn_ & f9dw & ta_alpha_) | (wt & ~(f5_ & f4_));
+	wire M14 = (M52_8 & mw & ~fic) | (sgn_ & f9dw & ta_alpha_) | (wt & ~(f5_ & f4_));
 
 	wire M24_6 = ~(f10_ & f4_ & ~(mw & f2));
 	wire sb1 = (M24_6 & fwz) | (ss & f7) | (ws_ & ok & f10) | (df13 & f13) | M14;
 	wire ws = ~ws_;
 	wire fwz_ = ~fwz;
-	wire k__ = (nrf & f4 & fwz_) | (ff & f7 & fic_) | (fic_ & ~opsu & (f8 & mf));
+	wire k__ = (nrf & f4 & fwz_) | (ff & f7 & ~fic) | (~fic & ~opsu & (f8 & mf));
 	wire opsu_ = ~opsu;
 
 	// sheet 11
@@ -442,11 +439,10 @@ module fps(
 
 	reg F13, f12, f11;
 	assign f13 = F13;
-	assign f13_ = ~F13;
 	wire f11_ = ~f11;
 	wire f12_ = ~f12;
-	always @ (posedge got_fp, negedge _0_f_) begin
-		if (~_0_f_) {F13, f12, f11} <= 3'd0;
+	always @ (posedge got_fp, posedge _0_f) begin
+		if (_0_f) {F13, f12, f11} <= 3'd0;
 		else {F13, f12, f11} <= {sb1, M2_6, M2_8};
 	end
 
@@ -463,7 +459,7 @@ module fps(
 	wire M23_6 = ~(opsu_ & fwz_ & M22_11 & fic);
 	wire M24_12 = ~(dw_mw & fic & f6);
 	wire M22_3 = ~(fic & f7);
-	wire M3_12 = f8 & fic_ & dw_df;
+	wire M3_12 = f8 & ~fic & dw_df;
 	wire M24_8 = ~(M23_6 & M24_12 & M22_3);
 
 	reg f10, F9, f8, f7;
@@ -472,11 +468,11 @@ module fps(
 	wire f9_ = ~F9;
 	assign f8_ = ~f8;
 	assign f7_ = ~f7;
-	always @ (posedge got_fp, negedge _0_f_) begin
-		if (~_0_f_) {f10, F9, f8, f7} <= 4'd0;
+	always @ (posedge got_fp, posedge _0_f) begin
+		if (_0_f) {f10, F9, f8, f7} <= 4'd0;
 		else {f10, F9, f8, f7} <= {sa1f710, M3_12, M24_8, ef7};
 	end
-	assign f9_ka_ = ~f9;
+	assign f9_ka = f9;
 
 	// sheet 13
 
@@ -489,7 +485,7 @@ module fps(
 	wire M28_3 = ~(mw_mf & f4);
 	wire M27_12 = ~(M28_3 & fcb_ & f8_);
 
-	assign scc_ = M17_11 & f7_ & f11_;
+	assign scc = ~(M17_11 & f7_ & f11_);
 	assign pc8 = ~(M17_3 & f11_);
 	assign _0_d = ~(M18_8 | ~strob2);
 	assign _0_m = ~(M41_3 & start_);
@@ -509,7 +505,7 @@ module fps(
 	wire M40_3 = ~(start_ & f2_);
 	wire M40_11 = ~(fwz & f4);
 	wire M40_6 = ~(M40_3 & mw_);
-	wire M23_8 = ~(M27_8 & f1_ & f3_ & f13_);
+	wire M23_8 = ~(M27_8 & f1_ & f3_ & ~f13);
 	wire M44_8 = M4_11 & f7_ & M4_8 & M40_11;
 	wire M51_8 = M44_8 & M40_6;
 	wire M51_6 = M65_8 & M44_8;
@@ -535,20 +531,20 @@ module fps(
 		.q(lpa)
 	);
 
-	assign rlp_fp_ = f13_ & f3_;
+	assign rlp_fp = ~(~f13 & f3_);
 
 	// sheet 15
 
 	wire lp3_ = ~(lpb & lpa);
 	wire lp3 = ~lp3_;
 	wire lp2 = lpb & lpa_;
-	assign zpa_ = ~(lpa_ & f13);
+	assign zpa = lpa_ & f13;
+	assign zpb = M64_11 & f13;
 	wire M64_11 = lpb_ ^ lpa;
-	assign zpb_ = ~(M64_11 & f13);
-	assign _0_zp_ = ~(fwz & lp & f13);
+	assign _0_zp = fwz & lp & f13;
 	wire lp1_ = ~(lpa & lpb_);
 	wire lp = ~(lpb_ & lpa_);
-	assign s_fp_ = ~(lp & f13);
+	assign s_fp = lp & f13;
 	assign ustr0_fp = f13 & lp_;
 	assign lp_ = ~lp;
 	assign lpb = ~lpb_;

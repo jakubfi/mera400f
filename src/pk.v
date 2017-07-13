@@ -44,28 +44,28 @@ module pk(
 	output [7:0] DIG,
 	// sheet 1
 	input hlt_n,
-	input off_,
+	input off,
 	output work,
-	output stop$_,
-	output start$_,
+	output stop,
+	output start,
 	output mode,
 	output stop_n,
 	// sheet 2
 	input p0,
 	output [0:15] kl,
-	output dcl_,
-	output step_,
-	output fetch_,
-	output store_,
-	output cycle_,
-	output load_,
-	output bin_,
-	output oprq_,
+	output dcl,
+	output step,
+	output fetch,
+	output store,
+	output cycle,
+	output load,
+	output bin,
+	output oprq,
 	// sheet 3
-	output reg zegar_,
+	output reg zegar,
 	// sheet 4
 	input [0:15] w,
-	input p_,
+	input p,
 	input mc_0,
 	input alarm,
 	input _wait,
@@ -184,7 +184,7 @@ module pk(
 	wire [7:0] data [3:0];
 	assign data[0] = w[0:7];
 	assign data[1] = w[8:15];
-	assign data[2] = {mode, stop_n, zeg, q, ~p_, ~mc_0, irq, run};
+	assign data[2] = {mode, stop_n, zeg, q, p, ~mc_0, irq, run};
 	assign data[3] = {rotary_pos, 2'd0, _wait, alarm};
 
 	wire send_leds;
@@ -242,21 +242,17 @@ module pk(
 
 	assign work = fnkey[`FN_START];
 
-	wire stop;
 	impulse STOP(
 		.clk(CLK_EXT),
 		.in(~fnkey[`FN_START]),
 		.q(stop)
 	);
-	assign stop$_ = ~stop;
 
-	wire start;
 	impulse START(
 		.clk(CLK_EXT),
 		.in(fnkey[`FN_START]),
 		.q(start)
 	);
-	assign start$_ = ~start;
 
 	assign mode = fnkey[`FN_MODE];
 	wire zeg = fnkey[`FN_CLOCK];
@@ -272,14 +268,14 @@ module pk(
 	// sheet 2
 
 	assign kl = keys;
-	assign dcl_ = ~fnkey[`FN_CLEAR];
-	assign step_ = ~fnkey[`FN_STEP];
-	assign fetch_ = ~fnkey[`FN_FETCH] | ~p0;
-	assign store_ = ~fnkey[`FN_STORE] | ~p0;
-	assign cycle_ = ~fnkey[`FN_CYCLE] | ~p0;
-	assign load_ = ~fnkey[`FN_LOAD] | ~p0;
-	assign bin_ = ~fnkey[`FN_BIN] | ~p0;
-	assign oprq_ = ~fnkey[`FN_OPRQ];
+	assign dcl = fnkey[`FN_CLEAR];
+	assign step = fnkey[`FN_STEP];
+	assign fetch = fnkey[`FN_FETCH] & p0;
+	assign store = fnkey[`FN_STORE] & p0;
+	assign cycle = fnkey[`FN_CYCLE] & p0;
+	assign load = fnkey[`FN_LOAD] & p0;
+	assign bin = fnkey[`FN_BIN] & p0;
+	assign oprq = fnkey[`FN_OPRQ];
 
 	// sheet 3
 
@@ -301,7 +297,7 @@ module pk(
 		end
 	end
 
-	assign zegar_ = |timer_cnt | ~zeg;
+	assign zegar = ~(|timer_cnt | ~zeg);
 
 	// sheet 4
 
@@ -309,7 +305,7 @@ module pk(
 	hex2seg d1(.hex(w[8:11]), .seg(digs[1]));
 	hex2seg d2(.hex(w[4:7]), .seg(digs[2]));
 	hex2seg d3(.hex(w[0:3]), .seg(digs[3]));
-	assign digs[7][0] = ~p_;
+	assign digs[7][0] = p;
 	assign digs[7][6] = ~mc_0;
 	assign digs[7][5:1] = 0;
 	assign dots = {run, _wait, alarm, irq, mode, stop_n, zeg, q};

@@ -42,7 +42,7 @@ module alu(
 	input sca, saa,
 	output [0:15] f,
 	output j$,
-	output carry_,
+	output carry,
 	output zsum_
 );
 
@@ -67,6 +67,8 @@ module alu(
 		.co_(carry_),
 		.eq(j$1[3])
 	);
+	wire carry_;
+	assign carry = ~carry_;
 
 	alu181 ALU_4_7(
 		.a(a[4:7]),

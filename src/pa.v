@@ -12,7 +12,7 @@ module pa(
 	input [0:15] ir,
 	input [0:15] bus_ki,
 	input [0:15] rdt_,
-	input w_dt_,
+	input w_dt,
 	input mwa,
 	input mwb,
 	input mwc,
@@ -30,24 +30,23 @@ module pa(
 	input sb,
 	input sd,
 	output s0,
-	output carry_,
+	output carry,
 	// sheet 6
 	input p16,
 	input saa,
 	input sca,
 	output j$,
-	output exx_,
+	output exx,
 	// sheet 7
 	input wx,
 	input eat0,
 	input axy,
-	output at15_,
-	output exy_,
+	output at15,
+	output exy,
 	// sheet 8
 	input w_ac,
-	input strob2_,
+	input strob2,
 	input as2,
-	input strob1_,
 	input am1,
 	input apb,
 	input amb,
@@ -64,7 +63,7 @@ module pa(
 	// sheet 10
 	input icp1,
 	input w_ic,
-	input off_,
+	input off,
 	// sheet 11, 12
 	input baa,
 	input bab,
@@ -75,9 +74,9 @@ module pa(
 	// sheet 13, 14
 	input barnb,
 	input [0:15] kl,
-	input ic_ad_,
+	input ic_ad,
 	output [0:15] dad_,
-	input ar_ad_,
+	input ar_ad,
 	output zga
 
 );
@@ -85,8 +84,6 @@ module pa(
   wor __NC; // unconnected signals here, to suppress warnings
 
 	// sheet 1..4
-
-	wire w_dt = ~w_dt_;
 
 	bus_w BUS_W(
 		.mwc(mwc),
@@ -123,12 +120,12 @@ module pa(
 		.saa(saa),
 		.f(f),
 		.j$(j$),
-		.carry_(carry_),
+		.carry(carry),
 		.zsum_(zsum_)
 	);
 
 	assign s0 = f[0];
-	assign exx_ = ~((a[15] & ir[6]) | (a[0] & ~ir[6]));
+	assign exx = (a[15] & ir[6]) | (a[0] & ~ir[6]);
 
 	// sheet 7
 
@@ -142,13 +139,12 @@ module pa(
 		.at(at)
 	);
 
-	assign at15_ = ~at[15];
-	assign exy_ = ~((at[15] & axy) | (a[0] & ~axy));
+	assign at15 = at[15];
+	assign exy = (at[15] & axy) | (a[0] & ~axy);
 
 	// sheet 8
 
 	wire as2_ = ~as2;
-	wire strob2 = ~strob2_;
 	wire strobb = as2 & strob2;
 	wire stroba = ~as2 & strob1;
 
@@ -164,7 +160,7 @@ module pa(
 	wire M8_11 = ac[0] ^ a[0];
 	wire M8_3 = ~ac[0] ^ a[0];
 	wire M7_8 = (~a[0] & am1) | (M8_11 & apb) | (M8_3 & amb) | (a[0] & ap1);
-	assign s_1 = ~M7_8 ^ carry_;
+	assign s_1 = ~M7_8 ^ ~carry;
 	assign zs = ~(s_1 | zsum_);
 
 	// WZI
@@ -206,7 +202,7 @@ module pa(
 	ic REG_IC(
 		.cu(ic_plus1),
 		.l(ic_load),
-		.r(~off_),
+		.r(off),
 		.w(w),
 		.ic(ic)
 	);
@@ -228,9 +224,6 @@ module pa(
 	);
 
 	// sheet 13, 14
-
-	wire ic_ad = ~ic_ad_;
-	wire ar_ad = ~ar_ad_;
 
 	wire [0:15] dad1_ = ~({16{ar_ad}} & ar);
 	wire [0:15] dad2_ = ~({16{ic_ad}} & ic);

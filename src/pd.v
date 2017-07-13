@@ -54,7 +54,7 @@ module pd(
 	input mc_3,				// B10 - MC=3: three consecutive pre-modifications
 	input [0:8] r0,		// B29, B33, B31, A16, B23, B22, B21, B32, A26 - R0 register flags
 	output _0_v,			// A14
-	input p_,					// A23 - P flag (branch)
+	input p,					// A23 - P flag (branch)
 	output md,				// B11 - MD
 	output xi,				// A24 - instruction is illegal
 	output nef,				// A20 - instruction is ineffective
@@ -85,7 +85,7 @@ module pd(
 	output sbar$,			// B91
 	output nrf,				// A12
 	// sheet 8
-	input at15_,			// A07
+	input at15,			// A07
 	input wx,				// A64 - state WX
 	input wa,				// A63 - state WA
 	output ust_z,			// B49
@@ -263,7 +263,7 @@ module pd(
 	wire nef_jz = j & a_eq[4] & ~r0[0];
 
 	assign xi = ~(~M27_8 & ~M40_8 & ir01);
-	assign nef = ~(~M27_8 & ir01 & ~M40_8 & p_ & ~nef_js & ~nef_jjs & ~nef_jm & ~nef_jn & ~nef_jz);
+	assign nef = ~(~M27_8 & ir01 & ~M40_8 & ~p & ~nef_js & ~nef_jjs & ~nef_jm & ~nef_jn & ~nef_jz);
 
 	// sheet 5, page 2-34
 
@@ -338,7 +338,7 @@ module pd(
 	assign ust_mc = ans & w$;
 	assign ust_leg = ccb & w$;
 	wire M59_8 = (ir[6] & r0[8]) | (~ir[6] & r0[7]);
-	assign eat0 = ~(~srxy | ~M59_8) ^ ~(~shc | at15_);
+	assign eat0 = ~(~srxy | ~M59_8) ^ ~(~shc | ~at15);
 	assign sr = srxy | srz | shc;
 	assign ust_y = (w$ & sl) | (sr & ~shc & wx);
 	assign ust_x = wa & sx;

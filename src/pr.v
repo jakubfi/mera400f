@@ -17,13 +17,13 @@ module pr(
 	input rc,				// A49
 	input as2,				// B43
 	input w_r,				// B47
-	input strob1_,		// B32
-	input strob2_,		// B42
+	input strob1,		// B32
+	input strob2,		// B42
 	// sheet 2-5
 	input [0:15] w,		// B07, B12, B11, B10, B22, B24, B25, B23, B13, B19, B20, B21, B16, B08, B17, B18 - bus W
 	output [0:15] l,	// A04, A03, A28, A27, A09, A10, A26, A25, A07, A08, A16, A17, A06, A05, A18, A19 - bus L
 	// sheet 6
-	input bar_nb_,		// B83 - BAR->NB: output BAR register to system bus
+	input bar_nb,		// B83 - BAR->NB: output BAR register to system bus
 	input w_rbb,			// A51 - RB[4:9] clock in
 	input w_rbc,			// B46 - RB[0:3] clock in
 	input w_rba,			// B50 - RB[10:15] clock in
@@ -35,18 +35,18 @@ module pr(
 	input q_nb,				// B90
 	input w_bar,			// B56 - W->BAR: send W bus to {BAR, Q, BS} registers
 	input zer_sp,		// A89
-	input clm_,				// B93
-	input ustr0_fp_,	// A11
+	input clm,				// B93
+	input ustr0_fp,	// A11
 	input ust_leg,		// B39
 	input aryt,				// B45
 	input zs,					// A47
-	input carry_,			// A48
+	input carry,			// A48
 	input s_1,				// B44
 	output zgpn,			// B88
 	output dpn_,			// B87 - PN system bus driver
 	output dqb_,			// B89 - Q system bus driver
 	output q,					// A53 - Q: system flag
-	output zer_,			// A52
+	output zer,			// A52
 	// sheet 8
 	input ust_z,			// B53
 	input ust_mc,			// B55
@@ -55,9 +55,9 @@ module pr(
 	input _0_v,				// B91
 	output [0:8] r0,	// A44, A46, A43, A42, A41, A45, A40, A39, B09 - CPU flags in R0 register
 	// sheet 9
-	input exy_,				// A37
+	input exy,				// A37
 	input ust_y,			// B40
-	input exx_,				// A38
+	input exx,				// A38
 	input ust_x,			// B41
 	// sheet 10-11
 	input kia,				// B81
@@ -72,8 +72,6 @@ module pr(
 	parameter CPU_NUMBER;
 	parameter AWP_PRESENT;
 
-	wire strob1 = ~strob1_;
-	wire strob2 = ~strob2_;
 	wire strob_a = ~as2 & strob1;
 	wire strob_b =  as2 & strob2;
 
@@ -131,10 +129,10 @@ module pr(
 	nb REG_NB(
 		.w(w[12:15]),
 		.cnb(cnb0_3),
-		.clm(~clm_),
+		.clm(clm),
 		.nb(nb)
 	);
-	assign dnb_ = ~(nb & {4{~bar_nb_}});
+	assign dnb_ = ~(nb & {4{bar_nb}});
 
 	wire [9:15] R0_9_15;
 	r0_9_15 R0_LOW(
@@ -161,7 +159,7 @@ module pr(
 		.s_(1'b1),
 		.d(w[11]),
 		.c(~cnb0_3),
-		.r_(clm_),
+		.r_(~clm),
 		.q(bs)
 	);
 
@@ -171,15 +169,15 @@ module pr(
 		.s_(1'b1),
 		.d(w[10]),
 		.c(~cnb0_3),
-		.r_(zer_),
+		.r_(~zer),
 		.q(q)
 	);
 
 	// FIX: -ZER*SP on <A89> was labeled as -ZER*FP
-	assign zer_ = ~zer_sp & clm_;
+	assign zer = zer_sp | clm;
 
 	// jumper on C-D: no AWP
-	wire M60_3 = strob_a & AWP_PRESENT & ustr0_fp_;
+	wire M60_3 = strob_a & AWP_PRESENT & ustr0_fp;
 	// FIX: missing connection from +W->R to M62.2, M62.12, M61.10
 	wire M62_6  = strob_a & w_r & wr0 & ~q;
 	wire M62_8  = strob_b & w_r & wr0 & ~q;
@@ -194,24 +192,23 @@ module pr(
 
 	wire cleg = strob_b & ust_leg;
 
-	wire vg = (~aryt & ~(zs | carry_)) | (~(zs | s_1) & aryt);
-	wire vl = (~aryt & carry_) | (aryt & s_1);
+	wire vg = (~aryt & ~(zs | ~carry)) | (~(zs | s_1) & aryt);
+	wire vl = (~aryt & ~carry) | (aryt & s_1);
 
 	// sheets 8..9, pages 2-65..2-66
 	// * R0 register positions 0-9: CPU flags: ZMVCLEGYX
 
-	wire zer = ~zer_;
 	r0 REG_R0(
 		.w(w[0:8]),
 		.r0(r0),
 		.zs(zs),
 		.s_1(s_1),
 		.s0(s0),
-		.carry(~carry_),
+		.carry(carry),
 		.vl(vl),
 		.vg(vg),
-		.exy(~exy_),
-		.exx(~exx_),
+		.exy(exy),
+		.exx(exx),
 		.strob1(strob1),
 		.ust_z(ust_z),
 		.ust_v(ust_v),

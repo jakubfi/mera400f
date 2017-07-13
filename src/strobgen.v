@@ -2,11 +2,11 @@ module strobgen(
   input __clk,
   input ss11, ss12, ss13, ss14, ss15,
   input ok, zw, oken,
-  input mode, step_,
-  input strob_fp_,
-  output got, got_,
-  output strob1, strob1_,
-  output strob2, strob2_
+  input mode, step,
+  input strob_fp,
+  output got,
+  output strob1,
+  output strob2
 );
 
   parameter STROB1_1_TICKS;
@@ -72,7 +72,7 @@ module strobgen(
   wire M15_12 = ~(M15_6 & zw & oken);
   wire M52_6 = M15_12 & M53_6;
   wire M53_6 = ~(sgot & M21_5);
-  wire M15_6 = ~(M52_6 & st812_ & strob2_);
+  wire M15_6 = ~(M52_6 & st812_ & ~strob2);
 
   wire got$;
   univib #(.ticks(GOT_TICKS)) VIB_GOT(
@@ -81,7 +81,6 @@ module strobgen(
     .b(1'b1),
     .q(got$)
   );
-  assign got_ = ~got$;
   assign got = got$;
 
   wire M53_11 = ~(M21_5 & ~sgot);
@@ -102,23 +101,18 @@ module strobgen(
     .b(1'b1),
     .q(strob2)
   );
-  assign strob2_ = ~strob2;
 
   // FIX: +MODE was labeled -MODE
   wire M21_5;
   ffd REG_STEP(
     .s_(~(mode & sts)),
     .d(1'b0),
-    .c(step_),
+    .c(~step),
     .r_(mode),
     .q(M21_5)
   );
 
-  // NOTE: Workaround for Error (35000)
-  // https://www.altera.com/support/support-resources/knowledge-base/solutions/rd06192013_268.html
-  wire strob1_int_ = st812_ & st56_ & strob_fp_ & ~M21_5;
-  assign strob1_ = strob1_int_;
-  assign strob1 = ~strob1_;
+  assign strob1 = ~st812_ | ~st56_ | strob_fp | M21_5;
 
 endmodule
 
