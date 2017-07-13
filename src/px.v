@@ -138,7 +138,7 @@ module px(
 	input pufa,			// B08 - any of the wide or floating point instructions
 	input ir7,			// A06
 	input ir8,			// A04
-	output hlt_n_,	// A94
+	output hlt_n,	// A94
 	output bod,			// A77
 	output b_parz_,	// A56
 	output b_p0_,		// B84
@@ -412,7 +412,6 @@ module px(
 	wire M59_11 = zwzg & rw;
 	wire M64_5 = stop_n & zga & M59_11;
 
-	wire hlt_n;
 	ffd REG_HLTN(
 		// S-R : stop on segfault in mem block 0
 		.s_(M55_11 | ~STOP_ON_NOMEM),
@@ -421,7 +420,6 @@ module px(
 		.r_(M59_11),
 		.q(hlt_n)
 	);
-	assign hlt_n_ = ~hlt_n;
 
 	assign bod = ~(rpe_ & ren_);
 

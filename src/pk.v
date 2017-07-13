@@ -43,7 +43,7 @@ module pk(
 	output [7:0] SEG,
 	output [7:0] DIG,
 	// sheet 1
-	input hlt_n_,
+	input hlt_n,
 	input off_,
 	output work,
 	output stop$_,
@@ -265,7 +265,7 @@ module pk(
 		.s_(1'b1),
 		.d(~stop_n),
 		.c(fnkey[`FN_STOPN]),
-		.r_(hlt_n_),
+		.r_(~hlt_n),
 		.q(stop_n)
 	);
 

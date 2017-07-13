@@ -12,7 +12,7 @@ module pm(
 	input start$_,
 	input pon_,
 	input work,
-	input hlt_n_,
+	input hlt_n,
 	input stop$_,
 	input clo_,
 	input hlt,
@@ -214,7 +214,7 @@ module pm(
 	// sheet 1, page 2-11
 	//  * ff: START, WAIT, CYCLE
 
-	wire start_reset_ = hlt_n_ & stop$_ & clo_;
+	wire start_reset_ = ~hlt_n & stop$_ & clo_;
 	wire start_clk = ~(~pon_ & work);
 	wire start;
 	ffd REG_START(
