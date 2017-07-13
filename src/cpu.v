@@ -84,30 +84,19 @@ module cpu(
 	parameter DOK_DLY_TICKS = 4'd15; // 300ns
 	parameter DOK_TICKS = 3'd7; // 153ns
 
-
 	// -DDT open-collector composition
-	assign ddt[0] = pa_ddt[0] | px_ddt0;
-	assign ddt[1:14] = pa_ddt[1:14];
-	assign ddt[15] = pa_ddt[15] | px_ddt15;
+	assign ddt = pa_ddt | px_ddt;
 
 	// -DAD open-collector composition
-	assign dad[0:3] = pa_dad[0:3];
-	assign dad[4] = pa_dad[4] | pp_dad4;
-	assign dad[5:8] = pa_dad[5:8];
-	assign dad[9] = pa_dad[9] | px_dad9;
-	assign dad[10] = pa_dad[10] | px_dad10;
-	assign dad[11] = pa_dad[11] | pp_dad11;
-	assign dad[12] = pa_dad[12] | px_dad12 | pp_dad12;
-	assign dad[13] = pa_dad[13] | px_dad13 | pp_dad13;
-	assign dad[14] = pa_dad[14] | px_dad14 | pp_dad14;
-	assign dad[15] = pa_dad[15] | px_dad15_ir9 | px_dad15_i | pp_dad15;
+	assign dad = pa_dad | pp_dad | px_dad;
 
 // -----------------------------------------------------------------------
 // --- P-X ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire k1, wp, k2, wa, wz, w$, wr, we, p1, p2, p5, p4, p3, i5, i4, i3, i2, i1, ww, wm, wx, as2, got, strob2, strob1, arm4, blw_pw, ekc_i, zer_sp, lipsp, pn_nb, bp_nb, bar_nb, barnb, q_nb, w_dt, dt_w, ar_ad, ic_ad, px_ddt15, px_ddt0, px_dad15_i, px_dad10, px_dad9, i3_ex_przer, ck_rz_w, zerrz, ok$, oken, bod, b_parz, b_p0, px_dad15_ir9, px_dad12, px_dad13, px_dad14;
-
+wire k1, wp, k2, wa, wz, w$, wr, we, p1, p2, p5, p4, p3, i5, i4, i3, i2, i1, ww, wm, wx, as2, got, strob2, strob1, arm4, blw_pw, ekc_i, zer_sp, lipsp, pn_nb, bp_nb, bar_nb, barnb, q_nb, w_dt, dt_w, ar_ad, ic_ad, i3_ex_przer, ck_rz_w, zerrz, ok$, oken, bod, b_parz, b_p0;
+wire [0:15] px_dad;
+wire [0:15] px_ddt;
 px #(
 	.AWP_PRESENT(AWP_PRESENT),
 	.STOP_ON_NOMEM(STOP_ON_NOMEM),
@@ -213,12 +202,8 @@ px #(
 	.lrz(lrz),
 	.ic_ad(ic_ad),
 	.dmcl(dmcl),
-	.ddt15(px_ddt15),
-	.ddt0(px_ddt0),
+	.ddt(px_ddt),
 	.din(din),
-	.dad15_i(px_dad15_i),
-	.dad10(px_dad10),
-	.dad9(px_dad9),
 	.dw(dw),
 	.i3_ex_przer(i3_ex_przer),
 	.ck_rz_w(ck_rz_w),
@@ -248,10 +233,7 @@ px #(
 	.b_parz(b_parz),
 	.b_p0(b_p0),
 	.awaria(awaria),
-	.dad15_ir9(px_dad15_ir9),
-	.dad12(px_dad12),
-	.dad13(px_dad13),
-	.dad14(px_dad14)
+	.dad(px_dad)
 );
 
 // -----------------------------------------------------------------------
@@ -648,7 +630,8 @@ pr #(
 
 wire [0:9] rs;
 wire [0:15] bus_rz;
-wire przerw_z, pp_dad11, pp_dad12, pp_dad13, pp_dad14, pp_dad4, pp_dad15;
+wire przerw_z;
+wire [0:15] pp_dad;
 
 pp #(
 	.DOK_DLY_TICKS(DOK_DLY_TICKS),
@@ -696,12 +679,7 @@ pp #(
 	.rdt15(rdt[15]),
 	.dok(dok),
 	.irq(irq),
-	.dad4(pp_dad4),
-	.dad11(pp_dad11),
-	.dad12(pp_dad12),
-	.dad13(pp_dad13),
-	.dad14(pp_dad14),
-	.dad15(pp_dad15)
+	.dad(pp_dad)
 );
 
 // -----------------------------------------------------------------------

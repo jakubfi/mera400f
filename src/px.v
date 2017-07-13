@@ -107,12 +107,9 @@ module px(
 	input lrz,			// B78
 	output ic_ad,	// B87
 	output dmcl,		// B88
-	output ddt15,	// A92
-	output ddt0,		// B89
+	output [0:15] ddt,
 	output din,		// A91
-	output dad15_i,// B81
-	output dad10,	// B82
-	output dad9,		// A86
+	output [0:15] dad,
 	output dw,			// A93
 	output i3_ex_przer,	// A52
 	output ck_rz_w,	// B91
@@ -143,11 +140,7 @@ module px(
 	output bod,			// A77
 	output b_parz,	// A56
 	output b_p0,		// B84
-	output awaria,	// B90
-	output dad15_ir9,// B07
-	output dad12,	// A08
-	output dad13,	// A07
-	output dad14		// A05
+	output awaria	// B90
 );
 
 	parameter AWP_PRESENT;
@@ -169,8 +162,8 @@ module px(
 
 	always @ (posedge got, posedge clo) begin
 		if (clo) begin
-			{k1, wp, k2, wa, we, wr, w$, wz, p2, p5, p4, p3} <= 'b0;
-			{i2, i3, i4, i5, wx, wm, ww} <= 'b0;
+			{k1, wp, k2, wa, we, wr, w$, wz, p2, p5, p4, p3} <= 'd0;
+			{i2, i3, i4, i5, wx, wm, ww} <= 'd0;
 		end else begin
 			{k1, wp, k2, wa, we, wr, w$, wz, p2, p5, p4, p3} <= {ek1, ewp, ek2, ewa, ewe, ewr, ew$, ewz, ep2, ep5, ep4, ep3};
 			{i2, i3, i4, i5, wx, wm, ww} <= {ei2, ei3, ei4, ei5, ewx, ewm, eww};
@@ -284,12 +277,13 @@ module px(
 	assign ic_ad = zwzg & (k1 | p1 | (inou & wr));
 	assign dmcl = zwzg & mcl & wm;
 	wire wmgi = wm & gi;
-	assign ddt15 = zwzg & wmgi;
-	assign ddt0 = zwzg & (wmgi & ir6);
+	assign ddt[15] = zwzg & wmgi;
+	assign ddt[0] = zwzg & (wmgi & ir6);
+	assign ddt[1:14] = 'd0;
 	assign din = zwzg & wmgi;
-	assign dad15_i = zwzg & (i5 | i1);
-	assign dad10 = zwzg & (i1 | (i4 & exr) | i5);
-	assign dad9 = zwzg & (i1 | i4 | i5);
+	wire dad15i = zwzg & (i5 | i1);
+	assign dad[10] = zwzg & (i1 | (i4 & exr) | i5);
+	assign dad[9] = zwzg & (i1 | i4 | i5);
 	wire M40_12 = arz | ~q | exrprzerw;
 	// A-C : 0-256 write deny
 	// B-A : no write deny
@@ -351,7 +345,7 @@ module px(
 	// P-X / K-N, N-M : one interface unit
 	// unused: SINGLE_INTERFACE 1'b1
 
-	wire M57_6 = ~ren & talarm_ & ~rok;
+	wire M57_6 = ~ren & ~talarm & ~rok;
 	ffjk REG_OK$(
 		.s_(1'b1),
 		.j(zwzg),
@@ -392,7 +386,7 @@ module px(
 		.q(hlt_n)
 	);
 
-	assign bod = ~(~rpe & ~ren);
+	assign bod = rpe | ren;
 
 	assign b_parz = strob1 & rpe & r;
 	assign b_p0 = rw & talarm;
@@ -420,12 +414,13 @@ module px(
 		.b(alarm_dly),
 		.q(talarm)
 	);
-	wire talarm_ = ~talarm;
 
-	assign dad15_ir9 = ad_ad & ir9;
-	assign dad12 = ad_ad & pufa;
-	assign dad13 = ad_ad & ir7;
-	assign dad14 = ad_ad & ir8;
+	assign dad[12] = ad_ad & pufa;
+	assign dad[13] = ad_ad & ir7;
+	assign dad[14] = ad_ad & ir8;
+	assign dad[15] = (ad_ad & ir9) | dad15i;
+	assign dad[0:8] = 'd0;
+	assign dad[11] = 'd0;
 
 endmodule
 

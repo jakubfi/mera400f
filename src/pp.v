@@ -64,12 +64,7 @@ module pp(
 	// sheet 12
 	// --
 	// sheet 13
-	output dad4,
-	output dad11,
-	output dad12,
-	output dad13,
-	output dad14,
-	output dad15
+	output [0:15] dad
 
 );
 
@@ -302,7 +297,7 @@ module pp(
 	wire npab = ~(rp_[ 2] & rp_[ 3] & rp_[ 6] & rp_[ 7] & rp_[10] & rp_[11] & rp_[14] & rp_[15]);
 	wire npaa = ~(rp_[ 1] & rp_[ 3] & rp_[ 5] & rp_[ 7] & rp_[ 9] & rp_[11] & rp_[13] & rp_[15]);
 
-	assign dad4 = nk_ad;
+	assign dad[4] = nk_ad;
 
 	wire M85_11 = npbd ^ npad;
 	wire M85_8  = npbc ^ npac;
@@ -312,11 +307,13 @@ module pp(
 
 	wire M4_8 = przerw & zw & i4;
 
-	assign dad11 = (M4_8 & zi[6])  | (nk_ad & M99_6);
-	assign dad12 = (M4_8 & M85_11) | (nk_ad & ~M85_8);
-	assign dad13 = (M4_8 & M85_8)  | (nk_ad & M85_6);
-	assign dad14 = (M4_8 & M85_6)  | (nk_ad & M85_3);
-	assign dad15 = M4_8 & M85_3;
+	assign dad[0:3] = 'd0;
+	assign dad[5:10] = 'd0;
+	assign dad[11] = (M4_8 & zi[6])  | (nk_ad & M99_6);
+	assign dad[12] = (M4_8 & M85_11) | (nk_ad & ~M85_8);
+	assign dad[13] = (M4_8 & M85_8)  | (nk_ad & M85_6);
+	assign dad[14] = (M4_8 & M85_6)  | (nk_ad & M85_3);
+	assign dad[15] = M4_8 & M85_3;
 
 endmodule
 
