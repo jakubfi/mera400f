@@ -168,9 +168,13 @@ module px(
 	// * state registers
 
 	always @ (posedge got, negedge clo_) begin
-		if (~clo_) {k1, wp, k2, wa, we, wr, w$, wz, p2, p5, p4, p3} <= 'b0;
-		else {k1, wp, k2, wa, we, wr, w$, wz, p2, p5, p4, p3}
-				<= {ek1, ewp, ek2, ewa, ewe, ewr, ew$, ewz, ep2, ep5, ep4, ep3};
+		if (~clo_) begin
+			{k1, wp, k2, wa, we, wr, w$, wz, p2, p5, p4, p3} <= 'b0;
+			{i2, i3, i4, i5, wx, wm, ww} <= 'b0;
+		end else begin
+			{k1, wp, k2, wa, we, wr, w$, wz, p2, p5, p4, p3} <= {ek1, ewp, ek2, ewa, ewe, ewr, ew$, ewz, ep2, ep5, ep4, ep3};
+			{i2, i3, i4, i5, wx, wm, ww} <= {ei2, ei3, ei4, ei5, ewx, ewm, eww};
+		end
 	end
 
 	ffd REG_P1(
@@ -189,16 +193,6 @@ module px(
 		.q(p0)
 	);
 
-	wire stp0$ = p0 & stp0;
-
-	// sheet 2, page 2-2
-	// * state registers
-
-	always @ (posedge got, negedge clo_) begin
-		if (~clo_) {i2, i3, i4, i5, wx, wm, ww} <= 'b0;
-		else {i2, i3, i4, i5, wx, wm, ww} <= {ei2, ei3, ei4, ei5, ewx, ewm, eww};
-	end
-
 	ffd REG_I1(
 		.s_(~si1),
 		.d(ei1),
@@ -210,6 +204,7 @@ module px(
 	// sheet 3, page 2-3
 	// * strob signals
 
+	wire stp0$ = p0 & stp0;
 	assign as2_sum_at = wz | p4 | we | w$;
 	wire M19_6 = w$ | we | p4 | (k2 & laduj);
 	wire M18_8 = p1 | k1 | k2 | i1 | i3;
