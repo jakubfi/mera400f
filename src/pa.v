@@ -11,14 +11,14 @@ module pa(
 	// sheet 1
 	input [0:15] ir,
 	input [0:15] bus_ki,
-	input [0:15] rdt_,
+	input [0:15] rdt,
 	input w_dt,
 	input mwa,
 	input mwb,
 	input mwc,
 	input bwa,
 	input bwb,
-	output [0:15] ddt_,
+	output [0:15] ddt,
 	output [0:15] w,
 	// sheet 2
 	// sheet 3
@@ -75,7 +75,7 @@ module pa(
 	input barnb,
 	input [0:15] kl,
 	input ic_ad,
-	output [0:15] dad_,
+	output [0:15] dad,
 	input ar_ad,
 	output zga
 
@@ -93,7 +93,7 @@ module pa(
 		.bwb(bwb),
 		.ir(ir),
 		.kl(kl),
-		.rdt_(rdt_),
+		.rdt(rdt),
 		.ki(bus_ki),
 		.at(at),
 		.ac(ac),
@@ -101,7 +101,7 @@ module pa(
 		.w(w)
 	);
 
-	assign ddt_ = ~(w & {16{w_dt}});
+	assign ddt = w & {16{w_dt}};
 
 	// sheet 5..6
 
@@ -225,12 +225,12 @@ module pa(
 
 	// sheet 13, 14
 
-	wire [0:15] dad1_ = ~({16{ar_ad}} & ar);
-	wire [0:15] dad2_ = ~({16{ic_ad}} & ic);
-	assign dad_ = dad1_ & dad2_;
+	wire [0:15] dad1 = {16{ar_ad}} & ar;
+	wire [0:15] dad2 = {16{ic_ad}} & ic;
+	assign dad = dad1 | dad2;
 
-	wire zga_ = ~(&(kl[0:7] ^ {barnb, dad_[1:7]}));
-	assign zga = ~(zga_ | ~(&(kl[8:15] ^ dad_[8:15])));
+	wire zga_ = ~(&(kl[0:7] ^ {barnb, ~dad[1:7]}));
+	assign zga = ~(zga_ | ~(&(kl[8:15] ^ ~dad[8:15])));
 
 endmodule
 

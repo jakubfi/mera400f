@@ -26,7 +26,7 @@ module pp(
 	input przerw,
 	output [0:15] bus_rz,
 	// sheet 4
-	input rpa_,
+	input rpa,
 	input zegar,
 	input xi,
 	// sheet 5
@@ -50,16 +50,16 @@ module pp(
 	input sin,
 	input ir15,
 	// sheet 11
-	input rin_,
+	input rin,
 	input zw,
-	input rdt15_,
 	input zgpn_,
-	input rdt0_,
-	input rdt14_,
-	input rdt13_,
-	input rdt12_,
-	input rdt11_,
-	output dok_,
+	input rdt0,
+	input rdt11,
+	input rdt12,
+	input rdt13,
+	input rdt14,
+	input rdt15,
+	output dok,
 	output irq,
 	// sheet 12
 	// --
@@ -107,7 +107,7 @@ module pp(
 		~b_parz,	// 1 memory parity error
 		~b_p0,		// 2 no memory
 		~rz4,			// 3 other CPU, high priority
-		rpa_,			// 4 interface power out
+		~rpa,			// 4 interface power out
 		~zegar,		// 5 timer
 		~xi,			// 6 illegal instruction
 		~fi0,			// 7 div overflow (fixed point)
@@ -243,7 +243,7 @@ module pp(
 	wire dok_dly;
 	dly #(.ticks(DOK_DLY_TICKS)) DLY_DOK(
 		.clk(__clk),
-		.i(~rin_),
+		.i(rin),
 		.o(dok_dly)
 	);
 	wire M12_3 = ~dok_dly;
@@ -259,8 +259,8 @@ module pp(
 		.q(M14_6)
 	);
 
-	wire M11_3 = ~(rdt15_ & zgpn_);
-	wire M12_6 = ~(M11_3 & rdt15_);
+	wire M11_3 = ~(~rdt15 & zgpn_);
+	wire M12_6 = ~(M11_3 & ~rdt15);
 
 	wire M9_5;
 	ffd REG_DOK(
@@ -270,10 +270,10 @@ module pp(
 		.r_(~M12_3),
 		.q(M9_5)
 	);
-	assign dok_ = ~(~rin_ & M9_5);
+	assign dok = rin & M9_5;
 
-	wire rz29 = M14_6 & ~rdt15_ & ~rdt0_;
-	wire rz4 = M14_6 & ~rdt15_ & rdt0_;
+	wire rz29 = M14_6 & rdt15 & rdt0;
+	wire rz4 = M14_6 & rdt15 & ~rdt0;
 
 	assign irq = ~(&sz);
 
@@ -281,10 +281,10 @@ module pp(
 	decoder16 DEC_ZK(
 		.en1_(M11_3),
 		.en2_(~M14_6),
-		.a(~rdt14_),
-		.b(~rdt13_),
-		.c(~rdt12_),
-		.d(~rdt11_),
+		.a(rdt14),
+		.b(rdt13),
+		.c(rdt12),
+		.d(rdt11),
 		.o_(zk_)
 	);
 

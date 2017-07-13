@@ -27,9 +27,9 @@ module pr(
 	input w_rbb,			// A51 - RB[4:9] clock in
 	input w_rbc,			// B46 - RB[0:3] clock in
 	input w_rba,			// B50 - RB[10:15] clock in
-	output [0:3] dnb_,// A86,  A90, A87, B84 - DNB: NB system bus driver
+	output [0:3] dnb,	// A86,  A90, A87, B84 - DNB: NB system bus driver
 	// sheet 7
-	input rpn_,				// B85
+	input rpn,				// B85
 	input bp_nb,			// B86
 	input pn_nb,			// A92
 	input q_nb,				// B90
@@ -43,8 +43,8 @@ module pr(
 	input carry,			// A48
 	input s_1,				// B44
 	output zgpn,			// B88
-	output dpn_,			// B87 - PN system bus driver
-	output dqb_,			// B89 - Q system bus driver
+	output dpn,			// B87 - PN system bus driver
+	output dqb,			// B89 - Q system bus driver
 	output q,					// A53 - Q: system flag
 	output zer,			// A52
 	// sheet 8
@@ -82,7 +82,7 @@ module pr(
 
 	wire rpp = blr; // R0>>8 -> L
 	wire rpa = ~blr & ~(sel_r1_r7 & M60_6); // R0 -> L
-	wire rpn = ~blr & sel_r1_r7 & M60_6; // R1-R7 -> L
+	wire rpnn = ~blr & sel_r1_r7 & M60_6; // R1-R7 -> L
 
 	wire lr0 = lpc & strob_a & wa;
 
@@ -106,7 +106,7 @@ module pr(
 */
 	// L bus final open-collector composition
 	assign l = 
-		(rpn ? R1_7 : 16'hffff) // user registers
+		(rpnn ? R1_7 : 16'hffff) // user registers
 		& (rpa ? {r0, R0_9_15} : 16'hffff) // r0 at original position
 		& (rpp ? {8'd0, r0[0:7]} : 16'hffff) // r0 shifted right 8 bits
 	;
@@ -132,7 +132,7 @@ module pr(
 		.clm(clm),
 		.nb(nb)
 	);
-	assign dnb_ = ~(nb & {4{bar_nb}});
+	assign dnb = nb & {4{bar_nb}};
 
 	wire [9:15] R0_9_15;
 	r0_9_15 R0_LOW(
@@ -148,11 +148,11 @@ module pr(
 
 	// jumper on 7-8 : CPU 0
 	// jumper on 8-9 : CPU 1
-	assign zgpn = ~rpn_ ^ ~CPU_NUMBER;
+	assign zgpn = rpn ^ ~CPU_NUMBER;
 	wire M35_8 = CPU_NUMBER ^ bs;
 	wire M23_11 = ~(CPU_NUMBER & pn_nb);
-	assign dpn_ = ~(M35_8 & bp_nb) & M23_11;
-	assign dqb_ = ~(q_nb & q);
+	assign dpn = ~(~(M35_8 & bp_nb) & M23_11);
+	assign dqb = q_nb & q;
 
 	wire bs;
 	ffd REG_BS(

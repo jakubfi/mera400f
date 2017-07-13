@@ -32,24 +32,24 @@ module cpu(
 	output awaria,
 
 	// system bus
-											input rpa_,
+											input rpa,
 	output dmcl,
 	// -OFF
-	output dw_,
-	output dr_,
-	output ds_,
-	output df_,
-	output din_,				input rin_,
-	output dok_,				input rok_,
-											input ren_,
-											input rpe_,
-	output dqb_,
-	output dpn_,				input rpn_,
-	output [0:3] dnb_,
-	output [0:15] dad_,
-	output [0:15] ddt_,	input [0:15] rdt_,
+	output dw,
+	output dr,
+	output ds,
+	output df,
+	output din,				input rin,
+	output dok,				input rok,
+										input ren,
+										input rpe,
+	output dqb,
+	output dpn,				input rpn,
+	output [0:3] dnb,
+	output [0:15] dad,
+	output [0:15] ddt,	input [0:15] rdt,
 	output zg,
-											input zw,
+										input zw,
 	output zz,
 
 	input __clk
@@ -86,21 +86,21 @@ module cpu(
 
 
 	// -DDT open-collector composition
-	assign ddt_[0] = pa_ddt_[0] & ~px_ddt0;
-	assign ddt_[1:14] = pa_ddt_[1:14];
-	assign ddt_[15] = pa_ddt_[15] & ~px_ddt15;
+	assign ddt[0] = pa_ddt[0] | px_ddt0;
+	assign ddt[1:14] = pa_ddt[1:14];
+	assign ddt[15] = pa_ddt[15] | px_ddt15;
 
 	// -DAD open-collector composition
-	assign dad_[0:3] = pa_dad_[0:3];
-	assign dad_[4] = pa_dad_[4] & ~pp_dad4;
-	assign dad_[5:8] = pa_dad_[5:8];
-	assign dad_[9] = pa_dad_[9] & ~px_dad9;
-	assign dad_[10] = pa_dad_[10] & ~px_dad10;
-	assign dad_[11] = pa_dad_[11] & ~pp_dad11;
-	assign dad_[12] = pa_dad_[12] & ~px_dad12 & ~pp_dad12;
-	assign dad_[13] = pa_dad_[13] & ~px_dad13 & ~pp_dad13;
-	assign dad_[14] = pa_dad_[14] & ~px_dad14 & ~pp_dad14;
-	assign dad_[15] = pa_dad_[15] & ~px_dad15_ir9 & ~px_dad15_i & ~pp_dad15;
+	assign dad[0:3] = pa_dad[0:3];
+	assign dad[4] = pa_dad[4] | pp_dad4;
+	assign dad[5:8] = pa_dad[5:8];
+	assign dad[9] = pa_dad[9] | px_dad9;
+	assign dad[10] = pa_dad[10] | px_dad10;
+	assign dad[11] = pa_dad[11] | pp_dad11;
+	assign dad[12] = pa_dad[12] | px_dad12 | pp_dad12;
+	assign dad[13] = pa_dad[13] | px_dad13 | pp_dad13;
+	assign dad[14] = pa_dad[14] | px_dad14 | pp_dad14;
+	assign dad[15] = pa_dad[15] | px_dad15_ir9 | px_dad15_i | pp_dad15;
 
 // -----------------------------------------------------------------------
 // --- P-X ---------------------------------------------------------------
@@ -198,12 +198,12 @@ px #(
 	.bar_nb(bar_nb),
 	.barnb(barnb),
 	.q_nb(q_nb),
-	.df_(df_),
+	.df(df),
 	.w_dt(w_dt),
-	.dr_(dr_),
+	.dr(dr),
 	.dt_w(dt_w),
 	.ar_ad(ar_ad),
-	.ds_(ds_),
+	.ds(ds),
 	.mcl(mcl),
 	.gi(gi),
 	.ir6(ir[6]),
@@ -215,11 +215,11 @@ px #(
 	.dmcl(dmcl),
 	.ddt15(px_ddt15),
 	.ddt0(px_ddt0),
-	.din_(din_),
+	.din(din),
 	.dad15_i(px_dad15_i),
 	.dad10(px_dad10),
 	.dad9(px_dad9),
-	.dw_(dw_),
+	.dw(dw),
 	.i3_ex_przer(i3_ex_przer),
 	.ck_rz_w(ck_rz_w),
 	.zerrz(zerrz),
@@ -228,8 +228,8 @@ px #(
 	.srez$(srez$),
 	.wzi(wzi),
 	.is(is),
-	.ren_(ren_),
-	.rok_(rok_),
+	.ren(ren),
+	.rok(rok),
 	.efp(efp),
 	.exl(exl),
 	.zg(zg),
@@ -237,7 +237,7 @@ px #(
 	.oken(oken),
 	.stop_n(stop_n),
 	.zga(zga),
-	.rpe_(rpe_),
+	.rpe(rpe),
 	.stop(stop),
 	.ir9(ir[9]),
 	.pufa(pufa),
@@ -292,7 +292,8 @@ pm #(
 	.panel_fetch(panel_fetch),
 	.panel_load(panel_load),
 	.panel_bin(panel_bin),
-	.rdt11_(rdt_[11]),
+	.rdt9(rdt[9]),
+	.rdt11(rdt[11]),
 	.k1(k1),
 	.laduj(laduj),
 	.k2_bin_store(k2_bin_store),
@@ -301,7 +302,6 @@ pm #(
 	.w_rba(w_rba),
 	.w_rbb(w_rbb),
 	.p0(p0),
-	.rdt9_(rdt_[9]),
 	.ep0(ep0),
 	.stp0(stp0),
 	.ek2(ek2),
@@ -343,18 +343,24 @@ pm #(
 	.wx(wx),
 	.shc(shc),
 	.read_fp(read_fp),
-	.ir7(ir[7]),
 	.inou(inou),
-	.rok_(rok_),
+	.rok(rok),
 	.arp1(arp1),
 	.lg_3(lg_3),
 	.lg_0(lg_0),
 	.rsc(rsc),
+	.ir6(ir[6]),
+	.ir7(ir[7]),
+	.ir8(ir[8]),
+	.ir9(ir[9]),
 	.ir10(ir[10]),
-	.lpb(lpb),
 	.ir11(ir[11]),
-	.rsb(rsb),
 	.ir12(ir[12]),
+	.ir13(ir[13]),
+	.ir14(ir[14]),
+	.ir15(ir[15]),
+	.lpb(lpb),
+	.rsb(rsb),
 	.rsa(rsa),
 	.lpa(lpa),
 	.rlp_fp(rlp_fp),
@@ -362,11 +368,6 @@ pm #(
 	.rb(rb),
 	.ra(ra),
 	.bod(bod),
-	.ir15(ir[15]),
-	.ir14(ir[14]),
-	.ir13(ir[13]),
-	.ir9(ir[9]),
-	.ir8(ir[8]),
 	.lk(lk),
 	.rj(rj),
 	.uj(uj),
@@ -416,7 +417,6 @@ pm #(
 	.w_rm(w_rm),
 	.we(we),
 	.ib(ib),
-	.ir6(ir[6]),
 	.cb(cb),
 	.i5(i5),
 	.rb$(rb$),
@@ -605,8 +605,8 @@ pr #(
 	.w_rbb(w_rbb),
 	.w_rbc(w_rbc),
 	.w_rba(w_rba),
-	.dnb_(dnb_),
-	.rpn_(rpn_),
+	.dnb(dnb),
+	.rpn(rpn),
 	.bp_nb(bp_nb),
 	.pn_nb(pn_nb),
 	.q_nb(q_nb),
@@ -620,8 +620,8 @@ pr #(
 	.carry(carry),
 	.s_1(s_1),
 	.zgpn(zgpn),
-	.dpn_(dpn_),
-	.dqb_(dqb_),
+	.dpn(dpn),
+	.dqb(dqb),
 	.q(q),
 	.zer(zer),
 	.ust_z(ust_z),
@@ -670,7 +670,7 @@ pp #(
 	.i1(i1),
 	.przerw(przerw),
 	.bus_rz(bus_rz),
-	.rpa_(rpa_),
+	.rpa(rpa),
 	.zegar(zegar),
 	.xi(xi$),
 	.fi0(fi0),
@@ -682,19 +682,19 @@ pp #(
 	.i2(i2),
 	.oprq(oprq),
 	.ir14(ir[14]),
+	.ir15(ir[15]),
 	.wx(wx),
 	.sin(sin),
-	.ir15(ir[15]),
-	.rin_(rin_),
+	.rin(rin),
 	.zw(zw),
-	.rdt15_(rdt_[15]),
 	.zgpn_(zgpn),
-	.rdt0_(rdt_[0]),
-	.rdt14_(rdt_[14]),
-	.rdt13_(rdt_[13]),
-	.rdt12_(rdt_[12]),
-	.rdt11_(rdt_[11]),
-	.dok_(dok_),
+	.rdt0(rdt[0]),
+	.rdt11(rdt[11]),
+	.rdt12(rdt[12]),
+	.rdt13(rdt[13]),
+	.rdt14(rdt[14]),
+	.rdt15(rdt[15]),
+	.dok(dok),
 	.irq(irq),
 	.dad4(pp_dad4),
 	.dad11(pp_dad11),
@@ -710,20 +710,20 @@ pp #(
 
 wire s0, carry, j$, exx, at15, exy, s_1, wzi, zs, arz;
 wire zga;
-wire [0:15] pa_ddt_;
-wire [0:15] pa_dad_;
+wire [0:15] pa_ddt;
+wire [0:15] pa_dad;
 
 pa PA(
 	.ir(ir),
 	.bus_ki(bus_ki),
-	.rdt_(rdt_),
+	.rdt(rdt),
 	.w_dt(w_dt),
 	.mwa(mwa),
 	.mwb(mwb),
 	.mwc(mwc),
 	.bwa(bwa),
 	.bwb(bwb),
-	.ddt_(pa_ddt_),
+	.ddt(pa_ddt),
 	.w(w),
 	.saryt(saryt),
 	.sab(sab),
@@ -769,7 +769,7 @@ pa PA(
 	.barnb(barnb),
 	.kl(kl),
 	.ic_ad(ic_ad),
-	.dad_(pa_dad_),
+	.dad(pa_dad),
 	.ar_ad(ar_ad),
 	.zga(zga)
 );

@@ -38,7 +38,8 @@ module pm(
 	input panel_fetch,
 	input panel_load,
 	input panel_bin,
-	input rdt11_,
+	input rdt9,
+	input rdt11,
 	input k1,
 	output laduj,
 	output k2_bin_store,
@@ -48,7 +49,6 @@ module pm(
 	output w_rbb,
 	// sheet 4
 	input p0,
-	input rdt9_,
 	output ep0,
 	output stp0,
 	output ek2,
@@ -97,7 +97,7 @@ module pm(
 	input read_fp,
 	input ir7,
 	input inou,
-	input rok_,
+	input rok,
 	output arp1,
 	output lg_3,
 	output lg_0,
@@ -336,7 +336,7 @@ module pm(
 		.r_(~clm),
 		.q(load)
 	);
-	wire bin_d = ~(rdt9 & ~rdt11_ & lg_0);
+	wire bin_d = ~(rdt9 & rdt11 & lg_0);
 	wire bin_clk = strob1 & k1;
 	ffd REG_BIN(
 		.s_(~panel_bin),
@@ -375,7 +375,6 @@ module pm(
 	wire lg_plus_1 = (bin & k2) | (k1 & rdt9);
 	// NOTE: not connected anywhere (on every schematic)
 	//wire zero_lg = ~(~rdt9 & k1s1 & rok);
-	wire rdt9 = ~rdt9_;
 
 	// sheet 5, page 2-15
 	//  * P - wskaźnik przeskoku (branch indicator)
@@ -528,7 +527,6 @@ module pm(
 	);
 
 	wire ic_1_ = ~(wx & inou);
-	wire rok = ~rok_;
 	wire okinou_ = ~(inou & rok);
 
 	// sheet 10, page 2-20

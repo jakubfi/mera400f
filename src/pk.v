@@ -73,7 +73,7 @@ module pk(
 	input q,
 	input run,
 	// sheet 5
-	output wre_,
+	output wre,
 	output rsa,
 	output rsb,
 	output rsc,
@@ -312,7 +312,7 @@ module pk(
 
 	// sheet 5
 
-	assign {wre_, rsc, rsb, rsa, wic, wac, war, wir, wrs, wrz, wkb} = rotary_bus;
+	assign {wre, rsc, rsb, rsa, wic, wac, war, wir, wrs, wrz, wkb} = rotary_bus;
 	none2seg d4(.seg(digs[4]));
 	rb2seg d5(.r(rotary_bus), .seg(digs[5]));
 	ra2seg d6(.r(rotary_bus), .seg(digs[6]));

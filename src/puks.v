@@ -9,7 +9,7 @@
 module puks(
 	input clk,
 	input zoff, // not implemented for FPGA
-	input rcl_,
+	input rcl,
 	input dcl,
 	output reg off, // not implemented for FPGA
 	output pout,
@@ -42,8 +42,8 @@ module puks(
 
 	// -CLO: general reset
 	// -CLM: module reset
-	assign clm = ~(~off & ~dcl & rcl_);
-	assign clo = ~(~off & ~dcl);
+	assign clm = ~(~off & ~dcl & ~rcl);
+	assign clo = off | dcl;
 
 endmodule
 

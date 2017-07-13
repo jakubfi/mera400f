@@ -91,12 +91,12 @@ module px(
 	output bar_nb,	// A75 - BAR->NB
 	output barnb,		// A72
 	output q_nb,		// A74 - Q->NB
-	output df_,			// B92
+	output df,			// B92
 	output w_dt,		// A81 - W->DT
-	output dr_,			// A87
+	output dr,			// A87
 	output dt_w,		// A65 - DT->W
 	output ar_ad,	// B63 - AR->AD
-	output ds_,			// A88 - DS: "Send" Driver // NOTE: missing on original schematic
+	output ds,			// A88 - DS: "Send" Driver // NOTE: missing on original schematic
 	// sheet 7
 	input mcl,			// A43 - instruction MCL
 	input gi,			// A47
@@ -109,11 +109,11 @@ module px(
 	output dmcl,		// B88
 	output ddt15,	// A92
 	output ddt0,		// B89
-	output din_,		// A91
+	output din,		// A91
 	output dad15_i,// B81
 	output dad10,	// B82
 	output dad9,		// A86
-	output dw_,			// A93
+	output dw,			// A93
 	output i3_ex_przer,	// A52
 	output ck_rz_w,	// B91
 	output zerrz,		// B85
@@ -123,8 +123,8 @@ module px(
 	input srez$,		// B76
 	input wzi,			// A60
 	input is,			// A84
-	input ren_,			// B74
-	input rok_,			// A89
+	input ren,			// B74
+	input rok,			// A89
 	input efp,			// B09
 	input exl,			// A78 - instruction EXL
 	output zg,			// B44 - request to use the system bus (ZGłoszenie)
@@ -133,7 +133,7 @@ module px(
 	// sheet 9
 	input stop_n,		// B55
 	input zga,			// B57
-	input rpe_,			// A82
+	input rpe,			// A82
 	input stop,		// B51
 	input ir9,			// B06
 	input pufa,			// B08 - any of the wide or floating point instructions
@@ -269,14 +269,14 @@ module px(
 	assign q_nb = zwzg & ~i2;
 	wire inou = in | ou;
 	wire M40_8 = i2 | (in & wm) | k1;
-	assign df_ = ~(M40_8 & zwzg);
+	assign df = M40_8 & zwzg;
 	wire M49_3 = (ou & wm) ^ w;
 	assign w_dt = M49_3 & zwzg;
-	assign dr_ = ~(r & zwzg);
+	assign dr = r & zwzg;
 	wire r = k2fetch | p5 | i4 | i1 | i3lips | wr | p1 | read_fp;
 	assign dt_w = M40_8 | r;
 	assign ar_ad = M30_8 & zwzg;
-	assign ds_ = ~(~(~ou | ~wm) & zwzg);
+	assign ds = ~(~ou | ~wm) & zwzg;
 
 	// sheet 7, page 2-7
 	// * system bus drivers
@@ -286,7 +286,7 @@ module px(
 	wire wmgi = wm & gi;
 	assign ddt15 = zwzg & wmgi;
 	assign ddt0 = zwzg & (wmgi & ir6);
-	assign din_ = ~(zwzg & wmgi);
+	assign din = zwzg & wmgi;
 	assign dad15_i = zwzg & (i5 | i1);
 	assign dad10 = zwzg & (i1 | (i4 & exr) | i5);
 	assign dad9 = zwzg & (i1 | i4 | i5);
@@ -295,7 +295,7 @@ module px(
 	// B-A : no write deny
 	wire ABC_A = M40_12 | ~LOW_MEM_WRITE_DENY;
 	wire M59_3 = w & ABC_A;
-	assign dw_ = ~(zwzg & M59_3);
+	assign dw = zwzg & M59_3;
 	wire w = i5 | i3_ex_przer | ww | k2_bin_store;
 	assign i3_ex_przer = i3 & exrprzerw;
 	wire rw = r ^ w;
@@ -351,7 +351,7 @@ module px(
 	// P-X / K-N, N-M : one interface unit
 	// unused: SINGLE_INTERFACE 1'b1
 
-	wire M57_6 = ren_ & talarm_ & rok_;
+	wire M57_6 = ~ren & talarm_ & ~rok;
 	ffjk REG_OK$(
 		.s_(1'b1),
 		.j(zwzg),
@@ -361,7 +361,7 @@ module px(
 		.q(ok$)
 	);
 	wire ok = ok$;
-	assign oken = ~(ren_ & rok_);
+	assign oken = ~(~ren & ~rok);
 
 	// E-F: no AWP
 	wire EF = ~efp | AWP_PRESENT;
@@ -392,9 +392,9 @@ module px(
 		.q(hlt_n)
 	);
 
-	assign bod = ~(rpe_ & ren_);
+	assign bod = ~(~rpe & ~ren);
 
-	assign b_parz = strob1 & ~rpe_ & r;
+	assign b_parz = strob1 & rpe & r;
 	assign b_p0 = rw & talarm;
 
 	wire awaria_set = (b_parz | b_p0) & ~bar_nb;

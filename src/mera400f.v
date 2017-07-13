@@ -28,26 +28,26 @@ module mera400f(
 // -----------------------------------------------------------------------
 
 	// output: to system bus - drivers
-	wire dw_;
-	wire dr_;
-	wire ds_;
-	wire df_;
-	wire din_;
-	wire dok_;
-	wire dqb_;
-	wire dpn_;
-	wire [0:3] dnb_;
-	wire [0:15] dad_;
-	wire [0:15] ddt_;
+	wire dw;
+	wire dr;
+	wire ds;
+	wire df;
+	wire din;
+	wire dok;
+	wire dqb;
+	wire dpn;
+	wire [0:3] dnb;
+	wire [0:15] dad;
+	wire [0:15] ddt;
 	wire dmcl;
 	// input: from system bus - receivers
-	wire rpa_ = 1;
-	wire rin_ = 1;
-	wire rok_;
-	wire ren_ = 1;
-	wire rpe_ = 1;
-	wire rpn_ = 1;
-	wire [0:15] rdt_;
+	wire rpa = 0;
+	wire rin = 0;
+	wire rok;
+	wire ren = 0;
+	wire rpe = 0;
+	wire rpn = 0;
+	wire [0:15] rdt;
 	wire zg;
 	wire zw = zg;
 	wire zz;
@@ -100,7 +100,7 @@ module mera400f(
 		.step(step),
 		.stop_n(stop_n),
 		.cycle(cycle),
-		.wre(wre_),
+		.wre(wre),
 		.rsa(rsa),
 		.rsb(rsb),
 		.rsc(rsc),
@@ -123,24 +123,24 @@ module mera400f(
 		.mc_0(mc_0),
 		.awaria(awaria),
 		// system bus
-		.rpa_(rpa_),
-		.dw_(dw_),
-		.dr_(dr_),
-		.ds_(ds_),
-		.df_(df_),
-		.din_(din_),
-		.rin_(rin_),
-		.dok_(dok_),
-		.rok_(rok_),
-		.ren_(ren_),
-		.rpe_(rpe_),
-		.dqb_(dqb_),
-		.dpn_(dpn_),
-		.rpn_(rpn_),
-		.dnb_(dnb_),
-		.dad_(dad_),
-		.ddt_(ddt_),
-		.rdt_(rdt_),
+		.rpa(rpa),
+		.dw(dw),
+		.dr(dr),
+		.ds(ds),
+		.df(df),
+		.din(din),
+		.rin(rin),
+		.dok(dok),
+		.rok(rok),
+		.ren(ren),
+		.rpe(rpe),
+		.dqb(dqb),
+		.dpn(dpn),
+		.rpn(rpn),
+		.dnb(dnb),
+		.dad(dad),
+		.ddt(ddt),
+		.rdt(rdt),
 		// ssytem bus reservation
 		.zg(zg),
 		.zw(zw),
@@ -153,7 +153,7 @@ module mera400f(
 
 	wire [0:15] kl;
 	wire zegar;
-	wire wre_, rsa, rsb, rsc;
+	wire wre, rsa, rsb, rsc;
 	wire wic, wac, war, wir, wrs, wrz, wkb;
 	wire panel_store, panel_fetch, panel_load, panel_bin;
 	wire oprq, stop, start, work, mode, step, stop_n, cycle;
@@ -195,7 +195,7 @@ module mera400f(
 		.irq(irq),
 		.q(q),
 		.run(run),
-		.wre_(wre_),
+		.wre(wre),
 		.rsa(rsa),
 		.rsb(rsb),
 		.rsc(rsc),
@@ -216,7 +216,7 @@ module mera400f(
 	puks PUKS(
 		.clk(CLK_EXT),
 		.zoff(zoff),
-		.rcl_(rcl_),
+		.rcl(rcl),
 		.dcl(dcl),
 		.off(off),
 		.pout(pout),
@@ -229,12 +229,12 @@ module mera400f(
 // --- I/F ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-	wire rcl_, zoff;
+	wire rcl, zoff;
 	isk ISK(
 		.dmcl(dmcl),
 		.dcl(dcl),
 		.off(off),
-		.rcl_(rcl_),
+		.rcl(rcl),
 		.zoff(zoff)
 	);
 
@@ -256,15 +256,20 @@ module mera400f(
 		.SRAM_LB(SRAM_LB),
 		.SRAM_A(SRAM_A),
 	  .SRAM_D(SRAM_D),
-		.nb_(dnb_),
-		.ad_(dad_),
-		.rdt_(ddt_),
+		.nb_(~dnb),
+		.ad_(~dad),
+		.rdt_(~ddt),
 		.ddt_(rdt_),
-		.w_(dw_),
-		.r_(dr_),
-		.s_(ds_),
+		.w_(~dw),
+		.r_(~dr),
+		.s_(~ds),
 		.ok_(rok_)
 	);
+
+	wire rok_;
+	assign rok = ~rok_;
+	wire [0:15] rdt_;
+	assign rdt = ~rdt_;
 
 endmodule
 
