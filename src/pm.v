@@ -254,7 +254,7 @@ module pm(
 	//  * univib: KC (koniec cyklu - cycle end)
 	//  * univib: PC (początek cyklu - cycle start)
 
-	wire ekc = ~(~ekc_1 & ~ekc_i & ~ekc_2 & ~p2 & p0stpc_);
+	wire ekc = ekc_1 | ekc_i | ekc_2 | p2 | p0stpc;
 	wire kc_reset = ~clo_ | pc;
 
 	wire trig_kc;
@@ -367,9 +367,9 @@ module pm(
 	//  * transition to P0 state
 
 	wire psr = ~(k2store_ & ~p0);
-	wire p0stpc_ = ~(stpc & p0);
-	wire p0_k2 = ~(~k2 & ~p0);
-	assign ep0 = ~(~k2 & ~k1) & bin_;
+	wire p0stpc = p0 & stpc;
+	wire p0_k2 = k2 | p0;
+	assign ep0 = (k2 | k1) & bin_;
 	assign stp0 = ~(bin_ & ~stpc & ~sfl);
 	assign ek2 = ~(~(p0 & sfl) & ~(bin & lg_3 & k1));
 	assign ek1 = ~(~(p0_k2 & bin) & ~(k1 & bin & ~lg_3));
