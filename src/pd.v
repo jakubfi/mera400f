@@ -59,9 +59,9 @@ module pd(
 	output xi,				// A24 - instruction is illegal
 	output nef,				// A20 - instruction is ineffective
 	// sheet 5
-	input w$_,				// A61 - W& state
-	input p4_,				// A77 - P4 state
-	input we_,				// A65 - WE state
+	input w$,				// A61 - W& state
+	input p4,				// A77 - P4 state
+	input we,				// A65 - WE state
 	output amb,				// A75
 	output apb,				// B65
 	output jkrb,			// A86
@@ -70,7 +70,7 @@ module pd(
 	output ap1,				// A76 - AP1: register A plus 1 (for IRB)
 	output am1,				// A90 - AM1: register A minus 1 (for DRB)
 	// sheet 6
-	input wz_,				// A66 - state WZ
+	input wz,				// A66 - state WZ
 	input wls,				// A70
 	output bcoc$,			// A89
 	// sheet 7
@@ -86,8 +86,8 @@ module pd(
 	output nrf,				// A12
 	// sheet 8
 	input at15_,			// A07
-	input wx_,				// A64 - state WX
-	input wa_,				// A63 - state WA
+	input wx,				// A64 - state WX
+	input wa,				// A63 - state WA
 	output ust_z,			// B49
 	output ust_v,			// A08
 	output ust_mc,		// B80
@@ -99,9 +99,9 @@ module pd(
 	output blr,			// A87
 	// sheet 9
 	input wpb,				// A58
-	input wr_,				// A60
+	input wr,				// A60
 	input pp,				// A62
-	input ww_,				// B60
+	input ww,				// B60
 	input wzi,				// A59
 	output ewa,				// A55 - Enter WA
 	output ewp,				// A56 - Enter WP
@@ -110,7 +110,7 @@ module pd(
 	output lj,				// B50
 	output ewe,				// A54 - Enter WE
 	// sheet 10
-	input wp_,				// A37
+	input wp,				// A37
 	output ekc_1,		// A42
 	output ewz,				// A49 - Enter WZ
 	output ew$,				// A50 - Enter W&
@@ -123,7 +123,7 @@ module pd(
 	output p16,			// A36
 	// sheet 12
 	input lk,					// A52
-	input wm_,				// A38
+	input wm,				// A38
 	output ewr,				// A51 - Enter WR
 	output ewm,				// A48 - Enter WM
 	output efp,			// A11
@@ -280,9 +280,6 @@ module pd(
 	assign ap1 = riirb & w$;
 	wire krb = irb | drb;
 	assign am1 = drb & w$;
-	wire w$ = ~w$_;
-	wire p4 = ~p4_;
-	wire we = ~we_;
 
 	// sheet 6, page 2-35
 	// * control signals
@@ -301,7 +298,6 @@ module pd(
 	assign amb = (uka & p4) | (cns & w$);
 
 	// FIX: -WZ on <A66> was labeled as +WZ
-	wire wz = ~wz_;
 	wire M84_8 = riirb ^ nglbb;
 	wire M67_8 = bm | is | er | xr;
 	wire sds = (wz & (xm | em)) | (M67_8 & w$) | (w$ & M84_8) | (we & wlsbs);
@@ -345,9 +341,7 @@ module pd(
 	assign eat0 = ~(~srxy | ~M59_8) ^ ~(~shc | at15_);
 	assign sr = srxy | srz | shc;
 	assign ust_y = (w$ & sl) | (sr & ~shc & wx);
-	wire wx = ~wx_;
-	assign ust_x = ~wa_ & sx;
-	wire wa = ~wa_;
+	assign ust_x = wa & sx;
 	assign blr = w$ & oc & ~ir[6];
 
 	// sheet 9, page 2-38
@@ -355,14 +349,12 @@ module pd(
 
 	wire M77_8 = ng$ | ri | rj;
 	assign ewa = (pcrs & pp) | (M77_8 & pp) | (we & (~wls & ls)) | (~wpb & lbcb & wr);
-	wire wr = ~wr_;
 	wire prawy = lbcb & wpb;
 	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & wa) | (pp & ~(~uj & ~lwlwt));
 	assign uj = j & ~a_eq[7];
 	assign lwlwt = lwt | lw;
 	assign lj = ~(~a_eq[7] | ~j);
 	assign ewe = (lj & ww) | (ls & wa) | (pp & ~(~llb & ~zb$ & ~js)) | (~wzi & krb & w$);
-	wire ww = ~ww_;
 
 	// sheet 10, page 2-39
 	// * execution phase control signals
@@ -370,7 +362,6 @@ module pd(
 
 	wire M59_6 = ~(rbib | (~wzi & ~(~krb & ~is)));
 	assign ekc_1 = (~lac & wr & (~grlk & ~lrcb)) | (~lrcb & wp) | (~llb & we) | (M59_6 & w$);
-	wire wp = ~wp_;
 	assign ewz = (w$ & ~wzi & is) | (wr & m) | (pp & lrcbsr);
 	wire lrcbsr = lrcb | sr;
 	wire M88_6 = is | rb$ | bmib | prawy;
@@ -398,7 +389,6 @@ module pd(
 	wire M60_8 = ~lk & inou;
 	wire M76_3 = l ^ M60_8;
 	assign ewr = (wp & lrcb) | (lk & wr & l) | (lws & we) | (M76_3 & wx) | M20_9 | M20_10;
-	wire wm = ~wm_;
 	wire M20_9 = M60_8 & wm;
 	wire M20_10 = (fimb | lac | tw) & pp;
 	assign ewm = gmio & pp;

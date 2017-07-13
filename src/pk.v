@@ -51,7 +51,7 @@ module pk(
 	output mode,
 	output stop_n,
 	// sheet 2
-	input p0_,
+	input p0,
 	output [0:15] kl,
 	output dcl_,
 	output step_,
@@ -274,11 +274,11 @@ module pk(
 	assign kl = keys;
 	assign dcl_ = ~fnkey[`FN_CLEAR];
 	assign step_ = ~fnkey[`FN_STEP];
-	assign fetch_ = ~fnkey[`FN_FETCH] | p0_;
-	assign store_ = ~fnkey[`FN_STORE] | p0_;
-	assign cycle_ = ~fnkey[`FN_CYCLE] | p0_;
-	assign load_ = ~fnkey[`FN_LOAD] | p0_;
-	assign bin_ = ~fnkey[`FN_BIN] | p0_;
+	assign fetch_ = ~fnkey[`FN_FETCH] | ~p0;
+	assign store_ = ~fnkey[`FN_STORE] | ~p0;
+	assign cycle_ = ~fnkey[`FN_CYCLE] | ~p0;
+	assign load_ = ~fnkey[`FN_LOAD] | ~p0;
+	assign bin_ = ~fnkey[`FN_BIN] | ~p0;
 	assign oprq_ = ~fnkey[`FN_OPRQ];
 
 	// sheet 3

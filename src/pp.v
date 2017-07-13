@@ -13,7 +13,7 @@ module pp(
 	input clm_,
 	input w_rm,
 	input strob1_,
-	input i4_,
+	input i4,
 	output [0:9] rs,
 	// sheet 3
 	input pout_,
@@ -22,7 +22,7 @@ module pp(
 	input ck_rz_w,
 	input b_p0_,
 	input zerrz,
-	input i1_,
+	input i1,
 	input przerw,
 	output [0:15] bus_rz,
 	// sheet 4
@@ -36,8 +36,8 @@ module pp(
 	input fi3_,
 	output przerw_z,
 	// sheet 6
-	input k1_,
-	input i2_,
+	input k1,
+	input i2,
 	// sheet 7
 	// ??
 	// sheet 8
@@ -46,7 +46,7 @@ module pp(
 	input oprq_,
 	// sheet 10
 	input ir14,
-	input wx_,
+	input wx,
 	input sin,
 	input ir15,
 	// sheet 11
@@ -81,10 +81,9 @@ module pp(
 	// sheet 1, 2
 	// * RM - interrupt mask register
 
-	wire clm$ = clm_ & ~(strob1 & i4$);
+	wire clm$ = clm_ & ~(strob1 & i4);
 	wire clrs = strob1 & w_rm;
 	wire strob1 = ~strob1_;
-	wire i4$ = ~i4_;
 
 	genvar num;
 	generate
@@ -127,7 +126,7 @@ module pp(
 	// FIX: missing connection from M104.12 to M89.5, M70.2
 
 	// RZ input: software interrupt drivers (sheet 10)
-	wire M104_12 = ~wx_ & sin & strob1;
+	wire M104_12 = wx & sin & strob1;
 	wire soft_high = ir14 & M104_12;
 	wire soft_low = ir15 & M104_12;
 
@@ -140,7 +139,7 @@ module pp(
 
 	// RZ input: clocks
 	wire ck_rzwm_ = strob1 & ck_rz_w;
-	wire ck_rzz_ = strob1 & ~i2_;
+	wire ck_rzz_ = strob1 & i2;
 	wire [0:31] RZ_CLK = {
 		{12{ck_rzwm_}},
 		{16{ck_rzz_}},
@@ -149,7 +148,7 @@ module pp(
 
 	// RZ input: resets
 	wire _0_rzw_ = clm_ & ~zerrz;
-	wire _0_rzz_ = clm_ & k1_;
+	wire _0_rzz_ = clm_ & ~k1;
 	wire M94_3 = _0_rzw_ & ~(M104_12 & (~ir14 & ~ir15));
 	wire [0:31] RZ_RESET = {
 		{12{_0_rzw_}},
@@ -171,7 +170,7 @@ module pp(
 	};
 
 	// RP input: clocks
-	wire ez_rpz = ~i1_ & przerw;
+	wire ez_rpz = i1 & przerw;
 
 	// RP output: interrupt mask drivers (to RM)
 	wire [0:9] zi = {
@@ -234,7 +233,7 @@ module pp(
 
 	// sheet 6
 
-	wire nk_ad = ~i2_ & zw;
+	wire nk_ad = i2 & zw;
 
 	// sheet 9
 
@@ -312,7 +311,7 @@ module pp(
 	wire M85_3  = npba ^ npaa;
 	wire M99_6 = M85_11 ^ M85_8;
 
-	wire M4_8 = przerw & zw & i4$;
+	wire M4_8 = przerw & zw & i4;
 
 	assign dad11_ = ~(M4_8 & zi[6])  & ~(nk_ad & M99_6);
 	assign dad12_ = ~(M4_8 & M85_11) & ~(nk_ad & ~M85_8);

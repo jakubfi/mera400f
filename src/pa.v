@@ -38,7 +38,7 @@ module pa(
 	output j$,
 	output exx_,
 	// sheet 7
-	input wx_,
+	input wx,
 	input eat0,
 	input axy,
 	output at15_,
@@ -134,7 +134,7 @@ module pa(
 
 	wire [0:15] at;
 	at REG_AT(
-		.s0(~(wx_ & as2_)),
+		.s0(~(~wx & as2_)),
 		.s1(as2),
 		.c(~strob1),
 		.sl(eat0),

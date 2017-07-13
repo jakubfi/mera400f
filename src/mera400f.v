@@ -53,7 +53,7 @@ module mera400f(
 	wire zz;
 
 	// output: to control panel
-	wire p0_;
+	wire p0;
 	wire [0:15] w;
 	wire hlt_n, p_, run, _wait, irq, q, mc_0, awaria;
 
@@ -112,7 +112,7 @@ module mera400f(
 		.wrz(wrz),
 		.wkb(wkb),
 		.zegar_(zegar_),
-		.p0_(p0_),
+		.p0(p0),
 		.w(w),
 		.hlt_n(hlt_n),
 		.p_(p_),
@@ -176,7 +176,7 @@ module mera400f(
 		.start$_(start$_),
 		.mode(mode),
 		.stop_n(stop_n),
-		.p0_(p0_),
+		.p0(p0),
 		.kl(kl),
 		.dcl_(dcl_),
 		.step_(step_),

@@ -10,7 +10,7 @@ module pr(
 	// sheet 1
 	input blr,				// A50 - BLokuj Rejestry
 	input lpc,				// A94 - LPC instruction
-	input wa_,				// B94 - state WA
+	input wa,				// B94 - state WA
 	input rpc,				// B03 - RPC instruction
 	input ra,				// B48 - user register address
 	input rb,				// B49 - user register address
@@ -80,13 +80,13 @@ module pr(
 	wire sel_r1_r7 = rb | ra | rc; // r1-r7 selected
 	wire wr0 = ~sel_r1_r7; // R0 selected
 
-	wire M60_6 = ~(~wa_ & rpc);
+	wire M60_6 = ~(wa & rpc);
 
 	wire rpp = blr; // R0>>8 -> L
 	wire rpa = ~blr & ~(sel_r1_r7 & M60_6); // R0 -> L
 	wire rpn = ~blr & sel_r1_r7 & M60_6; // R1-R7 -> L
 
-	wire lr0 = lpc & strob_a & ~wa_;
+	wire lr0 = lpc & strob_a & wa;
 
 	wire [0:15] R1_7;
 	regs USER_REGS(
