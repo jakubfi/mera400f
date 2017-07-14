@@ -293,7 +293,7 @@ module pd(
 	// * ALU control signals
 
 	wire M90_12 = a | trb | ib;
-	wire M49_6 = ~(~lwrs & ~lj & ~js & ~krb); // changing this to ORs upsets the CPU
+	wire M49_6 = ~(~lwrs & ~lj & ~js & ~krb); // does not (big time)
 	assign apb = (~uka & p4) | (M90_12 & w$) | (M49_6 & we);
 	assign amb = (uka & p4) | (cns & w$);
 
@@ -338,7 +338,7 @@ module pd(
 	assign ust_mc = ans & w$;
 	assign ust_leg = ccb & w$;
 	wire M59_8 = (ir[6] & r0[8]) | (~ir[6] & r0[7]);
-	assign eat0 = ~(~srxy | ~M59_8) ^ ~(~shc | ~at15);
+	assign eat0 = ~(~srxy | ~M59_8) ^ ~(~shc | ~at15); // does not
 	assign sr = srxy | srz | shc;
 	assign ust_y = (w$ & sl) | (sr & ~shc & wx);
 	assign ust_x = wa & sx;
@@ -350,22 +350,22 @@ module pd(
 	wire M77_8 = ng$ | ri | rj;
 	assign ewa = (pcrs & pp) | (M77_8 & pp) | (we & (~wls & ls)) | (~wpb & lbcb & wr);
 	wire prawy = lbcb & wpb;
-	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & wa) | (pp & ~(~uj & ~lwlwt));
+	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & wa) | (pp & (uj | lwlwt));
 	assign uj = j & ~a_eq[7];
 	assign lwlwt = lwt | lw;
-	assign lj = ~(~a_eq[7] | ~j);
-	assign ewe = (lj & ww) | (ls & wa) | (pp & ~(~llb & ~zb$ & ~js)) | (~wzi & krb & w$);
+	assign lj = ~(~a_eq[7] | ~j); // does not (big time)
+	assign ewe = (lj & ww) | (ls & wa) | (pp & (llb | zb$ | js)) | (~wzi & krb & w$);
 
 	// sheet 10, page 2-39
 	// * execution phase control signals
 	// * instruction cycle end signal
 
-	wire M59_6 = ~(rbib | (~wzi & ~(~krb & ~is)));
+	wire M59_6 = ~(rbib | (~wzi & (krb | is)));
 	assign ekc_1 = (~lac & wr & (~grlk & ~lrcb)) | (~lrcb & wp) | (~llb & we) | (M59_6 & w$);
 	assign ewz = (w$ & ~wzi & is) | (wr & m) | (pp & lrcbsr);
 	wire lrcbsr = lrcb | sr;
 	wire M88_6 = is | rb$ | bmib | prawy;
-	assign ew$ = (wr & M88_6) | (we & wlsbs) | (ri & ww) | (~(~ng$ & ~lbcb) & wa) | (pp & sew$);
+	assign ew$ = (wr & M88_6) | (we & wlsbs) | (ri & ww) | ((ng$ | lbcb) & wa) | (pp & sew$);
 
 	// sheet 11, page 2-40
 	// * control signals

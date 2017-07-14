@@ -269,7 +269,7 @@ module px(
 	wire r = k2fetch | p5 | i4 | i1 | i3lips | wr | p1 | read_fp;
 	assign dt_w = M40_8 | r;
 	assign ar_ad = M30_8 & zwzg;
-	assign ds = ~(~ou | ~wm) & zwzg;
+	assign ds = ou & wm & zwzg;
 
 	// sheet 7, page 2-7
 	// * system bus drivers
@@ -295,7 +295,7 @@ module px(
 	wire rw = r ^ w;
 	// FIX: -K2FBS was labeled +K2FBS
 	wire k2fbs = k2_bin_store | k2fetch;
-	assign ck_rz_w = ~(~(wr & fi) & ~lrz & ~blw_pw);
+	assign ck_rz_w = (wr & fi) | lrz | blw_pw;
 
 	wire __ck_rz_w_dly;
 	dly #(.ticks(2'd2)) DLY_ZERZ( // 2 ticks @50MHz = 40ns (~25ns orig.)
@@ -328,14 +328,14 @@ module px(
 	wire zwzg = zgi & zw;
 	assign zg = zgi | M47_15 | (zw & oken);
 
-	wire M46_8 = ~clo & ~(strob2 & w$ & wzi & is);
+	wire M46_8 = clo | (strob2 & w$ & wzi & is);
 	wire M47_15;
 	ffjk JK47(
 		.s_(1'b1),
 		.j(srez$ & wr),
 		.c_(~ok$),
 		.k(M47_15),
-		.r_(M46_8),
+		.r_(~M46_8),
 		.q(M47_15)
 	);
 	wire ad_ad = zw & zgi & (i4 & M37_15);
@@ -355,7 +355,7 @@ module px(
 		.q(ok$)
 	);
 	wire ok = ok$;
-	assign oken = ~(~ren & ~rok);
+	assign oken = ren | rok;
 
 	// E-F: no AWP
 	wire EF = ~efp | AWP_PRESENT;
@@ -369,7 +369,7 @@ module px(
 		.r_(~clo),
 		.q(M37_15)
 	);
-	wire exr = ~(~M37_15 & EF & ~exl);
+	wire exr = M37_15 | ~EF | exl;
 
 	// sheet 9, page 2-9
 

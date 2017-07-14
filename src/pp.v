@@ -1,71 +1,49 @@
-/*
-	P-P unit (interrupts)
-
-	document: 12-006368-01-8A
-	unit:     P-P3-2
-	pages:    2-44..2-57
-*/
-
 module pp(
-	input __clk,
-	// sheet 1, 2
-	input [0:15] w,
-	input clm,
 	input w_rm,
-	input strob1,
-	input i4,
-	output [0:9] rs,
-	// sheet 3
-	input pout,
 	input zer,
-	input b_parz,
 	input ck_rz_w,
-	input b_p0,
 	input zerrz,
-	input i1,
 	input przerw,
-	output [0:15] bus_rz,
-	// sheet 4
 	input rpa,
+	input ir14,
+	input ir15,
+	input wx,
+	input sin,
+	input rin,
+	input zw,
+	input zgpn_,
+	output przerw_z,
+	output irq,
+
+	// FPGA specific
+	input __clk,
+	// system-wide signals
+	input clm,
+	input strob1,
+	// CPU states
+	input k1,
+	input i1,
+	input i2,
+	input i4,
+	// interrupts
+	input pout,
+	input oprq,
+	input b_parz,
+	input b_p0,
 	input zegar,
 	input xi,
-	// sheet 5
 	input fi0,
 	input fi1,
 	input fi2,
 	input fi3,
-	output przerw_z,
-	// sheet 6
-	input k1,
-	input i2,
-	// sheet 7
-	// ??
-	// sheet 8
-	// --
-	// sheet 9
-	input oprq,
-	// sheet 10
-	input ir14,
-	input wx,
-	input sin,
-	input ir15,
-	// sheet 11
-	input rin,
-	input zw,
-	input zgpn_,
-	input rdt0,
-	input rdt11,
-	input rdt12,
-	input rdt13,
-	input rdt14,
-	input rdt15,
+	// internal buses
+	input [0:15] w,
+	output [0:15] bus_rz,
+	output [0:9] rs,
+	// system bus
+	input [0:15] rdt,
 	output dok,
-	output irq,
-	// sheet 12
-	// --
-	// sheet 13
 	output [0:15] dad
-
 );
 
 	parameter DOK_DLY_TICKS;
@@ -110,7 +88,7 @@ module pp(
 		~fi2,			// 9 floating point overflow
 		~fi3,			// 10 div/0 or floating point error
 		1'b1,			// 11 unused
-		zk_[0:15],// 12-27 channel interrupts
+		~zk[0:15],// 12-27 channel interrupts
 		~oprq,		// 28 operator request
 		~rz29,		// 29 other CPU, low priority
 		~soft_high,	// 30 software interrupt high
@@ -254,8 +232,8 @@ module pp(
 		.q(M14_6)
 	);
 
-	wire M11_3 = ~(~rdt15 & zgpn_);
-	wire M12_6 = ~(M11_3 & ~rdt15);
+	wire M11_3 = ~(~rdt[15] & zgpn_);
+	wire M12_6 = ~(M11_3 & ~rdt[15]);
 
 	wire M9_5;
 	ffd REG_DOK(
@@ -267,20 +245,17 @@ module pp(
 	);
 	assign dok = rin & M9_5;
 
-	wire rz29 = M14_6 & rdt15 & rdt0;
-	wire rz4 = M14_6 & rdt15 & ~rdt0;
+	wire rz29 = M14_6 & rdt[15] & rdt[0];
+	wire rz4 = M14_6 & rdt[15] & ~rdt[0];
 
 	assign irq = ~(&sz);
 
-	wire [0:15] zk_;
+	wire [0:15] zk;
 	decoder16 DEC_ZK(
-		.en1_(M11_3),
-		.en2_(~M14_6),
-		.a(rdt14),
-		.b(rdt13),
-		.c(rdt12),
-		.d(rdt11),
-		.o_(zk_)
+		.en1(~M11_3),
+		.en2(M14_6),
+		.i(rdt[11:14]),
+		.o(zk)
 	);
 
 	// sheet 12

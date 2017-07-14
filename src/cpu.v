@@ -671,12 +671,7 @@ pp #(
 	.rin(rin),
 	.zw(zw),
 	.zgpn_(zgpn),
-	.rdt0(rdt[0]),
-	.rdt11(rdt[11]),
-	.rdt12(rdt[12]),
-	.rdt13(rdt[13]),
-	.rdt14(rdt[14]),
-	.rdt15(rdt[15]),
+	.rdt(rdt),
 	.dok(dok),
 	.irq(irq),
 	.dad(pp_dad)
