@@ -30,13 +30,13 @@ module fps(
 	input mw_,
 	output _0_t,
 	output lkb,
-	output l_d_,
+	output l_d,
 	output clocktc,
 	output clocktb,
 	output clockta,
 	output opta, optb, optc, opm,
-	output t_c_,
-	output fcb_,
+	output t_c,
+	output fcb,
 	// sheet 4
 	input mf_,
 	input fp16_,
@@ -44,27 +44,27 @@ module fps(
 	output tab,
 	output trb,
 	output taa,
-	output cp_,
+	output cp,
 	// sheet 5
 	input sd$_,
-	input ck_,
+	input ck,
 	input sf,
 	input p32_,
-	input m14_,
+	input m14,
 	input t0_eq_c0,
-	input m38_,
+	input m38,
 	input t0_c0,
-	input ws_,
+	input ws,
 	input df_,
 	input af,
 	input ad,
-	output frb_,
+	output frb,
 	output p_16,
 	output p_32,
 	output p_40,
-	output fab_,
-	output faa_,
-	output fra_,
+	output fab,
+	output faa,
+	output fra,
 	// sheet 6
 	input fic,
 	input ad_sd,
@@ -73,7 +73,7 @@ module fps(
 	// sheet 7
 	input opsu,
 	input dw_,
-	input wc_,
+	input wc,
 	input wt,
 	input dw,
 	// sheet 8
@@ -87,7 +87,7 @@ module fps(
 	input ff_,
 	output read_fp,
 	// sheet 10
-	input sgn_,
+	input sgn,
 	input fwz,
 	input nrf,
 	// sheet 11
@@ -120,7 +120,7 @@ module fps(
 	output _0_zp,
 	output s_fp,
 	output ustr0_fp,
-	output lp_,
+	output lp,
 	output lpb
 );
 
@@ -195,7 +195,7 @@ module fps(
 
 	// sheet 2
 
-	wire sr = ~(start_ & M57_8);
+	wire sr = ~(~start & M57_8);
 	assign sr_fp = sr & f1;
 
 	wire M43_6 = ~(oken & f1 & zw);
@@ -248,33 +248,31 @@ module fps(
 		.b(M73_15),
 		.q(start)
 	);
-	wire start_ = ~start;
 
 	// sheet 3
 
 	wire M29_8 = (g & wdt & f5) | (wc & f4) | (~mw_ & f4) | (f4 & mf);
-	assign _0_t = ~(start_ & ~(strob2 & M29_8));
+	assign _0_t = ~(~start & ~(strob2 & M29_8));
 	wire M30_6 = ~(f3_ & f1_);
 	assign lkb = M30_6;
 	wire mw = ~mw_;
-	wire wdt_ = ~wdt;
 
-	wire M56_6 = ~(wdt_ & wc_);
+	wire M56_6 = ~(~wdt & ~wc);
 	wire M31_8 = ~(f5 & ~af_sf);
 	wire M31_6 = ~(lp3 & M30_6);
-	wire M43_8 = ~(M56_6 & ws_ & f7);
+	wire M43_8 = ~(M56_6 & ~ws & f7);
 	wire M31_11 = ~(sgn & f7);
 	wire M19_12 = ~(lp2 & M30_6 & mw_);
 
 	wire M32_8 = ~(M31_8 & M31_6 & M43_8);
-	wire M9_3 = ~(M31_6 & f7_f12_);
-	wire M19_8 = ~(f7_f12_ & M31_11 & M19_12);
-	wire M19_6 = ~(M20_6 & f7_f12_ & f6_);
+	wire M9_3 = ~(M31_6 & ~f7_f12);
+	wire M19_8 = ~(~f7_f12 & M31_11 & M19_12);
+	wire M19_6 = ~(M20_6 & ~f7_f12 & f6_);
 	wire M31_3 = ~(f12_ & f11_);
-	assign l_d_ = ~((M32_8 & strob1) | (M31_3 & strob1));
+	assign l_d = (M32_8 & strob1) | (M31_3 & strob1);
 
 	wire M30_11 = ~(mw_ & lp1_);
-	wire M20_6 = ~((M30_11 & M30_6) | (f7 & ~ta_alpha_));
+	wire M20_6 = ~((M30_11 & M30_6) | (f7 & ta_alpha));
 
 	// WORKAROUND: opt[abc] and opm are a workaround for T and M
 	// clocks being misaligned causing various problems when
@@ -285,57 +283,57 @@ module fps(
 	assign clocktc = strob1 & M9_3;
 	assign clocktb = strob1 & M19_8;
 	assign clockta = strob1 & M19_6;
-	assign t_c_ = ~(strob1 & f2);
-	assign fcb_ = ~M31_3;
+	assign t_c = strob1 & f2;
+	assign fcb = M31_3;
 
 	// sheet 4
 
-	wire M30_3 = ~(af_sf & wdt_);
+	wire M30_3 = ~(af_sf & ~wdt);
 	wire M30_8 = ~(f9 & dw);
-	wire M67_12 = ~(mw_ & mf_ & wdt_);
-	wire dwsgnf7_ = ~(sgn & dw & f7);
+	wire M67_12 = ~(mw_ & mf_ & ~wdt);
+	wire dwsgnf7 = sgn & dw & f7;
 
 	wire M20_8 = ~((dw_ & f7) | (M30_3 & f8));
 	wire M53_3 = ~(f8 & M67_12);
 
-	wire f7_f12_ = f9_ & f12_ & f11_ & M20_8;
+	wire f7_f12 = ~(f9_ & f12_ & f11_ & M20_8);
 	assign t_1_t_1 = ~(f8_ & f12_ & f11_ & M30_8);
 	assign tab = ~(M30_8 & f11_ & M53_3);
 	assign trb = ~(M53_3 &f11_);
 	assign taa = ~(~(dw_df & f8) & f12_);
-	assign cp_ = ~(strob1 & f8 & af_sf & wdt_);
-	wire dw_p16 = ~(dwsgnf7_ & fp16_ & mw_p16_);
+	assign cp = strob1 & f8 & af_sf & ~wdt;
+	wire dw_p16 = ~(~dwsgnf7 & fp16_ & ~mw_p16);
 	wire mf = ~mf_;
 
 	// sheet 5
 
-	wire M54_8 = ~(wdt_ & ck_);
-	wire M76_8 = ws_ & sf;
+	wire M54_8 = ~(~wdt & ~ck);
+	wire M76_8 = ~ws & sf;
 	wire M76_3 = ~df_ & fic;
-	wire M76_6 = mf & ws_;
+	wire M76_6 = mf & ~ws;
 
-	wire M67_8 = ~(f7 & sgn_ & dw);
+	wire M67_8 = ~(f7 & ~sgn & dw);
 	wire M77_6 = ~((M54_8 & M76_8) | (~fic & df));
-	wire M65_6 = ~((mw & m14_) | (dw & t0_c0));
-	wire M77_8 = ~((t0_eq_c0 & M76_3) | (M76_6 & ~m38_));
-	wire M78_8 = ~((m38_ & M76_6) | (ad) | (df & fic & t0_c0) | (ws_ & af));
+	wire M65_6 = ~((mw & ~m14) | (dw & t0_c0));
+	wire M77_8 = ~((t0_eq_c0 & M76_3) | (M76_6 & m38));
+	wire M78_8 = ~((~m38 & M76_6) | (ad) | (df & fic & t0_c0) | (~ws & af));
 
 	wire M52_3 = ~(~M65_6 & f6);
 	wire M52_6 = ~(M65_6 & f6);
-	wire M66_8 = sd$_ & ws_ & M77_6 & M77_8;
+	wire M66_8 = sd$_ & ~ws & M77_6 & M77_8;
 	wire M66_6 = M52_6 & sd$_ & M77_8 & ~M76_8;
 
-	wire M80_6 = ~(p32_ & dwsgnf7_ & sd$_);
+	wire M80_6 = ~(p32_ & ~dwsgnf7 & sd$_);
 
 	wire df = ~df_;
-	assign frb_ = M66_6;
+	assign frb = ~M66_6;
 	assign p_16 = dw_p16 & M67_8 & M52_3;
 	assign p_32 = M80_6 & ~ad;
-	wire mw_p16_ = M52_6;
+	wire mw_p16 = ~M52_6;
 	assign p_40 = ~M66_8;
-	assign fab_ = dwsgnf7_ & M66_6;
-	assign faa_ = M67_8 & M52_3 & fra_;
-	assign fra_ = M52_3 & M78_8;
+	assign fab = ~(~dwsgnf7 & M66_6);
+	assign faa = ~(M67_8 & M52_3 & ~fra);
+	assign fra = ~(M52_3 & M78_8);
 
 	// sheet 6
 
@@ -345,22 +343,20 @@ module fps(
 	wire M22_8 = ~(mf_ & M22_6);
 
 	wire f4mwdw = f4 & dw_mw;
-	wire ta_alpha_ = ~(ta & sgn_t0_c0);
+	wire ta_alpha = ta & sgn_t0_c0;
 	wire f9dw = dw & f9;
 
 	wire M35 = (M36_8 & opsu & M22_8) | (M45_6 & ~fic & wt_) | (f3 & lp3 & ad_sd);
 	wire ef7 = (ws & f10) | (sgn_t0_c0 & ta & f9dw) | (f4 & wc) | (f9 & sgn) | M35;
-	wire sgn = ~sgn_;
 
 	// sheet 7
 
-	wire wc = ~wc_;
-	wire M33_8 = (dw & fic & f8) | (f8 & mw) | (f4mwdw & fwz_);
+	wire M33_8 = (dw & fic & f8) | (f8 & mw) | (f4mwdw & ~fwz);
 	wire sb1f26 = M33_8 & opsu;
 	wire M70_6 = f4 & nrf_ & ff;
-	wire sa1f26 = fwz_ & wt_ & wc_ & M70_6;
+	wire sa1f26 = ~fwz & wt_ & ~wc & M70_6;
 	wire wt_ = ~wt;
-	wire M47_8 = ~((lp_) | (lp3 & dw_mw));
+	wire M47_8 = ~((~lp) | (lp3 & dw_mw));
 	wire sd1 = ~(M47_8 | f3_);
 	wire dw_mw = ~(mw_ & dw_);
 
@@ -423,13 +419,11 @@ module fps(
 	// sheet 10
 
 	wire M52_8 = ~(f6a_ & ~(opsu_ & f8));
-	wire M14 = (M52_8 & mw & ~fic) | (sgn_ & f9dw & ta_alpha_) | (wt & ~(f5_ & f4_));
+	wire M14 = (M52_8 & mw & ~fic) | (~sgn & f9dw & ~ta_alpha) | (wt & ~(f5_ & f4_));
 
 	wire M24_6 = ~(f10_ & f4_ & ~(mw & f2));
-	wire sb1 = (M24_6 & fwz) | (ss & f7) | (ws_ & ok & f10) | (df13 & f13) | M14;
-	wire ws = ~ws_;
-	wire fwz_ = ~fwz;
-	wire k__ = (nrf & f4 & fwz_) | (ff & f7 & ~fic) | (~fic & ~opsu & (f8 & mf));
+	wire sb1 = (M24_6 & fwz) | (ss & f7) | (~ws & ok & f10) | (df13 & f13) | M14;
+	wire k__ = (nrf & f4 & ~fwz) | (ff & f7 & ~fic) | (~fic & ~opsu & (f8 & mf));
 	wire opsu_ = ~opsu;
 
 	// sheet 11
@@ -450,13 +444,13 @@ module fps(
 	wire dp5 = ~(f11_ & f7_);
 
 	// FIX: wrongly placed -SGN moved from F12 to F9 case
-	wire sa1f710 = (f11) | (f12 & ok) | (sgn_ & df & f9) | k__;
+	wire sa1f710 = (f11) | (f12 & ok) | (~sgn & df & f9) | k__;
 
 	// sheet 12
 
 	wire M12_8 = ~((f5 & ff) | (f4 & dw_mw));
 	wire M22_11 = ~(M12_8 & f8_);
-	wire M23_6 = ~(opsu_ & fwz_ & M22_11 & fic);
+	wire M23_6 = ~(opsu_ & ~fwz & M22_11 & fic);
 	wire M24_12 = ~(dw_mw & fic & f6);
 	wire M22_3 = ~(fic & f7);
 	wire M3_12 = f8 & ~fic & dw_df;
@@ -483,12 +477,12 @@ module fps(
 	wire M18_6 = ~((af_sf & f8) | (mw_mf & f8));
 	wire M28_6 = ~(dw_df & f8);
 	wire M28_3 = ~(mw_mf & f4);
-	wire M27_12 = ~(M28_3 & fcb_ & f8_);
+	wire M27_12 = ~(M28_3 & ~fcb & f8_);
 
 	assign scc = ~(M17_11 & f7_ & f11_);
 	assign pc8 = ~(M17_3 & f11_);
 	assign _0_d = ~(M18_8 | ~strob2);
-	assign _0_m = ~(M41_3 & start_);
+	assign _0_m = ~(M41_3 & ~start);
 	assign mb = ~(f11_ & M18_6);
 	assign ma = ~(M28_6 & f12_);
 	assign clockm = M27_12 & strob1;
@@ -498,11 +492,11 @@ module fps(
 	// sheet 14
 
 	wire M3_8 = mw & strob1 & f2;
-	wire M65_8 = ~((start & mw) | (fwz_ & M3_8));
+	wire M65_8 = ~((start & mw) | (~fwz & M3_8));
 	wire M4_11 = ~(M3_8 & fwz);
 	wire M4_8 = ~(f4 & dw_);
 	wire M27_8 = ~(lp & f8 & dw);
-	wire M40_3 = ~(start_ & f2_);
+	wire M40_3 = ~(~start & f2_);
 	wire M40_11 = ~(fwz & f4);
 	wire M40_6 = ~(M40_3 & mw_);
 	wire M23_8 = ~(M27_8 & f1_ & f3_ & ~f13);
@@ -543,10 +537,9 @@ module fps(
 	wire M64_11 = lpb_ ^ lpa;
 	assign _0_zp = fwz & lp & f13;
 	wire lp1_ = ~(lpa & lpb_);
-	wire lp = ~(lpb_ & lpa_);
+	assign lp = ~(lpb_ & lpa_);
 	assign s_fp = lp & f13;
-	assign ustr0_fp = f13 & lp_;
-	assign lp_ = ~lp;
+	assign ustr0_fp = f13 & ~lp;
 	assign lpb = ~lpb_;
 
 endmodule

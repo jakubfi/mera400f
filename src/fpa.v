@@ -31,28 +31,28 @@ module fpa(
 	input clockm,
 	input _0_m,
 	output c0_eq_c1,
-	output fc0_,
-	output t1_,
+	output fc0,
+	output t1,
 	output t0_eq_c0,
 	output t0_c0,
 	output t0_t1,
-	output m0_,
-	output t0_,
+	output m0,
+	output t0,
 	// sheet 4
-	input fab_,
-	input faa_,
+	input fab,
+	input faa,
 	output fp0_,
 	// sheet 5
 	// sheet 6
 	input p_16,
-	output m14_,
-	output m15_,
+	output m14,
+	output m15,
 	// sheet 7
 	// (nothing)
 	// sheet 8
 	output fp16_,
 	// sheet 9
-	output t16_,
+	output t16,
 	// sheet 10
 	// (nothing)
 	// sheet 11
@@ -65,21 +65,21 @@ module fpa(
 	// sheet 14
 	input f2_,
 	input m_40,
-	input cp_,
-	input t_c_,
-	output m32_,
-	output m38_,
-	output m39_,
-	output c39_,
+	input cp,
+	input t_c,
+	output m32,
+	output m38,
+	output m39,
+	output c39,
 	// sheet 15
-	input fra_,
-	input frb_,
+	input fra,
+	input frb,
 	input p_40,
 	output p32_,
 	// sheet 16
 	input trb,
 	input _0_t,
-	output t39_,
+	output t39,
 	// sheet 17
 	input f9_ka,
 	input lkb,
@@ -176,8 +176,6 @@ module fpa(
 
 	// NOTE: unused in FPGA
 	// wire f2 = ~f2_;
-	wire t_c = ~t_c_;
-	wire cp = ~cp_;
 
 	reg [0:39] c;
 
@@ -190,19 +188,16 @@ module fpa(
 	end
 
 	assign c0_eq_c1 = c[0] ^ ~c[1];
-	assign fc0_ = ~c[0];
-	assign t1_ = ~t[1];
-	assign t0_eq_c0 = fc0_ ^ t[0];
+	assign fc0 = c[0];
+	assign t1 = t[1];
+	assign t0_eq_c0 = ~fc0 ^ t[0];
 	assign t0_c0 = c[0] ^ t[0];
 	assign t0_t1 = t[0] ^ t[1];
-	assign m0_ = ~m[0];
-	assign t0_ = ~t[0];
+	assign m0 = m[0];
+	assign t0 = t[0];
 
 	// sheet 4
 	// ALU
-
-	wire faa = ~faa_;
-	wire fab = ~fab_;
 
 	wire [0:39] sum;
 	wire g0a, g1a, g2a, g3a;
@@ -275,8 +270,8 @@ module fpa(
 		.eq(__NC)
 	);
 
-	assign m14_ = ~m[14];
-	assign m15_ = ~m[15];
+	assign m14 = m[14];
+	assign m15 = m[15];
 
 	// sheet 8
 
@@ -285,7 +280,7 @@ module fpa(
 		.b(c[16:19]),
 		.m(1'b0),
 		.c_(p21_),
-		.s({fra1, frb, frb, fra1}),
+		.s({fra, frb, frb, fra}),
 		.f(sum[16:19]),
 		.g(g3b),
 		.p(p3b),
@@ -298,7 +293,7 @@ module fpa(
 		.b(c[20:23]),
 		.m(1'b0),
 		.c_(p24_),
-		.s({fra1, frb, frb, fra1}),
+		.s({fra, frb, frb, fra}),
 		.f(sum[20:23]),
 		.g(g2b),
 		.p(p2b),
@@ -308,7 +303,7 @@ module fpa(
 
 	// sheet 9
 
-	assign t16_ = ~t[16];
+	assign t16 = t[16];
 
 	// sheet 10
 
@@ -333,7 +328,7 @@ module fpa(
 		.b(c[24:27]),
 		.m(1'b0),
 		.c_(p28_),
-		.s({fra1, frb, frb, fra1}),
+		.s({fra, frb, frb, fra}),
 		.f(sum[24:27]),
 		.g(g1b),
 		.p(p1b),
@@ -346,7 +341,7 @@ module fpa(
 		.b(c[28:31]),
 		.m(1'b0),
 		.c_(~p_32),
-		.s({fra1, frb, frb, fra1}),
+		.s({fra, frb, frb, fra}),
 		.f(sum[28:31]),
 		.g(g0b),
 		.p(p0b),
@@ -356,17 +351,14 @@ module fpa(
 
 	// sheet 14
 
-	assign m32_ = ~m[32];
-	assign m38_ = ~m[38];
-	assign m39_ = ~m[39];
-	assign c39_ = ~c[39];
+	assign m32 = m[32];
+	assign m38 = m[38];
+	assign m39 = m[39];
+	assign c39 = c[39];
 
 	// sheet 15
 
 	wire p36_;
-	wire fra = ~fra_;
-	wire fra1 = ~fra_;
-	wire frb = ~frb_;
 
 	alu181 M60(
 		.a(t[32:35]),
@@ -396,7 +388,7 @@ module fpa(
 
 	// sheet 16
 
-	assign t39_ = ~t[39];
+	assign t39 = t[39];
 
 	// sheet 18
 

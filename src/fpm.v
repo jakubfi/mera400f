@@ -11,12 +11,12 @@ module fpm(
 	input __clk,
 	// sheet 1
 	input [8:15] w,
-	input l_d_,
+	input l_d,
 	input _0_d,
 	input lkb,
 	output [0:7] d,
 	// sheet 2
-	input fcb_,
+	input fcb,
 	input scc,
 	input pc8,
 	// sheet 3
@@ -33,7 +33,7 @@ module fpm(
 	// sheet 5
 	input r03,
 	input r02,
-	input t16_,
+	input t16,
 	output c_f,
 	output v_f,
 	output m_f,
@@ -64,13 +64,13 @@ module fpm(
 	input f7_,
 	input f6_,
 	output fwz,
-	output ws_,
+	output ws,
 	// sheet 8
-	input lp_,
+	input lp,
 	input f8_,
 	input f13,
 	output di,
-	output wc_,
+	output wc,
 	output fi0,
 	output fi1,
 	output fi2,
@@ -79,14 +79,14 @@ module fpm(
 	input w0_,
 	input t_1_t_1,
 	input fp0_,
-	input fab_,
-	input faa_,
-	input fc0_,
+	input fab,
+	input faa,
+	input fc0,
 	input _0_t,
 	input t0_t1,
 	input c0_eq_c1,
-	input t1_,
-	input t0_,
+	input t1,
+	input t0,
 	input clockta,
 	input t_0_1,
 	input t_2_7,
@@ -102,26 +102,26 @@ module fpm(
 	output ta,
 	// sheet 10
 	input trb,
-	input t39_,
-	input m0_,
+	input t39,
+	input m0,
 	input mb,
-	input c39_,
+	input c39,
 	input f4_,
 	input clockm,
 	input _0_m,
-	input m39_,
-	input m15_,
-	input m38_,
-	input m14_,
+	input m39,
+	input m15,
+	input m38,
+	input m14,
 	output m_1,
-	output ck_,
+	output ck,
 	// sheet 11
-	input m32_,
+	input m32,
 	input t0_c0,
 	output m_40,
 	output m_32,
 	output sgn_t0_c0,
-	output sgn_
+	output sgn
 
 );
 
@@ -145,7 +145,7 @@ module fpm(
 	reg [0:7] D;
 	reg D_1, D_2;
 	wire _0_d_ = ~_0_d;
-	always @ (posedge l_d_, negedge _0_d_) begin
+	always @ (negedge l_d, negedge _0_d_) begin
 		if (~_0_d_) {D_2, D_1, D} <= 10'd0;
 		else {D_2, D_1, D} <= L;
 	end
@@ -168,7 +168,7 @@ module fpm(
 	wire [0:7] B_BUS /* synthesis keep */;
 
 	always @ (*) begin
-		case ({~fcb_, scc})
+		case ({fcb, scc})
 			2'b00: B_BUS <= ~B;
 			2'b01: B_BUS <= B;
 			2'b10: B_BUS <= 8'hff;
@@ -184,7 +184,7 @@ module fpm(
 		{M29_14, sum_c} <= B_BUS + D + pc8;
 	end
 
-	wire M9_3 = fcb_ ^ ~scc;
+	wire M9_3 = ~fcb ^ ~scc;
 	wire M3_6 = ~((B[0] & M9_3) | (~B[0] & ~scc));
 	wire M27_8 = M3_6 ^ d_1_;
 	wire sum_c_2 = ~((M29_14 & M3_6) | (M29_14 & d_1_) | (M3_6 & d_1_));
@@ -268,7 +268,7 @@ module fpm(
 	assign c_f = (df_ & ff & m_1) | (r03 & mwdw) | (ad_sd & ci);
 	// FIX: t0_t_1 instead of t0_t1
 	assign v_f = (r02) | (t0_t_1 & mwadsd);
-	assign m_f = ~((t_1_ & dw_) | (t16_ & dw));
+	assign m_f = ~((t_1_ & dw_) | (~t16 & dw));
 	wire M77_11 = ~t_24_31 & ~t_16_23;
 	assign z_f = (M77_11 & dw) | (mwadsd & t_) | (ff & fwz);
 	assign dw = ~dw_;
@@ -348,8 +348,6 @@ module fpm(
 		.q(_end)
 	);
 
-	wire ws;
-	assign ws_ = ~ws;
 	ffd REG_WS(
 		.s_(1'b1),
 		.d(M47_6),
@@ -365,7 +363,7 @@ module fpm(
 	wire M64_8 = (nrf_ & nz & f4) | (f2 & (dw_df & ~t)) | (nz & f2);
 	assign fi3 = strob_fp & M64_8;
 	wire M49_12 = ~(idi & ~f6_ & strob2_fp);
-	wire M49_6 = ~(strob_fp & lp_ & f8);
+	wire M49_6 = ~(strob_fp & ~lp & f8);
 	wire M35_8 = ~(f4 & af_sf & wt_ & t_);
 
 	ffd REG_DI(
@@ -385,8 +383,6 @@ module fpm(
 		.q(idi)
 	);
 
-	wire wc;
-	assign wc_ = ~wc;
 	ffd REG_WC(
 		.s_(M35_8),
 		.d(1'b1),
@@ -413,12 +409,12 @@ module fpm(
 
 	// sheet 9
 
-	wire M3_8 = ~((fab_ & fc0_) | (faa_ & ~fc0_));
+	wire M3_8 = ~((~fab & ~fc0) | (~faa & fc0));
 	wire M53_6 = M3_8 ^ t_1;
 	wire M53_8 = fp0_ ^ M53_6;
-	wire M40_8 = ~((w0_ & lkb) | (sgn_ & f9df) | (t_1_t_1 & t_1_) | (f6_f7 & M53_8));
+	wire M40_8 = ~((w0_ & lkb) | (~sgn & f9df) | (t_1_t_1 & t_1_) | (f6_f7 & M53_8));
 	wire M52_8 = ~((mw_mf & mfwp) | (t0_t1 & dw_df));
-	wire M67_3 = ~(t1_ & t0_);
+	wire M67_3 = ~(~t1 & ~t0);
 	wire M12_8 = ~t_32_39 & ~t_24_31 & ~t_16_23 & ~t_8_15;
 	assign ta = ~(~t_8_15 & ~t_2_7 & ~t_0_1 & t_1_);
 	wire t = ~(t_1_ & ~t_0_1 & ~t_2_7 & ~t_8_15 & ~t_16_23 & ~t_24_31 & ~t_32_39 & m_1_);
@@ -435,15 +431,15 @@ module fpm(
 		.q(t_1)
 	);
 
-	assign t0_t_1 = t_1_ ^ t0_;
-	wire M53_3 = t_1 ^ t0_;
+	assign t0_t_1 = t_1_ ^ ~t0;
+	wire M53_3 = t_1 ^ ~t0;
 	assign ok = M53_3 & t0_t1 & t & ff;
 	assign nz = ~t0_t1 & M53_3 & ff & t;
 	assign opsu = ~(M52_8 & M25_8 & M66_8);
 
 	// sheet 10
 
-	wire M22_8 = (trb & ~t39_) | (~m0_ & ~mb) | (t_1 & f4) | (af & ~c39_ & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
+	wire M22_8 = (trb & t39) | (m0 & ~mb) | (t_1 & f4) | (af & c39 & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
 
 	wire m_1_ = ~m_1;
 	ffd_ena REG_M_1(
@@ -456,11 +452,9 @@ module fpm(
 	);
 
 	wire M70_11 = ~(f4 & sf);
-	wire M77_6 = c39_ & ck;
-	wire M9_6 = ck ^ c39_;
+	wire M77_6 = ~c39 & ck;
+	wire M9_6 = ck ^ ~c39;
 
-	wire ck;
-	assign ck_ = ~ck;
 	ffd_ena REG_CK(
 		.s_(M70_11),
 		.d(M77_6),
@@ -472,8 +466,8 @@ module fpm(
 
 	wire f4 = ~f4_;
 
-	wire M13_6 = ~((m39_ & mf) | (m15_ & mw));
-	wire M13_8 = ~((m38_ & mf) | (m14_ & mw));
+	wire M13_6 = ~((~m39 & mf) | (~m15 & mw));
+	wire M13_8 = ~((~m38 & mf) | (~m14 & mw));
 	wire M52_6 = ~((M13_6 & ~pm) | (M13_8 & mfwp));
 
 	wire pm;
@@ -504,11 +498,9 @@ module fpm(
 	wire M38_8 = d$ ^ M39_8;
 	wire M38_6 = ~d$ ^ M39_8;
 	assign m_40 = M38_8 & f8 & df;
-	assign m_32 = ~((M38_6 & dw) | (dw_ & m32_));
+	assign m_32 = ~((M38_6 & dw) | (dw_ & ~m32));
 	assign sgn_t0_c0 = t0_c0 ^ sgn;
 
-	wire sgn;
-	assign sgn_ = ~sgn;
 	ffd REG_SGN(
 		.s_(1'b1),
 		.d(t0_c0),
@@ -517,9 +509,9 @@ module fpm(
 		.q(sgn)
 	);
 
-	wire M39_8 = ~((sgn_ & t_) | (~t0_c0 & t));
+	wire M39_8 = ~((~sgn & t_) | (~t0_c0 & t));
 	wire M38_11 = M38_8 ^ sgn;
-	wire M6_12 = ~(sgn & t_ & lp_);
+	wire M6_12 = ~(sgn & t_ & ~lp);
 	wire beta = M38_11 & M6_12;
 
 endmodule
