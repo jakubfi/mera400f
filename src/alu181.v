@@ -40,4 +40,4 @@ module alu181(
 
 endmodule
 
-// vim: tabstop=2 shiftwidth=2 autoindent noexppandtab
+// vim: tabstop=2 shiftwidth=2 autoindent noexpandtab

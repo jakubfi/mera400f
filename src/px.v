@@ -205,31 +205,31 @@ module px(
 	wire M16_8 = wz | stp0$ | p3 | wa;
 	wire M15_8 = p2 | wp | wx;
 
-  strobgen #(
-    .STROB1_1_TICKS(STROB1_1_TICKS),
-    .STROB1_2_TICKS(STROB1_2_TICKS),
-    .STROB1_3_TICKS(STROB1_3_TICKS),
-    .STROB1_4_TICKS(STROB1_4_TICKS),
-    .STROB1_5_TICKS(STROB1_5_TICKS),
-    .GOT_TICKS(GOT_TICKS),
-    .STROB2_TICKS(STROB2_TICKS)
-  ) STROBGEN(
-    .__clk(__clk),
-    .ok(ok),
-    .zw(zw),
+	strobgen #(
+		.STROB1_1_TICKS(STROB1_1_TICKS),
+		.STROB1_2_TICKS(STROB1_2_TICKS),
+		.STROB1_3_TICKS(STROB1_3_TICKS),
+		.STROB1_4_TICKS(STROB1_4_TICKS),
+		.STROB1_5_TICKS(STROB1_5_TICKS),
+		.GOT_TICKS(GOT_TICKS),
+		.STROB2_TICKS(STROB2_TICKS)
+	) STROBGEN(
+		.__clk(__clk),
+		.ok(ok),
+		.zw(zw),
 		.oken(oken),
-    .mode(mode),
-    .step(step),
-    .strob_fp(strob_fp),
-    .ss11(M19_6),
-    .ss12(M18_8),
-    .ss13(M20_8),
-    .ss14(M16_8),
+		.mode(mode),
+		.step(step),
+		.strob_fp(strob_fp),
+		.ss11(M19_6),
+		.ss12(M18_8),
+		.ss13(M20_8),
+		.ss14(M16_8),
 		.ss15(M15_8),
-    .strob1(strob1),
-    .strob2(strob2),
-    .got(got)
-  );
+		.strob1(strob1),
+		.strob2(strob2),
+		.got(got)
+	);
 
 	wire gotst1 = ~got & ~strob1;
 
@@ -314,6 +314,7 @@ module px(
 	wire M17_8 = k2fbs | p1 | p5 | k1;
 	wire M16_6 = M12_6 | read_fp | M12_8 | M17_8;
 
+	// Wskaźnik ZGłoszenia (?)
 	wire zgi_set = ~sr_fp & ~si1 & ~sp1;
 	wire zgi;
 	ffjk REG_ZGI(

@@ -86,7 +86,7 @@ module pk(
 	output wkb
 );
 
-  parameter TIMER_CYCLE_MS;
+	parameter TIMER_CYCLE_MS;
 	parameter CLK_EXT_HZ;
 	parameter UART_BAUD;
 
@@ -141,7 +141,7 @@ module pk(
 			fnkey[`FN_CLEAR] <= 0;
 		end else begin
 			case (rx_byte[7:5])
-			  3'b000 : ; // unused
+				3'b000 : ; // unused
 				3'b001 : fnkey[rx_byte[4:1]] <= rx_byte[0];
 				3'b010,
 				3'b011 : keys[5:0] <= rx_byte[5:0];
@@ -286,8 +286,8 @@ module pk(
 	// a: 6-5 : 20 ms = 50 Hz = 1_000_000 cycles @ 50MHz
 
 	localparam prescale = TIMER_CYCLE_MS * (CLK_EXT_HZ / 1_000);
-  localparam width = $clog2(prescale+1);
-  localparam [width-1:0] period = prescale[width-1:0] - 1'b1;
+	localparam width = $clog2(prescale+1);
+	localparam [width-1:0] period = prescale[width-1:0] - 1'b1;
 	reg [width-1:0] timer_cnt = period;
 	always @ (posedge CLK_EXT) begin
 		if (timer_cnt == 0) begin

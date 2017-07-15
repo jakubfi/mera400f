@@ -48,14 +48,14 @@ module mem_elwro_sram(
 
 	// --- memory configuration ------------------------------------------------
 
-  wire [0:7] map_log = ~{rdt_[12:15], rdt_[0:3]};
+	wire [0:7] map_log = ~{rdt_[12:15], rdt_[0:3]};
 	wire [0:7] map_phy = ~{ad_[11:14], ad_[7:10]};
 	wire [0:7] seg_addr = ~{nb_, ad_[0:3]};
 	reg [0:7] map_rd_addr;
 	reg map_wr = 0;
 	reg map_rd = 0;
 	/* synthesis ramstyle = "M4K" */
-  reg [0:7] map [0:255];
+	reg [0:7] map [0:255];
 	initial begin
 		reg [8:0] i;
 		for (i=0 ; i<9'd256 ; i=i+9'd1) begin
@@ -64,13 +64,13 @@ module mem_elwro_sram(
 		end
 	end
 
-  always @ (posedge clk)
-  begin
-    if (map_wr) map[map_log] <= map_phy;
+	always @ (posedge clk)
+	begin
+		if (map_wr) map[map_log] <= map_phy;
 		map_rd_addr <= seg_addr;
-  end
+	end
 
-  wire [0:7] map_out = map_rd ? map[map_rd_addr] : 8'hzz;
+	wire [0:7] map_out = map_rd ? map[map_rd_addr] : 8'hzz;
 
 	`define CIDLE		0
 	`define CCFG		1

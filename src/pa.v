@@ -81,7 +81,7 @@ module pa(
 
 );
 
-  wor __NC; // unconnected signals here, to suppress warnings
+	wor __NC; // unconnected signals here, to suppress warnings
 
 	// sheet 1..4
 
@@ -163,7 +163,7 @@ module pa(
 	assign s_1 = ~M7_8 ^ ~carry;
 	assign zs = ~(s_1 | zsum_);
 
-	// WZI
+	// WZI - wskaźnik zera sumatora
 
 	wire wzi_clk = as2 & strob1;
 

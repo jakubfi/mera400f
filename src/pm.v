@@ -624,7 +624,7 @@ module pm(
 	// sheet 17, page 2-27
 	//  * left/right byte selection signals
 
-	// Wskaźnik Prawego Bajtu (było: pb/pb_/wpb_)
+	// PBI - Wskaźnik Prawego Bajtu (było: pb/pb_/wpb_)
 	ffd REG_PB(
 		.r_(lrcb),
 		.d(at15),

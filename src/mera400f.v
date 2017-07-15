@@ -249,13 +249,13 @@ module mera400f(
 
 	mem_elwro_sram MEM(
 		.clk(CLK_EXT),
-	  .SRAM_CE(SRAM_CE),
+		.SRAM_CE(SRAM_CE),
 		.SRAM_OE(SRAM_OE),
 		.SRAM_WE(SRAM_WE),
 		.SRAM_UB(SRAM_UB),
 		.SRAM_LB(SRAM_LB),
 		.SRAM_A(SRAM_A),
-	  .SRAM_D(SRAM_D),
+		.SRAM_D(SRAM_D),
 		.nb_(~dnb),
 		.ad_(~dad),
 		.rdt_(~ddt),

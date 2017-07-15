@@ -11,9 +11,9 @@ module lg(
 	// @ slg1: na poczatku rozkazu ładuje ir[7:9]
 	// @ slg2: dla rozkazów grupowych ładuje numer pierwszego rejestru w grupie
 
-  wire set0 = ~((slg2) | (slg1 & ir[9]));
-  wire set1 = ~(slg1 & ir[8]);
-  wire set2 = ~((slg2 & (ir[8] & ir[9])) | (slg1 & ir[7]));
+	wire set0 = ~((slg2) | (slg1 & ir[9]));
+	wire set1 = ~(slg1 & ir[8]);
+	wire set2 = ~((slg2 & (ir[8] & ir[9])) | (slg1 & ir[7]));
 
 	// bit 0
 	ffjk __lga(
