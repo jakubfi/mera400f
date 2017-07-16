@@ -40,9 +40,10 @@ module strobgen(
 	// sheet 4, page 2-4
 	// * got, strob2, step register
 
-	wire sgot = ~ss11 & ~ss12;
-	wire M52_6 = (got_trig & zw & oken) | (sgot & strob_step);
-	wire got_trig = ~(~M52_6 & ~strob1_only & ~strob2);
+	wire sgot = ss11 | ss12;
+	wire if_holdoff = got_trig & zw & oken;
+	wire step_trig = ~sgot & strob_step;
+	wire got_trig = if_holdoff | step_trig | strob1_only | strob2;
 
 	univib #(.ticks(GOT_TICKS)) VIB_GOT(
 		.clk(__clk),
@@ -57,7 +58,7 @@ module strobgen(
 	// edge, and another on the strob2 rising edge.
 	reg strob2_trig = 1;
 	always @ (posedge __clk) begin
-		strob2_trig <= (strob_step & ~sgot) | strob1_st2;
+		strob2_trig <= (strob_step & sgot) | strob1_st2;
 	end
 
 	univib #(.ticks(STROB2_TICKS)) VIB_STROB2(
@@ -77,7 +78,7 @@ module strobgen(
 		.q(strob_step)
 	);
 
-	assign strob1 = strob1_only | strob1_st2 | strob_fp | strob_step;
+	assign strob1 = strob1_any | strob_fp | strob_step;
 
 endmodule
 
