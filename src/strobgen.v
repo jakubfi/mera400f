@@ -20,40 +20,21 @@ module strobgen(
 	// sheet 3, page 2-3
 	// * strob signals
 
-	wire strob1_1, strob1_2, strob1_3, strob1_4, strob1_5;
+	wire strob1_st2;
+	wire strob1_only;
 	univib #(.ticks(STROB1_1_TICKS)) VIB_STROB1_1(
 		.clk(__clk),
 		.a_(got),
-		.b(ss11),
-		.q(strob1_1)
-	);
-	univib #(.ticks(STROB1_2_TICKS)) VIB_STROB1_2(
-		.clk(__clk),
-		.a_(got),
-		.b(ss12 & ok),
-		.q(strob1_2)
+		.b(ss11 | (ss12 & ok)),
+		.q(strob1_st2)
 	);
 	univib #(.ticks(STROB1_3_TICKS)) VIB_STROB1_3(
 		.clk(__clk),
 		.a_(got),
-		.b(ss13 & ok),
-		.q(strob1_3)
-	);
-	univib #(.ticks(STROB1_4_TICKS)) VIB_STROB1_4(
-		.clk(__clk),
-		.a_(got),
-		.b(ss14),
-		.q(strob1_4)
-	);
-	univib #(.ticks(STROB1_5_TICKS)) VIB_STROB1_5(
-		.clk(__clk),
-		.a_(got),
-		.b(ss15),
-		.q(strob1_5)
+		.b((ss13 & ok) | ss14 | ss15),
+		.q(strob1_only)
 	);
 
-	wire strob1_st2 = strob1_1 | strob1_2;
-	wire strob1_only = strob1_3 | strob1_4 | strob1_5;
 	wire strob1_any = strob1_st2 | strob1_only;
 
 	// sheet 4, page 2-4
