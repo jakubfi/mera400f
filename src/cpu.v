@@ -759,7 +759,7 @@ wire [0:15] zp;
 generate
 	if (~AWP_PRESENT) begin
 		assign {fi0, fi1, fi2, fi3} = 4'b0000;
-		assign {read_fp, strob_fp, sr_fp, ekc_fp, rlp_fp, ustr0_fp, s_fp} = 7'b0100100;
+		assign {read_fp, strob_fp, sr_fp, ekc_fp, rlp_fp, ustr0_fp, s_fp} = 7'b0000000;
 		assign {f13, lpa, lpb} = 3'b000;
 		assign zp = 16'h0000;
 	end else begin
