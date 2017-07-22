@@ -39,8 +39,15 @@ module strobgen(
 	assign strob2b = state == S_ST2B;
 
 	// TODO: strob_fp
-	// TODO: step
 
+	// STEP
+	reg lstep;
+	always @ (posedge __clk) begin
+		lstep <= step;
+	end
+	wire strob1_leave = ~mode | (step & ~lstep);
+
+	// STROBS
 	reg [0:2] state;
 	always @ (posedge __clk) begin
 		case (state)
@@ -56,7 +63,7 @@ module strobgen(
 
 			// STROB1 (lonely) front edge
 			S_ST1: begin
-				state <= S_ST1B;
+				if (strob1_leave) state <= S_ST1B;
 				end
 
 			// STROB1 (lonely) back edge
@@ -69,7 +76,7 @@ module strobgen(
 
 			// STROB1 (with STROB2) front edge
 			S_ST12: begin
-				state <= S_ST12B;
+				if (strob1_leave) state <= S_ST12B;
 				end
 
 			// STROB1 (with STROB2) back edge
