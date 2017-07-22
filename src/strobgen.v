@@ -11,14 +11,6 @@ module strobgen(
 	output strob2b
 );
 
-	parameter STROB1_1_TICKS;
-	parameter STROB1_2_TICKS;
-	parameter STROB1_3_TICKS;
-	parameter STROB1_4_TICKS;
-	parameter STROB1_5_TICKS;
-	parameter GOT_TICKS;
-	parameter STROB2_TICKS;
-
 	localparam S_GOT	= 6'd0;
 	localparam S_ST1	= 6'd1;
 	localparam S_ST1B	= 6'd2;

@@ -147,13 +147,6 @@ module px(
 	parameter STOP_ON_NOMEM;
 	parameter LOW_MEM_WRITE_DENY;
 
-	parameter STROB1_1_TICKS;
-	parameter STROB1_2_TICKS;
-	parameter STROB1_3_TICKS;
-	parameter STROB1_4_TICKS;
-	parameter STROB1_5_TICKS;
-	parameter GOT_TICKS;
-	parameter STROB2_TICKS;
 	parameter ALARM_DLY_TICKS;
 	parameter ALARM_TICKS;
 
@@ -205,15 +198,7 @@ module px(
 	wire M16_8 = wz | stp0$ | p3 | wa;
 	wire M15_8 = p2 | wp | wx;
 
-	strobgen #(
-		.STROB1_1_TICKS(STROB1_1_TICKS),
-		.STROB1_2_TICKS(STROB1_2_TICKS),
-		.STROB1_3_TICKS(STROB1_3_TICKS),
-		.STROB1_4_TICKS(STROB1_4_TICKS),
-		.STROB1_5_TICKS(STROB1_5_TICKS),
-		.GOT_TICKS(GOT_TICKS),
-		.STROB2_TICKS(STROB2_TICKS)
-	) STROBGEN(
+	strobgen STROBGEN(
 		.__clk(__clk),
 		.ok(ok),
 		.zw(zw),

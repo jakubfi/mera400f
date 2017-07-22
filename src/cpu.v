@@ -67,13 +67,6 @@ module cpu(
 
 	// --- CPU CORE TIMINGS ------------------------------------------------
 
-	parameter STROB1_1_TICKS = 3'd5; // 80-130ns
-	parameter STROB1_2_TICKS = 3'd6; // 110-190ns
-	parameter STROB1_3_TICKS = 3'd5; // 80-130ns
-	parameter STROB1_4_TICKS = 3'd5; // 80-130ns
-	parameter STROB1_5_TICKS = 3'd5; // 80-130ns
-	parameter GOT_TICKS = 3'd5; // 80-130ns
-	parameter STROB2_TICKS = 3'd6; // 110-190ns
 	parameter KC_TICKS = 3'd7; // 100-200ns
 	parameter PC_TICKS = 3'd6; // 90-150ns
 
@@ -101,13 +94,6 @@ px #(
 	.AWP_PRESENT(AWP_PRESENT),
 	.STOP_ON_NOMEM(STOP_ON_NOMEM),
 	.LOW_MEM_WRITE_DENY(LOW_MEM_WRITE_DENY),
-	.STROB1_1_TICKS(STROB1_1_TICKS),
-	.STROB1_2_TICKS(STROB1_2_TICKS),
-	.STROB1_3_TICKS(STROB1_3_TICKS),
-	.STROB1_4_TICKS(STROB1_4_TICKS),
-	.STROB1_5_TICKS(STROB1_5_TICKS),
-	.GOT_TICKS(GOT_TICKS),
-	.STROB2_TICKS(STROB2_TICKS),
 	.ALARM_DLY_TICKS(ALARM_DLY_TICKS),
 	.ALARM_TICKS(ALARM_TICKS)
 ) PX(
