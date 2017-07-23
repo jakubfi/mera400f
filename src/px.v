@@ -216,8 +216,6 @@ module px(
 		.got(got)
 	);
 
-	wire gotst1 = ~got & ~strob1;
-
 	// sheet 5, page 2-5
 	// interrupt phase control signals
 
@@ -294,18 +292,15 @@ module px(
 
 	// sheet 8, page 2-8
 
-	wire M12_6 = wm | i2 | wr | ww;
-	wire M12_8 = i1 | i3 | i4 | i5;
-	wire M17_8 = k2fbs | p1 | p5 | k1;
-	wire M16_6 = M12_6 | read_fp | M12_8 | M17_8;
-
 	// Wskaźnik ZGłoszenia (?)
-	wire zgi_set = ~sr_fp & ~si1 & ~sp1;
+	wire gotst1 = got | strob1;
+	wire zgi_j = wm | i2 | wr | ww | read_fp | i1 | i3 | i4 | i5 | k2fbs | p1 | p5 | k1;
+	wire zgi_set = sr_fp | si1 | sp1;
 	wire zgi;
 	ffjk REG_ZGI(
-		.s_(zgi_set),
-		.j(M16_6),
-		.c_(~gotst1),
+		.s_(~zgi_set),
+		.j(zgi_j),
+		.c_(gotst1),
 		.k(zgi),
 		.r_(~clo),
 		.q(zgi)
