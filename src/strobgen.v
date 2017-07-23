@@ -11,83 +11,94 @@ module strobgen(
 	output strob2b
 );
 
-	localparam S_GOT	= 6'd0;
-	localparam S_ST1	= 6'd1;
-	localparam S_ST1B	= 6'd2;
-	localparam S_ST12	= 6'd3;
-	localparam S_ST12B= 6'd4;
-	localparam S_ST2	= 6'd5;
-	localparam S_ST2B	= 6'd6;
+	localparam S_GOT	= 3'd0;
+	localparam S_ST1	= 3'd1;
+	localparam S_ST1W	= 3'd2;
+	localparam S_ST1B	= 3'd3;
+	localparam S_PGOT	= 3'd4;
+	localparam S_ST2	= 3'd5;
+	localparam S_ST2B	= 3'd6;
 
 	wire if_got_holdoff = zw & oken;
-	wire e_s12 = ss11 | (ss12 & ok);
-	wire e_s1 = (ss13 & ok) | ss14 | ss15;
+	wire es1 = ss11 | (ss12 & ok) | (ss13 & ok) | ss14 | ss15;
+	wire es2 = ss11 | ss12;
+	wire egot = ss13 | ss14 | ss15;
 
 	// TODO: this needs to be cleaned up after strob signals loose their "clock" powers
 	//assign got = state == S_GOT;
-	assign strob1 = (state == S_ST1) | (state == S_ST12);
-	assign strob1b = (state == S_ST1B) | (state == S_ST12B);
+	assign strob1 = state == S_ST1;
+	assign strob1b = state == S_ST1B;
 	assign strob2 = state == S_ST2;
 	assign strob2b = state == S_ST2B;
 
 	// TODO: strob_fp
+	// NOTE: if_got_holdoff seems to be unnecessary
+	// NOTE: seems like got can work without a register now (with additional GOTW state)
 
 	// STEP
 	reg lstep;
 	always @ (posedge __clk) begin
 		lstep <= step;
 	end
-	wire strob1_leave = ~mode | (step & ~lstep);
+	wire step_trig = ~mode | (step & ~lstep);
 
 	// STROBS
 	reg [0:2] state;
 	always @ (posedge __clk) begin
+		got <= 0;
 		case (state)
 			// GOT
 			S_GOT: begin
-				got <= 0;
-				if (e_s12) begin
-					state <= S_ST12;
-				end else if (e_s1) begin
+				if (es1) begin
 					state <= S_ST1;
 				end
-				end
+			end
 
-			// STROB1 (lonely) front edge
+			// STROB1 front
 			S_ST1: begin
-				if (strob1_leave) state <= S_ST1B;
-				end
+				if (step_trig) state <= S_ST1B;
+				else state <= S_ST1W;
+			end
 
-			// STROB1 (lonely) back edge
+			// STROB1 front (wait for STEP)
+			S_ST1W: begin
+				if (step_trig) state <= S_ST1B;
+			end
+
+			// STROB1 back
 			S_ST1B: begin
-				if (~if_got_holdoff) begin
+				if (es2) begin
+					state <= S_ST2;
+				end else if (egot & ~if_got_holdoff) begin
 					state <= S_GOT;
 					got <= 1;
+				end else begin
+					state <= S_PGOT;
 				end
-				end
+			end
 
-			// STROB1 (with STROB2) front edge
-			S_ST12: begin
-				if (strob1_leave) state <= S_ST12B;
-				end
-
-			// STROB1 (with STROB2) back edge
-			S_ST12B: begin
-				state <= S_ST2;
-				end
-
-			// STROB2 front edge
+			// STROB2 front
 			S_ST2: begin
 				state <= S_ST2B;
-				end
+			end
 
-			// STROB2 back edge
+			// STROB2 back
 			S_ST2B: begin
 				if (~if_got_holdoff) begin
 					state <= S_GOT;
 					got <= 1;
+				end else begin
+					state <= S_PGOT;
 				end
+			end
+
+			// STROB2 back (wait for I/F operation to end)
+			S_PGOT: begin
+				if (~if_got_holdoff) begin
+					state <= S_GOT;
+					got <= 1;
 				end
+			end
 		endcase
 	end
 
