@@ -397,7 +397,7 @@ module pd(
 	wire M75_6 = pw | rw | lj | rz | ki;
 	assign eww = (we & rws) | (pp & M75_6) | (ri & wa) | (lk & ww & g) | M33_8_9_10;
 	wire M33_8_9_10 = (wx & g) | (mis & wz) | (rbib & w$);
-	assign srez$ = rbib ^ mis;
+	assign srez$ = rbib ^ mis; // there is no reason for this to be ^ instead of |, but FPGA impl. fails with |
 
 	// sheet 13, page 2-42
 	// * execution phase control signal

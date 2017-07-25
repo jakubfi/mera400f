@@ -292,51 +292,37 @@ module px(
 
 	// sheet 8, page 2-8
 
-	// Wskaźnik ZGłoszenia (?)
-	wire gotst1 = got | strob1;
-	wire zgi_j = wm | i2 | wr | ww | read_fp | i1 | i3 | i4 | i5 | k2fbs | p1 | p5 | k1;
-	wire zgi_set = sr_fp | si1 | sp1;
-	wire zgi;
-	ffjk REG_ZGI(
-		.s_(~zgi_set),
-		.j(zgi_j),
-		.c_(gotst1),
-		.k(zgi),
-		.r_(~clo),
-		.q(zgi)
+  wire gotst1 = got | strob1;
+  wire zgi_j = wm | i2 | wr | ww | read_fp | i1 | i3 | i4 | i5 | k2fbs | p1 | p5 | k1;
+  wire zgi_set = sr_fp | si1 | sp1;
+	wire ifhold_j = srez$ & wr;
+	wire ifhold_reset = strob2 & w$ & wzi & is;
+
+	wire zwzg, talarm;
+	ifctl #(
+		.ALARM_DLY_TICKS(ALARM_DLY_TICKS),
+		.ALARM_TICKS(ALARM_TICKS)
+	) IFCTL(
+		.__clk(__clk),
+		.clo(clo),
+		.gotst1(gotst1),
+		.zgi_j(zgi_j),
+		.zgi_set(zgi_set),
+		.ifhold_j(ifhold_j),
+		.ifhold_reset(ifhold_reset),
+		.zw(zw),
+		.ren(ren),
+		.rok(rok),
+		.ok$(ok$),
+		.zg(zg),
+		.zwzg(zwzg),
+		.talarm(talarm)
 	);
 
-	wire zwzg = zgi & zw;
-	assign zg = zgi | M47_15 | (zw & oken);
-
-	wire M46_8 = clo | (strob2 & w$ & wzi & is);
-	wire M47_15;
-	ffjk JK47(
-		.s_(1'b1),
-		.j(srez$ & wr),
-		.c_(~ok$),
-		.k(M47_15),
-		.r_(~M46_8),
-		.q(M47_15)
-	);
-	wire ad_ad = zw & zgi & (i4 & M37_15);
-	wire alarm = ~ok$ & zwzg;
-
-	// P-X / K-L, M-N : more than one interface unit (-ROK prolonged ~10ns)
-	// P-X / K-N, N-M : one interface unit
-	// unused: SINGLE_INTERFACE 1'b1
-
-	wire M57_6 = ~ren & ~talarm & ~rok;
-	ffjk REG_OK$(
-		.s_(1'b1),
-		.j(zwzg),
-		.c_(M57_6),
-		.k(1'b1),
-		.r_(zgi),
-		.q(ok$)
-	);
 	wire ok = ok$;
 	assign oken = ren | rok;
+
+	wire ad_ad = zwzg & (i4 & M37_15);
 
 	// E-F: no AWP
 	wire EF = ~efp | AWP_PRESENT;
@@ -356,10 +342,10 @@ module px(
 
 	wire hltn_reset = zwzg & rw;
 	wire hltn_d = stop_n & zga & hltn_reset;
+	// S-R : stop on segfault in mem block 0
 	wire hltn_set = awaria_set & STOP_ON_NOMEM;
 
 	ffd REG_HLTN(
-		// S-R : stop on segfault in mem block 0
 		.s_(~hltn_set),
 		.d(hltn_d),
 		.c(strob1),
@@ -379,21 +365,6 @@ module px(
 		.c(~clo),
 		.r_(~stop),
 		.q(awaria)
-	);
-
-	wire alarm_dly;
-	dly #(.ticks(ALARM_DLY_TICKS)) DLY_ALARM(
-		.clk(__clk),
-		.i(alarm),
-		.o(alarm_dly)
-	);
-
-	wire talarm;
-	univib #(.ticks(ALARM_TICKS)) VIB_ALARM(
-		.clk(__clk),
-		.a_(1'b0),
-		.b(alarm_dly),
-		.q(talarm)
 	);
 
 	assign dad[12] = ad_ad & pufa;
