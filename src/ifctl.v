@@ -9,7 +9,7 @@ module ifctl(
 	input zw,
 	input ren,
 	input rok,
-	output ok$,
+	output reg ok$,
 	output zg,
 	output zwzg,
 	output talarm
@@ -85,6 +85,12 @@ module ifctl(
 	// ok$ - koniec pracy z interfejsem (niezależnie od finału: ok/en/alarm)
 
 	wire ok_clk = ren | talarm | rok;
+	always @ (posedge ok_clk, negedge zgi) begin
+		if (~zgi) ok$ <= 0;
+		else ok$ <= zwzg;
+	end
+
+	/*
 	ffjk REG_OK$(
 		.s_(1'b1),
 		.j(zwzg),
@@ -93,7 +99,7 @@ module ifctl(
 		.r_(zgi),
 		.q(ok$)
 	);
-
+*/
 	// alarm przy braku odpowiedzi z interfejsu
 
 	wire alarm = zwzg & ~ok$;
