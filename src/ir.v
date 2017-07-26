@@ -13,8 +13,12 @@ module ir(
 	output reg [0:15] q
 );
 
-	// NOTE: invalidate_ was originaly done by shorting 7475 outputs to ground
-	// through open-collector drivers
+  // NOTE: in the original design, -SI1 drives open-collector buffers which
+  // short ir[0:1] 7475 outputs to ground, causing reset of the two most significant bits of IR.
+  // This is a way of 'disabling' instruction decoder so it doesn't send -LIP/-SP
+  // signals to interrupt control loop when serving 'invalid instruction' interrupt caused
+  // by LIP/SP instructions executed in user program. Here we just reset two bits in IR.
+
 	always @ (posedge c, posedge invalidate) begin
 		if (invalidate) q[0:1] <= 2'd0;
 		else q <= d;
