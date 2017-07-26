@@ -31,10 +31,10 @@ module ifctl(
 
 	reg zgi;
 	always @ (negedge gotst1, posedge zgi_set, posedge clo) begin
-		if (zgi_set) zgi <= 1;
-		else if (clo) zgi <= 0;
+		if (zgi_set) zgi <= 1'b1;
+		else if (clo) zgi <= 1'b0;
 		else case (zgi_j)
-			1'b0: zgi <= 0;
+			1'b0: zgi <= 1'b0;
 			1'b1: zgi <= ~zgi;
 		endcase
 	end
@@ -82,13 +82,13 @@ module ifctl(
 		.q(ifhold)
 	);
 
-	// ok$ - koniec pracy z interfejsem (niezależnie od tego jak się współpraca zakończyła)
+	// ok$ - koniec pracy z interfejsem (niezależnie od finału: ok/en/alarm)
 
-	wire M57_6 = ren | talarm | rok;
+	wire ok_clk = ren | talarm | rok;
 	ffjk REG_OK$(
 		.s_(1'b1),
 		.j(zwzg),
-		.c_(~M57_6),
+		.c_(~ok_clk),
 		.k(1'b1),
 		.r_(zgi),
 		.q(ok$)
