@@ -7,6 +7,7 @@
 */
 
 module pd(
+	input __clk,
 	// sheet 1
 	input [0:15] w,		// internal W bus
 	input strob1,			// STROB1

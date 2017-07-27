@@ -425,6 +425,7 @@ wire c0, ls, rj, bs, ou, in, is, ri, pufa, rb$, cb, sc$, oc, ka2, gr, hlt, mcl, 
 pd #(
 	.INOU_USER_ILLEGAL(INOU_USER_ILLEGAL)
 ) PD(
+	.__clk(__clk),
 	.w(w),
 	.strob1(strob1),
 	.w_ir(w_ir),
@@ -556,6 +557,7 @@ pr #(
 	.CPU_NUMBER(CPU_NUMBER),
 	.AWP_PRESENT(AWP_PRESENT)
 ) PR(
+	.__clk(__clk),
 	.blr(blr),
 	.lpc(lpc),
 	.wa(wa),
@@ -673,6 +675,7 @@ wire [0:15] pa_ddt;
 wire [0:15] pa_dad;
 
 pa PA(
+	.__clk(__clk),
 	.ir(ir),
 	.bus_ki(bus_ki),
 	.rdt(rdt),

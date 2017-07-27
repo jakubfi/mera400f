@@ -7,6 +7,7 @@
 */
 
 module pr(
+	input __clk,
 	// sheet 1
 	input blr,				// A50 - BLokuj Rejestry
 	input lpc,				// A94 - LPC instruction

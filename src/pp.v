@@ -1,4 +1,6 @@
 module pp(
+	input __clk,
+
 	input w_rm,
 	input zer,
 	input ck_rz_w,
@@ -15,8 +17,6 @@ module pp(
 	output przerw_z,
 	output irq,
 
-	// FPGA specific
-	input __clk,
 	// system-wide signals
 	input clm,
 	input strob1,
