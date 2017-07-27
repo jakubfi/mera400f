@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import serial
+import os
+import sys
 
 rot_names = {
      0 : "R0",
@@ -91,6 +93,11 @@ class m4cp:
 
     # --------------------------------------------------------------------
     def __init__(self, device, baud):
+        try:
+            self.debug = os.environ['CPDBG']
+        except:
+            self.debug = 0
+
         self.s = serial.Serial(
             port = device,
             baudrate = baud,
@@ -113,6 +120,8 @@ class m4cp:
     
     # --------------------------------------------------------------------
     def cmd(self, cmd):
+        if self.debug:
+            print("  %s" % cmd, file=sys.stderr);
         try:
             self.s.write([functions[cmd.lower()]])
         except:
@@ -120,6 +129,8 @@ class m4cp:
 
     # --------------------------------------------------------------------
     def keys(self, val):
+        if self.debug:
+            print(" 0x%04x" % val, file=sys.stderr);
         k1 = (val >> 0)  & 0b111111
         k2 = (val >> 6)  & 0b11111
         k3 = (val >> 11) & 0b11111
