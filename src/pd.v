@@ -11,6 +11,7 @@ module pd(
 	// sheet 1
 	input [0:15] w,		// internal W bus
 	input strob1,			// STROB1
+	input strob1b,		// STROB1 back
 	input w_ir,				// W -> IR: send bus W to instruction register IR
 	output [0:15] ir,	// IR register
 	input si1,				// invalidate IR contents

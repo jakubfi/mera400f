@@ -20,6 +20,7 @@ module pp(
 	// system-wide signals
 	input clm,
 	input strob1,
+	input strob1b,
 	// CPU states
 	input k1,
 	input i1,

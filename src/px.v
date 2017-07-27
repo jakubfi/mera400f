@@ -57,7 +57,9 @@ module px(
 
 	output got,			// CPU ready for the next state (state preload strob)
 	output strob1,	// CPU STROB2
+	output strob1b,	// CPU STROB2 back
 	output strob2,	// CPU STROB1
+	output strob2b,	// CPU STROB1 back
 	input strob_fp,	// strob1 from the FPU
 
 	input stp0,			// B48
@@ -211,7 +213,9 @@ module px(
 		.ss14(M16_8),
 		.ss15(M15_8),
 		.strob1(strob1),
+		.strob1b(strob1b),
 		.strob2(strob2),
+		.strob2b(strob2b),
 		.got(got)
 	);
 

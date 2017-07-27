@@ -87,7 +87,7 @@ module cpu(
 // --- P-X ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire k1, wp, k2, wa, wz, w$, wr, we, p1, p2, p5, p4, p3, i5, i4, i3, i2, i1, ww, wm, wx, as2, got, strob2, strob1, arm4, blw_pw, ekc_i, zer_sp, lipsp, pn_nb, bp_nb, bar_nb, barnb, q_nb, w_dt, dt_w, ar_ad, ic_ad, i3_ex_przer, ck_rz_w, zerrz, ok$, oken, bod, b_parz, b_p0;
+wire k1, wp, k2, wa, wz, w$, wr, we, p1, p2, p5, p4, p3, i5, i4, i3, i2, i1, ww, wm, wx, as2, got, strob1, strob1b, strob2, strob2b, arm4, blw_pw, ekc_i, zer_sp, lipsp, pn_nb, bp_nb, bar_nb, barnb, q_nb, w_dt, dt_w, ar_ad, ic_ad, i3_ex_przer, ck_rz_w, zerrz, ok$, oken, bod, b_parz, b_p0;
 wire [0:15] px_dad;
 wire [0:15] px_ddt;
 px #(
@@ -148,8 +148,10 @@ px #(
 	.mode(mode),
 	.step(step),
 	.got(got),
-	.strob2(strob2),
 	.strob1(strob1),
+	.strob1b(strob1b),
+	.strob2(strob2),
+	.strob2b(strob2b),
 	.przerw_z(przerw_z),
 	.przerw(przerw),
 	.lip(lip),
@@ -250,7 +252,10 @@ pm #(
 	.got(got),
 	.ekc_fp(ekc_fp),
 	.clm(clm),
+	.strob1(strob1),
+	.strob1b(strob1b),
 	.strob2(strob2),
+	.strob2b(strob2b),
 	.sp0(sp0),
 	.przerw(przerw),
 	.si1(si1),
@@ -304,7 +309,6 @@ pm #(
 	.ep1(ep1),
 	.ep2(ep2),
 	.icp1(icp1),
-	.strob1(strob1),
 	.exl(exl),
 	.lipsp(lipsp),
 	.gr(gr),
@@ -428,6 +432,7 @@ pd #(
 	.__clk(__clk),
 	.w(w),
 	.strob1(strob1),
+	.strob1b(strob1b),
 	.w_ir(w_ir),
 	.ir(ir),
 	.c0(c0),
@@ -568,7 +573,9 @@ pr #(
 	.as2(as2),
 	.w_r(w_r),
 	.strob1(strob1),
+	.strob1b(strob1b),
 	.strob2(strob2),
+	.strob2b(strob2b),
 	.w(w),
 	.l(l),
 	.bar_nb(bar_nb),
@@ -630,6 +637,7 @@ pp #(
 	.clm(clm),
 	.w_rm(w_rm),
 	.strob1(strob1),
+	.strob1b(strob1b),
 	.i4(i4),
 	.rs(rs),
 	.pout(pout),
@@ -705,13 +713,15 @@ pa PA(
 	.at15(at15),
 	.exy(exy),
 	.w_ac(w_ac),
+	.strob1(strob1),
+	.strob1b(strob1b),
 	.strob2(strob2),
+	.strob2b(strob2b),
 	.as2(as2),
 	.am1(am1),
 	.apb(apb),
 	.amb(amb),
 	.ap1(ap1),
-	.strob1(strob1),
 	.s_1(s_1),
 	.wzi(wzi),
 	.zs(zs),

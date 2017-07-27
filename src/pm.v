@@ -27,7 +27,10 @@ module pm(
 	input got,
 	input ekc_fp,
 	input clm,
+	input strob1,
+	input strob1b,
 	input strob2,
+	input strob2b,
 	output sp0,
 	output przerw,
 	output si1,
@@ -87,7 +90,6 @@ module pm(
 	output ep2,
 	output icp1,
 	// sheet 8
-	input strob1,
 	input exl,
 	input lipsp,
 	input gr,
