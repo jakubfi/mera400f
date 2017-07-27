@@ -618,8 +618,8 @@ module pm(
 	assign baa = bla | M67_8;
 	assign bab = bla | M67_8 | (ka1 & p3);
 	assign bac = bla | M72_8;
-	assign aa = ~M71_6 & ~i5 & ~p4wp & ~M71_8;
-	assign ab = ~M71_6 & ~M55_8 & ~abx;
+	assign aa = M71_6 | i5 | p4wp | M71_8;
+	assign ab = M71_6 | M55_8 | abx;
 
 	// sheet 17, page 2-27
 	//  * left/right byte selection signals
@@ -651,9 +651,9 @@ module pm(
 	wire mwbx = (pat & wp) | (srez$ & ww);
 	wire M56_8 = (wrsz & psr) | (i3_ex_przer & lg_2) | (bin & k2) | (ww & ki);
 	wire M73_8 = (k2 & load) | (psr & wkb) | (ir6 & wa & rc$);
-	assign mwa = ~wirpsr & ~mwax & ~M56_8 & ~f13 & ~dt_w;
-	assign mwb = ~wirpsr & ~mwbx & ~M56_8 & ~f13 & ~we & ~w$ & ~p4 & ~M73_8;
-	assign mwc = ~wirpsr & ~dt_w & ~M73_8 & ~(wa & lrcb);
+	assign mwa = wirpsr | mwax | M56_8 | f13 | dt_w;
+	assign mwb = wirpsr | mwbx | M56_8 | f13 | we | w$ | p4 | M73_8;
+	assign mwc = wirpsr | dt_w | M73_8 | (wa & lrcb);
 
 endmodule
 
