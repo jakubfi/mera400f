@@ -235,9 +235,14 @@ module pa(
 
 	// sheet 13, 14
 
-	wire [0:15] dad1 = {16{ar_ad}} & ar;
-	wire [0:15] dad2 = {16{ic_ad}} & ic;
-	assign dad = dad1 | dad2;
+	always @ (*) begin
+		case ({ar_ad, ic_ad})
+			2'b00 : dad = 16'd0;
+			2'b01 : dad = ic;
+			2'b10 : dad = ar;
+			2'b11 : dad = ic | ar; // yeah, whatever
+		endcase
+	end
 
 	assign zga = (kl[0:15] == {~barnb, dad[1:15]});
 
