@@ -115,7 +115,6 @@ module pr(
 
 	// sheet 6, page 2-63
 	// * RB register (binary load register)
-	// * NB (BAR) register and system bus drivers
 	// * R0 register positions 10-15 and system bus drivers
 
 	wire [0:15] rRB;
@@ -129,6 +128,7 @@ module pr(
 	);
 
 	// sheet 7, page 2-64
+	// * NB (BAR) register and system bus drivers
 	// * Q and BS flag registers and system bus drivers
 	// * R0 control signals
 
@@ -141,25 +141,21 @@ module pr(
 	assign dqb = q_nb & q;
 
 	wire cnb0_3 = w_bar & strob1b;
+	assign zer = zer_sp | clm;
 
 	wire [0:3] nb;
-	nb REG_NB(
+	wire bs;
+	bar REG_BAR(
 		.clk(__clk),
-		.w(w[12:15]),
+		.w(w[10:15]),
 		.cnb(cnb0_3),
 		.clm(clm),
-		.nb(nb)
+		.zer_sp(zer_sp),
+		.bar({q, bs, nb})
 	);
 	assign dnb = nb & {4{bar_nb}};
 
 /*
-	reg bs;
-	always @ (posedge __clk, posedge clm) begin
-		if (clm) bs <= 1'b0;
-		else if (cnb0_3) bs <= w[11];
-	end
-*/
-	wire bs;
 	ffd REG_BS(
 		.s_(1'b1),
 		.d(w[11]),
@@ -167,16 +163,9 @@ module pr(
 		.r_(~clm),
 		.q(bs)
 	);
-
-	assign zer = zer_sp | clm;
-/*
-	reg Q;
-	assign q = Q;
-	always @ (posedge __clk, posedge zer) begin
-		if (zer) Q <= 1'b0;
-		else if (cnb0_3) Q <= w[10];
-	end
 */
+
+/*
 	ffd REG_Q(
 		.s_(1'b1),
 		.d(w[10]),
@@ -184,11 +173,10 @@ module pr(
 		.r_(~zer),
 		.q(q)
 	);
-
+*/
 
 //  wire strob_a = ~as2 & strob1;
 //  wire strob_b =  as2 & strob2;
-
 
 	wire M60_3  = strob_a & AWP_PRESENT & ustr0_fp;
 	wire M62_6  = strob_a & w_r & wr0 & ~q;
