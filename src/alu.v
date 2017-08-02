@@ -43,7 +43,7 @@ module alu(
 	output [0:15] f,
 	output j$,
 	output carry,
-	output zsum_
+	output zsum
 );
 
 	wor __NC;
@@ -124,7 +124,7 @@ module alu(
 		.og(__NC)
 	);
 
-	assign zsum_ = |f;
+	assign zsum = ~|f;
 	assign j$ = &j$1;
 
 endmodule

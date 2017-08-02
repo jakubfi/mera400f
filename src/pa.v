@@ -109,7 +109,7 @@ module pa(
 	// sheet 5..6
 
 	wire [0:15] f;
-	wire zsum_;
+	wire zsum;
 	alu ALU(
 		.p16_(~p16),
 		.a(a),
@@ -124,7 +124,7 @@ module pa(
 		.f(f),
 		.j$(j$),
 		.carry(carry),
-		.zsum_(zsum_)
+		.zsum(zsum)
 	);
 
 	assign s0 = f[0];
@@ -135,7 +135,7 @@ module pa(
 	wire [0:15] at;
 	at REG_AT(
 		.clk(__clk),
-		.s0(~(~wx & as2_)),
+		.s0(wx | as2),
 		.s1(as2),
 		.c(strob1b),
 		.sl(eat0),
@@ -148,7 +148,6 @@ module pa(
 
 	// sheet 8
 
-	wire as2_ = ~as2;
 	wire strobb = as2 & strob2b;
 	wire stroba = ~as2 & strob1b;
 
@@ -166,16 +165,14 @@ module pa(
 	wire M8_3 = ~ac[0] ^ a[0];
 	wire M7_8 = (~a[0] & am1) | (M8_11 & apb) | (M8_3 & amb) | (a[0] & ap1);
 	assign s_1 = ~M7_8 ^ ~carry;
-	assign zs = ~(s_1 | zsum_);
+	assign zs = ~s_1 & zsum;
 
 	// WZI - wskaźnik zera sumatora
 
 	wire wzi_clk = as2 & strob1b;
 
-	reg WZI;
-	assign wzi = WZI;
 	always @ (posedge __clk) begin
-		if (wzi_clk) WZI <= zs;
+		if (wzi_clk) wzi <= zs;
 	end
 /*
 	wire wzi_;
