@@ -1,4 +1,5 @@
 module mc(
+	input clk,
 	input inc,
 	input reset,
 	output mc_3,
@@ -7,9 +8,9 @@ module mc(
 
 	reg [1:0] mc;
 
-	always @ (posedge inc, posedge reset) begin
+	always @ (posedge clk, posedge reset) begin
 		if (reset) mc <= 2'd0;
-		else mc <= mc + 1'b1;
+		else if (inc) mc <= mc + 1'b1;
 	end
 
 	assign mc_3 = (mc == 3);

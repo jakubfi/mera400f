@@ -7,6 +7,7 @@
 */
 
 module regs(
+	input clk,
 	input [0:15] w,
 	input [0:2] addr,
 	input we,
@@ -15,8 +16,8 @@ module regs(
 
 	reg [0:15] mem [0:7];
 
-	always @ (posedge we) begin
-		mem[addr] <= w;
+	always @ (posedge clk) begin
+		if (we) mem[addr] <= w;
 	end
 
 	assign l = mem[addr];

@@ -150,6 +150,7 @@ module pd(
 
 	wire ir_clk = strob1 & w_ir;
 	ir REG_IR(
+		.clk(__clk),
 		.d(w),
 		.c(ir_clk),
 		.invalidate(si1),

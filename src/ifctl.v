@@ -18,10 +18,14 @@ module ifctl(
 	parameter ALARM_DLY_TICKS;
 	parameter ALARM_TICKS;
 
+	// Cała obsługa interfejsu potencjalnie też powinna być zrobiona jako automat.
+	// Być może powinna znaleźć się (po części?) w strobgen - oczekiwanie na interfejs między
+	// GOT a S1 jest niczym innym jak kolejnym stanem.
+
 	wire oken = ren | rok;
 	assign zwzg = zgi & zw;
 	assign zg = zgi | ifhold | (zw & oken);
-	// (zw & oken): trzymamy zg aż nie spadnie ok/en
+	// (zw & oken): trzymamy zg aż nie spadnie ok|en
 	// ifhold: trzymamy zajęty interfejs przez cały rozkaz z wymogiem atomowych odwołań do pamięci
 
 	// * wejście do zgi_set zaczyna zgłoszenie
@@ -30,10 +34,10 @@ module ifctl(
 	// * zgi_j mówi w jakich stanach zgłaszanie się odbywa
 
 	reg zgi;
-	always @ (negedge gotst1, posedge zgi_set, posedge clo) begin
-		if (zgi_set) zgi <= 1'b1;
-		else if (clo) zgi <= 1'b0;
-		else case (zgi_j)
+	always @ (posedge __clk, posedge clo) begin
+		if (clo) zgi <= 1'b0;
+		else if (zgi_set) zgi <= 1'b1;
+		else if (gotst1) case (zgi_j)
 			1'b0: zgi <= 1'b0;
 			1'b1: zgi <= ~zgi;
 		endcase
@@ -83,11 +87,12 @@ module ifctl(
 	);
 
 	// ok$ - koniec pracy z interfejsem (niezależnie od finału: ok/en/alarm)
+	// to zasadniczo jest zwzg & ok_clk, ale tak nie działa (póki co)
 
 	wire ok_clk = ren | talarm | rok;
-	always @ (posedge ok_clk, negedge zgi) begin
+	always @ (posedge __clk, negedge zgi) begin
 		if (~zgi) ok$ <= 0;
-		else ok$ <= zwzg;
+		else if (ok_clk) ok$ <= zwzg;
 	end
 
 	/*

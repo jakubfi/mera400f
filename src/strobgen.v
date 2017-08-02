@@ -1,10 +1,11 @@
 module strobgen(
 	input __clk,
 	input ss11, ss12, ss13, ss14, ss15,
-	input ok, zw, oken,
+	input ok$, zw, oken,
 	input mode, step,
 	input strob_fp,
-	output reg got,
+	output ldstate,
+	output got,
 	output strob1,
 	output strob1b,
 	output strob2,
@@ -12,28 +13,27 @@ module strobgen(
 );
 
 	localparam S_GOT	= 3'd0;
-	localparam S_ST1	= 3'd1;
-	localparam S_ST1W	= 3'd2;
-	localparam S_ST1B	= 3'd3;
-	localparam S_PGOT	= 3'd4;
-	localparam S_ST2	= 3'd5;
-	localparam S_ST2B	= 3'd6;
+	localparam S_GOTW	= 3'd1;
+	localparam S_ST1	= 3'd2;
+	localparam S_ST1W	= 3'd3;
+	localparam S_ST1B	= 3'd4;
+	localparam S_PGOT	= 3'd5;
+	localparam S_ST2	= 3'd6;
+	localparam S_ST2B	= 3'd7;
 
-	wire if_got_holdoff = zw & oken;
-	wire es1 = ss11 | (ss12 & ok) | (ss13 & ok) | ss14 | ss15;
-	wire es2 = ss11 | ss12;
-	wire egot = ss13 | ss14 | ss15;
+	wire if_busy = zw & oken;
+	wire es1 = ss11 | (ss12 & ok$) | (ss13 & ok$) | ss14 | ss15;
+	wire has_strob2 = ss11 | ss12;
+	wire no_strob2 = ss13 | ss14 | ss15;
 
-	// TODO: this needs to be cleaned up after strob signals loose their "clock" powers
-	//assign got = state == S_GOT;
+	assign got = state == S_GOT;
 	assign strob1 = state == S_ST1;
 	assign strob1b = state == S_ST1B;
 	assign strob2 = state == S_ST2;
 	assign strob2b = state == S_ST2B;
+	assign ldstate = ~if_busy & ((state == S_PGOT) | ((state == S_ST1B) & no_strob2) | (state == S_ST2B));
 
 	// TODO: strob_fp
-	// NOTE: if_got_holdoff seems to be unnecessary
-	// NOTE: seems like got can work without a register now (with additional GOTW state)
 
 	// STEP
 	reg lstep;
@@ -45,10 +45,17 @@ module strobgen(
 	// STROBS
 	reg [0:2] state;
 	always @ (posedge __clk) begin
-		got <= 0;
 		case (state)
 			// GOT
 			S_GOT: begin
+				if (es1) begin
+					state <= S_ST1;
+				end else begin
+					state <= S_GOTW;
+				end
+			end
+
+			S_GOTW: begin
 				if (es1) begin
 					state <= S_ST1;
 				end
@@ -67,11 +74,10 @@ module strobgen(
 
 			// STROB1 back
 			S_ST1B: begin
-				if (es2) begin
+				if (has_strob2) begin
 					state <= S_ST2;
-				end else if (egot & ~if_got_holdoff) begin
+				end else if (no_strob2 & ~if_busy) begin
 					state <= S_GOT;
-					got <= 1;
 				end else begin
 					state <= S_PGOT;
 				end
@@ -84,9 +90,8 @@ module strobgen(
 
 			// STROB2 back
 			S_ST2B: begin
-				if (~if_got_holdoff) begin
+				if (~if_busy) begin
 					state <= S_GOT;
-					got <= 1;
 				end else begin
 					state <= S_PGOT;
 				end
@@ -94,9 +99,8 @@ module strobgen(
 
 			// STROB2 back (wait for I/F operation to end)
 			S_PGOT: begin
-				if (~if_got_holdoff) begin
+				if (~if_busy) begin
 					state <= S_GOT;
-					got <= 1;
 				end
 			end
 		endcase
@@ -108,13 +112,13 @@ module strobgen(
 	univib #(.ticks(STROB1_1_TICKS)) VIB_STROB1_1(
 		.clk(__clk),
 		.a_(got),
-		.b(ss11 | (ss12 & ok)),
+		.b(ss11 | (ss12 & ok$)),
 		.q(strob1_st2)
 	);
 	univib #(.ticks(STROB1_3_TICKS)) VIB_STROB1_3(
 		.clk(__clk),
 		.a_(got),
-		.b((ss13 & ok) | ss14 | ss15),
+		.b((ss13 & ok$) | ss14 | ss15),
 		.q(strob1_only)
 	);
 

@@ -87,10 +87,9 @@ module pr(
 	wire rpa = ~blr & ~(sel_r1_r7 & M60_6); // R0 -> L
 	wire rpnn = ~blr & sel_r1_r7 & M60_6; // R1-R7 -> L
 
-	wire lr0 = lpc & strob_a & wa;
-
 	wire [0:15] R1_7;
 	regs USER_REGS(
+		.clk(__clk),
 		.w(w),
 		.addr({rc, rb, ra}),
 		.we((strob_a | strob_b) & w_r & sel_r1_r7),
@@ -100,7 +99,7 @@ module pr(
 	// Nice L bus that upsets the AWP
 	always @ (*) begin
 		case ({blr, sel_r1_r7 & M60_6})
-			2'b00: l = {r0, R0_9_15};
+			2'b00: l = {r0, r0low};
 			2'b01: l = R1_7;
 			2'b10: l = {8'd0, r0[0:7]};
 			2'b11: l = {8'd0, r0[0:7]};
@@ -110,7 +109,7 @@ module pr(
 	// L bus final open-collector composition
 	assign l = 
 		(rpnn ? R1_7 : 16'hffff) // user registers
-		& (rpa ? {r0, R0_9_15} : 16'hffff) // r0 at original position
+		& (rpa ? {r0, r0low} : 16'hffff) // r0 at original position
 		& (rpp ? {8'd0, r0[0:7]} : 16'hffff) // r0 shifted right 8 bits
 	;
 
@@ -121,28 +120,12 @@ module pr(
 
 	wire [0:15] rRB;
 	rb REG_RB(
+		.clk(__clk),
 		.w(w[10:15]),
 		.w_rba(w_rba),
 		.w_rbb(w_rbb),
 		.w_rbc(w_rbc),
 		.rb(rRB)
-	);
-
-	wire [0:3] nb;
-	nb REG_NB(
-		.w(w[12:15]),
-		.cnb(cnb0_3),
-		.clm(clm),
-		.nb(nb)
-	);
-	assign dnb = nb & {4{bar_nb}};
-
-	wire [9:15] R0_9_15;
-	r0_9_15 R0_LOW(
-		.w(w[9:15]),
-		.lrp(~lrp),
-		.zer(zer),
-		.r0(R0_9_15)
 	);
 
 	// sheet 7, page 2-64
@@ -157,6 +140,25 @@ module pr(
 	assign dpn = ~(~(M35_8 & bp_nb) & M23_11);
 	assign dqb = q_nb & q;
 
+	wire cnb0_3 = w_bar & strob1b;
+
+	wire [0:3] nb;
+	nb REG_NB(
+		.clk(__clk),
+		.w(w[12:15]),
+		.cnb(cnb0_3),
+		.clm(clm),
+		.nb(nb)
+	);
+	assign dnb = nb & {4{bar_nb}};
+
+/*
+	reg bs;
+	always @ (posedge __clk, posedge clm) begin
+		if (clm) bs <= 1'b0;
+		else if (cnb0_3) bs <= w[11];
+	end
+*/
 	wire bs;
 	ffd REG_BS(
 		.s_(1'b1),
@@ -166,8 +168,15 @@ module pr(
 		.q(bs)
 	);
 
-	wire cnb0_3 = w_bar & strob1;
-
+	assign zer = zer_sp | clm;
+/*
+	reg Q;
+	assign q = Q;
+	always @ (posedge __clk, posedge zer) begin
+		if (zer) Q <= 1'b0;
+		else if (cnb0_3) Q <= w[10];
+	end
+*/
 	ffd REG_Q(
 		.s_(1'b1),
 		.d(w[10]),
@@ -176,34 +185,35 @@ module pr(
 		.q(q)
 	);
 
-	// FIX: -ZER*SP on <A89> was labeled as -ZER*FP
-	assign zer = zer_sp | clm;
 
-	// jumper on C-D: no AWP
-	wire M60_3 = strob_a & AWP_PRESENT & ustr0_fp;
-	// FIX: missing connection from +W->R to M62.2, M62.12, M61.10
+//  wire strob_a = ~as2 & strob1;
+//  wire strob_b =  as2 & strob2;
+
+
+	wire M60_3  = strob_a & AWP_PRESENT & ustr0_fp;
 	wire M62_6  = strob_a & w_r & wr0 & ~q;
 	wire M62_8  = strob_b & w_r & wr0 & ~q;
 	wire M61_8  = strob_a & w_r & wr0;
 	wire M61_12 = strob_b & w_r & wr0;
 
+	wire lr0 = lpc & strob_a & wa;
 	wire w_zmvc = lr0 | M62_8 | M62_6 | M60_3;
 	wire w_legy = lr0 | M62_8 | M62_6;
-
 	wire lrp  = lr0 | M61_8 | M61_12;
-	wire w8_x = lr0 | M61_8 | M61_12;
 
-	wire cleg = strob_b & ust_leg;
-
+	// TODO: cleg was being used on negedge in r0, so technically this should be @strob2b, but it doesn't work with strob2b now :-(
+	// NOTE: For now it does work with strob2.
+	wire cleg = as2 & strob2b & ust_leg;
 	wire vg = (~aryt & ~(zs | ~carry)) | (~(zs | s_1) & aryt);
 	wire vl = (~aryt & ~carry) | (aryt & s_1);
 
-	// sheets 8..9, pages 2-65..2-66
-	// * R0 register positions 0-9: CPU flags: ZMVCLEGYX
+	// * R0 register
 
+	wire [9:15] r0low;
 	r0 REG_R0(
-		.w(w[0:8]),
-		.r0(r0),
+		.clk(__clk),
+		.w(w),
+		.r0({r0, r0low}),
 		.zs(zs),
 		.s_1(s_1),
 		.s0(s0),
@@ -212,7 +222,7 @@ module pr(
 		.vg(vg),
 		.exy(exy),
 		.exx(exx),
-		.strob1(strob1),
+		.strob1b(strob1b),
 		.ust_z(ust_z),
 		.ust_v(ust_v),
 		.ust_mc(ust_mc),
@@ -221,12 +231,11 @@ module pr(
 		.cleg(cleg),
 		.w_zmvc(w_zmvc),
 		.w_legy(w_legy),
-		.w8_x(w8_x),
 		._0_v(_0_v),
+		.lrp(lrp),
 		.zer(zer)
 	);
 
-	// sheets 10..11, pages 2-67..2-68
 	// * KI bus
 
 	bus_ki BUS_KI(

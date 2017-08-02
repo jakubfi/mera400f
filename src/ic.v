@@ -7,6 +7,7 @@
 */
 
 module ic(
+	input clk,
 	input cu,
 	input l,
 	input r,
@@ -16,15 +17,11 @@ module ic(
 
 	// NOTE: Sensitivities are different for the FPGA implementation.
 	//       Idea behind it is to always be front-edge sensitive
-	wire clk = cu | l | r;
-	always @ (posedge clk) begin
-		if (l) begin
-			ic <= w;
-		end else if (r) begin
-			ic <= 16'd0;
-		end else begin
-			ic <= ic + 1'b1;
-		end
+	//wire clk = cu | l | r;
+	always @ (posedge clk, posedge r) begin
+		if (r) ic <= 16'd0;
+		else if (l) ic <= w;
+		else if (cu) ic <= ic + 1'b1;
 	end
 
 endmodule

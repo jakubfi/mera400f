@@ -7,6 +7,7 @@
 */
 
 module lk(
+	input clk,
 	input cd,
 	input [0:3] i,
 	input r,
@@ -16,10 +17,10 @@ module lk(
 
 	reg [0:3] cnt;
 
-	always @ (posedge cd, posedge l, posedge r) begin
+	always @ (posedge clk, posedge r) begin
 		if (r) cnt <= 4'd0;
 		else if (l) cnt <= i;
-		else cnt <= cnt - 1'b1;
+		else if (cd) cnt <= cnt - 1'b1;
 	end
 
 	assign lk = |cnt;

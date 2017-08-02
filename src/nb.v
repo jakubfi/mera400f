@@ -7,15 +7,16 @@
 */
 
 module nb(
+	input clk,
 	input [12:15] w,
 	input cnb,
 	input clm,
 	output reg [0:3] nb
 );
 
-	always @ (negedge cnb, posedge clm) begin
+	always @ (posedge clk, posedge clm) begin
 		if (clm) nb <= 4'd0;
-		else nb <= w[12:15];
+		else if (cnb) nb <= w[12:15];
 	end
 
 endmodule

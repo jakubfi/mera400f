@@ -31,6 +31,7 @@ module pm(
 	input strob1b,
 	input strob2,
 	input strob2b,
+	input ldstate,
 	output sp0,
 	output przerw,
 	output si1,
@@ -218,6 +219,12 @@ module pm(
 
 	wire start_reset = hlt_n | stop | clo;
 	wire start_clk = pon & work;
+	reg startq;
+	always @ (posedge __clk, posedge start_reset) begin
+		if (start_reset) startq <= 1'b0;
+		else if (start_clk | start) startq <= 1'b1;
+	end
+/*
 	wire startq;
 	ffd REG_START(
 		.s_(~start),
@@ -226,8 +233,14 @@ module pm(
 		.r_(~start_reset),
 		.q(startq)
 	);
+*/
 
-	wire M43_3 = start_reset | si1;
+	wire wait_reset = start_reset | si1;
+	always @ (posedge __clk, posedge wait_reset) begin
+		if (wait_reset) _wait <= 1'b0;
+		else if (wx) _wait <= hlt;
+	end
+/*
 	ffd REG_WAIT(
 		.s_(1'b1),
 		.d(hlt),
@@ -235,7 +248,14 @@ module pm(
 		.r_(~M43_3),
 		.q(_wait)
 	);
+*/
 
+	reg __cycle_q;
+	always @ (posedge __clk, posedge cycle) begin
+		if (cycle) __cycle_q <= 1'b1;
+		else if (rescyc) __cycle_q <= 1'b0;
+	end
+/*
 	wire __cycle_q;
 	ffd REG_CYCLE(
 		.s_(~cycle),
@@ -244,7 +264,7 @@ module pm(
 		.r_(~rescyc),
 		.q(__cycle_q)
 	);
-
+*/
 	assign run = startq & ~_wait;
 	wire dpr = run | __cycle_q;
 	wire dprzerw = (__cycle_q | startq) & irq & ~p & mc_0;
@@ -259,6 +279,13 @@ module pm(
 	wire ekc = ekc_1 | ekc_i | ekc_2 | p2 | p0stpc;
 	wire kc_reset = clo | pc;
 
+	reg trig_kc;
+	always @ (posedge __clk, posedge kc_reset) begin
+		if (kc_reset) trig_kc <= 1'b0;
+		else if (ekc_fp) trig_kc <= 1'b1;
+		else if (ldstate) trig_kc <= ekc;
+	end
+/*
 	wire trig_kc;
 	ffjk REG_KC(
 		.s_(~ekc_fp),
@@ -268,7 +295,7 @@ module pm(
 		.r_(~kc_reset),
 		.q(trig_kc)
 	);
-
+*/
 	wire kc;
 	univib #(.ticks(KC_TICKS)) VIB_KC(
 		.clk(__clk),
@@ -379,8 +406,20 @@ module pm(
 	//  * P - wskaźnik przeskoku (branch indicator)
 	//  * MC - premodification counter
 
+	reg p_;
+	always @ (posedge __clk, posedge clm) begin
+		if (clm) p_ <= 1'b1;
+		else if (strob1) begin
+			if (rok & ~inou & wm) p_ <= 1'b0;
+			else if (p2) p_ <= 1'b1;
+			else if (ssp$ & w$) p_ <= ~p_d;
+		end
+	end
+	assign p = ~p_;
+
 	wire p_d = (~j$ & bcoc$) | zs;
 	wire p_set = (p2 & strob1) | clm;
+/*
 	wire p_clk = ssp$ & strob1 & w$;
 	wire p_reset = strob1 & rok & ~inou & wm;
 
@@ -393,27 +432,40 @@ module pm(
 		.q(p_)
 	);
 	assign p = ~p_;
+*/
 
 	wire setwp = strob1 & wx & md;
 	wire reswp = p_set | (sc$ & strob2 & p1);
 	wire reset_mc = reswp | (~md & p4);
 
 	mc MC(
+		.clk(__clk),
 		.inc(setwp),
 		.reset(reset_mc),
 		.mc_3(mc_3),
 		.mc_0(mc_0)
 	);
 
-	assign xi$ = ~p & p1 & strob2 & xi;
-
 	// sheet 6, page 2-16
 	//  * WMI - wskaźnik rozkazu dwusłowowego (2-word instruction indicator)
 	//  * WPI - wskaźnik premodyfikacji (premodification indicator)
 	//  * WBI - wskaźnik B-modyfikacji (B-modification indicator)
 
-	wire wm_q;
+	assign xi$ = ~p & p1 & strob2 & xi;
 	wire wm_d = pr & ~c0 & na;
+
+	// TODO: moved from strob2 to strob1b
+	// trzeba pewnie będzie ostatecznie wrócić do strob2 jakoś
+	reg wm_q;
+	always @ (posedge __clk) begin
+		if (strob1b) begin
+			if (~p & p1 & xi) wm_q <= 1'b0;
+			else wm_q <= wm_d;
+		end
+	end
+
+/*
+	wire wm_q;
 	ffd REG_WMI(
 		.s_(1'b1),
 		.d(wm_d),
@@ -421,9 +473,24 @@ module pm(
 		.r_(~xi$),
 		.q(wm_q)
 	);
+*/
 
 	wire wb_j = pr & ~b0 & na;
 	wire wb_k = (p4 & ~wpp) | p2;
+
+	reg wb;
+	always @ (posedge __clk, negedge zerstan_) begin
+		if (~zerstan_) wb <= 1'b0;
+		else if (strob1b) begin
+			case ({wb_j, wb_k})
+				2'b00: wb <= wb;
+				2'b01: wb <= 1'b0;
+				2'b10: wb <= 1'b1;
+				2'b11: wb <= ~wb;
+			endcase
+		end
+	end
+/*
 	wire wb;
 	ffjk REG_WBI(
 		.s_(1'b1),
@@ -433,7 +500,17 @@ module pm(
 		.r_(zerstan_),
 		.q(wb)
 	);
+*/
 
+	reg wpp;
+	always @ (posedge __clk, posedge reswp) begin
+		if (reswp) wpp <= 1'b0;
+		else if (strob1b) begin
+			if (wx & md) wpp <= 1'b1; // wire setwp = strob1 & wx & md;
+			else if (p4) wpp <= 1'b0;
+		end
+	end
+/*
 	wire wpp;
 	ffjk REG_WPI(
 		.s_(~setwp),
@@ -443,7 +520,7 @@ module pm(
 		.r_(~reswp),
 		.q(wpp)
 	);
-
+*/
 	wire p4wp = p4 & wpp;
 	// Wskaźnik Premodyfikacji i B-modyfikacji (było: wpb)
 	wire wpbmod = wb | wpp;
@@ -486,7 +563,6 @@ module pm(
 
 	// sheet 8, page 2-18
 
-	wire str1wx = strob1 & wx;
 	wire lolk = slg2 | (strob2 & p1 & shc) | (strob1 & wm & inou);
 
 	wire downlk = strob1 & (wrwwgr | ((shc | inou) & wx));
@@ -497,20 +573,21 @@ module pm(
 
 	assign arp1 = ar_1 | read_fp | i3 | wrwwgr;
 
-	// LG clock
-	wire M62_3 = strob1 & (i3 | wrwwgr | lg_plus_1);
+	// LG+1
+	wire lg_p1 = strob1b & (i3 | wrwwgr | lg_plus_1);
 	// LG reset
-	wire M62_11 = zerstan_ & ~i1;
+	wire lg_reset = zerstan_ & ~i1;
 
-	// LG preload triggers
+	// LG load
 	wire slg1 = strob2 & ~gr & p1 & ~exl & ~lipsp; // "common" preload at P1
 	wire slg2 = strob1 & gr & wx; // preload for register group operations (at WX)
 
 	wire lg_2, lg_1;
 	wire lga, lgb, lgc;
 	lg LG(
-		.clk_(M62_3),
-		.reset_(M62_11),
+		.clk(__clk),
+		.cu(lg_p1),
+		.reset_(lg_reset),
 		.gr(gr),
 		.slg1(slg1),
 		.slg2(slg2),
@@ -545,6 +622,7 @@ module pm(
 	assign lk_in[0] = (shc & ir6);
 
 	lk CNT_LK(
+		.clk(__clk),
 		.cd(downlk),
 		.i(lk_in),
 		.l(lolk),
@@ -626,6 +704,16 @@ module pm(
 	// sheet 17, page 2-27
 	//  * left/right byte selection signals
 
+	wire str1wx = strob1b & wx;
+
+	reg WPB;
+	assign wpb = WPB;
+	always @ (posedge __clk, negedge lrcb) begin
+		if (~lrcb) WPB <= 1'b0;
+		else if (str1wx) WPB <= at15;
+	end
+
+/*
 	// PBI - Wskaźnik Prawego Bajtu (było: pb/pb_/wpb_)
 	ffd REG_PB(
 		.r_(lrcb),
@@ -634,7 +722,7 @@ module pm(
 		.s_(1'b1),
 		.q(wpb)
 	);
-
+*/
 	assign w_ir = (wir & ur) | pr;
 
 	// KI bus control signals

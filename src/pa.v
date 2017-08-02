@@ -134,9 +134,10 @@ module pa(
 
 	wire [0:15] at;
 	at REG_AT(
+		.clk(__clk),
 		.s0(~(~wx & as2_)),
 		.s1(as2),
-		.c(~strob1),
+		.c(strob1b),
 		.sl(eat0),
 		.f(f),
 		.at(at)
@@ -148,14 +149,15 @@ module pa(
 	// sheet 8
 
 	wire as2_ = ~as2;
-	wire strobb = as2 & strob2;
-	wire stroba = ~as2 & strob1;
+	wire strobb = as2 & strob2b;
+	wire stroba = ~as2 & strob1b;
 
 	wire ac_clk = w_ac & (stroba | strobb);
 
 	wire [0:15] ac;
 	ac REG_AC(
-		.c(~ac_clk),
+		.clk(__clk),
+		.c(ac_clk),
 		.w(w),
 		.ac(ac)
 	);
@@ -168,8 +170,14 @@ module pa(
 
 	// WZI - wskaźnik zera sumatora
 
-	wire wzi_clk = as2 & strob1;
+	wire wzi_clk = as2 & strob1b;
 
+	reg WZI;
+	assign wzi = WZI;
+	always @ (posedge __clk) begin
+		if (wzi_clk) WZI <= zs;
+	end
+/*
 	wire wzi_;
 	ffd REG_WZI(
 		.s_(1'b1),
@@ -179,7 +187,7 @@ module pa(
 		.q(wzi_)
 	);
 	assign wzi = wzi_;
-
+*/
 	// sheet 9
 
 	wire ar_load = w_ar & (stroba | strobb);
@@ -187,6 +195,7 @@ module pa(
 
 	wire [0:15] ar;
 	ar REG_AR(
+		.clk(__clk),
 		.l(ar_load),
 		.p1(ar_plus1),
 		.m4(arm4),
@@ -198,11 +207,12 @@ module pa(
 
 	// sheet 10
 
-	wire ic_plus1 = icp1 & strob1;
+	wire ic_plus1 = icp1 & strob1b;
 	wire ic_load = w_ic & (stroba | strobb);
 
 	wire [0:15] ic;
 	ic REG_IC(
+		.clk(__clk),
 		.cu(ic_plus1),
 		.l(ic_load),
 		.r(off),

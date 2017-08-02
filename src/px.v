@@ -7,8 +7,16 @@
 */
 
 module px(
-	input __clk,// system clock
-	input clo,	// general clear (reset)
+	input __clk,		// system clock
+	input clo,			// general clear (reset)
+
+	input strob_fp,	// strob1 from the FPU
+	output got,			// CPU ready for the next state (state preload strob)
+	output strob1,	// CPU STROB2
+	output strob1b,	// CPU STROB2 back
+	output strob2,	// CPU STROB1
+	output strob2b,	// CPU STROB1 back
+	output ldstate,
 
 	input ek1,	// Enter state K1
 	input ek2,	// Enter state K2
@@ -55,91 +63,97 @@ module px(
 	output reg i4,	// state I4
 	output reg i5,	// state I5
 
-	output got,			// CPU ready for the next state (state preload strob)
-	output strob1,	// CPU STROB2
-	output strob1b,	// CPU STROB2 back
-	output strob2,	// CPU STROB1
-	output strob2b,	// CPU STROB1 back
-	input strob_fp,	// strob1 from the FPU
-
 	input stp0,			// B48
 	// sheet 3
-	input laduj,		// A38
 	output as2_sum_at,	// A13
-	// sheet 4
-	input mode,			// control panel MODE
-	input step,			// control panel STEP
+
+	// control panel
+	input laduj,		// LOAD
+	input mode,			// MODE
+	input step,			// STEP
+	input stop,			// STOP
+	input k2_bin_store,	// BIN | STORE @ K2
+	input k2fetch,	// FETCH @ K2
+
 	// sheet 5
 	input przerw_z,	// A61
 	input przerw,		// A24
+
+	// instructions
 	input lip,			// op: LIP
-	input sp,				// op: A67
+	input sp,				// op: SP
+	input in,				// op: IN
+	input ou,				// op: OU
+	input mcl,			// op: MCL
+	input gi,				// op: GI
+	input fi,				// op: FI
+	input is,				// op: IS
+	input exl,			// op: EXL
+	input pufa,			// op: any of the wide or floating point instructions
 	output lipsp,		// op: LIP | SP
+
 	input lg_0,			// LG==0
 	input lg_3,			// LG==3 (Licznik Grupowy)
 	input pp,				// A64
-	output arm4,		// AR-4 -> AR
 	output blw_pw,	// B85
 	output zer_sp,	// A73
 	// sheet 6
 	input sbar$,		// A53
 	input q,				// Q system flag
-	input in,				// op: IN
-	input ou,				// op: OU
-	input k2fetch,	// B41
 	input read_fp,	// A39
+
+	// microoperations
+	input arz,			// 0 -> AR
 	output pn_nb,		// PN -> NB
 	output bp_nb,		// BP -> NB
 	output bar_nb,	// BAR -> NB
 	output barnb,		// A72
 	output q_nb,		// Q -> NB
 	output w_dt,		// W -> DT
+	output dt_w,		// DT -> W
+	output ar_ad,		// AR -> AD
+	output ic_ad,		// IC -> AD bus
+	output arm4,		// AR-4 -> AR
+
+	// interface drivers
 	output df,			// "fetch" I/F driver
 	output dr,			// "read" I/F driver
 	output din,			// "interrupt" I/F driver
 	output dw,			// "write" I/F driver
 	output ds,			// "send" I/F driver // NOTE: missing on original schematic
 	output dmcl,		// software reset I/F driver
-	output dt_w,		// DT -> W
-	output ar_ad,	// AR -> AD
-	// sheet 7
-	input mcl,			// MCL
-	input gi,				// GI
-	input fi,				// FI
-	input arz,			// 0 -> AR
-	input k2_bin_store,	// A31
-	input lrz,			// B78
-	output ic_ad,		// IC -> AD bus
 	output [0:15] ddt, // DT bus
 	output [0:15] dad, // AD bus
+
+	// sheet 7
+	input lrz,			// B78
 	output i3_ex_przer,	// A52
 	output ck_rz_w,	// B91
 	output zerrz,		// B85
 	// sheet 8
 	input sr_fp,		// B53
-	input zw,				// A85 - module allowed to use the system bus (CPU) (ZezWolenie)
 	input srez$,		// B76
 	input wzi,			// arithmetic "0" indicator
-	input is,				// A84
+	input efp,			// B09
+
+	// interface related
+	output zg,			// request to use the system bus (ZGłoszenie)
+	input zw,				// module allowed to use the system bus (CPU) (ZezWolenie)
 	input ren,			// EN received on the interface
 	input rok,			// OK received on the interface
-	input efp,			// B09
-	input exl,			// A78 - instruction EXL
-	output zg,			// B44 - request to use the system bus (ZGłoszenie)
-	output ok$,			// A80 - other party is done with the reply (with either OK, EN or ALARM)
-	output oken,		// B17 - OK or EN from the interface
+	output oken,		// OK | EN on the interface
+	output bod,			// PE | EN on the interface
+	output ok$,			// other party is done with the reply (with either OK, EN or ALARM)
+
 	// sheet 9
 	input stop_n,		// B55
 	input zga,			// B57
 	input rpe,			// A82
-	input stop,			// B51
-	input pufa,			// op: any of the wide or floating point instructions
 	input ir6,			// B58
 	input ir7,			// A06
 	input ir8,			// A04
 	input ir9,			// B06
 	output hlt_n,		// A94
-	output bod,			// PE | EN
 	output b_parz,	// parity error interrupt source
 	output b_p0,		// memory access error interrupt source
 	output awaria		// CPU stopped due to a memory access or parity error indicator
@@ -155,39 +169,30 @@ module px(
 	// sheet 1, page 2-1
 	// * state registers
 
-	always @ (posedge got, posedge clo) begin
+	always @ (posedge __clk, posedge clo) begin
 		if (clo) begin
-			{k1, wp, k2, wa, we, wr, w$, wz, p2, p5, p4, p3} <= 'd0;
-			{i2, i3, i4, i5, wx, wm, ww} <= 'd0;
+			{k1, k2} <= 2'd0;
+			{wp, wa, we, wr, w$, wz, wx, wm, ww} <= 9'd0;
+			{p0, p1, p2, p3, p4, p5} <= 6'b100000;
+			{i1, i2, i3, i4, i5} <= 5'd0;
 		end else begin
-			{k1, wp, k2, wa, we, wr, w$, wz, p2, p5, p4, p3} <= {ek1, ewp, ek2, ewa, ewe, ewr, ew$, ewz, ep2, ep5, ep4, ep3};
-			{i2, i3, i4, i5, wx, wm, ww} <= {ei2, ei3, ei4, ei5, ewx, ewm, eww};
+			if (ldstate) begin
+				{k1, k2} <= {ek1, ek2};
+				{wp, wa, we, wr, w$, wz, wx, wm, ww} <= {ewp, ewa, ewe, ewr, ew$, ewz, ewx, ewm, eww};
+				{p2, p3, p4, p5} <= {ep2, ep3, ep4, ep5};
+				{i2, i3, i4, i5} <= {ei2, ei3, ei4, ei5};
+			end
+
+			if (sp1) p1 <= 1'b1;
+			else if (ldstate) p1 <= ep1;
+
+			if (sp0) p0 <= 1'b1;
+			else if (ldstate) p0 <= ep0;
+
+			if (si1) i1 <= 1'b1;
+			else if (ldstate) i1 <= ei1;
 		end
 	end
-
-	ffd REG_P1(
-		.s_(~sp1),
-		.d(ep1),
-		.c(got),
-		.r_(~clo),
-		.q(p1)
-	);
-
-	ffd REG_P0(
-		.s_(~clo & ~sp0),
-		.d(ep0),
-		.c(got),
-		.r_(1'b1),
-		.q(p0)
-	);
-
-	ffd REG_I1(
-		.s_(~si1),
-		.d(ei1),
-		.c(got),
-		.r_(~clo),
-		.q(i1)
-	);
 
 	// sheet 3, page 2-3
 	// * strob signals
@@ -201,7 +206,7 @@ module px(
 
 	strobgen STROBGEN(
 		.__clk(__clk),
-		.ok(ok),
+		.ok$(ok$),
 		.zw(zw),
 		.oken(oken),
 		.mode(mode),
@@ -212,6 +217,7 @@ module px(
 		.ss13(M20_8),
 		.ss14(M16_8),
 		.ss15(M15_8),
+		.ldstate(ldstate),
 		.strob1(strob1),
 		.strob1b(strob1b),
 		.strob2(strob2),
@@ -228,7 +234,7 @@ module px(
 	wire ei4 = i3 & lg_0;
 	wire ei5 = i4 | (lip & i1);
 
-	assign arm4 = strob2 & i1 & lip;
+	assign arm4 = strob2b & i1 & lip;
 	assign blw_pw = ~przerw_z & lg_3 & i3 & przerw;
 	wire exrprzerw = przerw | exr;
 	wire i3lips = i3 & lipsp;
@@ -292,7 +298,7 @@ module px(
 
 	// sheet 8, page 2-8
 
-  wire gotst1 = got | strob1;
+  wire gotst1 = got | strob1b;
   wire zgi_j = wm | i2 | wr | ww | read_fp | i1 | i3 | i4 | i5 | k2fbs | p1 | p5 | k1;
   wire zgi_set = sr_fp | si1 | sp1;
 	wire ifhold_j = srez$ & wr;
@@ -319,7 +325,6 @@ module px(
 		.talarm(talarm)
 	);
 
-	wire ok = ok$;
 	assign oken = ren | rok;
 
 	wire ad_ad = zwzg & (i4 & M37_15);

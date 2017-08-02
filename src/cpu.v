@@ -90,6 +90,7 @@ module cpu(
 wire k1, wp, k2, wa, wz, w$, wr, we, p1, p2, p5, p4, p3, i5, i4, i3, i2, i1, ww, wm, wx, as2, got, strob1, strob1b, strob2, strob2b, arm4, blw_pw, ekc_i, zer_sp, lipsp, pn_nb, bp_nb, bar_nb, barnb, q_nb, w_dt, dt_w, ar_ad, ic_ad, i3_ex_przer, ck_rz_w, zerrz, ok$, oken, bod, b_parz, b_p0;
 wire [0:15] px_dad;
 wire [0:15] px_ddt;
+wire ldstate;
 px #(
 	.AWP_PRESENT(AWP_PRESENT),
 	.STOP_ON_NOMEM(STOP_ON_NOMEM),
@@ -148,6 +149,7 @@ px #(
 	.mode(mode),
 	.step(step),
 	.got(got),
+	.ldstate(ldstate),
 	.strob1(strob1),
 	.strob1b(strob1b),
 	.strob2(strob2),
@@ -250,6 +252,7 @@ pm #(
 	.ekc_i(ekc_i),
 	.ekc_2(ekc_2),
 	.got(got),
+	.ldstate(ldstate),
 	.ekc_fp(ekc_fp),
 	.clm(clm),
 	.strob1(strob1),
