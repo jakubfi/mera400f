@@ -239,8 +239,7 @@ module pa(
 	wire [0:15] dad2 = {16{ic_ad}} & ic;
 	assign dad = dad1 | dad2;
 
-	wire zga_ = ~(&(kl[0:7] ^ {barnb, ~dad[1:7]}));
-	assign zga = ~(zga_ | ~(&(kl[8:15] ^ ~dad[8:15])));
+	assign zga = (kl[0:15] == {~barnb, dad[1:15]});
 
 endmodule
 
