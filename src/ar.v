@@ -12,6 +12,7 @@ module ar(
 	input m4,
 	input l,
 	input [0:15] w,
+	output arz,
 	output reg [0:15] ar
 );
 
@@ -25,6 +26,8 @@ module ar(
 			else if (p1) ar <= ar + 1'b1;
 		end
 	end
+
+	assign arz = ~|ar[0:7];
 
 endmodule
 

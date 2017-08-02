@@ -92,6 +92,7 @@ module px(
 	input pufa,			// op: any of the wide or floating point instructions
 	output lipsp,		// op: LIP | SP
 
+	input arz,			// AR[0:7]==0
 	input lg_0,			// LG==0
 	input lg_3,			// LG==3 (Licznik Grupowy)
 	input pp,				// A64
@@ -103,7 +104,6 @@ module px(
 	input read_fp,	// A39
 
 	// microoperations
-	input arz,			// 0 -> AR
 	output pn_nb,		// PN -> NB
 	output bp_nb,		// BP -> NB
 	output bar_nb,	// BAR -> NB
@@ -273,12 +273,8 @@ module px(
 	assign ddt[1:14] = 'd0;
 	assign ddt[15] = zwzg & wmgi;
 	assign din = zwzg & wmgi;
-	wire M40_12 = arz | ~q | exrprzerw;
-	// A-C : 0-256 write deny
-	// B-A : no write deny
-	wire ABC_A = M40_12 | ~LOW_MEM_WRITE_DENY;
-	wire M59_3 = w & ABC_A;
-	assign dw = zwzg & M59_3;
+	wire write_deny = LOW_MEM_WRITE_DENY & arz & q & ~exrprzerw;
+	assign dw = zwzg & w & ~write_deny;
 	wire w = i5 | i3_ex_przer | ww | k2_bin_store;
 	assign i3_ex_przer = i3 & exrprzerw;
 	wire rw = r ^ w;

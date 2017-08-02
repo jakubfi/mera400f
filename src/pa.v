@@ -197,10 +197,9 @@ module pa(
 		.p1(ar_plus1),
 		.m4(arm4),
 		.w(w),
+		.arz(arz),
 		.ar(ar)
 	);
-
-	assign arz = |ar[0:7];
 
 	// sheet 10
 
