@@ -83,10 +83,6 @@ module pr(
 
 	wire M60_6 = ~(wa & rpc);
 
-	wire rpp = blr; // R0>>8 -> L
-	wire rpa = ~blr & ~(sel_r1_r7 & M60_6); // R0 -> L
-	wire rpnn = ~blr & sel_r1_r7 & M60_6; // R1-R7 -> L
-
 	wire [0:15] R1_7;
 	regs USER_REGS(
 		.clk(__clk),
@@ -95,24 +91,26 @@ module pr(
 		.we((strob_a | strob_b) & w_r & sel_r1_r7),
 		.l(R1_7)
 	);
+
+	l BUS_L(
+		.r0({r0, r0low}),
+		.rn(R1_7),
+		.sel({blr, sel_r1_r7 & M60_6}),
+		.l(l)
+	);
+
 /*
-	// Nice L bus that upsets the AWP
-	always @ (*) begin
-		case ({blr, sel_r1_r7 & M60_6})
-			2'b00: l = {r0, r0low};
-			2'b01: l = R1_7;
-			2'b10: l = {8'd0, r0[0:7]};
-			2'b11: l = {8'd0, r0[0:7]};
-		endcase
-	end
-*/
+	wire rpp = blr; // R0>>8 -> L
+	wire rpa = ~blr & ~(sel_r1_r7 & M60_6); // R0 -> L
+	wire rpnn = ~blr & sel_r1_r7 & M60_6; // R1-R7 -> L
+
 	// L bus final open-collector composition
 	assign l = 
 		(rpnn ? R1_7 : 16'hffff) // user registers
 		& (rpa ? {r0, r0low} : 16'hffff) // r0 at original position
 		& (rpp ? {8'd0, r0[0:7]} : 16'hffff) // r0 shifted right 8 bits
 	;
-
+*/
 	// sheet 6, page 2-63
 	// * RB register (binary load register)
 	// * R0 register positions 10-15 and system bus drivers
