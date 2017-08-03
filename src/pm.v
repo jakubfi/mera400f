@@ -279,61 +279,29 @@ module pm(
 	wire ekc = ekc_1 | ekc_i | ekc_2 | p2 | p0stpc;
 	wire kc_reset = clo | pc;
 
-	reg trig_kc;
-	always @ (posedge __clk, posedge kc_reset) begin
-		if (kc_reset) trig_kc <= 1'b0;
-		else if (ekc_fp) trig_kc <= 1'b1;
-		else if (ldstate) trig_kc <= ekc;
-	end
-/*
-	wire trig_kc;
-	ffjk REG_KC(
-		.s_(~ekc_fp),
-		.j(ekc),
-		.c_(~got),
-		.k(1'b0),
-		.r_(~kc_reset),
-		.q(trig_kc)
-	);
-*/
-	wire kc;
-	univib #(.ticks(KC_TICKS)) VIB_KC(
+	wire kc, pc;
+	wire pr;
+	kcpc #(
+		.KC_TICKS(KC_TICKS),
+		.PC_TICKS(PC_TICKS)
+	) KCPC(
 		.clk(__clk),
-		.a_(1'b0),
-		.b(trig_kc),
-		.q(kc)
-	);
-
-	wire pc;
-	univib #(.ticks(PC_TICKS)) VIB_PC(
-		.clk(__clk),
-		.a_(kc),
-		.b(1'b1),
-		.q(pc)
+		.kc_reset(kc_reset),
+		.ekc(ekc),
+		.ekc_fp(ekc_fp),
+		.ldstate(ldstate),
+		.rescyc(rescyc),
+		.dpr(dpr),
+		.clm(clm),
+		.dprzerw(dprzerw),
+		.przerw(przerw),
+		.pr(pr),
+		.kc(kc),
+		.pc(pc)
 	);
 
 	wire rescyc = clm | strob2 | si1;
-
-	wire pr_;
-	ffd REG_PR(
-		.s_(~rescyc),
-		.d(~dpr),
-		.c(kc),
-		.r_(1'b1),
-		.q(pr_)
-	);
-	wire pr = ~pr_;
-
-	assign sp0 = pr_ & ~przerw & pc;
-
-	ffd REG_PRZERW(
-		.r_(~clm),
-		.d(dprzerw),
-		.c(kc),
-		.s_(1'b1),
-		.q(przerw)
-	);
-
+	assign sp0 = ~pr & ~przerw & pc;
 	assign si1 = pc & przerw;
 	assign sp1 = ~przerw & pr & pc;
 	wire zerstan_ = ~kc & ~clm & ~p0;
