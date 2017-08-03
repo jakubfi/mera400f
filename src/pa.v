@@ -104,7 +104,7 @@ module pa(
 		.w(w)
 	);
 
-	assign ddt = w & {16{w_dt}};
+	assign ddt = w_dt ? w : 16'd0;
 
 	// sheet 5..6
 
