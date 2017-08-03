@@ -48,15 +48,13 @@ module kcpc(
 		.q(pc)
 	);
 
-	wire pr_;
 	ffd REG_PR(
-		.s_(~rescyc),
-		.d(~dpr),
+		.r_(~rescyc),
+		.d(dpr),
 		.c(kc),
-		.r_(1'b1),
-		.q(pr_)
+		.s_(1'b1),
+		.q(pr)
 	);
-	assign pr = ~pr_;
 
 	ffd REG_PRZERW(
 		.r_(~clm),
