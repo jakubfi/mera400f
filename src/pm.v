@@ -594,8 +594,15 @@ module pm(
 	wire rjcpc = rj | rpc | rc$;
 	wire lrcbngls$ = lrcb | ng$ | ls;
 	wire M95_10 = ~w$ & ls;
+	always @ (posedge __clk, negedge M95_10) begin
+		if (~M95_10) wls <= 1'b0;
+		else if (wa & strob1) wls <= 1'b1;
+	end
+/*
 	wire wls_ = ~(M95_10 & wls);
 	assign wls = ~(wls_ & ~wa);
+*/
+
 	wire M24_8 = ~oc & ~bs & w$;
 	wire M36_3 = ~ls & we;
 	wire w = wa | M24_8 | M36_3 | wm | wz | ww | wr | wp;
