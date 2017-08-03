@@ -245,8 +245,8 @@ module pd(
 	wire nef_jm = j & a_eq[5] & ~r0[1];
 	wire nef_jz = j & a_eq[4] & ~r0[0];
 
-	assign xi = ~(~M27_8 & ~M40_8 & ir01);
-	assign nef = ~(~M27_8 & ir01 & ~M40_8 & ~p & ~nef_js & ~nef_jjs & ~nef_jm & ~nef_jn & ~nef_jz);
+	assign xi = ~ir01 | M27_8 | M40_8;
+	assign nef = xi | p | nef_js | nef_jjs | nef_jm | nef_jn | nef_jz;
 
 	// --- Instruction groups ------------------------------------------------
 
@@ -281,10 +281,11 @@ module pd(
 
 	// --- ALU control signals -----------------------------------------------
 
+	wire uka = ka1 & ir[6];
 	wire M90_8 = sl | ri | krb;
 	assign saryt = (we & M49_6) | (p4) | (w$ & M90_8) | ((cns ^ M90_12) & w$);
 	wire M90_12 = a | trb | ib;
-	wire M49_6 = ~(~lwrs & ~lj & ~js & ~krb); // does not (big time)
+	wire M49_6 = lwrs | lj | js | krb;
 	assign apb = (~uka & p4) | (M90_12 & w$) | (M49_6 & we);
 	assign amb = (uka & p4) | (cns & w$);
 
@@ -327,7 +328,7 @@ module pd(
 	assign ust_mc = ans & w$;
 	assign ust_leg = ccb & w$;
 	wire M59_8 = (ir[6] & r0[8]) | (~ir[6] & r0[7]);
-	assign eat0 = (srxy & M59_8) ^ (shc & at15); // does not (now does, also ^ can be |)
+	assign eat0 = (srxy & M59_8) | (shc & at15); // | was ^, but there is no need for ^
 	assign ust_y = (w$ & sl) | (sr & ~shc & wx);
 	assign ust_x = wa & sx;
 	assign blr = w$ & oc & ~ir[6];
@@ -335,21 +336,23 @@ module pd(
 	// sheet 9, page 2-38
 	// * execution phase control signals
 
-	wire M77_8 = ng$ | ri | rj;
-	assign ewa = (pcrs & pp) | (M77_8 & pp) | (we & (~wls & ls)) | (~wpb & lbcb & wr);
+	wire ngrij = ng$ | ri | rj;
 	wire prawy = lbcb & wpb;
-	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & wa) | (pp & (uj | lwlwt));
-	assign uj = j & ~a_eq[7]; // Note: jump conditions are checked during ineffective instruction tests, so everything becomes "UJ"
 	assign lwlwt = lwt | lw;
-	assign lj = ~(~a_eq[7] | ~j); // does not (big time)
+	assign uj = j & ~a_eq[7]; // Note: jump conditions are checked during ineffective instruction tests, so everything becomes "UJ"
+	assign lj = j & a_eq[7];
+	assign ewa = (pcrs & pp) | (ngrij & pp) | (we & ~wls & ls) | (~wpb & lbcb & wr);
+	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & wa) | (pp & (uj | lwlwt));
 	assign ewe = (lj & ww) | (ls & wa) | (pp & (llb | zb$ | js)) | (~wzi & krb & w$);
 
 	// sheet 10, page 2-39
 	// * execution phase control signals
 	// * instruction cycle end signal
 
-	wire M59_6 = ~(rbib | (~wzi & (krb | is)));
-	assign ekc_1 = (~lac & wr & (~grlk & ~lrcb)) | (~lrcb & wp) | (~llb & we) | (M59_6 & w$);
+	wire grlk = gr & lk;
+
+	wire M59_6 = rbib | (~wzi & (krb | is));
+	assign ekc_1 = (~lac & wr & ~grlk & ~lrcb) | (~lrcb & wp) | (~llb & we) | (~M59_6 & w$);
 	assign ewz = (w$ & ~wzi & is) | (wr & m) | (pp & lrcbsr);
 	wire M88_6 = is | rb$ | bmib | prawy;
 	assign ew$ = (wr & M88_6) | (we & wlsbs) | (ri & ww) | ((ng$ | lbcb) & wa) | (pp & sew$);
@@ -362,13 +365,13 @@ module pd(
 	assign ssp$ = is | bmib | M92_12 | bs;
 	wire sew$ = M92_12 | krb | nor$ | sl | sw | a | c$;
 	wire llb = bs | ls | lwrs;
-	assign ka1 = (ir[0] & ir[1] & ~ir[2]) | js;
-	wire uka = ka1 & ir[6]; // Ujemny Krótki Argument
+	assign ka1 = js | (ir[0:2] == 3'b110);
 	assign na = ~ka1 & ~ka2 & ~sc$ & ir01;
-	assign exl = ~ir[6] & ka2 & ir[7];
-	wire M63_3 = ~(ng$ & ir[6]);
-	assign p16 = (M63_3 & w$ & cns) | (riirb & w$) | (ib & w$) | (slx & r0[8]) | M31_6;
-	wire M31_6 = (~(~ac & M63_3) & w$ & r0[3]) | (r0[7] & sly) | (uka & p4) | (lj & we);
+	assign exl = ka2 & (ir[6:7] == 2'b01);
+
+	wire M63_3 = ng$ & ir[6];
+	wire M31_6 = ((ac | M63_3) & w$ & r0[3]) | (r0[7] & sly) | (uka & p4) | (lj & we);
+	assign p16 = (~M63_3 & w$ & cns) | (riirb & w$) | (ib & w$) | (slx & r0[8]) | M31_6;
 
 	// sheet 12, page 2-41
 	// * execution phase control signals
@@ -382,9 +385,8 @@ module pd(
 	assign efp = fppn & pp;
 	assign sar$ = l | lws | tw;
 	wire M75_6 = pw | rw | lj | rz | ki;
-	assign eww = (we & rws) | (pp & M75_6) | (ri & wa) | (lk & ww & g) | M33_8_9_10;
-	wire M33_8_9_10 = (wx & g) | (mis & wz) | (rbib & w$);
-	assign srez$ = rbib ^ mis; // there is no reason for this to be ^ instead of |, but FPGA impl. fails with |
+	assign eww = (we & rws) | (pp & M75_6) | (ri & wa) | (lk & ww & g) | (wx & g) | (mis & wz) | (rbib & w$);
+	assign srez$ = rbib | mis; // it was ^ instead of |, but there is no need for ^
 
 	// sheet 13, page 2-42
 	// * execution phase control signal
@@ -392,7 +394,6 @@ module pd(
 
 	assign ewx = (lrcbsr & wz) | (pp & (gr ^ hsm)) | ((inou & lk) & wm) | (lk & (inou | sr) & wx);
 	assign axy = sr | (ir[6] & rbib);
-	wire grlk = gr & lk;
 	assign ekc_2 = (wx & hsm) | (wm & ~inou) | (~grlk & ~lj & ~ri & ww) | (pcrs & wa);
 	assign lac = bmib | mis;
 
