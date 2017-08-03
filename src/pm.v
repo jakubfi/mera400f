@@ -304,7 +304,7 @@ module pm(
 	assign sp0 = ~pr & ~przerw & pc;
 	assign si1 = pc & przerw;
 	assign sp1 = ~przerw & pr & pc;
-	wire zerstan_ = ~kc & ~clm & ~p0;
+	wire zerstan = kc | clm | p0;
 
 	// sheet 3, page 2-13
 	//  * ff: FETCH, STORE, LOAD, BIN (bootstrap)
@@ -447,8 +447,8 @@ module pm(
 	wire wb_k = (p4 & ~wpp) | p2;
 
 	reg wb;
-	always @ (posedge __clk, negedge zerstan_) begin
-		if (~zerstan_) wb <= 1'b0;
+	always @ (posedge __clk, posedge zerstan) begin
+		if (zerstan) wb <= 1'b0;
 		else if (strob1b) begin
 			case ({wb_j, wb_k})
 				2'b00: wb <= wb;
@@ -465,7 +465,7 @@ module pm(
 		.j(wb_j),
 		.c_(strob1),
 		.k(wb_k),
-		.r_(zerstan_),
+		.r_(~zerstan),
 		.q(wb)
 	);
 */
@@ -544,7 +544,7 @@ module pm(
 	// LG+1
 	wire lg_p1 = strob1b & (i3 | wrwwgr | lg_plus_1);
 	// LG reset
-	wire lg_reset = zerstan_ & ~i1;
+	wire lg_reset = zerstan | i1;
 
 	// LG load
 	wire slg1 = strob2 & ~gr & p1 & ~exl & ~lipsp; // "common" preload at P1
@@ -555,7 +555,7 @@ module pm(
 	lg LG(
 		.clk(__clk),
 		.cu(lg_p1),
-		.reset_(lg_reset),
+		.reset(lg_reset),
 		.gr(gr),
 		.slg1(slg1),
 		.slg2(slg2),
@@ -594,7 +594,7 @@ module pm(
 		.cd(downlk),
 		.i(lk_in),
 		.l(lolk),
-		.r(~zerstan_),
+		.r(zerstan),
 		.lk(lk)
 	);
 	
