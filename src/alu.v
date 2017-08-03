@@ -12,8 +12,8 @@
 8-15: {sd, sca, sb, saa}
 
 			.-> saryt
-			| .-> sd, sca, sb, saa (s[3:0])
-			| |			.-> sd, scb, sb, sab (s[3:0])
+			| .-> ~sd, ~sca, ~sb, ~saa (s[3:0])
+			| |			.-> ~sd, ~scb, ~sb, ~sab (s[3:0])
 			| |			|
 A+B		1	1001	1001	ad, lws, rws, js, lj, ib, trb, krb
 A-B		1	0110	0110	sw, co, ng, cb
@@ -48,34 +48,31 @@ module alu(
 
 	wor __NC;
 
-	// sheet 5
-
 	wire [3:0] g, p;
 	wire [3:1] c_;
 	wire [3:0] j$1;
 
 	// most significant
+	wire carry_;
 	alu181 ALU_0_3(
 		.a(a[0:3]),
 		.b(ac[0:3]),
 		.m(~saryt),
 		.c_(c_[3]),
-		.s({sd, scb, sb, sab}),
+		.s({~sd, ~scb, ~sb, ~sab}),
 		.f(f[0:3]),
 		.g(g[3]),
 		.p(p[3]),
 		.co_(carry_),
 		.eq(j$1[3])
 	);
-	wire carry_;
-	assign carry = ~carry_;
 
 	alu181 ALU_4_7(
 		.a(a[4:7]),
 		.b(ac[4:7]),
 		.m(~saryt),
 		.c_(c_[2]),
-		.s({sd, scb, sb, sab}),
+		.s({~sd, ~scb, ~sb, ~sab}),
 		.f(f[4:7]),
 		.p(p[2]),
 		.g(g[2]),
@@ -83,14 +80,12 @@ module alu(
 		.eq(j$1[2])
 	);
 
-	// sheet 6
-
 	alu181 ALU_8_11(
 		.a(a[8:11]),
 		.b(ac[8:11]),
 		.m(~saryt),
 		.c_(c_[1]),
-		.s({sd, sca, sb, saa}),
+		.s({~sd, ~sca, ~sb, ~saa}),
 		.f(f[8:11]),
 		.p(p[1]),
 		.g(g[1]),
@@ -104,7 +99,7 @@ module alu(
 		.b(ac[12:15]),
 		.m(~saryt),
 		.c_(p16_),
-		.s({sd, sca, sb, saa}),
+		.s({~sd, ~sca, ~sb, ~saa}),
 		.f(f[12:15]),
 		.p(p[0]),
 		.g(g[0]),
@@ -112,7 +107,6 @@ module alu(
 		.eq(j$1[0])
 	);
 
-	// FIX: M35 and M33 had 'carry in', G and P pins switched between them
 	carry182 CARRY(
 		.g(g),
 		.p(p),
@@ -124,6 +118,7 @@ module alu(
 		.og(__NC)
 	);
 
+	assign carry = ~carry_;
 	assign zsum = ~|f;
 	assign j$ = &j$1;
 

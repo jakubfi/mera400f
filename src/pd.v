@@ -227,8 +227,8 @@ module pd(
 	wire M85_11 = ir[10] | (ir[11] & ir[12]);
 	// jumper a on 1-3 : IN/OU illegal for user
 	// jupmer a on 2-3 : IN/OU legal for user
-	wire M27_8 = (INOU_USER_ILLEGAL & inou & q) | (M85_11 & c) | (q & s) | (q & ~snef & b_n);
-	wire M40_8 = (md & mc_3) | (c & ir13_14 & b_1) | (snef & s);
+	wire xi_1 = (INOU_USER_ILLEGAL & inou & q) | (M85_11 & c) | (q & s) | (q & ~snef & b_n);
+	wire xi_2 = (md & mc_3) | (c & ir13_14 & b_1) | (snef & s);
 
 	wire nef_jcs = a_eq[7] & ~r0[3];
 	wire nef_jys = a_eq[6] & ~r0[7];
@@ -245,7 +245,7 @@ module pd(
 	wire nef_jm = j & a_eq[5] & ~r0[1];
 	wire nef_jz = j & a_eq[4] & ~r0[0];
 
-	assign xi = ~ir01 | M27_8 | M40_8;
+	assign xi = ~ir01 | xi_1 | xi_2;
 	assign nef = xi | p | nef_js | nef_jjs | nef_jm | nef_jn | nef_jz;
 
 	// --- Instruction groups ------------------------------------------------
@@ -294,8 +294,8 @@ module pd(
 	wire sds = (wz & (xm | em)) | (M67_8 & w$) | (w$ & M84_8) | (we & wlsbs);
 	wire ssb = w$ & (ngl | oc | bc);
 
-	assign sd = ~sds & ~amb;
-	assign sb = ~apb & ~ssb & ~sl & ~ap1;
+	assign sd = sds | amb;
+	assign sb = apb | ssb | sl | ap1;
 
 	wire M93_12 = sl | ls | orxr;
 	wire M50_8 = (M93_12 & w$) | (w$ & nglbb) | (wlsbs & we) | (wz & ~nm & (mis | lrcb));
@@ -303,16 +303,14 @@ module pd(
 	wire ssaa = (rb$ & w$ & ~wpb) | (w$ & lb);
 	wire ssca = (M84_8 & w$) | (w$ & (bs | bn | nr)) | (wz & (emnm | lrcb)) | (we & ls);
 
-	assign sca = ~ssca & ~apb & ~ssaa;
-	assign scb = ~ssca & ~apb & ~ssab;
-	assign saa = ~ssaa & ~amb & ~ap1 & ~M50_8;
-	assign sab = ~ssab & ~amb & ~ap1 & ~M50_8;
+	assign sca = ssca | apb | ssaa;
+	assign scb = ssca | apb | ssab;
+	assign saa = ssaa | amb | ap1 | M50_8;
+	assign sab = ssab | amb | ap1 | M50_8;
 
 	assign sbar$ = lrcb | mis | (gr & ir[7]) | bm | pw | tw;
 	assign nrf = ir[7] & ka2 & ir[6];
 	wire fppn = pufa ^ nrf;
-
-
 
 	assign _0_v = js & a_eq[4] & we;
 	assign ap1 = riirb & w$;
