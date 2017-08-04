@@ -74,8 +74,20 @@ module ifctl(
 	// (ifhold wypełnia sygnał ZW pomiędzy stanami WR a WW)
 	// Przypadek specjalny:
 	// IS dokonuje zapisu do pamięci warunkowo względem wskaźnika zera WZI,
-	// więc jeśli w W& przy rozkazie IS podczas STROB2 WZI będzie zapalone, to zdejmujemy zajętość
+	// więc jeśli w W& przy rozkazie IS podczas STROB2 WZI będzie zapalone, to zdejmujemy zajętość (ifhold_reset)
 
+	reg ifhold;
+	wire ifh_reset = ifhold_reset | clo;
+	always @ (posedge __clk, posedge ifh_reset) begin
+		if (ifh_reset) ifhold <= 1'b0;
+		else if (ok$) case ({ifhold_j, ifhold})
+			2'b00: ifhold <= ifhold;
+			2'b01: ifhold <= 1'b0;
+			2'b10: ifhold <= 1'b1;
+			2'b11: ifhold <= ~ifhold;
+		endcase
+	end
+/*
 	wire ifhold;
 	ffjk IFHOLD(
 		.s_(1'b1),
@@ -85,16 +97,18 @@ module ifctl(
 		.r_(~(ifhold_reset | clo)),
 		.q(ifhold)
 	);
-
+*/
 	// ok$ - koniec pracy z interfejsem (niezależnie od finału: ok/en/alarm)
 	// to zasadniczo jest zwzg & ok_clk, ale tak nie działa (póki co)
 
 	wire ok_clk = ren | talarm | rok;
+	assign ok$ = zwzg & ok_clk;
+	/*
 	always @ (posedge __clk, negedge zgi) begin
 		if (~zgi) ok$ <= 0;
 		else if (ok_clk) ok$ <= zwzg;
 	end
-
+*/
 	/*
 	ffjk REG_OK$(
 		.s_(1'b1),
@@ -105,23 +119,19 @@ module ifctl(
 		.q(ok$)
 	);
 */
+
 	// alarm przy braku odpowiedzi z interfejsu
 
 	wire alarm = zwzg & ~ok$;
-
-	wire alarm_dly;
-	dly #(.ticks(ALARM_DLY_TICKS)) DLY_ALARM(
+	alarm #(
+		.ALARM_DLY_TICKS(ALARM_DLY_TICKS),
+		.ALARM_TICKS(ALARM_TICKS)
+	) ALARM(
 		.clk(__clk),
-		.i(alarm),
-		.o(alarm_dly)
-	);
-
-	univib #(.ticks(ALARM_TICKS)) VIB_ALARM(
-		.clk(__clk),
-		.a_(1'b0),
-		.b(alarm_dly),
-		.q(talarm)
+		.engage(alarm),
+		.talarm(talarm)
 	);
 
 endmodule
+
 // vim: tabstop=2 shiftwidth=2 autoindent noexpandtab

@@ -64,7 +64,7 @@ module mera400f(
 		.STOP_ON_NOMEM(1'b1),
 		.LOW_MEM_WRITE_DENY(1'b0),
 		.ALARM_DLY_TICKS(8'd250),
-		.ALARM_TICKS(2'd3),
+		.ALARM_TICKS(8'd3),
 		.DOK_DLY_TICKS(4'd15),
 		.DOK_TICKS(3'd7)
 	) CPU0(

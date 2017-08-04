@@ -12,7 +12,7 @@ SOURCES = mera400f.v \
 	dly.v \
 	pr.v regs.v r0.v rb.v bar.v ki.v l.v \
 	pd.v ir.v idec1.v \
-	px.v strobgen.v ifctl.v \
+	px.v strobgen.v ifctl.v alarm.v \
 	pm.v lk.v mc.v lg.v kcpc.v \
 	pp.v rzrp.v \
 	pa.v alu.v at.v ac.v ar.v ic.v w.v a.v \
