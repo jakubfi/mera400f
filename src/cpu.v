@@ -65,11 +65,6 @@ module cpu(
 	parameter STOP_ON_NOMEM = 1'b1;
 	parameter LOW_MEM_WRITE_DENY = 1'b0;
 
-	// --- CPU CORE TIMINGS ------------------------------------------------
-
-	parameter KC_TICKS = 3'd7; // 100-200ns
-	parameter PC_TICKS = 3'd6; // 90-150ns
-
 	// --- BUS TIMINGS -----------------------------------------------------
 
 	parameter ALARM_DLY_TICKS = 8'd250; // 2.5-5us in DTR, >=5us from notes on HSO schematic, ~10us in hw(?)
@@ -232,10 +227,7 @@ px #(
 
 wire sp0, przerw, si1, sp1, laduj, k2_bin_store, k2fetch, w_rbc, w_rba, w_rbb, ep0, stp0, ek2, ek1, mc_3, xi$, pp, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc, rb, ra, lk, wls, w_r, w_ic, w_ac, w_ar, lrz, w_bar, w_rm, baa, bab, bac, aa, ab, wpb, bwb, bwa, kia, kib, w_ir, mwa, mwb, mwc;
 
-pm #(
-	.KC_TICKS(KC_TICKS),
-	.PC_TICKS(PC_TICKS)
-)PM(
+pm PM(
 	.__clk(__clk),
 	.start(start),
 	.pon(pon),

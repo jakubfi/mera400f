@@ -14,55 +14,36 @@ module kcpc(
 	output pc
 );
 
-	parameter KC_TICKS;
-	parameter PC_TICKS;
+	localparam ST_IDLE	= 2'd0;
+	localparam ST_KC		= 2'd1;
+	localparam ST_PC		= 2'd2;
 
-	reg trig_kc;
-	always @ (posedge clk, posedge kc_reset) begin
-		if (kc_reset) trig_kc <= 1'b0;
-		else if (ekc_fp) trig_kc <= 1'b1;
-		else if (ldstate) trig_kc <= ekc;
+	assign kc = (state == ST_KC);
+	assign pc = (state == ST_PC);
+	wire idle = (state == ST_IDLE);
+
+	wire kc_trig = (ldstate & ekc) | ekc_fp;
+
+	// KC, PC
+
+	reg [1:0] state = ST_IDLE;
+	always @ (posedge clk) begin
+		if (kc_reset) state <= ST_IDLE;
+		else case (state)
+			ST_IDLE: if (kc_trig) state <= ST_KC;
+			ST_KC: state <= ST_PC;
+			ST_PC: state <= ST_IDLE;
+		endcase
 	end
-/*
-	wire trig_kc;
-	ffjk REG_KC(
-		.s_(~ekc_fp),
-		.j(ekc),
-		.c_(~got),
-		.k(1'b0),
-		.r_(~kc_reset),
-		.q(trig_kc)
-	);
-*/
-	univib #(.ticks(KC_TICKS)) VIB_KC(
-		.clk(clk),
-		.a_(1'b0),
-		.b(trig_kc),
-		.q(kc)
-	);
 
-	univib #(.ticks(PC_TICKS)) VIB_PC(
-		.clk(clk),
-		.a_(kc),
-		.b(1'b1),
-		.q(pc)
-	);
+	// PR, PRZERW
 
-	ffd REG_PR(
-		.r_(~rescyc),
-		.d(dpr),
-		.c(kc),
-		.s_(1'b1),
-		.q(pr)
-	);
-
-	ffd REG_PRZERW(
-		.r_(~clm),
-		.d(dprzerw),
-		.c(kc),
-		.s_(1'b1),
-		.q(przerw)
-	);
+	always @ (posedge clk) begin
+		if (rescyc) pr <= 1'b0;
+		else if (idle & kc_trig) pr <= dpr;
+		if (clm) przerw <= 1'b0;
+		else if (idle & kc_trig) przerw <= dprzerw;
+	end
 
 endmodule
 

@@ -211,9 +211,6 @@ module pm(
 	output mwc
 );
 
-	parameter KC_TICKS;
-	parameter PC_TICKS;
-
 	// sheet 1, page 2-11
 	//  * ff: START, WAIT, CYCLE
 
@@ -266,8 +263,6 @@ module pm(
 	);
 */
 	assign run = startq & ~_wait;
-	wire dpr = run | __cycle_q;
-	wire dprzerw = (__cycle_q | startq) & irq & ~p & mc_0;
 	wire stpc = dpr | dprzerw;
 
 	// sheet 2, page 2-12
@@ -278,13 +273,13 @@ module pm(
 
 	wire ekc = ekc_1 | ekc_i | ekc_2 | p2 | p0stpc;
 	wire kc_reset = clo | pc;
+	wire rescyc = clm | strob2 | si1;
+	wire dpr = run | __cycle_q;
+	wire dprzerw = (__cycle_q | startq) & irq & ~p & mc_0;
 
 	wire kc, pc;
 	wire pr;
-	kcpc #(
-		.KC_TICKS(KC_TICKS),
-		.PC_TICKS(PC_TICKS)
-	) KCPC(
+	kcpc KCPC(
 		.clk(__clk),
 		.kc_reset(kc_reset),
 		.ekc(ekc),
@@ -300,7 +295,6 @@ module pm(
 		.pc(pc)
 	);
 
-	wire rescyc = clm | strob2 | si1;
 	assign sp0 = ~pr & ~przerw & pc;
 	assign si1 = pc & przerw;
 	assign sp1 = ~przerw & pr & pc;
