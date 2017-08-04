@@ -303,40 +303,67 @@ module pm(
 	// sheet 3, page 2-13
 	//  * ff: FETCH, STORE, LOAD, BIN (bootstrap)
 
-	wire M30_X = strob2 & k2;
+	wire st2k2 = strob2 & k2;
 
-	wire bin, load, fetch, store;
+	wire bin, load;
+	reg fetch;
+	wire store;
+
+	always @ (posedge __clk, posedge panel_store) begin
+		if (panel_store) store <= 1'b1;
+		else if (clm | st2k2) store <= 1'b0;
+	end
+/*
 	ffd REG_STORE(
 		.s_(~panel_store),
 		.d(1'b0),
-		.c(M30_X),
+		.c(st2k2),
 		.r_(~clm),
 		.q(store)
 	);
+*/
+	always @ (posedge __clk, posedge panel_fetch) begin
+		if (panel_fetch) fetch <= 1'b1;
+		else if (clm | st2k2) fetch <= 1'b0;
+	end
+/*
 	ffd REG_FETCH(
 		.s_(~panel_fetch),
 		.d(1'b0),
-		.c(M30_X),
+		.c(st2k2),
 		.r_(~clm),
 		.q(fetch)
 	);
+*/
+	always @ (posedge __clk, posedge panel_load) begin
+		if (panel_load) load <= 1'b1;
+		else if (clm | st2k2) load <= 1'b0;
+	end
+/*
 	ffd REG_LOAD(
 		.s_(~panel_load),
 		.d(1'b0),
-		.c(M30_X),
+		.c(st2k2),
 		.r_(~clm),
 		.q(load)
 	);
+*/
 	wire bin_d = ~(rdt9 & rdt11 & lg_0);
-	wire bin_clk = strob1 & k1;
+	wire s1k1 = strob1 & k1;
+	always @ (posedge __clk, posedge panel_bin) begin
+		if (panel_bin) bin <= 1'b1;
+		else if (clm) bin <= 1'b0;
+		else if (s1k1) bin <= bin_d;
+	end
+/*
 	ffd REG_BIN(
 		.s_(~panel_bin),
 		.d(bin_d),
-		.c(~bin_clk),
+		.c(~s1k1),
 		.r_(~clm),
 		.q(bin)
 	);
-
+*/
 	assign laduj = load;
 	wire sfl = store | fetch | load;
 	// FIX: +UR was a NAND output on schematic, instead of AND
