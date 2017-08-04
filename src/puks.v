@@ -8,41 +8,28 @@
 
 module puks(
 	input clk,
-	input zoff, // not implemented for FPGA
-	input rcl,
-	input dcl,
-	output reg off, // not implemented for FPGA
-	output pout,
-	output pon,
-	output reg clo,
-	output reg clm
+	input zoff,	// not implemented
+	input rcl,	// received clear
+	input dcl,	// clear driver
+	output off,	// power lines not ready (in real hardware: goes high 0.5-2s after the power is switched on)
+	output pout,// power out (0.2-2us strob, not implemented)
+	output pon,	// power on (0.2-2us strob when power is ready)
+	output clo,	// general reset
+	output clm	// module reset
 );
 
-	// -POUT: power out (0.2-2us strob, not implemented)
-	assign pout = 1'b0;
-
-	// -OFF: power lines not ready (in real hardware: goes high 0.5-2s after the power is switched on)
-	initial off = 1;
-	reg [2:0] power_ok_cnt = 3'd7;
+	reg on = 1'b0;
+	reg [3:0] pwon_cnt =  4'd0;
 	always @ (posedge clk) begin
-		if (power_ok_cnt == 0) begin
-			off <= 0;
-		end else begin
-			power_ok_cnt <= power_ok_cnt - 1'b1;
-		end
+		if (pwon_cnt != 4'b111)  pwon_cnt <= pwon_cnt + 1'b1;
+		if (pwon_cnt == 4'd3) on <= 1'b1;
+		if (pwon_cnt == 4'd3) pon <= 1'b1;
+		else if (pwon_cnt == 4'd5) pon <= 1'b0;
 	end
 
-	// -PON: power on (0.2-2us strob when power is ready)
-	univib #(.ticks(3'd7)) PON(
-		.clk(clk),
-		.a_(1'b0),
-		.b(~off),
-		.q(pon)
-	);
-
-	// -CLO: general reset
-	// -CLM: module reset
-	assign clm = ~(~off & ~dcl & ~rcl);
+	assign off = ~on;
+	assign pout = 1'b0;
+	assign clm = off | dcl | rcl;
 	assign clo = off | dcl;
 
 endmodule
