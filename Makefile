@@ -14,7 +14,7 @@ SOURCES = mera400f.v \
 	pd.v ir.v idec1.v \
 	px.v strobgen.v ifctl.v alarm.v \
 	pm.v lk.v mc.v lg.v kcpc.v \
-	pp.v rzrp.v \
+	pp.v rm.v rzrp.v \
 	pa.v alu.v at.v ac.v ar.v ic.v w.v a.v \
 	pk.v uart.v sevenseg.v impulse.v \
 	puks.v \

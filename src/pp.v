@@ -58,16 +58,14 @@ module pp(
 	wire clm$ = clm | (strob1 & i4);
 	wire clrs = strob1b & w_rm;
 
-	genvar num;
-	generate
-		for (num=0 ; num<10 ; num=num+1) begin : GEN_REG_RM
-			wire rm_reset = zi[num] & clm$;
-			always @ (posedge clrs, posedge rm_reset) begin
-				if (rm_reset) rs[num] <= 1'b0;
-				else rs[num] <= w[num];
-			end
-		end
-	endgenerate
+	rm RM(
+		.clk(__clk),
+		.clm$(clm$),
+		.clrs(clrs),
+		.zi(zi),
+		.w(w),
+		.rs(rs)
+	);
 
 	// sheet 3..10
 	// * RZ, RP - interrupt request and service registers
