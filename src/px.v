@@ -323,21 +323,36 @@ module px(
 
 	assign oken = ren | rok;
 
-	wire ad_ad = zwzg & (i4 & M37_15);
+	wire ad_ad = zwzg & (i4 & soft_fp);
 
 	// E-F: no AWP
-	wire EF = ~efp | AWP_PRESENT;
-	wire M65_6 = ~EF;
-	wire M37_15;
+	wire ef = efp & ~AWP_PRESENT;
+
+	reg soft_fp;
+	always @ (posedge __clk, posedge clo) begin
+		if (clo) soft_fp <= 1'b0;
+		else if (ldstate) begin
+			case ({ef, i5})
+				2'b00: soft_fp <= soft_fp;
+				2'b01: soft_fp <= 1'b0;
+				2'b10: soft_fp <= 1'b1;
+				2'b11: soft_fp <= ~soft_fp;
+			endcase
+		end
+	end
+
+/*
+	wire soft_fp;
 	ffjk JK37(
 		.s_(1'b1),
-		.j(M65_6),
+		.j(ef),
 		.c_(~got),
 		.k(i5),
 		.r_(~clo),
-		.q(M37_15)
+		.q(soft_fp)
 	);
-	wire exr = M37_15 | ~EF | exl;
+*/
+	wire exr = soft_fp | ef | exl;
 
 	// sheet 9, page 2-9
 
