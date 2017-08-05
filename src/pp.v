@@ -70,6 +70,11 @@ module pp(
 	// sheet 3..10
 	// * RZ, RP - interrupt request and service registers
 
+	// RZ input: software interrupt drivers (sheet 10)
+	wire M104_12 = wx & sin & strob1;
+	wire soft_high = ir14 & M104_12;
+	wire soft_low = ir15 & M104_12;
+
 	// RZ input: async interrupt signals bus
 	wire [0:31] IRQ = {
 		pout,			// 0 power out (NMI)
@@ -90,13 +95,6 @@ module pp(
 		soft_high,// 30 software interrupt high
 		soft_low	// 31 software interrupt low
 	};
-
-	// FIX: missing connection from M104.12 to M89.5, M70.2
-
-	// RZ input: software interrupt drivers (sheet 10)
-	wire M104_12 = wx & sin & strob1;
-	wire soft_high = ir14 & M104_12;
-	wire soft_low = ir15 & M104_12;
 
 	// RZ input: W bus, synchronous (software-set) interrupt sources
 	wire [0:31] INT_SYNC = {
@@ -154,8 +152,9 @@ module pp(
 		1'b1
 	};
 
-	// RP input/output: interrupt priority chain
+	// RP output: interrupt priority chain
 	wire [0:31] PRIO_OUT;
+	// RP input: interrupt priority chain
 	wire [0:31] PRIO_IN = {
 		zer,
 		PRIO_OUT[0:30]
@@ -193,21 +192,8 @@ module pp(
 		end
 	endgenerate
 
-	// sheet 3
-
-	// sheet 5
-
-	assign przerw_z = srps & ~zi[4];
-
-	// sheet 6
-
-	wire nk_ad = i2 & zw;
-
-	// sheet 9
-
-	wire srps = zi[8];
-
-	// sheet 11
+	assign irq = |sz; // Suma Zgłoszeń
+	assign przerw_z = zi[8] & ~zi[4];
 
 	wire dok_dly;
 	dly #(.ticks(DOK_DLY_TICKS)) DLY_DOK(
@@ -244,8 +230,6 @@ module pp(
 	wire rz29 = M14_6 & rdt[15] & rdt[0];
 	wire rz4 = M14_6 & rdt[15] & ~rdt[0];
 
-	assign irq = |sz;
-
 	wire [0:15] zk;
 	decoder16 DEC_ZK(
 		.en1(~M11_3),
@@ -254,37 +238,36 @@ module pp(
 		.o(zk)
 	);
 
-	// sheet 12
+	// interrupts 17-31 encoded as {npbd, npbc, npbb, npba}
+	wire npbd = rp[24] | rp[25] | rp[26] | rp[27] | rp[28] | rp[29] | rp[30] | rp[31];
+	wire npbc = rp[20] | rp[21] | rp[22] | rp[23] | rp[28] | rp[29] | rp[30] | rp[31];
+	wire npbb = rp[18] | rp[19] | rp[22] | rp[23] | rp[26] | rp[27] | rp[30] | rp[31];
+	wire npba = rp[17] | rp[19] | rp[21] | rp[23] | rp[25] | rp[27] | rp[29] | rp[31];
 
-	wire npbd = rp[24] | rp[25] | rp[26] | rp[28] | rp[29] | rp[30] | rp[27] | rp[31];
-	wire npbc = rp[28] | rp[29] | rp[30] | rp[31] | rp[23] | rp[22] | rp[21] | rp[20];
-	wire npbb = rp[22] | rp[23] | rp[26] | rp[30] | rp[27] | rp[31] | rp[19] | rp[18];
-	wire npba = rp[19] | rp[21] | rp[23] | rp[25] | rp[29] | rp[27] | rp[31] | rp[17];
-
-	// sheet 13
-
+	// interrupts 1-15 encoded as {npad, npac, npab, npaa}
 	wire npad = rp[ 8] | rp[ 9] | rp[10] | rp[11] | rp[12] | rp[13] | rp[14] | rp[15];
 	wire npac = rp[ 4] | rp[ 5] | rp[ 6] | rp[ 7] | rp[12] | rp[13] | rp[14] | rp[15];
 	wire npab = rp[ 2] | rp[ 3] | rp[ 6] | rp[ 7] | rp[10] | rp[11] | rp[14] | rp[15];
 	wire npaa = rp[ 1] | rp[ 3] | rp[ 5] | rp[ 7] | rp[ 9] | rp[11] | rp[13] | rp[15];
 
-	assign dad[4] = nk_ad;
+	wire npe = ~zi[6];
+	wire npd = npbd ^ npad; // can be |
+	wire npc = npbc ^ npac; // can be |
+	wire npb = npbb ^ npab; // can be |
+	wire npa = npba ^ npaa; // can be |
+	wire np = npd ^ npc;
 
-	wire M85_11 = npbd ^ npad;
-	wire M85_8  = npbc ^ npac;
-	wire M85_6  = npbb ^ npab;
-	wire M85_3  = npba ^ npaa;
-	wire M99_6 = M85_11 ^ M85_8;
-
-	wire M4_8 = przerw & zw & i4;
+	wire nk_ad = i2 & zw;
+	wire pzwi4 = przerw & zw & i4;
 
 	assign dad[0:3] = 'd0;
+	assign dad[4] = nk_ad;
 	assign dad[5:10] = 'd0;
-	assign dad[11] = (M4_8 & ~zi[6])  | (nk_ad & M99_6);
-	assign dad[12] = (M4_8 & M85_11) | (nk_ad & ~M85_8);
-	assign dad[13] = (M4_8 & M85_8)  | (nk_ad & M85_6);
-	assign dad[14] = (M4_8 & M85_6)  | (nk_ad & M85_3);
-	assign dad[15] = M4_8 & M85_3;
+	assign dad[11] = (pzwi4 & npe) | (nk_ad & np);
+	assign dad[12] = (pzwi4 & npd) | (nk_ad & ~npc);
+	assign dad[13] = (pzwi4 & npc) | (nk_ad & npb);
+	assign dad[14] = (pzwi4 & npb) | (nk_ad & npa);
+	assign dad[15] = (pzwi4 & npa);
 
 endmodule
 
