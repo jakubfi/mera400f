@@ -346,6 +346,12 @@ module px(
 	// S-R : stop on segfault in mem block 0
 	wire hltn_set = awaria_set & STOP_ON_NOMEM;
 
+	always @ (posedge __clk, negedge hltn_reset) begin
+		if (~hltn_reset) hlt_n <= 1'b0;
+		else if (hltn_set) hlt_n <= 1'b1;
+		else if (strob1) hlt_n <= hltn_d;
+	end
+/*
 	ffd REG_HLTN(
 		.s_(~hltn_set),
 		.d(hltn_d),
@@ -353,12 +359,17 @@ module px(
 		.r_(hltn_reset),
 		.q(hlt_n)
 	);
-
+*/
 	assign bod = rpe | ren;
 	assign b_parz = strob1 & rpe & r;
 	assign b_p0 = rw & talarm;
 
 	wire awaria_set = (b_parz | b_p0) & ~bar_nb;
+	always @ (posedge __clk) begin
+		if (clo | stop) awaria <= 1'b0;
+		else if (awaria_set) awaria <= 1'b1;
+	end
+/*
 	ffd REG_AWARIA(
 		.s_(~awaria_set),
 		.d(1'b0),
@@ -366,7 +377,7 @@ module px(
 		.r_(~stop),
 		.q(awaria)
 	);
-
+*/
 	assign dad[0:8] = 'd0;
 	assign dad[9] = zwzg & (i1 | i4 | i5);
 	assign dad[10] = zwzg & (i1 | (i4 & exr) | i5);
