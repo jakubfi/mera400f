@@ -59,7 +59,7 @@ module mera400f(
 
 	cpu #(
 		.CPU_NUMBER(1'b0),
-		.AWP_PRESENT(1'b1),
+		.AWP_PRESENT(1'b0),
 		.INOU_USER_ILLEGAL(1'b1),
 		.STOP_ON_NOMEM(1'b1),
 		.LOW_MEM_WRITE_DENY(1'b0),
