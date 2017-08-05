@@ -177,6 +177,7 @@ module pp(
 	generate
 		for (j=0 ; j<32 ; j=j+1) begin : GEN_RZ_RP
 			rzrp RZ_RP(
+				.clk(__clk),
 				.imask(IMASK[j]),				// IRQ mask input
 				.irq(IRQ[j]),						// IRQ (async)
 				.w(INT_SYNC[j]),				// synchronous interrupt set

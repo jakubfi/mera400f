@@ -3,6 +3,7 @@
 */
 
 module rzrp(
+	input clk,
 	input imask,		// interrupt mask
 	input irq,			// async irq source
 	input w,				// clocked irq source
@@ -18,14 +19,10 @@ module rzrp(
 
 	assign sz = rz & imask;
 
-	// rz_c @ strob1 (opadającym w oryginale, narastającym w fpga)
-	// rz_r @ clm k1
-	// irq @ async
-
-	always @ (posedge rz_c, posedge rz_r, posedge irq) begin
-		if (rz_r) rz <= 1'b0;
-		else if (irq) rz <= 1'b1;
-		else case ({w, rp})
+	always @ (posedge clk, posedge irq) begin
+		if (irq) rz <= 1'b1;
+		else if (rz_r) rz <= 1'b0;
+		else if (rz_c) case ({w, rp})
 			2'b00 : rz <= rz;
 			2'b01 : rz <= 1'b0;
 			2'b10 : rz <= 1'b1;
@@ -33,10 +30,8 @@ module rzrp(
 		endcase
 	end
 
-	// rp_c @ i1 & przerw (faza z KC)
-	// prio_in @ rp_
-
-	always @ (posedge rp_c, posedge prio_in) begin
+	// NOTE: rp_c seems to be too long to be a clock enable signal...
+	always @ (posedge clk, posedge prio_in) begin
 		if (prio_in) rp <= 1'b0;
 		else if (rp_c) rp <= sz;
 	end
