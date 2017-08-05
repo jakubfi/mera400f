@@ -55,20 +55,17 @@ module pp(
 	// sheet 1, 2
 	// * RM - interrupt mask register
 
-	wire clm$ = ~clm & ~(strob1 & i4);
-	wire clrs = strob1 & w_rm;
+	wire clm$ = clm | (strob1 & i4);
+	wire clrs = strob1b & w_rm;
 
 	genvar num;
 	generate
 		for (num=0 ; num<10 ; num=num+1) begin : GEN_REG_RM
-			wire rm_reset_ = zi[num] | clm$;
-			ffd REG_RM(
-				.s_(1'b1),
-				.d(w[num]),
-				.c(~clrs),
-				.r_(rm_reset_),
-				.q(rs[num])
-			);
+			wire rm_reset = zi[num] & clm$;
+			always @ (posedge clrs, posedge rm_reset) begin
+				if (rm_reset) rs[num] <= 1'b0;
+				else rs[num] <= w[num];
+			end
 		end
 	endgenerate
 
@@ -76,24 +73,24 @@ module pp(
 	// * RZ, RP - interrupt request and service registers
 
 	// RZ input: async interrupt signals bus
-	wire [0:31] IRQ_ = {
-		~pout,		// 0 power out (NMI)
-		~b_parz,	// 1 memory parity error
-		~b_p0,		// 2 no memory
-		~rz4,			// 3 other CPU, high priority
-		~rpa,			// 4 interface power out
-		~zegar,		// 5 timer
-		~xi,			// 6 illegal instruction
-		~fi0,			// 7 div overflow (fixed point)
-		~fi1,			// 8 floating point underflow
-		~fi2,			// 9 floating point overflow
-		~fi3,			// 10 div/0 or floating point error
-		1'b1,			// 11 unused
-		~zk[0:15],// 12-27 channel interrupts
-		~oprq,		// 28 operator request
-		~rz29,		// 29 other CPU, low priority
-		~soft_high,	// 30 software interrupt high
-		~soft_low		// 31 software interrupt low
+	wire [0:31] IRQ = {
+		pout,			// 0 power out (NMI)
+		b_parz,		// 1 memory parity error
+		b_p0,			// 2 no memory
+		rz4,			// 3 other CPU, high priority
+		rpa,			// 4 interface power out
+		zegar,		// 5 timer
+		xi,				// 6 illegal instruction
+		fi0,			// 7 div overflow (fixed point)
+		fi1,			// 8 floating point underflow
+		fi2,			// 9 floating point overflow
+		fi3,			// 10 div/0 or floating point error
+		1'b0,			// 11 unused
+		zk[0:15],	// 12-27 channel interrupts
+		oprq,			// 28 operator request
+		rz29,			// 29 other CPU, low priority
+		soft_high,// 30 software interrupt high
+		soft_low	// 31 software interrupt low
 	};
 
 	// FIX: missing connection from M104.12 to M89.5, M70.2
@@ -111,22 +108,22 @@ module pp(
 	};
 
 	// RZ input: clocks
-	wire ck_rzwm_ = strob1 & ck_rz_w;
-	wire ck_rzz_ = strob1 & i2;
+	wire ck_rzwm = strob1 & ck_rz_w;
+	wire ck_rzz = strob1 & i2;
 	wire [0:31] RZ_CLK = {
-		{12{ck_rzwm_}},
-		{16{ck_rzz_}},
-		{4{ck_rzwm_}}
+		{12{ck_rzwm}},
+		{16{ck_rzz}},
+		{4{ck_rzwm}}
 	};
 
 	// RZ input: resets
-	wire _0_rzw_ = ~clm & ~zerrz;
-	wire _0_rzz_ = ~clm & ~k1;
-	wire M94_3 = _0_rzw_ & ~(M104_12 & (~ir14 & ~ir15));
+	wire _0_rzw = clm | zerrz;
+	wire _0_rzz = clm | k1;
+	wire M94_3 = _0_rzw | (M104_12 & ~ir14 & ~ir15);
 	wire [0:31] RZ_RESET = {
-		{12{_0_rzw_}},
-		{16{_0_rzz_}},
-		{2{_0_rzw_}},
+		{12{_0_rzw}},
+		{16{_0_rzz}},
+		{2{_0_rzw}},
 		{2{M94_3}}
 	};
 
@@ -156,13 +153,13 @@ module pp(
 		PRIO_OUT[15],
 		PRIO_OUT[21],
 		PRIO_OUT[27],
-		1'b0
+		1'b1
 	};
 
 	// RP input/output: interrupt priority chain
 	wire [0:31] PRIO_OUT;
 	wire [0:31] PRIO_IN = {
-		~zer,
+		zer,
 		PRIO_OUT[0:30]
 	};
 
@@ -177,23 +174,23 @@ module pp(
 	wire [0:31] sz;
 
 	// RP output
-	wire [0:31] rp_;
+	wire [0:31] rp;
 
 	genvar j;
 	generate
 		for (j=0 ; j<32 ; j=j+1) begin : GEN_RZ_RP
 			rzrp RZ_RP(
-				.imask(IMASK[j]),					// IRQ mask input
-				.irq_(IRQ_[j]),						// IRQ (async)
-				.w(INT_SYNC[j]),					// synchronous interrupt set
-				.rz_c_(RZ_CLK[j]),				// RZ clock
-				.rz_r_(RZ_RESET[j]),			// RZ reset
-				.rp_c(ez_rpz),						// RP clock
-				.prio_in_(PRIO_IN[j]),		// priority chain input
-				.rz(__rz[j]),							// RZ content
-				.sz(sz[j]),								// RZ & mask
-				.rp_(rp_[j]),							// RP content
-				.prio_out(PRIO_OUT[j])		// priority chain output
+				.imask(IMASK[j]),				// IRQ mask input
+				.irq(IRQ[j]),						// IRQ (async)
+				.w(INT_SYNC[j]),				// synchronous interrupt set
+				.rz_c(RZ_CLK[j]),				// RZ clock
+				.rz_r(RZ_RESET[j]),			// RZ reset
+				.rp_c(ez_rpz),					// RP clock
+				.prio_in(PRIO_IN[j]),		// priority chain input
+				.rz(__rz[j]),						// RZ content
+				.sz(sz[j]),							// RZ & mask
+				.rp(rp[j]),							// RP content
+				.prio_out(PRIO_OUT[j])	// priority chain output
 			);
 		end
 	endgenerate
@@ -202,7 +199,7 @@ module pp(
 
 	// sheet 5
 
-	assign przerw_z = srps & zi[4];
+	assign przerw_z = srps & ~zi[4];
 
 	// sheet 6
 
@@ -210,7 +207,7 @@ module pp(
 
 	// sheet 9
 
-	wire srps = ~zi[8];
+	wire srps = zi[8];
 
 	// sheet 11
 
@@ -249,7 +246,7 @@ module pp(
 	wire rz29 = M14_6 & rdt[15] & rdt[0];
 	wire rz4 = M14_6 & rdt[15] & ~rdt[0];
 
-	assign irq = ~(&sz);
+	assign irq = |sz;
 
 	wire [0:15] zk;
 	decoder16 DEC_ZK(
@@ -261,17 +258,17 @@ module pp(
 
 	// sheet 12
 
-	wire npbd = ~(rp_[24] & rp_[25] & rp_[26] & rp_[28] & rp_[29] & rp_[30] & rp_[27] & rp_[31]);
-	wire npbc = ~(rp_[28] & rp_[29] & rp_[30] & rp_[31] & rp_[23] & rp_[22] & rp_[21] & rp_[20]);
-	wire npbb = ~(rp_[22] & rp_[23] & rp_[26] & rp_[30] & rp_[27] & rp_[31] & rp_[19] & rp_[18]);
-	wire npba = ~(rp_[19] & rp_[21] & rp_[23] & rp_[25] & rp_[29] & rp_[27] & rp_[31] & rp_[17]);
+	wire npbd = rp[24] | rp[25] | rp[26] | rp[28] | rp[29] | rp[30] | rp[27] | rp[31];
+	wire npbc = rp[28] | rp[29] | rp[30] | rp[31] | rp[23] | rp[22] | rp[21] | rp[20];
+	wire npbb = rp[22] | rp[23] | rp[26] | rp[30] | rp[27] | rp[31] | rp[19] | rp[18];
+	wire npba = rp[19] | rp[21] | rp[23] | rp[25] | rp[29] | rp[27] | rp[31] | rp[17];
 
 	// sheet 13
 
-	wire npad = ~(rp_[ 8] & rp_[ 9] & rp_[10] & rp_[11] & rp_[12] & rp_[13] & rp_[14] & rp_[15]);
-	wire npac = ~(rp_[ 4] & rp_[ 5] & rp_[ 6] & rp_[ 7] & rp_[12] & rp_[13] & rp_[14] & rp_[15]);
-	wire npab = ~(rp_[ 2] & rp_[ 3] & rp_[ 6] & rp_[ 7] & rp_[10] & rp_[11] & rp_[14] & rp_[15]);
-	wire npaa = ~(rp_[ 1] & rp_[ 3] & rp_[ 5] & rp_[ 7] & rp_[ 9] & rp_[11] & rp_[13] & rp_[15]);
+	wire npad = rp[ 8] | rp[ 9] | rp[10] | rp[11] | rp[12] | rp[13] | rp[14] | rp[15];
+	wire npac = rp[ 4] | rp[ 5] | rp[ 6] | rp[ 7] | rp[12] | rp[13] | rp[14] | rp[15];
+	wire npab = rp[ 2] | rp[ 3] | rp[ 6] | rp[ 7] | rp[10] | rp[11] | rp[14] | rp[15];
+	wire npaa = rp[ 1] | rp[ 3] | rp[ 5] | rp[ 7] | rp[ 9] | rp[11] | rp[13] | rp[15];
 
 	assign dad[4] = nk_ad;
 
@@ -285,7 +282,7 @@ module pp(
 
 	assign dad[0:3] = 'd0;
 	assign dad[5:10] = 'd0;
-	assign dad[11] = (M4_8 & zi[6])  | (nk_ad & M99_6);
+	assign dad[11] = (M4_8 & ~zi[6])  | (nk_ad & M99_6);
 	assign dad[12] = (M4_8 & M85_11) | (nk_ad & ~M85_8);
 	assign dad[13] = (M4_8 & M85_8)  | (nk_ad & M85_6);
 	assign dad[14] = (M4_8 & M85_6)  | (nk_ad & M85_3);
