@@ -3,8 +3,6 @@ module display(
 	input [0:15] w,
 	input [10:0] rotary_bus,
 	input [9:0] indicators,
-	input p,
-	input mc_0,
 	output [7:0] SEG,
 	output [7:0] DIG
 );
