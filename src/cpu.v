@@ -661,7 +661,7 @@ pp #(
 	.sin(sin),
 	.rin(rin),
 	.zw(zw),
-	.zgpn_(zgpn),
+	.zgpn(zgpn),
 	.rdt(rdt),
 	.dok(dok),
 	.irq(irq),

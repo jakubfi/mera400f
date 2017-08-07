@@ -132,10 +132,10 @@ module pr(
 
 	// jumper on 7-8 : CPU 0
 	// jumper on 8-9 : CPU 1
-	assign zgpn = rpn ^ ~CPU_NUMBER;
+	assign zgpn = rpn ^ ~CPU_NUMBER; // zgodny numer procesora
 	wire M35_8 = CPU_NUMBER ^ bs;
-	wire M23_11 = ~(CPU_NUMBER & pn_nb);
-	assign dpn = ~(~(M35_8 & bp_nb) & M23_11);
+	wire M23_11 = CPU_NUMBER & pn_nb;
+	assign dpn = (M35_8 & bp_nb) | M23_11;
 	assign dqb = q_nb & q;
 
 	wire cnb0_3 = w_bar & strob1b;

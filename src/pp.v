@@ -13,7 +13,7 @@ module pp(
 	input sin,
 	input rin,
 	input zw,
-	input zgpn_,
+	input zgpn,
 	output przerw_z,
 	output irq,
 
@@ -215,8 +215,8 @@ module pp(
 		.q(M14_6)
 	);
 
-	wire M11_3 = ~(~rdt[15] & zgpn_);
-	wire M12_6 = ~(M11_3 & ~rdt[15]);
+	wire M11_3 = ~rdt[15] & zgpn;
+	wire M12_6 = M11_3 | rdt[15];
 
 	wire M9_5;
 	ffd REG_DOK(
