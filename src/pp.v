@@ -196,45 +196,30 @@ module pp(
 	assign irq = |sz; // Suma Zgłoszeń
 	assign przerw_z = zi[8] & ~zi[4];
 
-	wire dok_dly;
-	dly #(.ticks(DOK_DLY_TICKS)) DLY_DOK(
-		.clk(clk_sys),
-		.i(rin),
-		.o(dok_dly)
-	);
-	wire M12_3 = ~dok_dly;
+	wire int_chan = ~rdt[15] & zgpn; // przerwanie kanałowe do tego procesora
+	wire int_cpu = rdt[15]; // przerwanie od innego procesora
+	wire int_ext = int_chan | int_cpu;
 
-	// TODO: cap + diode?
-	wire zw_dly = ~zw;
-
-	wire M14_6;
-	univib #(.ticks(DOK_TICKS)) TRIG_DOK(
-		.clk(clk_sys),
-		.a_(M12_3),
-		.b(zw_dly),
-		.q(M14_6)
+	wire dok_trig;
+	dok #(
+		.DOK_DLY_TICKS(DOK_DLY_TICKS),
+		.DOK_TICKS(DOK_TICKS)
+	) DOK(
+		.clk_sys(clk_sys),
+		.rin(rin),
+		.zw(zw),
+		.int_ext(int_ext),
+		.dok_trig(dok_trig),
+		.dok(dok)
 	);
 
-	wire M11_3 = ~rdt[15] & zgpn;
-	wire M12_6 = M11_3 | rdt[15];
-
-	wire M9_5;
-	ffd REG_DOK(
-		.s_(1'b1),
-		.d(M12_6),
-		.c(~M14_6),
-		.r_(~M12_3),
-		.q(M9_5)
-	);
-	assign dok = rin & M9_5;
-
-	wire rz29 = M14_6 & rdt[15] & rdt[0];
-	wire rz4 = M14_6 & rdt[15] & ~rdt[0];
+	wire rz29 = dok_trig & rdt[15] & rdt[0];
+	wire rz4 = dok_trig & rdt[15] & ~rdt[0];
 
 	wire [0:15] zk;
 	decoder16 DEC_ZK(
-		.en1(~M11_3),
-		.en2(M14_6),
+		.en1(int_chan),
+		.en2(dok_trig),
 		.i(rdt[11:14]),
 		.o(zk)
 	);
