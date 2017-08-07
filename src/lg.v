@@ -1,5 +1,5 @@
 module lg(
-	input clk,
+	input clk_sys,
 	input reset,
 	input cu,
 	input gr,
@@ -14,7 +14,7 @@ module lg(
 
 	reg [0:2] lg;
 	//wire clk = slg1 | slg2 | clk_;
-	always @ (posedge clk, posedge reset) begin
+	always @ (posedge clk_sys, posedge reset) begin
 		if (reset) lg <= 3'd0;
 		else case ({slg1, slg2, cu})
 			3'b100: lg <= ir[7:9];

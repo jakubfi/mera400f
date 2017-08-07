@@ -7,7 +7,7 @@
 */
 
 module pd(
-	input __clk,
+	input clk_sys,
 	// sheet 1
 	input [0:15] w,		// internal W bus
 	input strob1,			// STROB1
@@ -150,7 +150,7 @@ module pd(
 
 	wire ir_clk = strob1 & w_ir;
 	ir REG_IR(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.d(w),
 		.c(ir_clk),
 		.invalidate(si1),

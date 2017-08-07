@@ -1,5 +1,5 @@
 module mc(
-	input clk,
+	input clk_sys,
 	input inc,
 	input reset,
 	output mc_3,
@@ -8,7 +8,7 @@ module mc(
 
 	reg [1:0] mc;
 
-	always @ (posedge clk, posedge reset) begin
+	always @ (posedge clk_sys, posedge reset) begin
 		if (reset) mc <= 2'd0;
 		else if (inc) mc <= mc + 1'b1;
 	end

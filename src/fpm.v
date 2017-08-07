@@ -8,7 +8,7 @@
 
 module fpm(
 	input opm, opta,
-	input __clk,
+	input clk_sys,
 	// sheet 1
 	input [8:15] w,
 	input l_d,
@@ -254,7 +254,7 @@ module fpm(
 	wire fic_load = (f4 & strob_fp) | (f5_af_sf & strob_fp);
 
 	fic CNT_FIC(
-		.clk(__clk),
+		.clk(clk_sys),
 		.cda(cda),
 		.cua(cua),
 		.rab(rab),
@@ -393,7 +393,7 @@ module fpm(
 
 	wire M20_13;
 	univib #(.ticks(FP_FI0_TICKS)) VIB_FI0(
-		.clk(__clk),
+		.clk(clk_sys),
 		.a_(~M49_12),
 		.b(1'b1),
 		.q(M20_13)

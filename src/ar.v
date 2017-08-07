@@ -7,7 +7,7 @@
 */
 
 module ar(
-	input clk,
+	input clk_sys,
 	input p1,
 	input m4,
 	input l,
@@ -19,7 +19,7 @@ module ar(
 	// NOTE: Sensitivities are different for the FPGA implementation.
 	//       Idea behind it is to always be front-edge sensitive
 	//wire clk = l | m4 | p1;
-	always @ (posedge clk) begin
+	always @ (posedge clk_sys) begin
 		if (l) ar <= w;
 		else begin
 			if (m4) ar <= ar - 3'd4;

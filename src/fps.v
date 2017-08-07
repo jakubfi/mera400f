@@ -7,7 +7,7 @@
 */
 
 module fps(
-	input __clk,
+	input clk_sys,
 	// sheet 1
 	input mode,
 	input step,
@@ -137,25 +137,25 @@ module fps(
 
 	wire M74_12, M68_12, M72_12, M72_4;
 	univib #(.ticks(FP_STROB1_1_TICKS)) VIB_STROB1_1(
-		.clk(__clk),
+		.clk(clk_sys),
 		.a_(sr),
 		.b(dp8),
 		.q_(M74_12)
 	);
 	univib #(.ticks(FP_STROB1_2_TICKS)) VIB_STROB1_2(
-		.clk(__clk),
+		.clk(clk_sys),
 		.a_(sr),
 		.b(dp2),
 		.q_(M68_12)
 	);
 	univib #(.ticks(FP_STROB1_3_TICKS)) VIB_STROB1_3(
-		.clk(__clk),
+		.clk(clk_sys),
 		.a_(sr),
 		.b(dp6),
 		.q_(M72_12)
 	);
 	univib #(.ticks(FP_STROB1_4_TICKS)) VIB_STROB1_4(
-		.clk(__clk),
+		.clk(clk_sys),
 		.a_(sr),
 		.b(dp5),
 		.q_(M72_4)
@@ -184,7 +184,7 @@ module fps(
 
 	wire strob2;
 	univib #(.ticks(FP_STROB2_TICKS)) VIB_STROB2(
-		.clk(__clk),
+		.clk(clk_sys),
 		.a_(M54_6),
 		.b(1'b1),
 		.q(strob2)
@@ -202,7 +202,7 @@ module fps(
 
 	wire M71_5;
 	univib #(.ticks(FP_KC1_TICKS)) VIB_KC1(
-		.clk(__clk),
+		.clk(clk_sys),
 		.a_(~stgot),
 		.b(M43_6),
 		.q(M71_5)
@@ -221,7 +221,7 @@ module fps(
 	);
 
 	univib #(.ticks(FP_KC2_TICKS)) VIB_KC2(
-		.clk(__clk),
+		.clk(clk_sys),
 		.a_(1'b0),
 		.b(M55_9),
 		.q(ekc_fp)
@@ -243,7 +243,7 @@ module fps(
 
 	wire start;
 	univib #(.ticks(FP_START_TICKS)) VIB_START(
-		.clk(__clk),
+		.clk(clk_sys),
 		.a_(got),
 		.b(M73_15),
 		.q(start)

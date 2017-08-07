@@ -6,7 +6,7 @@
 */
 
 module bar(
-	input clk,
+	input clk_sys,
 	input [10:15] w,
 	input cnb,
 	input clm,
@@ -14,7 +14,7 @@ module bar(
 	output reg [0:5] bar
 );
 
-	always @ (posedge clk, posedge clm) begin
+	always @ (posedge clk_sys, posedge clm) begin
 		if (clm) bar <= 6'd0;
 		else begin
 			if (cnb) bar[1:5] <= w[11:15];

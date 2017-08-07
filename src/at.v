@@ -7,7 +7,7 @@
 */
 
 module at(
-	input clk,
+	input clk_sys,
 	input s0, s1,
 	input c,
 	input sl,
@@ -15,7 +15,7 @@ module at(
 	output reg [0:15] at
 );
 
-	always @ (posedge clk) begin
+	always @ (posedge clk_sys) begin
 		if (c) case ({s1, s0})
 			2'b00 : at <= at;
 			2'b01 : at <= {sl, at[0:14]};

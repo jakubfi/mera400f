@@ -1,5 +1,5 @@
 module cpin(
-	input clk,
+	input clk_sys,
 	input [7:0] rx_byte,
 	input rx_busy,
 	output reg send_leds,
@@ -16,7 +16,7 @@ module cpin(
 	reg rxb;
 	reg [1:0] state = S_IDLE;
 
-	always @ (posedge clk) begin
+	always @ (posedge clk_sys) begin
 		case (state)
 
 			S_IDLE: begin

@@ -7,7 +7,7 @@
 */
 
 module px(
-	input __clk,		// system clock
+	input clk_sys,	// system clock
 	input clo,			// general clear (reset)
 
 	input strob_fp,	// strob1 from the FPU
@@ -169,7 +169,7 @@ module px(
 	// sheet 1, page 2-1
 	// * state registers
 
-	always @ (posedge __clk, posedge clo) begin
+	always @ (posedge clk_sys, posedge clo) begin
 		if (clo) begin
 			{k1, k2} <= 2'd0;
 			{wp, wa, we, wr, w$, wz, wx, wm, ww} <= 9'd0;
@@ -205,7 +205,7 @@ module px(
 	wire M15_8 = p2 | wp | wx;
 
 	strobgen STROBGEN(
-		.__clk(__clk),
+		.clk_sys(clk_sys),
 		.ok$(ok$),
 		.zw(zw),
 		.oken(oken),
@@ -284,7 +284,7 @@ module px(
 
 	wire __ck_rz_w_dly;
 	dly #(.ticks(2'd2)) DLY_ZERZ( // 2 ticks @50MHz = 40ns (~25ns orig.)
-		.clk(__clk),
+		.clk(clk_sys),
 		.i(ck_rz_w),
 		.o(__ck_rz_w_dly)
 	);
@@ -305,7 +305,7 @@ module px(
 		.ALARM_DLY_TICKS(ALARM_DLY_TICKS),
 		.ALARM_TICKS(ALARM_TICKS)
 	) IFCTL(
-		.__clk(__clk),
+		.clk_sys(clk_sys),
 		.clo(clo),
 		.gotst1(gotst1),
 		.zgi_j(zgi_j),
@@ -329,7 +329,7 @@ module px(
 	wire ef = efp & ~AWP_PRESENT;
 
 	reg soft_fp;
-	always @ (posedge __clk, posedge clo) begin
+	always @ (posedge clk_sys, posedge clo) begin
 		if (clo) soft_fp <= 1'b0;
 		else if (ldstate) begin
 			case ({ef, i5})
@@ -361,7 +361,7 @@ module px(
 	// S-R : stop on segfault in mem block 0
 	wire hltn_set = awaria_set & STOP_ON_NOMEM;
 
-	always @ (posedge __clk, negedge hltn_reset) begin
+	always @ (posedge clk_sys, negedge hltn_reset) begin
 		if (~hltn_reset) hlt_n <= 1'b0;
 		else if (hltn_set) hlt_n <= 1'b1;
 		else if (strob1) hlt_n <= hltn_d;
@@ -380,7 +380,7 @@ module px(
 	assign b_p0 = rw & talarm;
 
 	wire awaria_set = (b_parz | b_p0) & ~bar_nb;
-	always @ (posedge __clk) begin
+	always @ (posedge clk_sys) begin
 		if (clo | stop) awaria <= 1'b0;
 		else if (awaria_set) awaria <= 1'b1;
 	end

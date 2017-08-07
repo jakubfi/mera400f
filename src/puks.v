@@ -7,7 +7,7 @@
 */
 
 module puks(
-	input clk,
+	input clk_sys,
 	input zoff,	// not implemented
 	input rcl,	// received clear
 	input dcl,	// clear driver
@@ -20,7 +20,7 @@ module puks(
 
 	reg on = 1'b0;
 	reg [3:0] pwon_cnt =  4'd0;
-	always @ (posedge clk) begin
+	always @ (posedge clk_sys) begin
 		if (pwon_cnt != 4'b111)  pwon_cnt <= pwon_cnt + 1'b1;
 		if (pwon_cnt == 4'd3) on <= 1'b1;
 		if (pwon_cnt == 4'd3) pon <= 1'b1;

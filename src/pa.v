@@ -8,7 +8,7 @@
 */
 
 module pa(
-	input __clk,
+	input clk_sys,
 	// sheet 1
 	input [0:15] ir,
 	input [0:15] bus_ki,
@@ -134,7 +134,7 @@ module pa(
 
 	wire [0:15] at;
 	at REG_AT(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.s0(wx | as2),
 		.s1(as2),
 		.c(strob1b),
@@ -155,7 +155,7 @@ module pa(
 
 	wire [0:15] ac;
 	ac REG_AC(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.c(ac_clk),
 		.w(w),
 		.ac(ac)
@@ -171,7 +171,7 @@ module pa(
 
 	wire wzi_clk = as2 & strob1b;
 
-	always @ (posedge __clk) begin
+	always @ (posedge clk_sys) begin
 		if (wzi_clk) wzi <= zs;
 	end
 /*
@@ -192,7 +192,7 @@ module pa(
 
 	wire [0:15] ar;
 	ar REG_AR(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.l(ar_load),
 		.p1(ar_plus1),
 		.m4(arm4),
@@ -208,7 +208,7 @@ module pa(
 
 	wire [0:15] ic;
 	ic REG_IC(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.cu(ic_plus1),
 		.l(ic_load),
 		.r(off),

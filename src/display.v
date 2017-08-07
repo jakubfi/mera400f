@@ -1,5 +1,5 @@
 module display(
-	input clk,
+	input clk_sys,
 	input [0:15] w,
 	input [10:0] rotary_bus,
 	input [9:0] indicators,
@@ -24,7 +24,7 @@ module display(
 	assign digs[7][5:1] = 0;
 
 	sevenseg_drv DRV(
-		.clk(clk),
+		.clk(clk_sys),
 		.seg(SEG),
 		.dig(DIG),
 		.digs(digs),

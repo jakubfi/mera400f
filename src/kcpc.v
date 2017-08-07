@@ -1,5 +1,5 @@
 module kcpc(
-	input clk,
+	input clk_sys,
 	input kc_reset,
 	input ekc,
 	input ekc_fp,
@@ -27,7 +27,7 @@ module kcpc(
 	// KC, PC
 
 	reg [1:0] state = ST_IDLE;
-	always @ (posedge clk) begin
+	always @ (posedge clk_sys) begin
 		if (kc_reset) state <= ST_IDLE;
 		else case (state)
 			ST_IDLE: if (kc_trig) state <= ST_KC;
@@ -38,7 +38,7 @@ module kcpc(
 
 	// PR, PRZERW
 
-	always @ (posedge clk) begin
+	always @ (posedge clk_sys) begin
 		if (rescyc) pr <= 1'b0;
 		else if (idle & kc_trig) pr <= dpr;
 		if (clm) przerw <= 1'b0;

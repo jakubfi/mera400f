@@ -1,5 +1,5 @@
 module ifctl(
-	input __clk,
+	input clk_sys,
 	input clo,
 	input gotst1,
 	input zgi_j,
@@ -34,7 +34,7 @@ module ifctl(
 	// * zgi_j mówi w jakich stanach zgłaszanie się odbywa
 
 	reg zgi;
-	always @ (posedge __clk, posedge clo) begin
+	always @ (posedge clk_sys, posedge clo) begin
 		if (clo) zgi <= 1'b0;
 		else if (zgi_set) zgi <= 1'b1;
 		else if (gotst1) case (zgi_j)
@@ -78,7 +78,7 @@ module ifctl(
 
 	reg ifhold;
 	wire ifh_reset = ifhold_reset | clo;
-	always @ (posedge __clk, posedge ifh_reset) begin
+	always @ (posedge clk_sys, posedge ifh_reset) begin
 		if (ifh_reset) ifhold <= 1'b0;
 		else if (ok$) case ({ifhold_j, ifhold})
 			2'b00: ifhold <= ifhold;
@@ -104,7 +104,7 @@ module ifctl(
 	wire ok_clk = ren | talarm | rok;
 	assign ok$ = zwzg & ok_clk;
 	/*
-	always @ (posedge __clk, negedge zgi) begin
+	always @ (posedge clk_sys, negedge zgi) begin
 		if (~zgi) ok$ <= 0;
 		else if (ok_clk) ok$ <= zwzg;
 	end
@@ -127,7 +127,7 @@ module ifctl(
 		.ALARM_DLY_TICKS(ALARM_DLY_TICKS),
 		.ALARM_TICKS(ALARM_TICKS)
 	) ALARM(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.engage(alarm),
 		.talarm(talarm)
 	);

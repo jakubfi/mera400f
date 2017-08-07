@@ -7,7 +7,7 @@
 */
 
 module awp(
-	input __clk,
+	input clk_sys,
 	input [0:15] w,
 	input r02,
 	input r03,
@@ -65,7 +65,7 @@ fps #(
 	.FP_KC2_TICKS(FP_KC2_TICKS),
 	.FP_START_TICKS(FP_START_TICKS)
 ) FPS(
-	.__clk(__clk),
+	.clk_sys(clk_sys),
 	.opm(opm),
 	.opta(opta),
 	.optb(optb),
@@ -182,7 +182,7 @@ fpm #(
 ) FPM(
 	.opta(opta),
 	.opm(opm),
-	.__clk(__clk),
+	.clk_sys(clk_sys),
 	.w(w[8:15]),
 	.l_d(l_d),
 	._0_d(_0_d),

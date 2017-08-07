@@ -7,13 +7,13 @@
 */
 
 module ac(
-	input clk,
+	input clk_sys,
 	input c,
 	input [0:15] w,
 	output reg [0:15] ac
 );
 
-	always @ (posedge clk) begin
+	always @ (posedge clk_sys) begin
 		if (c) ac <= w;
 	end
 

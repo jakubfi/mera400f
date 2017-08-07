@@ -1,10 +1,3 @@
-/*
-	MERA-400 system
-*/
-
-// external board clock frequency in Hz
-`define CLK_EXT_HZ 50_000_000
-
 module mera400f(
 	input CLK_EXT,
 	output BUZZER,
@@ -21,7 +14,15 @@ module mera400f(
 );
 
 	// FPGA cruft
-	assign BUZZER = 1;
+	assign BUZZER = 1'b1;
+
+	// clocks
+	localparam CLK_EXT_HZ = 50_000_000;
+  localparam CLK_SYS_HZ = CLK_EXT_HZ;
+  localparam CLK_UART_HZ = CLK_EXT_HZ;
+	wire clk_sys = CLK_EXT;
+	wire clk_uart = CLK_EXT;
+	wire clk_sram = CLK_EXT;
 
 // -----------------------------------------------------------------------
 // --- CPU ---------------------------------------------------------------
@@ -68,8 +69,7 @@ module mera400f(
 		.DOK_DLY_TICKS(4'd15),
 		.DOK_TICKS(3'd7)
 	) CPU0(
-		// FPGA
-		.__clk(CLK_EXT),
+		.clk_sys(clk_sys),
 		// power supply
 		.off(off),
 		.pon(pon),
@@ -152,10 +152,12 @@ module mera400f(
 
 	pk #(
 		.TIMER_CYCLE_MS(8'd10),
-		.CLK_EXT_HZ(`CLK_EXT_HZ),
+		.CLK_SYS_HZ(CLK_SYS_HZ),
+		.CLK_UART_HZ(CLK_UART_HZ),
 		.UART_BAUD(1_000_000)
 	) PK(
-		.__clk(CLK_EXT),
+		.clk_sys(clk_sys),
+		.clk_uart(clk_uart),
 		.RXD(RXD),
 		.TXD(TXD),
 		.SEG(SEG),
@@ -205,7 +207,7 @@ module mera400f(
 
 	wire off, pout, pon, clo, clm;
 	puks PUKS(
-		.clk(CLK_EXT),
+		.clk_sys(clk_sys),
 		.zoff(zoff),
 		.rcl(rcl),
 		.dcl(dcl),
@@ -239,7 +241,7 @@ module mera400f(
 	assign F_WE = 1'b1;
 
 	mem_elwro_sram MEM(
-		.clk(CLK_EXT),
+		.clk(clk_sram),
 		.SRAM_CE(SRAM_CE),
 		.SRAM_OE(SRAM_OE),
 		.SRAM_WE(SRAM_WE),

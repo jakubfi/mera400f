@@ -3,7 +3,7 @@
 */
 
 module rzrp(
-	input clk,
+	input clk_sys,
 	input imask,		// interrupt mask
 	input irq,			// async irq source
 	input w,				// clocked irq source
@@ -19,7 +19,7 @@ module rzrp(
 
 	assign sz = rz & imask;
 
-	always @ (posedge clk, posedge irq) begin
+	always @ (posedge clk_sys, posedge irq) begin
 		if (irq) rz <= 1'b1;
 		else if (rz_r) rz <= 1'b0;
 		else if (rz_c) case ({w, rp})
@@ -31,7 +31,7 @@ module rzrp(
 	end
 
 	// NOTE: rp_c seems to be too long to be a clock enable signal...
-	always @ (posedge clk, posedge prio_in) begin
+	always @ (posedge clk_sys, posedge prio_in) begin
 		if (prio_in) rp <= 1'b0;
 		else if (rp_c) rp <= sz;
 	end

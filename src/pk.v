@@ -21,7 +21,8 @@
 
 module pk(
 	// FPGA I/Os
-	input __clk,
+	input clk_sys,
+	input clk_uart,
 	input RXD,
 	output TXD,
 	output [7:0] SEG,
@@ -70,8 +71,9 @@ module pk(
 	output wkb
 );
 
+	parameter CLK_SYS_HZ;
+	parameter CLK_UART_HZ;
 	parameter TIMER_CYCLE_MS;
-	parameter CLK_EXT_HZ;
 	parameter UART_BAUD;
 
 	// --- UART
@@ -81,9 +83,9 @@ module pk(
 	wire [7:0] rx_byte;
 	uart #(
 		.baud(UART_BAUD),
-		.clk_speed(CLK_EXT_HZ))
+		.clk_speed(CLK_UART_HZ))
 	UART0(
-		.clk(__clk),
+		.clk(clk_uart),
 		.rx_byte(rx_byte),
 		.rx_busy(rx_busy),
 		.rxd(RXD),
@@ -108,7 +110,7 @@ module pk(
 	wire [11:0] fnkey;
 	wire [3:0] rotary_pos;
 	cpin CPIN(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.rx_byte(rx_byte),
 		.rx_busy(rx_busy),
 		.send_leds(send_leds),
@@ -120,7 +122,7 @@ module pk(
 	// --- Virtual switches assignments
 
 	reg owork;
-	always @ (posedge __clk) begin
+	always @ (posedge clk_sys) begin
 		owork <= fnkey[`FN_START];
 	end
 
@@ -130,7 +132,7 @@ module pk(
 	assign mode = fnkey[`FN_MODE];
 
 	reg ostop_n;
-	always @ (posedge __clk, posedge hlt_n) begin
+	always @ (posedge clk_sys, posedge hlt_n) begin
 		if (hlt_n) stop_n <= 1'b0;
 		else begin
 			ostop_n <= fnkey[`FN_STOPN];
@@ -152,7 +154,7 @@ module pk(
 	wire send;
 	wire [7:0] tx_byte;
 	cpout CPOUT(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.trigger(send_leds),
 		.w(w),
 		.indicators({mode, stop_n, zeg, q, p, ~mc_0, irq, run, _wait, alarm}),
@@ -168,9 +170,9 @@ module pk(
 
 	timer #(
 		.TIMER_CYCLE_MS(TIMER_CYCLE_MS),
-		.CLK_EXT_HZ(CLK_EXT_HZ)
+		.CLK_SYS_HZ(CLK_SYS_HZ)
 	) TIMER(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.enable(zeg),
 		.zegar(zegar)
 	);
@@ -178,7 +180,7 @@ module pk(
 	// --- 7-segment display
 
 	display DISPLAY(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.w(w),
 		.rotary_bus(rotary_bus),
 		.indicators({run, _wait, alarm, irq, mode, stop_n, zeg, q, p, mc_0}),

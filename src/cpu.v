@@ -6,6 +6,8 @@
 */
 
 module cpu(
+	input clk_sys,
+
 	// from power supply (?)
 	input off,
 	input pon,
@@ -50,9 +52,7 @@ module cpu(
 	output [0:15] ddt,	input [0:15] rdt,
 	output zg,
 										input zw,
-	output zz,
-
-	input __clk
+	output zz
 );
 
 	assign zz = 1'b1;
@@ -93,7 +93,7 @@ px #(
 	.ALARM_DLY_TICKS(ALARM_DLY_TICKS),
 	.ALARM_TICKS(ALARM_TICKS)
 ) PX(
-	.__clk(__clk),
+	.clk_sys(clk_sys),
 	.ek1(ek1),
 	.ewp(ewp),
 	.ek2(ek2),
@@ -228,7 +228,7 @@ px #(
 wire sp0, przerw, si1, sp1, laduj, k2_bin_store, k2fetch, w_rbc, w_rba, w_rbb, ep0, stp0, ek2, ek1, mc_3, xi$, pp, ep5, ep4, ep3, ep1, ep2, icp1, arp1, lg_3, lg_0, rc, rb, ra, lk, wls, w_r, w_ic, w_ac, w_ar, lrz, w_bar, w_rm, baa, bab, bac, aa, ab, wpb, bwb, bwa, kia, kib, w_ir, mwa, mwb, mwc;
 
 pm PM(
-	.__clk(__clk),
+	.clk_sys(clk_sys),
 	.start(start),
 	.pon(pon),
 	.work(work),
@@ -424,7 +424,7 @@ wire c0, ls, rj, bs, ou, in, is, ri, pufa, rb$, cb, sc$, oc, ka2, gr, hlt, mcl, 
 pd #(
 	.INOU_USER_ILLEGAL(INOU_USER_ILLEGAL)
 ) PD(
-	.__clk(__clk),
+	.clk_sys(clk_sys),
 	.w(w),
 	.strob1(strob1),
 	.strob1b(strob1b),
@@ -557,7 +557,7 @@ pr #(
 	.CPU_NUMBER(CPU_NUMBER),
 	.AWP_PRESENT(AWP_PRESENT)
 ) PR(
-	.__clk(__clk),
+	.clk_sys(clk_sys),
 	.blr(blr),
 	.lpc(lpc),
 	.wa(wa),
@@ -627,7 +627,7 @@ pp #(
 	.DOK_DLY_TICKS(DOK_DLY_TICKS),
 	.DOK_TICKS(DOK_TICKS)
 ) PP(
-	.__clk(__clk),
+	.clk_sys(clk_sys),
 	.w(w),
 	.clm(clm),
 	.w_rm(w_rm),
@@ -678,7 +678,7 @@ wire [0:15] pa_ddt;
 wire [0:15] pa_dad;
 
 pa PA(
-	.__clk(__clk),
+	.clk_sys(clk_sys),
 	.ir(ir),
 	.bus_ki(bus_ki),
 	.rdt(rdt),
@@ -758,7 +758,7 @@ generate
 		assign zp = 16'h0000;
 	end else begin
 		awp AWP(
-			.__clk(__clk),
+			.clk_sys(clk_sys),
 			.w(w),
 			.r02(r0[2]),
 			.r03(r0[3]),

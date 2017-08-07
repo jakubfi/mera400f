@@ -1,5 +1,5 @@
 module pp(
-	input __clk,
+	input clk_sys,
 
 	input w_rm,
 	input zer,
@@ -59,7 +59,7 @@ module pp(
 	wire clrs = strob1b & w_rm;
 
 	rm RM(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.clm$(clm$),
 		.clrs(clrs),
 		.zi(zi),
@@ -177,7 +177,7 @@ module pp(
 	generate
 		for (j=0 ; j<32 ; j=j+1) begin : GEN_RZ_RP
 			rzrp RZ_RP(
-				.clk(__clk),
+				.clk_sys(clk_sys),
 				.imask(IMASK[j]),				// IRQ mask input
 				.irq(IRQ[j]),						// IRQ (async)
 				.w(INT_SYNC[j]),				// synchronous interrupt set
@@ -198,7 +198,7 @@ module pp(
 
 	wire dok_dly;
 	dly #(.ticks(DOK_DLY_TICKS)) DLY_DOK(
-		.clk(__clk),
+		.clk(clk_sys),
 		.i(rin),
 		.o(dok_dly)
 	);
@@ -209,7 +209,7 @@ module pp(
 
 	wire M14_6;
 	univib #(.ticks(DOK_TICKS)) TRIG_DOK(
-		.clk(__clk),
+		.clk(clk_sys),
 		.a_(M12_3),
 		.b(zw_dly),
 		.q(M14_6)

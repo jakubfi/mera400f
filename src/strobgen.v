@@ -1,5 +1,5 @@
 module strobgen(
-	input __clk,
+	input clk_sys,
 	input ss11, ss12, ss13, ss14, ss15,
 	input ok$, zw, oken,
 	input mode, step,
@@ -37,14 +37,14 @@ module strobgen(
 
 	// STEP
 	reg lstep;
-	always @ (posedge __clk) begin
+	always @ (posedge clk_sys) begin
 		lstep <= step;
 	end
 	wire step_trig = ~mode | (step & ~lstep);
 
 	// STROBS
 	reg [0:2] state;
-	always @ (posedge __clk) begin
+	always @ (posedge clk_sys) begin
 		case (state)
 			// GOT
 			S_GOT: begin
@@ -175,7 +175,6 @@ module strobgen(
 
 	assign strob1 = strob1_any | strob_fp | strob_step;
 */
-
 
 endmodule
 

@@ -1,5 +1,5 @@
 module rm(
-	input clk,
+	input clk_sys,
 	input clm$,
 	input clrs,
 	input [0:9] zi,
@@ -11,7 +11,7 @@ module rm(
 	generate
 		for (num=0 ; num<10 ; num=num+1) begin : REG_RM
 			wire rm_reset = zi[num] & clm$;
-			always @ (posedge clk, posedge rm_reset) begin
+			always @ (posedge clk_sys, posedge rm_reset) begin
 				if (rm_reset) rs[num] <= 1'b0;
 				else if (clrs) rs[num] <= w[num];
 			end

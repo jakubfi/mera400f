@@ -7,7 +7,7 @@
 */
 
 module ir(
-	input clk,
+	input clk_sys,
 	input [0:15] d,
 	input c,
 	input invalidate,
@@ -20,7 +20,7 @@ module ir(
   // signals to interrupt control loop when serving 'invalid instruction' interrupt caused
   // by LIP/SP instructions executed in user program. Here we just reset two bits in IR.
 
-	always @ (posedge clk, posedge invalidate) begin
+	always @ (posedge clk_sys, posedge invalidate) begin
 		if (invalidate) q[0:1] <= 2'd0;
 		else if (c) q <= d;
 	end

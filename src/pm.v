@@ -7,7 +7,7 @@
 */
 
 module pm(
-	input __clk,
+	input clk_sys,
 	// sheet 1
 	input start,
 	input pon,
@@ -217,7 +217,7 @@ module pm(
 	wire start_reset = hlt_n | stop | clo;
 	wire start_clk = pon & work;
 	reg startq;
-	always @ (posedge __clk, posedge start_reset) begin
+	always @ (posedge clk_sys, posedge start_reset) begin
 		if (start_reset) startq <= 1'b0;
 		else if (start_clk | start) startq <= 1'b1;
 	end
@@ -233,7 +233,7 @@ module pm(
 */
 
 	wire wait_reset = start_reset | si1;
-	always @ (posedge __clk, posedge wait_reset) begin
+	always @ (posedge clk_sys, posedge wait_reset) begin
 		if (wait_reset) _wait <= 1'b0;
 		else if (wx) _wait <= hlt;
 	end
@@ -248,7 +248,7 @@ module pm(
 */
 
 	reg __cycle_q;
-	always @ (posedge __clk, posedge cycle) begin
+	always @ (posedge clk_sys, posedge cycle) begin
 		if (cycle) __cycle_q <= 1'b1;
 		else if (rescyc) __cycle_q <= 1'b0;
 	end
@@ -280,7 +280,7 @@ module pm(
 	wire kc, pc;
 	wire pr;
 	kcpc KCPC(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.kc_reset(kc_reset),
 		.ekc(ekc),
 		.ekc_fp(ekc_fp),
@@ -309,7 +309,7 @@ module pm(
 	reg fetch;
 	wire store;
 
-	always @ (posedge __clk, posedge panel_store) begin
+	always @ (posedge clk_sys, posedge panel_store) begin
 		if (panel_store) store <= 1'b1;
 		else if (clm | st2k2) store <= 1'b0;
 	end
@@ -322,7 +322,7 @@ module pm(
 		.q(store)
 	);
 */
-	always @ (posedge __clk, posedge panel_fetch) begin
+	always @ (posedge clk_sys, posedge panel_fetch) begin
 		if (panel_fetch) fetch <= 1'b1;
 		else if (clm | st2k2) fetch <= 1'b0;
 	end
@@ -335,7 +335,7 @@ module pm(
 		.q(fetch)
 	);
 */
-	always @ (posedge __clk, posedge panel_load) begin
+	always @ (posedge clk_sys, posedge panel_load) begin
 		if (panel_load) load <= 1'b1;
 		else if (clm | st2k2) load <= 1'b0;
 	end
@@ -350,7 +350,7 @@ module pm(
 */
 	wire bin_d = ~(rdt9 & rdt11 & lg_0);
 	wire s1k1 = strob1 & k1;
-	always @ (posedge __clk, posedge panel_bin) begin
+	always @ (posedge clk_sys, posedge panel_bin) begin
 		if (panel_bin) bin <= 1'b1;
 		else if (clm) bin <= 1'b0;
 		else if (s1k1) bin <= bin_d;
@@ -395,7 +395,7 @@ module pm(
 	//  * P - wskaźnik przeskoku (branch indicator)
 	//  * MC - premodification counter
 
-	always @ (posedge __clk, posedge clm) begin
+	always @ (posedge clk_sys, posedge clm) begin
 		if (clm) p <= 1'b0;
 		else if (strob1) begin
 			if (rok & ~inou & wm) p <= 1'b1;
@@ -426,7 +426,7 @@ module pm(
 	wire reset_mc = reswp | (~md & p4);
 
 	mc MC(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.inc(setwp),
 		.reset(reset_mc),
 		.mc_3(mc_3),
@@ -444,7 +444,7 @@ module pm(
 	// TODO: moved from strob2 to strob1b
 	// trzeba pewnie będzie ostatecznie wrócić do strob2 jakoś
 	reg wm_q;
-	always @ (posedge __clk) begin
+	always @ (posedge clk_sys) begin
 		if (strob1b) begin
 			if (~p & p1 & xi) wm_q <= 1'b0;
 			else wm_q <= wm_d;
@@ -466,7 +466,7 @@ module pm(
 	wire wb_k = (p4 & ~wpp) | p2;
 
 	reg wb;
-	always @ (posedge __clk, posedge zerstan) begin
+	always @ (posedge clk_sys, posedge zerstan) begin
 		if (zerstan) wb <= 1'b0;
 		else if (strob1b) begin
 			case ({wb_j, wb_k})
@@ -490,7 +490,7 @@ module pm(
 */
 
 	reg wpp;
-	always @ (posedge __clk, posedge reswp) begin
+	always @ (posedge clk_sys, posedge reswp) begin
 		if (reswp) wpp <= 1'b0;
 		else if (strob1b) begin
 			if (wx & md) wpp <= 1'b1; // wire setwp = strob1 & wx & md;
@@ -560,7 +560,7 @@ module pm(
 	wire lg_2, lg_1;
 	wire lga, lgb, lgc;
 	lg LG(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.cu(lg_p1),
 		.reset(lg_reset),
 		.gr(gr),
@@ -597,7 +597,7 @@ module pm(
 	assign lk_in[0] = (shc & ir6);
 
 	lk CNT_LK(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.cd(downlk),
 		.i(lk_in),
 		.l(lolk),
@@ -615,7 +615,7 @@ module pm(
 	wire rjcpc = rj | rpc | rc$;
 	wire lrcbngls$ = lrcb | ng$ | ls;
 	wire M95_10 = ~w$ & ls;
-	always @ (posedge __clk, negedge M95_10) begin
+	always @ (posedge clk_sys, negedge M95_10) begin
 		if (~M95_10) wls <= 1'b0;
 		else if (wa & strob1) wls <= 1'b1;
 	end
@@ -687,7 +687,7 @@ module pm(
 
 	reg WPB;
 	assign wpb = WPB;
-	always @ (posedge __clk, negedge lrcb) begin
+	always @ (posedge clk_sys, negedge lrcb) begin
 		if (~lrcb) WPB <= 1'b0;
 		else if (str1wx) WPB <= at15;
 	end

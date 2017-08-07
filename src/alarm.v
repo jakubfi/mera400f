@@ -1,5 +1,5 @@
 module alarm(
-	input clk,
+	input clk_sys,
 	input engage,
 	output talarm
 );
@@ -16,7 +16,7 @@ module alarm(
 	reg [0:width-1] alarm_cnt;
 	reg [0:1] state = S_IDLE;
 
-	always @ (posedge clk) begin
+	always @ (posedge clk_sys) begin
 		case (state)
 
 			S_IDLE:

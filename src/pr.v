@@ -7,7 +7,7 @@
 */
 
 module pr(
-	input __clk,
+	input clk_sys,
 	// sheet 1
 	input blr,				// A50 - BLokuj Rejestry
 	input lpc,				// A94 - LPC instruction
@@ -85,7 +85,7 @@ module pr(
 
 	wire [0:15] R1_7;
 	regs USER_REGS(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.w(w),
 		.addr({rc, rb, ra}),
 		.we((strob_a | strob_b) & w_r & sel_r1_r7),
@@ -117,7 +117,7 @@ module pr(
 
 	wire [0:15] rRB;
 	rb REG_RB(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.w(w[10:15]),
 		.w_rba(w_rba),
 		.w_rbb(w_rbb),
@@ -144,7 +144,7 @@ module pr(
 	wire [0:3] nb;
 	wire bs;
 	bar REG_BAR(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.w(w[10:15]),
 		.cnb(cnb0_3),
 		.clm(clm),
@@ -197,7 +197,7 @@ module pr(
 
 	wire [9:15] r0low;
 	r0 REG_R0(
-		.clk(__clk),
+		.clk_sys(clk_sys),
 		.w(w),
 		.r0({r0, r0low}),
 		.zs(zs),

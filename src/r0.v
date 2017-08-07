@@ -7,7 +7,7 @@
 */
 
 module r0 (
-	input clk,
+	input clk_sys,
 	input strob1b,
 	// parallel input
 	input [0:15] w,
@@ -30,7 +30,7 @@ module r0 (
 	wire c7 = ust_y & strob1b;
 	wire c8 = ust_x & strob1b;
 
-	always @ (posedge clk, posedge zer) begin
+	always @ (posedge clk_sys, posedge zer) begin
 		if (zer) r0[0:15] <= 16'b0;
 		else begin
 

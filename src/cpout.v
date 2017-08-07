@@ -1,5 +1,5 @@
 module cpout (
-	input clk,
+	input clk_sys,
 	input trigger,
 	input [0:15] w,
 	input [0:9] indicators,
@@ -25,7 +25,7 @@ module cpout (
 	assign tx_byte = data[b_cnt];
 
 	reg [1:0] snd_state = IDLE;
-	always @ (posedge clk) begin
+	always @ (posedge clk_sys) begin
 		case (snd_state)
 
 			IDLE: begin
