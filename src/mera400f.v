@@ -155,7 +155,7 @@ module mera400f(
 		.CLK_EXT_HZ(`CLK_EXT_HZ),
 		.UART_BAUD(1_000_000)
 	) PK(
-		.CLK_EXT(CLK_EXT),
+		.__clk(CLK_EXT),
 		.RXD(RXD),
 		.TXD(TXD),
 		.SEG(SEG),
