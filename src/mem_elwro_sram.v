@@ -15,35 +15,17 @@ module mem_elwro_sram(
 	output ok_
 );
 
-/*
-
-	Memory configuration: OU r, n
-	r = rdt_
-	n = ad_
-
-     .---------------> logical segment number
-     |             .-> logical block number
-	rrrr rrrrrrrr rrrr
-             .--------> physical segment (last 3 bits for Elwro)
-             |    .---> physical module
-             |    | .-> 1=memory configuration
-	nnnnnnn nnnn nnnn n
-
-*/
-
-	// chip and bytes always enabled
+	// RAM module signals
 	assign SRAM_CE = 0;
 	assign SRAM_UB = 0;
 	assign SRAM_LB = 0;
 	assign SRAM_WE = ~we;
 	assign SRAM_OE = ~oe;
-	assign ok_ = ~((ok & (~r_ | ~w_)) | (cok & ~s_));
-
-	// address lines
 	assign SRAM_A[17:0] = {map_out[2:7], ~ad_[4:15]};
-
-	// data lines
 	assign SRAM_D = we ? ~rdt_ : 16'hzzzz;
+
+	// Interface signals
+	assign ok_ = ~((ok & (~r_ | ~w_)) | (cok & ~s_));
 	assign ddt_ = ~r_ ? ~rd_data : 16'hffff;
 
 	// --- memory configuration ------------------------------------------------
@@ -51,58 +33,21 @@ module mem_elwro_sram(
 	wire [0:7] map_log = ~{rdt_[12:15], rdt_[0:3]};
 	wire [0:7] map_phy = ~{ad_[11:14], ad_[7:10]};
 	wire [0:7] seg_addr = ~{nb_, ad_[0:3]};
-	reg [0:7] map_rd_addr;
-	reg map_wr = 0;
 	reg map_rd = 0;
-	/* synthesis ramstyle = "M4K" */
-	reg [0:7] map [0:255];
-	initial begin
-		reg [8:0] i;
-		for (i=0 ; i<9'd256 ; i=i+9'd1) begin
-			if (i == 1) map[i] = 1;
-			else map[i] = 0;
-		end
-	end
+	wire [0:7] map_out;
+	wire cok;
 
-	always @ (posedge clk) begin
-		if (map_wr) map[map_log] <= map_phy;
-		map_rd_addr <= seg_addr;
-	end
-
-	wire [0:7] map_out = map_rd ? map[map_rd_addr] : 8'hzz;
-
-	localparam S_CIDLE	= 2'd0;
-	localparam S_CCFG		= 2'd1;
-	localparam S_COK		= 2'd2;
-
-	reg [1:0] cstate = S_CIDLE;
-	reg cok = 0;
-
-	always @ (posedge clk) begin
-		case (cstate)
-
-			S_CIDLE: begin
-				if (~s_ && ~ad_[15] && (map_log > 1)) begin
-					map_wr <= 1;
-					cstate <= S_CCFG;
-				end
-			end
-
-			S_CCFG: begin
-				map_wr <= 0;
-				cok <= 1;
-				cstate <= S_COK;
-			end
-
-			S_COK: begin
-				if (s_) begin
-					cok <= 0;
-					cstate <= S_CIDLE;
-				end
-			end
-
-		endcase
-	end
+	memcfg MEMCFG(
+		.clk(clk),
+		.s_(s_),
+		.ad15(~ad_[15]),
+		.map_rd(map_rd),
+		.map_log(map_log),
+		.map_phy(map_phy),
+		.seg_addr(seg_addr),
+		.cok(cok),
+		.map_out(map_out)
+	);
 
 	// --- memory access -------------------------------------------------------
 
