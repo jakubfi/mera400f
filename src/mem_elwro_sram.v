@@ -64,39 +64,40 @@ module mem_elwro_sram(
 		end
 	end
 
-	always @ (posedge clk)
-	begin
+	always @ (posedge clk) begin
 		if (map_wr) map[map_log] <= map_phy;
 		map_rd_addr <= seg_addr;
 	end
 
 	wire [0:7] map_out = map_rd ? map[map_rd_addr] : 8'hzz;
 
-	`define CIDLE		0
-	`define CCFG		1
-	`define COK			2
-	reg [1:0] cstate = `CIDLE;
+	localparam S_CIDLE	= 2'd0;
+	localparam S_CCFG		= 2'd1;
+	localparam S_COK		= 2'd2;
+
+	reg [1:0] cstate = S_CIDLE;
 	reg cok = 0;
+
 	always @ (posedge clk) begin
 		case (cstate)
 
-			`CIDLE: begin
+			S_CIDLE: begin
 				if (~s_ && ~ad_[15] && (map_log > 1)) begin
 					map_wr <= 1;
-					cstate <= `CCFG;
+					cstate <= S_CCFG;
 				end
 			end
 
-			`CCFG: begin
+			S_CCFG: begin
 				map_wr <= 0;
 				cok <= 1;
-				cstate <= `COK;
+				cstate <= S_COK;
 			end
 
-			`COK: begin
+			S_COK: begin
 				if (s_) begin
 					cok <= 0;
-					cstate <= `CIDLE;
+					cstate <= S_CIDLE;
 				end
 			end
 
@@ -105,56 +106,50 @@ module mem_elwro_sram(
 
 	// --- memory access -------------------------------------------------------
 
-	`define IDLE		0
-	`define	READ		1
-	`define WRITE		2
-	`define OK			3
-	`define MAP			4
-	reg [2:0] state = `IDLE;
+	localparam S_IDLE	= 2'd0;
+	localparam S_OK		= 2'd1;
+	localparam S_MAP	= 2'd2;
+
+	reg [1:0] state = S_IDLE;
 	reg we, oe, ok;
 	reg [0:15] rd_data;
+
 	always @ (posedge clk) begin
 		case (state)
 
-			`IDLE: begin
-				if (~r_ | ~w_) begin
-					state <= `MAP;
+			S_IDLE: begin
+				if (~r_) begin
+					state <= S_MAP;
+					map_rd <= 1;
+					oe <= 1;
+				end else if (~w_) begin
+					state <= S_MAP;
 					map_rd <= 1;
 				end
 			end
 
-			`MAP: begin
+			S_MAP: begin
+				map_rd <= 0;
 				if ((seg_addr > 1) && (map_out == 0)) begin
-					state <= `IDLE;
-					map_rd <= 0;
+					state <= S_IDLE;
 				end else if (~r_) begin
-					state <= `READ;
-					oe <= 1;
+					rd_data <= SRAM_D;
+					ok <= 1;
+					state <= S_OK;
 				end else if (~w_) begin
-					state <= `WRITE;
+					state <= S_OK;
+					ok <= 1;
 					we <= 1;
 				end
 			end
 	
-			`READ: begin
-				rd_data <= SRAM_D;
-				ok <= 1;
-				state <= `OK;
-			end
-	
-			`WRITE: begin
-				map_rd <= 0;
-				we <= 0;
-				ok <= 1;
-				state <= `OK;
-			end
-	
-			`OK: begin
+			S_OK: begin
 				map_rd <= 0;
 				oe <= 0;
+				we <= 0;
 				if (r_ & w_) begin
 					ok <= 0;
-					state <= `IDLE;
+					state <= S_IDLE;
 				end
 			end
 
