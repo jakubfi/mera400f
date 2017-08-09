@@ -130,7 +130,7 @@ class m4cp:
     # --------------------------------------------------------------------
     def keys(self, val):
         if self.debug:
-            print(" 0x%04x" % val, file=sys.stderr);
+            print("  keys: 0x%04x" % val, file=sys.stderr);
         k1 = (val >> 0)  & 0b111111
         k2 = (val >> 6)  & 0b11111
         k3 = (val >> 11) & 0b11111
@@ -142,7 +142,10 @@ class m4cp:
     def state(self):
         self.s.write([0b11000000])
         res = self.s.read(4)
-        return m4state(res)
+        st = m4state(res)
+        if self.debug:
+            print("  %s" % st, file=sys.stderr);
+        return st;
 
     # --------------------------------------------------------------------
     def cmds(self, line):
