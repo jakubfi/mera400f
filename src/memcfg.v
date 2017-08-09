@@ -10,6 +10,9 @@ module memcfg(
 	output [0:7] frame
 );
 
+	parameter MODULE_ADDR_WIDTH;
+	parameter FRAME_ADDR_WIDTH;
+
 /*
   Memory configuration: "OU r, n": OU=s_, r=rdt_, n=ad_
 
@@ -54,6 +57,15 @@ module memcfg(
 
 	// --- configuration process -----------------------------------------------
 
+	localparam mmask = 2**MODULE_ADDR_WIDTH - 1;
+	localparam fmask = 2**FRAME_ADDR_WIDTH - 1;
+	localparam [3:0] frame_addr_mask = fmask[3:0];
+	localparam [3:0] module_addr_mask = mmask[3:0];
+	localparam [7:0] invalidity_mask = ~{module_addr_mask, frame_addr_mask};
+
+	wire frame_addr_valid = (cfg_frame & invalidity_mask) == 8'd0;
+	wire cfg_cmd_valid = ~s_ && ad15 && (cfg_page > 1) && frame_addr_valid;
+
 	localparam S_CIDLE	= 2'd0;
 	localparam S_CCFG		= 2'd1;
 	localparam S_COK		= 2'd2;
@@ -64,7 +76,7 @@ module memcfg(
 		case (cstate)
 
 			S_CIDLE: begin
-				if (~s_ && ad15 && (cfg_page > 1)) begin
+				if (cfg_cmd_valid) begin
 					map_wr <= 1;
 					cstate <= S_CCFG;
 				end

@@ -37,7 +37,10 @@ module mem_elwro_sram(
 	wire [0:7] frame;
 	wire cok;
 
-	memcfg MEMCFG(
+	memcfg #(
+		.MODULE_ADDR_WIDTH(2),
+		.FRAME_ADDR_WIDTH(3)
+	) MEMCFG(
 		.clk(clk),
 		.s_(s_),
 		.ad15(~ad_[15]),
