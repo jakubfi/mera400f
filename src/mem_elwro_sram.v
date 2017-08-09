@@ -21,7 +21,7 @@ module mem_elwro_sram(
 	assign SRAM_LB = 0;
 	assign SRAM_WE = ~we;
 	assign SRAM_OE = ~oe;
-	assign SRAM_A[17:0] = {map_out[2:7], ~ad_[4:15]};
+	assign SRAM_A[17:0] = {frame[2:7], ~ad_[4:15]};
 	assign SRAM_D = we ? ~rdt_ : 16'hzzzz;
 
 	// Interface signals
@@ -30,23 +30,23 @@ module mem_elwro_sram(
 
 	// --- memory configuration ------------------------------------------------
 
-	wire [0:7] map_log = ~{rdt_[12:15], rdt_[0:3]};
-	wire [0:7] map_phy = ~{ad_[11:14], ad_[7:10]};
-	wire [0:7] seg_addr = ~{nb_, ad_[0:3]};
+	wire [0:7] cfg_page = ~{rdt_[12:15], rdt_[0:3]};
+	wire [0:7] cfg_frame = ~{ad_[11:14], ad_[7:10]};
+	wire [0:7] page = ~{nb_, ad_[0:3]};
 	reg map_rd = 0;
-	wire [0:7] map_out;
+	wire [0:7] frame;
 	wire cok;
 
 	memcfg MEMCFG(
 		.clk(clk),
 		.s_(s_),
 		.ad15(~ad_[15]),
-		.map_rd(map_rd),
-		.map_log(map_log),
-		.map_phy(map_phy),
-		.seg_addr(seg_addr),
+		.rd(map_rd),
+		.cfg_page(cfg_page),
+		.cfg_frame(cfg_frame),
+		.page(page),
 		.cok(cok),
-		.map_out(map_out)
+		.frame(frame)
 	);
 
 	// --- memory access -------------------------------------------------------
@@ -75,7 +75,7 @@ module mem_elwro_sram(
 
 			S_MAP: begin
 				map_rd <= 0;
-				if ((seg_addr > 1) && (map_out == 0)) begin
+				if ((page > 1) && (frame == 0)) begin
 					state <= S_IDLE;
 				end else if (~r_) begin
 					rd_data <= SRAM_D;
