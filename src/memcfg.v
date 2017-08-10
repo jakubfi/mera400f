@@ -1,5 +1,6 @@
 module memcfg(
 	input clk,
+	input reset,
 	input s_,
 	input ad15,
 	input rd,
@@ -7,7 +8,8 @@ module memcfg(
 	input [0:7] cfg_frame,
 	input [0:7] page,
 	output reg cok,
-	output [0:7] frame
+	output [0:7] frame,
+	output pvalid
 );
 
 	parameter MODULE_ADDR_WIDTH;
@@ -54,6 +56,17 @@ module memcfg(
 	end
 
 	assign frame = rd ? map[rd_addr] : 8'hzz;
+
+	// --- memory cfg validity map ---------------------------------------------
+
+	reg [255:0] page_valid = 2'b11;
+
+	always @ (posedge clk, posedge reset) begin
+		if (reset) page_valid[255:2] = 'd0;
+		else if (map_wr) page_valid[addr] = 1'b1;
+	end
+
+	assign pvalid = page_valid[addr];
 
 	// --- configuration process -----------------------------------------------
 

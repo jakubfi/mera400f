@@ -4,6 +4,7 @@
 
 module mem_elwro_sram(
 	input clk,
+	input reset,
 	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,
 	output [17:0] SRAM_A,
 	inout [15:0] SRAM_D,
@@ -36,12 +37,14 @@ module mem_elwro_sram(
 	reg map_rd = 0;
 	wire [0:7] frame;
 	wire cok;
+	wire pvalid;
 
 	memcfg #(
 		.MODULE_ADDR_WIDTH(2),
 		.FRAME_ADDR_WIDTH(3)
 	) MEMCFG(
 		.clk(clk),
+		.reset(reset),
 		.s_(s_),
 		.ad15(~ad_[15]),
 		.rd(map_rd),
@@ -49,7 +52,8 @@ module mem_elwro_sram(
 		.cfg_frame(cfg_frame),
 		.page(page),
 		.cok(cok),
-		.frame(frame)
+		.frame(frame),
+		.pvalid(pvalid)
 	);
 
 	// --- memory access -------------------------------------------------------
@@ -78,7 +82,7 @@ module mem_elwro_sram(
 
 			S_MAP: begin
 				map_rd <= 0;
-				if ((page > 1) && (frame == 0)) begin
+				if (~pvalid) begin
 					state <= S_IDLE;
 				end else if (~r_) begin
 					rd_data <= SRAM_D;

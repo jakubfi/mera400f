@@ -242,6 +242,7 @@ module mera400f(
 
 	mem_elwro_sram MEM(
 		.clk(clk_sram),
+		.reset(clm),
 		.SRAM_CE(SRAM_CE),
 		.SRAM_OE(SRAM_OE),
 		.SRAM_WE(SRAM_WE),
