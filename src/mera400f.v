@@ -225,7 +225,7 @@ module mera400f(
 	wire rcl, zoff;
 	isk ISK(
 		.dmcl(dmcl),
-		.dcl(dcl),
+		.dcl(dcl|dcl_hold),
 		.off(off),
 		.rcl(rcl),
 		.zoff(zoff)
@@ -240,9 +240,11 @@ module mera400f(
 	assign F_OE = 1'b1;
 	assign F_WE = 1'b1;
 
+	wire dcl_hold;
 	mem_elwro_sram MEM(
 		.clk(clk_sram),
 		.reset(clm),
+		.reset_hold(dcl_hold),
 		.SRAM_CE(SRAM_CE),
 		.SRAM_OE(SRAM_OE),
 		.SRAM_WE(SRAM_WE),

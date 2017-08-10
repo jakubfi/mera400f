@@ -5,6 +5,7 @@
 module mem_elwro_sram(
 	input clk,
 	input reset,
+	output reset_hold,
 	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,
 	output [17:0] SRAM_A,
 	inout [15:0] SRAM_D,
@@ -45,6 +46,7 @@ module mem_elwro_sram(
 	) MEMCFG(
 		.clk(clk),
 		.reset(reset),
+		.reset_hold(reset_hold),
 		.s_(s_),
 		.ad15(~ad_[15]),
 		.rd(map_rd),

@@ -1,20 +1,8 @@
-Bugs:
-* good/ops/em.asm sometimes fails on freshly started fpga with freshly uploaded core (mem map issue?)
-
-Needs investigation:
-* IC is cleared on -OFF only? But DTR says 0->IC on CLO!
-
 Keep an eye on:
-* IR is loaded on STROB1*W->IR rising edge instead of a latching on high. Data on RDT may be not ready then.
-* also, AWP uses STROB1 falling edge to get mem argument, so it may be already too late
-* LF used to destroy registers >r3 (due to wrong register selection signals?).
-* The huge combinatorial loop (gone when AWP is present).
-* "UPLOAD FAILED" after compilation sometimes
+* AWP uses STROB1 falling edge to get mem argument, so it may be already too late
 * AWP: T and M are interdependent and thus need to use the same clock
-* store to 0x1000 sometimes stores data to 0x0000 (and tp.asm fails to load for example)
 
 Features:
-* Elwro needs to respond to 'clear'
 * MEGA
 * DRAM driver
 * DRAM cache
