@@ -22,12 +22,8 @@ SOURCES = mera400f.v \
 	cpu.v \
 	mem_elwro_sram.v memcfg.v \
 	awp.v fps.v fpm.v fpa.v fic.v
-TESTS_DIR = tests
-TESTS = regs.v pd.v \
-	alu_add_16bit_182.v alu_add_16bit.v alu_fn.v \
-	decoder_bcd.v decoder16.v \
-	ir.v \
-	ar.v at.v ic.v ac.v
+TESTS_DIR = 
+TESTS = 
 SETTINGS = $(SOURCES_DIR)/settings.qsf
 QSYS_SYNTH = VERILOG
 # See: https://github.com/jakubfi/altlogfilter (or comment out the line below)
