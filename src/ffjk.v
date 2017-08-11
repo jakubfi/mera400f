@@ -1,6 +1,4 @@
-/*
-	JK flip-flop
-*/
+// Generic JK flip-flop
 
 module ffjk(
 	input c_, j, k, r_, s_,

@@ -1,3 +1,5 @@
+// W bus (main internal bus)
+
 module bus_w(
 	input mwc, mwb, mwa,
 	input bwa, bwb,

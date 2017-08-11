@@ -1,6 +1,4 @@
-/*
-	74154 4-bit to 16-bit decoder
-*/
+// 74154 4-bit to 16-bit decoder
 
 module decoder16(
 	input en1, en2,

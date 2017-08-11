@@ -1,3 +1,5 @@
+// KI bus
+
 module bus_ki(
 	input kia, kib,
 	input [0:15] rz,

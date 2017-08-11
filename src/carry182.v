@@ -1,6 +1,4 @@
-/*
-	74182 Look-Ahead Carry Generator
-*/
+// 74182 Look-Ahead Carry Generator
 
 module carry182(
 	input c_,

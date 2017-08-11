@@ -1,10 +1,4 @@
-/*
-	AWP (FPU)
-
-	document: 12-006370-01-4A
-	unit:     F-PA2-1
-	pages:    2-1..2-48
-*/
+// AWP (coprocessor, 32-bit fixed point and 48-bit floating point arithmetic)
 
 module awp(
 	input clk_sys,

@@ -1,3 +1,5 @@
+// Level 1 instruction decoder
+
 module idec1(
 	input [0:5] i,
 	output [0:47] o

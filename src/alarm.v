@@ -1,3 +1,5 @@
+// Alarm signal generator (fires when there was no answer on the interface)
+
 module alarm(
 	input clk_sys,
 	input engage,

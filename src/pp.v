@@ -50,10 +50,7 @@ module pp(
 	parameter DOK_DLY_TICKS;
 	parameter DOK_TICKS;
 
-	wor __NC; // unconnected signals here, to suppress warnings
-
-	// sheet 1, 2
-	// * RM - interrupt mask register
+	// --- RM - interrupt mask register
 
 	wire clm$ = clm | (strob1 & i4);
 	wire clrs = strob1b & w_rm;
@@ -67,8 +64,7 @@ module pp(
 		.rs(rs)
 	);
 
-	// sheet 3..10
-	// * RZ, RP - interrupt request and service registers
+	// --- RZ, RP - interrupt request and service registers
 
 	// RZ input: software interrupt drivers (sheet 10)
 	wire M104_12 = wx & sin & strob1;
@@ -196,8 +192,8 @@ module pp(
 	assign irq = |sz; // Suma Zgłoszeń
 	assign przerw_z = zi[8] & ~zi[4];
 
-	wire int_chan = ~rdt[15] & zgpn; // przerwanie kanałowe do tego procesora
-	wire int_cpu = rdt[15]; // przerwanie od innego procesora
+	wire int_chan = ~rdt[15] & zgpn; // channel interrupt for this CPU
+	wire int_cpu = rdt[15]; // interrupt from the other CPU
 	wire int_ext = int_chan | int_cpu;
 
 	wire dok_trig;

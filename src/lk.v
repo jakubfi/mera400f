@@ -1,10 +1,4 @@
-/*
-	Step counter (LK)
-
-	document: 12-006368-01-8A
-	unit:     P-M3-2
-	pages:    2-20
-*/
+// Step counter (LK)
 
 module lk(
 	input clk_sys,

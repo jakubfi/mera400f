@@ -1,3 +1,5 @@
+// Interface control
+
 module ifctl(
 	input clk_sys,
 	input clo,
@@ -43,32 +45,6 @@ module ifctl(
 		endcase
 	end
 
-/*
-	wire zgi;
-	ffjk REG_ZGI(
-		.s_(~zgi_set),
-		.j(zgi_j),
-		.c_(gotst1),
-		.k(zgi),
-		.r_(~clo),
-		.q(zgi)
-	);
-*/
-
-/*
-	wire zgi2_reset = clo | (strob2 & w$ & wzi & is);
-	wire zgi2_j = srez$ & wr;
-
-	reg ifhold;
-	always @ (posedge ok$, posedge zgi2_reset) begin
-		if (zgi2_reset) ifhold <= 0;
-		else case (zgi2_j)
-			1'b0: ifhold <= 0;
-			1'b1: ifhold <= ~ifhold;
-		endcase
-	end
-*/
-
 	// ten rejestr trzyma zgłoszenie na interfejsie dla rozkazów, które robią
 	// odczyt+zapis, który powinien być zrobiony w tym samym dostępie do I/F (atomowo)
 	// (ifhold wypełnia sygnał ZW pomiędzy stanami WR a WW)
@@ -87,38 +63,12 @@ module ifctl(
 			2'b11: ifhold <= ~ifhold;
 		endcase
 	end
-/*
-	wire ifhold;
-	ffjk IFHOLD(
-		.s_(1'b1),
-		.j(ifhold_j),
-		.c_(~ok$),
-		.k(ifhold),
-		.r_(~(ifhold_reset | clo)),
-		.q(ifhold)
-	);
-*/
+
 	// ok$ - koniec pracy z interfejsem (niezależnie od finału: ok/en/alarm)
-	// to zasadniczo jest zwzg & ok_clk, ale tak nie działa (póki co)
+	// oryginalnie był to przerzutnik, ale w sumie...
 
 	wire ok_clk = ren | talarm | rok;
 	assign ok$ = zwzg & ok_clk;
-	/*
-	always @ (posedge clk_sys, negedge zgi) begin
-		if (~zgi) ok$ <= 0;
-		else if (ok_clk) ok$ <= zwzg;
-	end
-*/
-	/*
-	ffjk REG_OK$(
-		.s_(1'b1),
-		.j(zwzg),
-		.c_(~ok_clk),
-		.k(1'b1),
-		.r_(zgi),
-		.q(ok$)
-	);
-*/
 
 	// alarm przy braku odpowiedzi z interfejsu
 

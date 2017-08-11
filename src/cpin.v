@@ -1,11 +1,13 @@
+// Control Panel input - serial commands interpreter
+
 module cpin(
 	input clk_sys,
 	input [7:0] rx_byte,
 	input rx_busy,
 	output reg send_leds,
-	output reg [11:0] fnkey, // function switches
-	output reg [3:0] rotary_pos, // user-set rotary switch position ("r1" initial)
-	output reg [15:0] kl // data input switches
+	output reg [11:0] fnkey,			// function switches
+	output reg [3:0] rotary_pos,	// user-set rotary switch position
+	output reg [15:0] kl					// data input switches
 );
 
 	localparam S_IDLE = 2'd0;

@@ -1,10 +1,4 @@
-/*
-	State register (R0)
-
-	document: 12-006368-01-8A
-	unit:     P-R3-2
-	pages:    2-63..2-66
-*/
+// State register (R0)
 
 module r0 (
 	input clk_sys,
@@ -40,7 +34,7 @@ module r0 (
 				if (c1) {r0[1], r0[3]} <= {s_1, carry};
 			end
 
-			// NOTE: dla JVS zawsze robi się 0->V i ma priorytet (jako reset): _0_v = js & a_eq[4] & we;
+			// NOTE: for JVS there is always 0->V and it has the priority (as a reset signal)
 			if (_0_v) r0[2] <= 1'b0;
 			else if (w_zmvc) r0[2] <= w[2];
 			else if (c2 & (s0 ^ s_1)) r0[2] <= 1'b1;

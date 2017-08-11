@@ -1,3 +1,5 @@
+// Premodification counter
+
 module mc(
 	input clk_sys,
 	input inc,

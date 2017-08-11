@@ -1,3 +1,5 @@
+// Control Panel 7-seg display
+
 module display(
 	input clk_sys,
 	input [0:15] w,

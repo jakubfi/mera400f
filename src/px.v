@@ -64,7 +64,6 @@ module px(
 	output reg i5,	// state I5
 
 	input stp0,			// B48
-	// sheet 3
 	output as2_sum_at,	// A13
 
 	// control panel
@@ -75,7 +74,6 @@ module px(
 	input k2_bin_store,	// BIN | STORE @ K2
 	input k2fetch,	// FETCH @ K2
 
-	// sheet 5
 	input przerw_z,	// A61
 	input przerw,		// A24
 
@@ -98,7 +96,6 @@ module px(
 	input pp,				// A64
 	output blw_pw,	// B85
 	output zer_sp,	// A73
-	// sheet 6
 	input sbar$,		// A53
 	input q,				// Q system flag
 	input read_fp,	// A39
@@ -125,12 +122,10 @@ module px(
 	output [0:15] ddt, // DT bus
 	output [0:15] dad, // AD bus
 
-	// sheet 7
 	input lrz,			// B78
 	output i3_ex_przer,	// A52
 	output ck_rz_w,	// B91
 	output zerrz,		// B85
-	// sheet 8
 	input sr_fp,		// B53
 	input srez$,		// B76
 	input wzi,			// arithmetic "0" indicator
@@ -145,7 +140,6 @@ module px(
 	output bod,			// PE | EN on the interface
 	output ok$,			// other party is done with the reply (with either OK, EN or ALARM)
 
-	// sheet 9
 	input stop_n,		// B55
 	input zga,			// B57
 	input rpe,			// A82
@@ -166,8 +160,7 @@ module px(
 	parameter ALARM_DLY_TICKS;
 	parameter ALARM_TICKS;
 
-	// sheet 1, page 2-1
-	// * state registers
+	// CPU state registers
 
 	always @ (posedge clk_sys, posedge clo) begin
 		if (clo) begin
@@ -194,8 +187,7 @@ module px(
 		end
 	end
 
-	// sheet 3, page 2-3
-	// * strob signals
+	// strob triggers
 
 	assign as2_sum_at = wz | p4 | we | w$;
 	wire M19_6 = w$ | we | p4 | (k2 & laduj);
@@ -225,7 +217,6 @@ module px(
 		.got(got)
 	);
 
-	// sheet 5, page 2-5
 	// interrupt phase control signals
 
 	wire ei1 = (exr | lip) & pp;
@@ -242,7 +233,7 @@ module px(
 	assign zer_sp = ~lip & i5;
 	assign lipsp = lip | sp;
 
-	// sheet 6, page 2-6
+	// ---
 
 	wire M28_8 = wr | p1 | p5 | wm | k2fbs | ww | read_fp;
 	wire M30_8 = i3 | read_fp | wm | p5 | ww | k2fbs | (wr & ~inou);
@@ -263,8 +254,7 @@ module px(
 	assign ar_ad = M30_8 & zwzg;
 	assign ds = ou & wm & zwzg;
 
-	// sheet 7, page 2-7
-	// * system bus drivers
+	// system bus drivers
 
 	assign ic_ad = zwzg & (k1 | p1 | (inou & wr));
 	assign dmcl = zwzg & mcl & wm;
@@ -278,9 +268,10 @@ module px(
 	wire w = i5 | i3_ex_przer | ww | k2_bin_store;
 	assign i3_ex_przer = i3 & exrprzerw;
 	wire rw = r ^ w;
-	// FIX: -K2FBS was labeled +K2FBS
 	wire k2fbs = k2_bin_store | k2fetch;
 	assign ck_rz_w = (wr & fi) | lrz | blw_pw;
+
+	// TODO: is it needed?
 
 	wire __ck_rz_w_dly;
 	dly #(.ticks(2'd2)) DLY_ZERZ( // 2 ticks @50MHz = 40ns (~25ns orig.)
@@ -292,7 +283,7 @@ module px(
 
 	assign zerrz = __ck_rz_w_dly_ & ck_rz_w & ~blw_pw;
 
-	// sheet 8, page 2-8
+	// ---
 
   wire gotst1 = got | strob1b;
   wire zgi_j = wm | i2 | wr | ww | read_fp | i1 | i3 | i4 | i5 | k2fbs | p1 | p5 | k1;
@@ -325,7 +316,6 @@ module px(
 
 	wire ad_ad = zwzg & (i4 & soft_fp);
 
-	// E-F: no AWP
 	wire ef = efp & ~AWP_PRESENT;
 
 	reg soft_fp;
@@ -341,24 +331,12 @@ module px(
 		end
 	end
 
-/*
-	wire soft_fp;
-	ffjk JK37(
-		.s_(1'b1),
-		.j(ef),
-		.c_(~got),
-		.k(i5),
-		.r_(~clo),
-		.q(soft_fp)
-	);
-*/
 	wire exr = soft_fp | ef | exl;
 
-	// sheet 9, page 2-9
+	// ---
 
 	wire hltn_reset = zwzg & rw;
 	wire hltn_d = stop_n & zga & hltn_reset;
-	// S-R : stop on segfault in mem block 0
 	wire hltn_set = awaria_set & STOP_ON_NOMEM;
 
 	always @ (posedge clk_sys, negedge hltn_reset) begin
@@ -366,15 +344,7 @@ module px(
 		else if (hltn_set) hlt_n <= 1'b1;
 		else if (strob1) hlt_n <= hltn_d;
 	end
-/*
-	ffd REG_HLTN(
-		.s_(~hltn_set),
-		.d(hltn_d),
-		.c(strob1),
-		.r_(hltn_reset),
-		.q(hlt_n)
-	);
-*/
+
 	assign bod = rpe | ren;
 	assign b_parz = strob1 & rpe & r;
 	assign b_p0 = rw & talarm;
@@ -384,15 +354,7 @@ module px(
 		if (clo | stop) awaria <= 1'b0;
 		else if (awaria_set) awaria <= 1'b1;
 	end
-/*
-	ffd REG_AWARIA(
-		.s_(~awaria_set),
-		.d(1'b0),
-		.c(~clo),
-		.r_(~stop),
-		.q(awaria)
-	);
-*/
+
 	assign dad[0:8] = 'd0;
 	assign dad[9] = zwzg & (i1 | i4 | i5);
 	assign dad[10] = zwzg & (i1 | (i4 & exr) | i5);

@@ -1,10 +1,4 @@
-/*
-	Address register (AR)
-
-	document: 12-006368-01-8A
-	unit:     P-A3-2
-	pages:    2-77
-*/
+// Address register (AR)
 
 module ar(
 	input clk_sys,
@@ -16,9 +10,6 @@ module ar(
 	output reg [0:15] ar
 );
 
-	// NOTE: Sensitivities are different for the FPGA implementation.
-	//       Idea behind it is to always be front-edge sensitive
-	//wire clk = l | m4 | p1;
 	always @ (posedge clk_sys) begin
 		if (l) ar <= w;
 		else begin

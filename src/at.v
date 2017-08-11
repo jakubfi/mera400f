@@ -1,10 +1,4 @@
-/*
-	ALU output register (AT)
-
-	document: 12-006368-01-8A
-	unit:     P-A3-2
-	pages:    2-76
-*/
+// ALU output register (AT)
 
 module at(
 	input clk_sys,

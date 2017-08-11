@@ -1,10 +1,4 @@
-/*
-	Binary load register (RB)
-
-	document: 12-006368-01-8A
-	unit:     P-R2-3
-	pages:    2-63
-*/
+// Binary load register (RB)
 
 module rb(
 	input clk_sys,

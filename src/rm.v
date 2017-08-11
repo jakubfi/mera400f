@@ -1,3 +1,5 @@
+// Interrupt mask register
+
 module rm(
 	input clk_sys,
 	input clm$,

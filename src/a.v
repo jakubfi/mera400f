@@ -1,3 +1,5 @@
+// A bus (ALU A input)
+
 module bus_a(
 	input bac, bab, baa,
 	input aa, ab,

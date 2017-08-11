@@ -1,14 +1,7 @@
-/*
-	P-R unit (registers)
-
-	document: 12-006368-01-8A
-	unit:     P-R2-3
-	pages:    2-58..2-68
-*/
+// P-R unit (registers)
 
 module pr(
 	input clk_sys,
-	// sheet 1
 	input blr,				// A50 - BLokuj Rejestry
 	input lpc,				// A94 - LPC instruction
 	input wa,				// B94 - state WA
@@ -22,16 +15,13 @@ module pr(
 	input strob1b,		// B32
 	input strob2,		// B42
 	input strob2b,		// B42
-	// sheet 2-5
 	input [0:15] w,		// B07, B12, B11, B10, B22, B24, B25, B23, B13, B19, B20, B21, B16, B08, B17, B18 - bus W
 	output [0:15] l,	// A04, A03, A28, A27, A09, A10, A26, A25, A07, A08, A16, A17, A06, A05, A18, A19 - bus L
-	// sheet 6
 	input bar_nb,		// B83 - BAR->NB: output BAR register to system bus
 	input w_rbb,			// A51 - RB[4:9] clock in
 	input w_rbc,			// B46 - RB[0:3] clock in
 	input w_rba,			// B50 - RB[10:15] clock in
 	output [0:3] dnb,	// A86,  A90, A87, B84 - DNB: NB system bus driver
-	// sheet 7
 	input rpn,				// B85
 	input bp_nb,			// B86
 	input pn_nb,			// A92
@@ -50,19 +40,16 @@ module pr(
 	output dqb,			// B89 - Q system bus driver
 	output q,					// A53 - Q: system flag
 	output zer,			// A52
-	// sheet 8
 	input ust_z,			// B53
 	input ust_mc,			// B55
 	input s0,					// B92
 	input ust_v,			// A93
 	input _0_v,				// B91
 	output [0:8] r0,	// A44, A46, A43, A42, A41, A45, A40, A39, B09 - CPU flags in R0 register
-	// sheet 9
 	input exy,				// A37
 	input ust_y,			// B40
 	input exx,				// A38
 	input ust_x,			// B41
-	// sheet 10-11
 	input kia,				// B81
 	input kib,				// A91
 	input [0:15] bus_rz,	// B70, B76, B60, B66, A60, A64, A68, A56, B80, A80, A74, A84, A77, B74, A71, B57
@@ -99,21 +86,7 @@ module pr(
 		.l(l)
 	);
 
-/*
-	wire rpp = blr; // R0>>8 -> L
-	wire rpa = ~blr & ~(sel_r1_r7 & M60_6); // R0 -> L
-	wire rpnn = ~blr & sel_r1_r7 & M60_6; // R1-R7 -> L
-
-	// L bus final open-collector composition
-	assign l = 
-		(rpnn ? R1_7 : 16'hffff) // user registers
-		& (rpa ? {r0, r0low} : 16'hffff) // r0 at original position
-		& (rpp ? {8'd0, r0[0:7]} : 16'hffff) // r0 shifted right 8 bits
-	;
-*/
-	// sheet 6, page 2-63
-	// * RB register (binary load register)
-	// * R0 register positions 10-15 and system bus drivers
+	// RB register (binary load register)
 
 	wire [0:15] rRB;
 	rb REG_RB(
@@ -125,14 +98,7 @@ module pr(
 		.rb(rRB)
 	);
 
-	// sheet 7, page 2-64
-	// * NB (BAR) register and system bus drivers
-	// * Q and BS flag registers and system bus drivers
-	// * R0 control signals
-
-	// jumper on 7-8 : CPU 0
-	// jumper on 8-9 : CPU 1
-	assign zgpn = rpn ^ ~CPU_NUMBER; // zgodny numer procesora
+	assign zgpn = rpn ^ ~CPU_NUMBER; // CPU number matches
 	wire M35_8 = CPU_NUMBER ^ bs;
 	wire M23_11 = CPU_NUMBER & pn_nb;
 	assign dpn = (M35_8 & bp_nb) | M23_11;
@@ -140,6 +106,9 @@ module pr(
 
 	wire cnb0_3 = w_bar & strob1b;
 	assign zer = zer_sp | clm;
+
+	// NB (BAR) register and system bus drivers
+	// Q and BS flag registers and system bus drivers
 
 	wire [0:3] nb;
 	wire bs;
@@ -153,29 +122,6 @@ module pr(
 	);
 	assign dnb = nb & {4{bar_nb}};
 
-/*
-	ffd REG_BS(
-		.s_(1'b1),
-		.d(w[11]),
-		.c(~cnb0_3),
-		.r_(~clm),
-		.q(bs)
-	);
-*/
-
-/*
-	ffd REG_Q(
-		.s_(1'b1),
-		.d(w[10]),
-		.c(~cnb0_3),
-		.r_(~zer),
-		.q(q)
-	);
-*/
-
-//  wire strob_a = ~as2 & strob1;
-//  wire strob_b =  as2 & strob2;
-
 	wire M60_3  = strob_a & AWP_PRESENT & ustr0_fp;
 	wire M62_6  = strob_a & w_r & wr0 & ~q;
 	wire M62_8  = strob_b & w_r & wr0 & ~q;
@@ -187,13 +133,11 @@ module pr(
 	wire w_legy = lr0 | M62_8 | M62_6;
 	wire lrp  = lr0 | M61_8 | M61_12;
 
-	// TODO: cleg was being used on negedge in r0, so technically this should be @strob2b, but it doesn't work with strob2b now :-(
-	// NOTE: For now it does work with strob2.
 	wire cleg = as2 & strob2b & ust_leg;
 	wire vg = (~aryt & ~(zs | ~carry)) | (~(zs | s_1) & aryt);
 	wire vl = (~aryt & ~carry) | (aryt & s_1);
 
-	// * R0 register
+	// R0 register
 
 	wire [9:15] r0low;
 	r0 REG_R0(
@@ -222,7 +166,7 @@ module pr(
 		.zer(zer)
 	);
 
-	// * KI bus
+	// KI bus
 
 	bus_ki BUS_KI(
 		.kia(kia),

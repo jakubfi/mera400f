@@ -1,14 +1,7 @@
-/*
-	P-M unit (microinstructions)
-
-	document: 12-006368-01-8A
-	unit:     P-M3-2
-	pages:    2-11..2-28
-*/
+// P-M unit (microinstructions)
 
 module pm(
 	input clk_sys,
-	// sheet 1
 	input start,
 	input pon,
 	input work,
@@ -20,7 +13,6 @@ module pm(
 	input irq,
 	output _wait,
 	output run,
-	// sheet 2
 	input ekc_1,
 	input ekc_i,
 	input ekc_2,
@@ -36,7 +28,6 @@ module pm(
 	output przerw,
 	output si1,
 	output sp1,
-	// sheet 3
 	input k2,
 	input panel_store,
 	input panel_fetch,
@@ -51,13 +42,11 @@ module pm(
 	output w_rbc,
 	output w_rba,
 	output w_rbb,
-	// sheet 4
 	input p0,
 	output ep0,
 	output stp0,
 	output ek2,
 	output ek1,
-	// sheet 5
 	input j$,
 	input bcoc$,
 	input zs,
@@ -70,14 +59,12 @@ module pm(
 	output mc_3,
 	output mc_0,
 	output xi$,
-	// sheet 6
 	input p4,
 	input b0,
 	input na,
 	input c0,
 	input ka2,
 	input ka1,
-	// sheet 7
 	input p3,
 	input p1,
 	input nef,
@@ -90,13 +77,11 @@ module pm(
 	output ep1,
 	output ep2,
 	output icp1,
-	// sheet 8
 	input exl,
 	input lipsp,
 	input gr,
 	input wx,
 	input shc,
-	// sheet 9
 	input read_fp,
 	input ir7,
 	input inou,
@@ -104,7 +89,6 @@ module pm(
 	output arp1,
 	output lg_3,
 	output lg_0,
-	// sheet 10
 	input rsc,
 	input ir10,
 	input lpb,
@@ -117,7 +101,6 @@ module pm(
 	output rc,
 	output rb,
 	output ra,
-	// sheet 11
 	input bod,
 	input ir15,
 	input ir14,
@@ -125,7 +108,6 @@ module pm(
 	input ir9,
 	input ir8,
 	output lk,
-	// sheet 12
 	input rj,
 	input uj,
 	input lwlwt,
@@ -144,7 +126,6 @@ module pm(
 	input wr,
 	input wp,
 	output wls,
-	// sheet 13
 	input ri,
 	input war,
 	input wre,
@@ -156,7 +137,6 @@ module pm(
 	input bs,
 	input zb$,
 	output w_r,
-	// sheet 14
 	input wic,
 	input i4,
 	input wac,
@@ -164,7 +144,6 @@ module pm(
 	output w_ic,
 	output w_ac,
 	output w_ar,
-	// sheet 15
 	input wrz,
 	input wrs,
 	input mb,
@@ -175,7 +154,6 @@ module pm(
 	output lrz,
 	output w_bar,
 	output w_rm,
-	// sheet 16
 	input we,
 	input ib,
 	input ir6,
@@ -189,7 +167,6 @@ module pm(
 	output bac,
 	output aa,
 	output ab,
-	// sheet 17
 	input at15,
 	input srez$,
 	input rz,
@@ -201,7 +178,6 @@ module pm(
 	output kia,
 	output kib,
 	output w_ir,
-	// sheet 18
 	input ki,
 	input dt_w,
 	input f13,
@@ -211,8 +187,7 @@ module pm(
 	output mwc
 );
 
-	// sheet 1, page 2-11
-	//  * ff: START, WAIT, CYCLE
+	// START, WAIT, CYCLE
 
 	wire start_reset = hlt_n | stop | clo;
 	wire start_clk = pon & work;
@@ -221,61 +196,32 @@ module pm(
 		if (start_reset) startq <= 1'b0;
 		else if (start_clk | start) startq <= 1'b1;
 	end
-/*
-	wire startq;
-	ffd REG_START(
-		.s_(~start),
-		.d(1'b1),
-		.c(~start_clk),
-		.r_(~start_reset),
-		.q(startq)
-	);
-*/
 
 	wire wait_reset = start_reset | si1;
 	always @ (posedge clk_sys, posedge wait_reset) begin
 		if (wait_reset) _wait <= 1'b0;
 		else if (wx) _wait <= hlt;
 	end
-/*
-	ffd REG_WAIT(
-		.s_(1'b1),
-		.d(hlt),
-		.c(wx),
-		.r_(~M43_3),
-		.q(_wait)
-	);
-*/
 
 	reg __cycle_q;
 	always @ (posedge clk_sys, posedge cycle) begin
 		if (cycle) __cycle_q <= 1'b1;
 		else if (rescyc) __cycle_q <= 1'b0;
 	end
-/*
-	wire __cycle_q;
-	ffd REG_CYCLE(
-		.s_(~cycle),
-		.d(1'b0),
-		.c(1'b1),
-		.r_(~rescyc),
-		.q(__cycle_q)
-	);
-*/
+
 	assign run = startq & ~_wait;
 	wire stpc = dpr | dprzerw;
-
-	// sheet 2, page 2-12
-	//  * ff: PR (pobranie rozkazu - instruction fetch)
-	//  * ff: PP (przyjęcie przerwania - interrupt receive)
-	//  * univib: KC (koniec cyklu - cycle end)
-	//  * univib: PC (początek cyklu - cycle start)
 
 	wire ekc = ekc_1 | ekc_i | ekc_2 | p2 | p0stpc;
 	wire kc_reset = clo | pc;
 	wire rescyc = clm | strob2 | si1;
 	wire dpr = run | __cycle_q;
 	wire dprzerw = (__cycle_q | startq) & irq & ~p & mc_0;
+
+	//  PR (pobranie rozkazu - instruction fetch)
+	//  PP (przyjęcie przerwania - interrupt receive)
+	//  KC (koniec cyklu - cycle end)
+	//  PC (początek cyklu - cycle start)
 
 	wire kc, pc;
 	wire pr;
@@ -300,8 +246,7 @@ module pm(
 	assign sp1 = ~przerw & pr & pc;
 	wire zerstan = kc | clm | p0;
 
-	// sheet 3, page 2-13
-	//  * ff: FETCH, STORE, LOAD, BIN (bootstrap)
+	// FETCH, STORE, LOAD, BIN (bootstrap)
 
 	wire st2k2 = strob2 & k2;
 
@@ -313,41 +258,17 @@ module pm(
 		if (panel_store) store <= 1'b1;
 		else if (clm | st2k2) store <= 1'b0;
 	end
-/*
-	ffd REG_STORE(
-		.s_(~panel_store),
-		.d(1'b0),
-		.c(st2k2),
-		.r_(~clm),
-		.q(store)
-	);
-*/
+
 	always @ (posedge clk_sys, posedge panel_fetch) begin
 		if (panel_fetch) fetch <= 1'b1;
 		else if (clm | st2k2) fetch <= 1'b0;
 	end
-/*
-	ffd REG_FETCH(
-		.s_(~panel_fetch),
-		.d(1'b0),
-		.c(st2k2),
-		.r_(~clm),
-		.q(fetch)
-	);
-*/
+
 	always @ (posedge clk_sys, posedge panel_load) begin
 		if (panel_load) load <= 1'b1;
 		else if (clm | st2k2) load <= 1'b0;
 	end
-/*
-	ffd REG_LOAD(
-		.s_(~panel_load),
-		.d(1'b0),
-		.c(st2k2),
-		.r_(~clm),
-		.q(load)
-	);
-*/
+
 	wire bin_d = ~(rdt9 & rdt11 & lg_0);
 	wire s1k1 = strob1 & k1;
 	always @ (posedge clk_sys, posedge panel_bin) begin
@@ -355,18 +276,9 @@ module pm(
 		else if (clm) bin <= 1'b0;
 		else if (s1k1) bin <= bin_d;
 	end
-/*
-	ffd REG_BIN(
-		.s_(~panel_bin),
-		.d(bin_d),
-		.c(~s1k1),
-		.r_(~clm),
-		.q(bin)
-	);
-*/
+
 	assign laduj = load;
 	wire sfl = store | fetch | load;
-	// FIX: +UR was a NAND output on schematic, instead of AND
 	wire ur = k2 & (load | fetch);
 	wire ar_1 = k2 & ~load;
 	wire k2store = k2 & store;
@@ -378,9 +290,8 @@ module pm(
 	assign w_rba = k1s1 & lg_2;
 	assign w_rbb = k1s1 & lg_1;
 
-	// sheet 4, page 2-14
-	//  * control panel state transitions
-	//  * transition to P0 state
+	// control panel state transitions
+	// transition to P0 state
 
 	wire psr = p0 | k2store;
 	wire p0stpc = p0 & stpc;
@@ -391,10 +302,7 @@ module pm(
 	assign ek1 = (p0_k2 & bin) | (k1 & bin & ~lg_3);
 	wire lg_plus_1 = (bin & k2) | (k1 & rdt9);
 
-	// sheet 5, page 2-15
-	//  * P - wskaźnik przeskoku (branch indicator)
-	//  * MC - premodification counter
-
+	// P - wskaźnik przeskoku (branch indicator)
 	always @ (posedge clk_sys, posedge clm) begin
 		if (clm) p <= 1'b0;
 		else if (strob1) begin
@@ -406,25 +314,12 @@ module pm(
 
 	wire p_d = (~j$ & bcoc$) | zs;
 	wire p_set = (p2 & strob1) | clm;
-/*
-	wire p_clk = ssp$ & strob1 & w$;
-	wire p_reset = strob1 & rok & ~inou & wm;
-
-	wire p_;
-	ffd WSK_P(
-		.s_(~p_set),
-		.d(~p_d),
-		.c(~p_clk),
-		.r_(~p_reset),
-		.q(p_)
-	);
-	assign p = ~p_;
-*/
 
 	wire setwp = strob1 & wx & md;
 	wire reswp = p_set | (sc$ & strob2 & p1);
 	wire reset_mc = reswp | (~md & p4);
 
+	// MC - premodification counter
 	mc MC(
 		.clk_sys(clk_sys),
 		.inc(setwp),
@@ -433,13 +328,10 @@ module pm(
 		.mc_0(mc_0)
 	);
 
-	// sheet 6, page 2-16
-	//  * WMI - wskaźnik rozkazu dwusłowowego (2-word instruction indicator)
-	//  * WPI - wskaźnik premodyfikacji (premodification indicator)
-	//  * WBI - wskaźnik B-modyfikacji (B-modification indicator)
-
 	assign xi$ = ~p & p1 & strob2 & xi;
 	wire wm_d = pr & ~c0 & na;
+
+	// WMI - wskaźnik rozkazu dwusłowowego (2-word instruction indicator)
 
 	// TODO: moved from strob2 to strob1b
 	// trzeba pewnie będzie ostatecznie wrócić do strob2 jakoś
@@ -451,19 +343,10 @@ module pm(
 		end
 	end
 
-/*
-	wire wm_q;
-	ffd REG_WMI(
-		.s_(1'b1),
-		.d(wm_d),
-		.c(strob2),
-		.r_(~xi$),
-		.q(wm_q)
-	);
-*/
-
 	wire wb_j = pr & ~b0 & na;
 	wire wb_k = (p4 & ~wpp) | p2;
+
+	// WBI - wskaźnik B-modyfikacji (B-modification indicator)
 
 	reg wb;
 	always @ (posedge clk_sys, posedge zerstan) begin
@@ -477,17 +360,8 @@ module pm(
 			endcase
 		end
 	end
-/*
-	wire wb;
-	ffjk REG_WBI(
-		.s_(1'b1),
-		.j(wb_j),
-		.c_(strob1),
-		.k(wb_k),
-		.r_(~zerstan),
-		.q(wb)
-	);
-*/
+
+	// WPI - wskaźnik premodyfikacji (premodification indicator)
 
 	reg wpp;
 	always @ (posedge clk_sys, posedge reswp) begin
@@ -497,17 +371,7 @@ module pm(
 			else if (p4) wpp <= 1'b0;
 		end
 	end
-/*
-	wire wpp;
-	ffjk REG_WPI(
-		.s_(~setwp),
-		.j(1'b0),
-		.c_(strob1),
-		.k(p4),
-		.r_(~reswp),
-		.q(wpp)
-	);
-*/
+
 	wire p4wp = p4 & wpp;
 	// Wskaźnik Premodyfikacji lub B-modyfikacji (było: wpb)
 	wire wpbmod = wb | wpp;
@@ -516,8 +380,7 @@ module pm(
 	wire ka12x = (na & c0) | ka2 | ka1;
 	wire ka1ir6 = ka1 & ir6;
 
-	// sheet 7, page 2-17
-	//  * interrupt loop state transition signals
+	// interrupt loop state transition signals
 
 	wire p3_p4 = p3 | p4;
 	wire p5_p4 = p5 | p4;
@@ -536,15 +399,12 @@ module pm(
 	wire load_ac = p5_p4 | p1 | p3 | i2;
 	assign icp1 = (wm_q & p2) | p1 | ic_1;
 
-	// sheet 8, page 2-18
-
 	wire lolk = slg2 | (strob2 & p1 & shc) | (strob1 & wm & inou);
 
 	wire downlk = strob1 & (wrwwgr | ((shc | inou) & wx));
 	wire wrwwgr = gr & wrww;
 
-	// sheet 9, page 2-19
-	//  * group counter (licznik grupowy)
+	// group counter (licznik grupowy)
 
 	assign arp1 = ar_1 | read_fp | i3 | wrwwgr;
 
@@ -579,15 +439,13 @@ module pm(
 	wire ic_1 = wx & inou;
 	wire okinou = inou & rok;
 
-	// sheet 10, page 2-20
-	//  * general register selectors
+	// general register selectors
 
 	assign rc = _7_rkod | (p3 & ir13) | (p4 & ir10) | (p0_k2 & rsc) | (rlp_fp & 1'b0) | (w & lgc);
 	assign rb = _7_rkod | (p3 & ir14) | (p4 & ir11) | (p0_k2 & rsb) | (rlp_fp & lpb)  | (w & lgb);
 	assign ra = _7_rkod | (p3 & ir15) | (p4 & ir12) | (p0_k2 & rsa) | (rlp_fp & lpa)  | (w & lga);
 
-	// sheet 11, page 2-21
-	//  * step counter (licznik kroków)
+	// step counter (licznik kroków)
 
 	wire [0:3] lk_in;
 
@@ -605,8 +463,6 @@ module pm(
 		.lk(lk)
 	);
 	
-	// sheet 12, page 2-22
-
 	wire ruj = rj | uj;
 	wire pac = rj | uj | lwlwt;
 	wire lwtsr = lwlwt | sr;
@@ -614,33 +470,27 @@ module pm(
 	wire pat = lrcb | sr;
 	wire rjcpc = rj | rpc | rc$;
 	wire lrcbngls$ = lrcb | ng$ | ls;
+
 	wire M95_10 = ~w$ & ls;
 	always @ (posedge clk_sys, negedge M95_10) begin
 		if (~M95_10) wls <= 1'b0;
 		else if (wa & strob1) wls <= 1'b1;
 	end
-/*
-	wire wls_ = ~(M95_10 & wls);
-	assign wls = ~(wls_ & ~wa);
-*/
 
 	wire M24_8 = ~oc & ~bs & w$;
 	wire M36_3 = ~ls & we;
 	wire w = wa | M24_8 | M36_3 | wm | wz | ww | wr | wp;
 	wire wrww = wr | ww;
 
-	// sheet 13, page 2-23
-	//  * W bus to Rx microoperation
+	// W bus to Rx microoperation
 
 	wire warx = (p1 & ~wpp) | (~wpp & p3) | (ri & wa) | (war & ur);
 	wire w_r_1 = (ur & wre) | (lipsp & lg_1 & i3) | (lwtsr & wp) | (wa & rjcpc);
 	wire w_r_2 = (wr & sar$) | (zb$ & we) | (lar$ & w$) | (wm & in & rok);
 	assign w_r = w_r_1 | s_fp | w_r_2;
-	// FIX: -7->RKOD was a active-high output of a 7451, which has active-low outputs
 	wire _7_rkod = (w$ & bs) | (ls & we);
 
-	// sheet 14, page 2-24
-	//  * W bus to IC, AC, AR microoperations
+	// W bus to IC, AC, AR microoperations
 
 	wire bs_wls = bs | wls;
 	wire wrinou = inou & wr;
@@ -648,8 +498,7 @@ module pm(
 	assign w_ac = (bs_wls & we) | (ur & wac) | (wa & lrcbngls$) | (wr & lrcblac) | load_ac;
 	assign w_ar = (~wls & ls & we) | (we & lwrs) | (wp & lrcb) | warx | i1 | p5_p4;
 
-	// sheet 15, page 2-25
-	//  * W bus to block number (NB) and interrupt mask (RM)
+	// W bus to block number (NB) and interrupt mask (RM)
 
 	assign lrz = ur & wrz;
 	wire wrsz = wrz ^ wrs;
@@ -658,8 +507,7 @@ module pm(
 	wire abx = (psr & wic) | (wa & rj) | (we & (lwrs | jkrb)) | (lj & ww);
 	wire ljkrb = lj | jkrb;
 
-	// sheet 16, page 2-26
-	//  * A bus control signals
+	// A bus control signals
 
 	wire ib_ng = ib | ng$;
 	wire cb_oc = cb | oc;
@@ -670,7 +518,6 @@ module pm(
 	wire M71_8 = (w$ & ls) | (psr & war);
 	wire M89_4 = ~wpb & rb$;
 	wire M71_6 = (~na & p3) | (w$ & M89_4);
-	// FIX: M10_4 was labeled as a NAND gate, instead of NOR
 	wire M10_4 = ~ir6 & rc$;
 	wire M55_8 = (M10_4 & wa) | (lg_0 & i3_ex_przer);
 
@@ -680,8 +527,7 @@ module pm(
 	assign aa = M71_6 | i5 | p4wp | M71_8;
 	assign ab = M71_6 | M55_8 | abx;
 
-	// sheet 17, page 2-27
-	//  * left/right byte selection signals
+	// left/right byte selection signals
 
 	wire str1wx = strob1b & wx;
 
@@ -692,16 +538,6 @@ module pm(
 		else if (str1wx) WPB <= at15;
 	end
 
-/*
-	// PBI - Wskaźnik Prawego Bajtu (było: pb/pb_/wpb_)
-	ffd REG_PB(
-		.r_(lrcb),
-		.d(at15),
-		.c(~str1wx),
-		.s_(1'b1),
-		.q(wpb)
-	);
-*/
 	assign w_ir = (wir & ur) | pr;
 
 	// KI bus control signals

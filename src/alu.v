@@ -1,10 +1,4 @@
-/*
-	ALU
-
-	document: 12-006368-01-8A
-	unit:     P-A3-2
-	pages:    2-74..2-75
-*/
+// 16-bit ALU
 
 /*
 

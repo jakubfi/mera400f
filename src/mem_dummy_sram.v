@@ -1,6 +1,4 @@
-/*
-	Memory (dummy, not software configurable)
-*/
+// Memory (dummy, not software configurable)
 
 module mem_dummy_sram(
 	input clk,

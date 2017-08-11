@@ -1,3 +1,5 @@
+// Cycle end / cycle start
+
 module kcpc(
 	input clk_sys,
 	input kc_reset,

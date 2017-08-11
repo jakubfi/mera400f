@@ -1,6 +1,4 @@
-/*
-	Minimal 8N1 TX/RX UART driver
-*/
+// Minimal 8N1 TX/RX UART driver
 
 // -----------------------------------------------------------------------
 module uart(

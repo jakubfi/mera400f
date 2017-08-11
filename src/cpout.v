@@ -1,3 +1,5 @@
+// Control Panel output - sends CPU status over serial
+
 module cpout (
 	input clk_sys,
 	input trigger,

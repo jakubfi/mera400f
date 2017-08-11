@@ -1,3 +1,5 @@
+// MERA-400 top
+
 module mera400f(
 	input CLK_EXT,
 	output BUZZER,
@@ -18,8 +20,8 @@ module mera400f(
 
 	// clocks
 	localparam CLK_EXT_HZ = 50_000_000;
-  localparam CLK_SYS_HZ = CLK_EXT_HZ;
-  localparam CLK_UART_HZ = CLK_EXT_HZ;
+	localparam CLK_SYS_HZ = CLK_EXT_HZ;
+	localparam CLK_UART_HZ = CLK_EXT_HZ;
 	wire clk_sys = CLK_EXT;
 	wire clk_uart = CLK_EXT;
 	wire clk_sram = CLK_EXT;

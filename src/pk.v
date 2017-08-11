@@ -1,10 +1,4 @@
-/*
-	P-K unit (control panel, heavily modified for the FPGA implementation)
-
-	document: 12-006368-01-8A
-	unit:     SM-PK11
-	pages:    2-103..2-108
-*/
+// P-K unit (control panel, heavily modified for the FPGA implementation)
 
 `define FN_START	4'd0
 `define FN_MODE		4'd1
@@ -20,14 +14,12 @@
 `define FN_CLEAR	4'd11
 
 module pk(
-	// FPGA I/Os
 	input clk_sys,
 	input clk_uart,
 	input RXD,
 	output TXD,
 	output [7:0] SEG,
 	output [7:0] DIG,
-	// sheet 1
 	input hlt_n,
 	input off,
 	output work,
@@ -35,7 +27,6 @@ module pk(
 	output start,
 	output mode,
 	output stop_n,
-	// sheet 2
 	input p0,
 	output [0:15] kl,
 	output dcl,
@@ -46,9 +37,7 @@ module pk(
 	output load,
 	output bin,
 	output oprq,
-	// sheet 3
 	output reg zegar,
-	// sheet 4
 	input [0:15] w,
 	input p,
 	input mc_0,
@@ -57,7 +46,6 @@ module pk(
 	input irq,
 	input q,
 	input run,
-	// sheet 5
 	output wre,
 	output rsa,
 	output rsb,

@@ -1,6 +1,4 @@
-/*
-	1-clock impulse generator
-*/
+// Generic 1-clock impulse generator
 
 module impulse(
 	input clk,

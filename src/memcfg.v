@@ -1,3 +1,5 @@
+// Memory configuration map
+
 module memcfg(
 	input clk,
 	input reset,
@@ -17,10 +19,10 @@ module memcfg(
 	parameter FRAME_ADDR_WIDTH;
 
 /*
-  Memory configuration: "OU r, n": OU=s_, r=rdt_, n=ad_
+	Memory configuration: "OU r, n": OU=s_, r=rdt_, n=ad_
 
-  page -------- segment           ------- frame module 1
-  rrrr rrrrrrrr rrrr              nnnnnnn nnnn  nnnn   n
+	page -------- segment           ------- frame module 1
+	rrrr rrrrrrrr rrrr              nnnnnnn nnnn  nnnn   n
 
 	NOTE: frame address is 3 bits long for Elwro 32K modules
 */

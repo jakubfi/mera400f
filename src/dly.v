@@ -1,6 +1,4 @@
-/*
-	Delay line
-*/
+// Generic delay line
 
 module dly(
 	input clk,

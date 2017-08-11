@@ -1,10 +1,4 @@
-/*
-	I-SK unit (system interface)
-
-	document: 12-006368-01-8A
-	unit:     I-SK1-1
-	pages:    2-85..2.90
-*/
+// I-SK unit (system interface)
 
 module isk(
 	input dmcl,

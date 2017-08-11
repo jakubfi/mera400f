@@ -1,6 +1,4 @@
-/*
-	Memory (software configurable, Elwro-like)
-*/
+// Memory (software configurable, Elwro-like)
 
 module mem_elwro_sram(
 	input clk,

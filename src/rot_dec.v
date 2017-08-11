@@ -1,3 +1,5 @@
+// Control Panel rotational switch decoder
+
 module rot_dec(
 	input [3:0] in,
 	output [10:0] out

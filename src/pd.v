@@ -1,14 +1,7 @@
-/*
-	P-D unit (instruction decoder)
-
-	document: 12-006368-01-8A
-	unit:     P-D2-3
-	pages:    2-30..2-43
-*/
+// P-D unit (instruction decoder)
 
 module pd(
 	input clk_sys,
-	// sheet 1
 	input [0:15] w,		// internal W bus
 	input strob1,			// STROB1
 	input strob1b,		// STROB1 back
@@ -66,21 +59,17 @@ module pd(
 	output na,				// instruction with a Normal Argument
 	output xi,				// instruction is illegal
 	output nef,				// instruction is ineffective
-	// sheet 4
 	input q,					// Q system flag
 	input mc_3,				// MC==3: three consecutive pre-modifications
 	input [0:8] r0,		// upper R0 register (CPU flags)
 	output _0_v,			// A14
 	input p,					// P flag (branch)
-	// sheet 5
 	output amb,				// A75
 	output apb,				// B65
 	output ap1,				// register A plus 1 (for IRB)
 	output am1,				// register A minus 1 (for DRB)
-	// sheet 6
 	input wls,				// A70
 	output bcoc$,			// A89
-	// sheet 7
 	output saryt,			// SARYT: ALU operation mode (0 - logic, 1 - arythmetic)
 	output sd,				// ALU function select
 	output scb,				// ALU function select
@@ -90,7 +79,6 @@ module pd(
 	output saa,				// ALU function select
 	output aryt,			// A68
 	output sbar$,			// B91
-	// sheet 8
 	input at15,				// A07
 	output ust_z,			// B49
 	output ust_v,			// A08
@@ -100,7 +88,6 @@ module pd(
 	output ust_y,			// A53
 	output ust_x,			// A47
 	output blr,				// A87
-	// sheet 9
 	input wpb,				// A58
 	input wr,					// A60
 	input pp,					// A62
@@ -127,16 +114,13 @@ module pd(
 	output ewx,				// Enter WX
 	output ekc_1,			// EKC*1 - Enter cycle end (Koniec Cyklu)
 	output ekc_2,			// EKC*2 - Enter cycle end (Koniec Cyklu)
-	// sheet 11
 	output lar$,			// B82
 	output ssp$,			// B81
 	output p16,				// A36
-	// sheet 12
 	input lk,					// LK != 0
 	output efp,				// A11
 	output sar$,			// A05
 	output srez$,			// A17
-	// sheet 13
 	output axy,				// A46
 	output lac				// B43
 );
@@ -145,8 +129,7 @@ module pd(
 
 	wor __NC; // unconnected signals here, to suppress warnings
 
-	// sheet 1, page 2-30
-	// * IR - instruction register
+	// IR - instruction register
 
 	wire ir_clk = strob1 & w_ir;
 	ir REG_IR(
@@ -163,9 +146,8 @@ module pd(
 	wire b_1 = (ir[10:12] == 1);
 	assign b0 = (ir[10:12] == 0);
 
-	// sheet 2, page 2-31
-	// * decoder for 2-arg instructions with normal argument (opcodes 020-036 and 040-057)
-	// * decoder for KA1 instruction group (opcodes 060-067)
+	// decoder for 2-arg instructions with normal argument (opcodes 020-036 and 040-057)
+	// decoder for KA1 instruction group (opcodes 060-067)
 
 	wire lw, tw, rw, pw, bb, bm, bc, bn;
 	wire aw, ac, sw, cw, _or, om, nr, nm, er, em, xr, xm, cl, lb;
@@ -179,12 +161,7 @@ module pd(
 	assign oc = ka2 & ~ir[7];
 	assign gr = l | g;
 
-	// sheet 3, page 2-32
-	// * opcode field A register number decoder
-	// * S opcode group decoder
-	// * B/N opcode group decoder
-	// * C opcode group decoder
-
+	// opcode field A register number decoder
 	wire [0:7] a_eq;
 	decoder8pos DEC_A_EQ(
 		.i(ir[7:9]),
@@ -192,12 +169,14 @@ module pd(
 		.o({a_eq})
 	);
 
+	// S opcode group decoder
 	decoder8pos DEC_S(
 		.i(ir[7:9]),
 		.ena(s),
 		.o({hlt, mcl, sin, gi, lip, __NC, __NC, __NC})
 	);
 
+	// B/N opcode group decoder
 	decoder8pos DEC_BN(
 		.i(ir[7:9]),
 		.ena(b_n),
@@ -214,6 +193,7 @@ module pd(
 
 	wire c_b0 = c & b0;
 
+	// C opcode group decoder
 	wire sx, sz, sly, slx, srxy;
 	decoder8pos DEC_OTHER(
 		.i(ir[13:15]),
@@ -225,8 +205,6 @@ module pd(
 
 	wire snef = (a_eq[5:7] != 0);
 	wire M85_11 = ir[10] | (ir[11] & ir[12]);
-	// jumper a on 1-3 : IN/OU illegal for user
-	// jupmer a on 2-3 : IN/OU legal for user
 	wire xi_1 = (INOU_USER_ILLEGAL & inou & q) | (M85_11 & c) | (q & s) | (q & ~snef & b_n);
 	wire xi_2 = (md & mc_3) | (c & ir13_14 & b_1) | (snef & s);
 
@@ -316,8 +294,7 @@ module pd(
 	assign ap1 = riirb & w$;
 	assign am1 = drb & w$;
 
-	// sheet 8, page 2-37
-	// * R0 flags control signals
+	// R0 flags control signals
 
 	wire nor$ = ngl | er | nr | orxr;
 	assign ust_z = (nor$ & w$) | (w$ & ans) | (m & wz);
@@ -331,8 +308,7 @@ module pd(
 	assign ust_x = wa & sx;
 	assign blr = w$ & oc & ~ir[6];
 
-	// sheet 9, page 2-38
-	// * execution phase control signals
+	// execution phase control signals
 
 	wire ngrij = ng$ | ri | rj;
 	wire prawy = lbcb & wpb;
@@ -343,9 +319,8 @@ module pd(
 	assign ewp = (lrcb & wx) | (wx & sr & ~lk) | (rj & wa) | (pp & (uj | lwlwt));
 	assign ewe = (lj & ww) | (ls & wa) | (pp & (llb | zb$ | js)) | (~wzi & krb & w$);
 
-	// sheet 10, page 2-39
-	// * execution phase control signals
-	// * instruction cycle end signal
+	// execution phase control signals
+	// instruction cycle end signal
 
 	wire grlk = gr & lk;
 
@@ -355,8 +330,7 @@ module pd(
 	wire M88_6 = is | rb$ | bmib | prawy;
 	assign ew$ = (wr & M88_6) | (we & wlsbs) | (ri & ww) | ((ng$ | lbcb) & wa) | (pp & sew$);
 
-	// sheet 11, page 2-40
-	// * control signals
+	// control signals
 
 	assign lar$ = lb | ri | ans | trb | ls | sl | nor$ | krb;
 	wire M92_12 = bc | bn | bb | trb | oc;
@@ -371,8 +345,7 @@ module pd(
 	wire M31_6 = ((ac | M63_3) & w$ & r0[3]) | (r0[7] & sly) | (uka & p4) | (lj & we);
 	assign p16 = (~M63_3 & w$ & cns) | (riirb & w$) | (ib & w$) | (slx & r0[8]) | M31_6;
 
-	// sheet 12, page 2-41
-	// * execution phase control signals
+	// execution phase control signals
 
 	wire M60_8 = ~lk & inou;
 	wire M76_3 = l ^ M60_8;
@@ -386,9 +359,8 @@ module pd(
 	assign eww = (we & rws) | (pp & M75_6) | (ri & wa) | (lk & ww & g) | (wx & g) | (mis & wz) | (rbib & w$);
 	assign srez$ = rbib | mis; // it was ^ instead of |, but there is no need for ^
 
-	// sheet 13, page 2-42
-	// * execution phase control signal
-	// * instruction cycle end signal
+	// execution phase control signal
+	// instruction cycle end signal
 
 	assign ewx = (lrcbsr & wz) | (pp & (gr ^ hsm)) | ((inou & lk) & wm) | (lk & (inou | sr) & wx);
 	assign axy = sr | (ir[6] & rbib);

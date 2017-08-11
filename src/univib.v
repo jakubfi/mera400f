@@ -1,6 +1,4 @@
-/*
-	74123, 74121 univibrator
-*/
+// 74123, 74121 univibrator
 
 module univib(
 	input clk,

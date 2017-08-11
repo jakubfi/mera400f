@@ -1,6 +1,4 @@
-/*
-	Interrupt request and interrupt service register pair
-*/
+// Interrupt request and interrupt service register pair
 
 module rzrp(
 	input clk_sys,
@@ -30,7 +28,7 @@ module rzrp(
 		endcase
 	end
 
-	// NOTE: rp_c seems to be too long to be a clock enable signal...
+	// NOTE: rp_c should be too long to be a clock enable signal here, but it seems to work just fine
 	always @ (posedge clk_sys, posedge prio_in) begin
 		if (prio_in) rp <= 1'b0;
 		else if (rp_c) rp <= sz;

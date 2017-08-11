@@ -1,6 +1,5 @@
-/*
-	D flip-flop
-*/
+// generic D flip-flop
+
 module ffd_ena(
 	input c, d, r_, s_, ena,
 	output reg q
@@ -13,7 +12,6 @@ module ffd_ena(
 	end
 
 endmodule
-
 
 module ffd(
 	input c, d, r_, s_,

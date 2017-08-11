@@ -1,3 +1,5 @@
+// L bus (user registers output)
+
 module l(
 	input [0:15] r0,
 	input [0:15] rn,

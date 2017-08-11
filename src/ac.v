@@ -1,10 +1,4 @@
-/*
-	Accumulator (AC register)
-
-	document: 12-006368-01-8A
-	unit:     P-A3-2
-	pages:    2-77
-*/
+// Accumulator (AC register)
 
 module ac(
 	input clk_sys,

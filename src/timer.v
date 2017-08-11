@@ -1,3 +1,5 @@
+// Control panel - system timer
+
 module timer(
 	input clk_sys,
 	input enable,

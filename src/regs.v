@@ -1,10 +1,4 @@
-/*
-	User registers
-
-	document: 12-006368-01-8A
-	unit:     P-R2-3
-	pages:    2-59..2-62
-*/
+// User registers
 
 module regs(
 	input clk_sys,
