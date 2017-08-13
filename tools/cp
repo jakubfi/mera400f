@@ -9,8 +9,12 @@ def asm(l):
     tab = []
     print("running emas: %s" % l)
     p = Popen(['emas', '-O', 'debug'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
-    stdout_data = p.communicate(l.encode('ascii'))[0].decode('ascii').split("\n")
-    for line in stdout_data:
+    (stdout_data, stderr_data) = p.communicate(l.encode('ascii'))
+    if p.returncode != 0:
+        print("FAILED: %s" % stdout_data.decode('ascii').strip())
+        return []
+
+    for line in stdout_data.decode('ascii').split("\n"):
         if len(line) > 0 and "none" not in line:
             print("   %s" % line)
             dls = line.split()
