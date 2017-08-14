@@ -17,11 +17,11 @@ module fps(
 	input oken,
 	input zw,
 	input di,
-	input efp,
+	input efp, // Enter FP - start AWP job
 	input puf,
 	input got,
-	output sr_fp,
-	output ekc_fp,
+	output sr_fp, // initiate interface access from AWP
+	output ekc_fp, // AWP has done its job
 	output _0_f,
 	// sheet 3
 	input g,
@@ -85,7 +85,7 @@ module fps(
 	// sheet 9
 	input ok$,
 	input ff_,
-	output read_fp,
+	output read_fp, // memory read
 	// sheet 10
 	input sgn,
 	input fwz,
@@ -112,16 +112,16 @@ module fps(
 	output ma,
 	output clockm,
 	// sheet 14
-	output rlp_fp,
-	output lpa,
+	output rlp_fp, // read/write r[123] registers according to LP counter
+	output lpa, // LP lsb
+	output lpb, // LP msb
 	// sheet 15
 	output zpa,
 	output zpb,
 	output _0_zp,
 	output s_fp,
 	output ustr0_fp,
-	output lp,
-	output lpb
+	output lp
 );
 
 	parameter FP_STROB1_1_TICKS;
@@ -133,121 +133,73 @@ module fps(
 	parameter FP_KC2_TICKS;
 	parameter FP_START_TICKS;
 
-	// sheet 1
+	// --- Start AWP work
+	// sync: @ldstate: start <= efp
 
-	wire M74_12, M68_12, M72_12, M72_4;
-	univib #(.ticks(FP_STROB1_1_TICKS)) VIB_STROB1_1(
-		.clk(__clk),
-		.a_(sr),
-		.b(dp8),
-		.q_(M74_12)
-	);
-	univib #(.ticks(FP_STROB1_2_TICKS)) VIB_STROB1_2(
-		.clk(__clk),
-		.a_(sr),
-		.b(dp2),
-		.q_(M68_12)
-	);
-	univib #(.ticks(FP_STROB1_3_TICKS)) VIB_STROB1_3(
-		.clk(__clk),
-		.a_(sr),
-		.b(dp6),
-		.q_(M72_12)
-	);
-	univib #(.ticks(FP_STROB1_4_TICKS)) VIB_STROB1_4(
-		.clk(__clk),
-		.a_(sr),
-		.b(dp5),
-		.q_(M72_4)
-	);
-
-	wire M59_8 = M74_12 & M68_12;
-	wire M79_11 = M72_12 & M72_4;
-	wire M56_8 = ~(~(M59_8 & M79_11) & mode);
-
-	wire M55_5;
-	ffd REG_STEP(
-		.s_(M56_8),
-		.d(1'b0),
-		.c(~step),
-		.r_(mode),
-		.q(M55_5)
-	);
-
-	wire strob1 = ~(M79_11 & ~M55_5 & M59_8);
-	assign strob_fp = ~(M79_11 & ~M55_5 & M59_8);
-
-	wire M49_4 = ~(dp8 | dp2);
-	wire M54_11 = ~(M49_4 & M55_5);
-	wire M54_3 = ~(~M49_4 & M55_5);
-	wire M54_6 = ~(M59_8 & M54_3);
-
-	wire strob2;
-	univib #(.ticks(FP_STROB2_TICKS)) VIB_STROB2(
-		.clk(__clk),
-		.a_(M54_6),
-		.b(1'b1),
-		.q(strob2)
-	);
-
-	wire stgot = M54_11 & M79_11 & ~strob2;
-	assign strob2_fp = strob2;
-
-	// sheet 2
-
-	wire sr = ~(~start & M57_8);
-	assign sr_fp = sr & f1;
-
-	wire M43_6 = ~(oken & f1 & zw);
-
-	wire M71_5;
-	univib #(.ticks(FP_KC1_TICKS)) VIB_KC1(
-		.clk(__clk),
-		.a_(~stgot),
-		.b(M43_6),
-		.q(M71_5)
-	);
-
-	wire M57_6 = ~(dkc_ & ~di);
-	wire M57_8 = ~(~di & M71_5);
-
-	wire M55_9;
-	ffd REG_KC(
-		.s_(1'b1),
-		.d(M57_6),
-		.c(M71_5),
-		.r_(puf),
-		.q(M55_9)
-	);
-
-	univib #(.ticks(FP_KC2_TICKS)) VIB_KC2(
-		.clk(__clk),
-		.a_(1'b0),
-		.b(M55_9),
-		.q(ekc_fp)
-	);
-
-	wire got_fp = ~M57_8;
-
-	assign _0_f = ~(~ekc_fp & puf);
-
-	wire M73_15;
+	wire start_trig;
 	ffjk REG_START(
 		.s_(1'b1),
 		.j(efp),
 		.c_(~got),
 		.k(1'b1),
 		.r_(~_0_f),
-		.q(M73_15)
+		.q(start_trig)
 	);
 
 	wire start;
 	univib #(.ticks(FP_START_TICKS)) VIB_START(
 		.clk(__clk),
 		.a_(got),
-		.b(M73_15),
+		.b(start_trig),
 		.q(start)
 	);
+
+	// --- Internal AWP strobs (strob_fp to CPU also)
+
+	wire strob1, strob2, __got, got_fp;
+	fp_strobgen FP_STROBGEN(
+		.clk_sys(__clk),
+		.start(start),
+		.di(di),
+		.dp8(dp8),
+		.dp2(dp2),
+		.dp6(dp6),
+		.dp5(dp5),
+		.mode(mode),
+		.step(step),
+		.oken(oken),
+		.f1(f1),
+		.zw(zw),
+		.strob1(strob1),
+		.strob2(strob2),
+		.__got(__got),
+		.got_fp(got_fp),
+		.sr_fp(sr_fp)
+	);
+
+	assign strob_fp = strob1;
+	assign strob2_fp = strob2;
+
+	// --- End AWP work
+
+	wire d_ekc = dkc | di;
+	wire ekc_fp_trig;
+	ffd REG_KC(
+		.s_(1'b1),
+		.d(d_ekc),
+		.c(__got),
+		.r_(puf),
+		.q(ekc_fp_trig)
+	);
+
+	univib #(.ticks(2'd3)) VIB_KC(
+		.clk(__clk),
+		.a_(1'b0),
+		.b(ekc_fp_trig),
+		.q(ekc_fp)
+	);
+
+	assign _0_f = ekc_fp | ~puf;
 
 	// sheet 3
 
@@ -389,7 +341,7 @@ module fps(
 	);
 
 	wire dp6 = ~(f2_ & f10_);
-	wire dkc_ = ~(M46_6 & f13);
+	wire dkc = M46_6 & f13;
 
 	// sheet 9
 
