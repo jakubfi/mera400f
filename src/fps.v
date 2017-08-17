@@ -124,7 +124,7 @@ module fps(
 	output lp
 );
 
-	// --- Start AWP work
+	// --- Start AWP work ---------------------------------------------------
 	// sync: @ldstate: start <= efp
 
 	wire start_trig;
@@ -145,7 +145,7 @@ module fps(
 		.q(start)
 	);
 
-	// --- Internal AWP strobs (strob_fp to CPU also)
+	// --- Internal AWP strobs (strob_fp to CPU also) -----------------------
 
 	wire strob1, strob2, __got, got_fp;
 	fp_strobgen FP_STROBGEN(
@@ -171,7 +171,7 @@ module fps(
 	assign strob_fp = strob1;
 	assign strob2_fp = strob2;
 
-	// --- End AWP work
+	// --- End AWP work -----------------------------------------------------
 
 	wire d_ekc = dkc | di;
 	wire ekc_fp_trig;
@@ -190,7 +190,45 @@ module fps(
 		.q(ekc_fp)
 	);
 
-	// ------------------------------------------------------------------
+	// --- State registers --------------------------------------------------
+
+	reg f2, f4, f5, f6, f7, f8, f10, f11, f12;
+
+	assign {f5_, f6_, f2_, f4_} = ~{f5, f6, f2, f4};
+	assign f10_ = ~f10;
+	assign f8_ = ~f8;
+	assign f7_ = ~f7;
+	assign f9_ka = f9;
+
+	always @ (posedge got_fp, posedge _0_f) begin
+		if (_0_f) begin
+			{f2, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13} <= 4'd0;
+		end else begin
+			{f2, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13} <= {ef2, ef4, ef5, ef6, ef7, ef8, ef9, ef10, ef11, ef12, ef13};
+		end
+	end
+
+	wire f3;
+	ffd REG_F3(
+		.r_(~_0_f),
+		.d(ef3),
+		.c(got_fp),
+		.s_(~(nrf & start)),
+		.q(f3)
+	);
+
+	wire f1;
+	ffd REG_F1(
+		.s_(~f1_s),
+		.d(ef1),
+		.c(got_fp),
+		.r_(~_0_f),
+		.q(f1)
+	);
+
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
 
 	assign _0_f = ekc_fp | ~puf;
 	assign fcb = f12 | f11;
@@ -280,37 +318,21 @@ module fps(
 	// sheet 7
 
 	wire M33_8 = (dw & fic & f8) | (f8 & mw) | (f4mwdw & ~fwz);
-	wire sb1f26 = M33_8 & opsu;
+	wire ef6 = M33_8 & opsu;
 	wire M70_6 = f4 & ~nrf & ff;
-	wire sa1f26 = ~fwz & ~wt & ~wc & M70_6;
+	wire ef5 = ~fwz & ~wt & ~wc & M70_6;
 	wire M47_8 = ~((~lp) | (lp3 & dw_mw));
-	wire sd1 = ~(M47_8 | ~f3);
+	wire ef4 = ~(M47_8 | ~f3);
 	wire dw_mw = mw | dw;
 
 	// sheet 8
 	// przerzutniki stanów
 
-	reg f5, f6, f2, f4;
-	assign {f5_, f6_, f2_, f4_} = ~{f5, f6, f2, f4};
-	always @ (posedge got_fp, posedge _0_f) begin
-		if (_0_f) {f5, f6, f2, f4} <= 4'd0;
-		else {f5, f6, f2, f4} <= {sa1f26, sb1f26, sc1, sd1};
-	end
-
 	wire dp2 = f6 | f5 | f12;
 
 	wire df13 = (~lp3 & ss) | (ff & lp);
 	wire M36_3 = ~(mw & fwz);
-	wire M47_6 = (f2 & M36_3) | (f3 & df13);
-
-	wire f3;
-	ffd REG_F3(
-		.r_(~_0_f),
-		.d(M47_6),
-		.c(got_fp),
-		.s_(~(nrf & start)),
-		.q(f3)
-	);
+	wire ef3 = (f2 & M36_3) | (f3 & df13);
 
 	wire dp6 = f2 | f10;
 	wire dkc = ~df13 & f13;
@@ -320,20 +342,11 @@ module fps(
 	wire M46_8 = ~((~dw & lp2) | (lp & ff));
 
 	wire dp8 = f4 | f8 | f3 | (ok$ & f1) | f9 | f13;
-	wire sc1 = M46_8 & f1;
+	wire ef2 = M46_8 & f1;
 	assign read_fp = f1;
 
 	wire f1_s = start & ~nrf;
-	wire f1_d = ~(~f1 | M46_8);
-
-	wire f1;
-	ffd REG_F1(
-		.s_(~f1_s),
-		.d(f1_d),
-		.c(got_fp),
-		.r_(~_0_f),
-		.q(f1)
-	);
+	wire ef1 = ~(~f1 | M46_8);
 
 	wire ff = ~ff_;
 
@@ -343,40 +356,24 @@ module fps(
 	wire M14 = (M52_8 & mw & ~fic) | (~sgn & f9dw & ~ta_alpha) | (wt & ~(~f5 & ~f4));
 
 	wire M24_6 = f10 | f4 | (mw & f2);
-	wire sb1 = (M24_6 & fwz) | (ss & f7) | (~ws & ok & f10) | (df13 & f13) | M14;
+	wire ef13 = (M24_6 & fwz) | (ss & f7) | (~ws & ok & f10) | (df13 & f13) | M14;
 
 	// sheet 11
 
-	wire M2_6 = nz & M4_6;
-	wire M2_8 = f10 & t0_t_1;
-
-	reg f12, f11;
-	always @ (posedge got_fp, posedge _0_f) begin
-		if (_0_f) {f13, f12, f11} <= 3'd0;
-		else {f13, f12, f11} <= {sb1, M2_6, M2_8};
-	end
+	wire ef12 = nz & M4_6;
+	wire ef11 = f10 & t0_t_1;
 
 	wire M4_6 = f12 | f10;
 	wire dp5 = f11 | f7;
 
-	wire sa1f710 = f11 | (f12 & ok) | (~sgn & df & f9) | (nrf & f4 & ~fwz) | (ff & f7 & ~fic) | (~fic & ~opsu & (f8 & mf));
+	wire ef10 = f11 | (f12 & ok) | (~sgn & df & f9) | (nrf & f4 & ~fwz) | (ff & f7 & ~fic) | (~fic & ~opsu & (f8 & mf));
 
 	// sheet 12
 
-	wire M3_12 = f8 & ~fic & dw_df;
+	wire ef9 = f8 & ~fic & dw_df;
 
 	wire M22_11 = (f5 & ff) | (f4 & dw_mw) | f8;
-	wire M24_8 = (~opsu & ~fwz & M22_11 & fic) | (dw_mw & fic & f6) | (fic & f7);
-
-	reg f10, f8, f7;
-	assign f10_ = ~f10;
-	assign f8_ = ~f8;
-	assign f7_ = ~f7;
-	always @ (posedge got_fp, posedge _0_f) begin
-		if (_0_f) {f10, f9, f8, f7} <= 4'd0;
-		else {f10, f9, f8, f7} <= {sa1f710, M3_12, M24_8, ef7};
-	end
-	assign f9_ka = f9;
+	wire ef8 = (~opsu & ~fwz & M22_11 & fic) | (dw_mw & fic & f6) | (fic & f7);
 
 	// sheet 13
 
