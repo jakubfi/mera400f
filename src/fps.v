@@ -124,15 +124,6 @@ module fps(
 	output lp
 );
 
-	parameter FP_STROB1_1_TICKS;
-	parameter FP_STROB1_2_TICKS;
-	parameter FP_STROB1_3_TICKS;
-	parameter FP_STROB1_4_TICKS;
-	parameter FP_STROB2_TICKS;
-	parameter FP_KC1_TICKS;
-	parameter FP_KC2_TICKS;
-	parameter FP_START_TICKS;
-
 	// --- Start AWP work
 	// sync: @ldstate: start <= efp
 
@@ -147,7 +138,7 @@ module fps(
 	);
 
 	wire start;
-	univib #(.ticks(FP_START_TICKS)) VIB_START(
+	univib #(.ticks(2'd3)) VIB_START(
 		.clk(__clk),
 		.a_(got),
 		.b(start_trig),

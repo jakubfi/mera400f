@@ -38,14 +38,6 @@ module awp(
 	output ekc_fp			// FPU done
 );
 
-	parameter FP_STROB1_1_TICKS = 2'd3;
-	parameter FP_STROB1_2_TICKS = 2'd3;
-	parameter FP_STROB1_3_TICKS = 2'd3;
-	parameter FP_STROB1_4_TICKS = 2'd3;
-	parameter FP_STROB2_TICKS = 2'd3;
-	parameter FP_KC1_TICKS = 2'd3;
-	parameter FP_KC2_TICKS = 2'd3;
-	parameter FP_START_TICKS = 2'd3;
 	parameter FP_FI0_TICKS = 2'd3;
 
 // -----------------------------------------------------------------------
@@ -55,16 +47,7 @@ module awp(
 wire strob2_fp, _0_f, _0_t, lkb, l_d, clocktc, clocktb, clockta, t_c, fcb, t_1_t_1, tab, trb, taa, cp, frb, p_16, p_32, p_40, fab, faa, fra, f5_, f6_, f2_, f4_, f10_, f9, f8_, f7_, f9_ka, scc, pc8, _0_d, _0_m, mb, ma, clockm, zpa, zpb, _0_zp, lp;
 wire opta, optb, optc, opm;
 
-fps #(
-	.FP_STROB1_1_TICKS(FP_STROB1_1_TICKS),
-	.FP_STROB1_2_TICKS(FP_STROB1_2_TICKS),
-	.FP_STROB1_3_TICKS(FP_STROB1_3_TICKS),
-	.FP_STROB1_4_TICKS(FP_STROB1_4_TICKS),
-	.FP_STROB2_TICKS(FP_STROB2_TICKS),
-	.FP_KC1_TICKS(FP_KC1_TICKS),
-	.FP_KC2_TICKS(FP_KC2_TICKS),
-	.FP_START_TICKS(FP_START_TICKS)
-) FPS(
+fps FPS(
 	.__clk(__clk),
 	.opm(opm),
 	.opta(opta),
