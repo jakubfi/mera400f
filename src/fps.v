@@ -178,6 +178,7 @@ module fps(
 
 	// --- End AWP work -----------------------------------------------------
 
+	wire dkc = ~df13 & f13;
 	wire d_ekc = dkc | di;
 	wire ekc_fp_trig;
 	ffd REG_KC(
@@ -274,14 +275,14 @@ module fps(
 	// sheet 4
 
 	wire M30_3 = ~(af_sf & ~wdt);
-	wire M30_8 = ~(f9 & dw);
+	wire M30_8 = f9 & dw;
 	wire dwsgnf7 = dw & sgn & f7;
 
 	wire M53_3 = f8 & (mw | mf | wdt);
 
 	wire f7_f12 = f9 | f12 | f11 | (~dw & f7) | (M30_3 & f8);
-	assign t_1_t_1 = ~(f8_ & ~f12 & ~f11 & M30_8);
-	assign tab = ~(M30_8 & ~f11 & ~M53_3);
+	assign t_1_t_1 = f8 | f12 | f11 | M30_8;
+	assign tab = M30_8 | f11 | M53_3;
 	assign trb = M53_3 | f11;
 	assign taa = (dw_df & f8) | f12;
 	assign cp = strob1 & f8 & af_sf & ~wdt;
@@ -327,7 +328,7 @@ module fps(
 	wire ef2 = f1 & ~f1f2_sel;
 	wire ef3 = (f2 & ~(mw & fwz)) | (f3 & df13);
 	wire ef4 = f3 & (~lp | (lp3 & dw_mw));
-	wire ef5 = ~fwz & ~wt & ~wc & f4 & ~nrf & ff;
+	wire ef5 = f4 & ~fwz & ~wt & ~wc & ~nrf & ff;
 	wire ef6 = opsu & ((dw & fic & f8) | (f8 & mw) | (f4mwdw & ~fwz));
 	wire ef7 = (ws & f10) | (sgn_t0_c0 & ta & f9dw) | (f4 & wc) | (f9 & sgn) | (f5_f8 & opsu & (mf | (df & fic))) | (f5_f8 & af_sf & ~fic & ~wt) | (f3 & lp3 & ad_sd);
 	wire M22_11 = (f5 & ff) | (f4 & dw_mw) | f8;
@@ -335,12 +336,10 @@ module fps(
 	wire ef9 = f8 & ~fic & dw_df;
 	wire ef10 = f11 | (f12 & ok) | (~sgn & df & f9) | (nrf & f4 & ~fwz) | (ff & f7 & ~fic) | (~fic & ~opsu & (f8 & mf));
 	wire ef11 = f10 & t0_t_1;
-	wire ef12 = nz & (f12 | f10);
+	wire ef12 = (f12 | f10) & nz;
 	wire M52_8 = f6 | (~opsu & f8);
 	wire M24_6 = f10 | f4 | (mw & f2);
-	wire ef13 = (M24_6 & fwz) | (ss & f7) | (~ws & ok & f10) | (df13 & f13) | (M52_8 & mw & ~fic) | (~sgn & f9dw & ~ta_alpha) | (wt & ~(~f5 & ~f4));
-
-	wire dkc = ~df13 & f13;
+	wire ef13 = (M24_6 & fwz) | (ss & f7) | (~ws & ok & f10) | (df13 & f13) | (M52_8 & mw & ~fic) | (~sgn & f9dw & ~ta_alpha) | (wt & (f5 | f4));
 
 	// sheet 13
 
