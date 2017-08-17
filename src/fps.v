@@ -208,6 +208,8 @@ module fps(
 	assign f9_ka = f9;
 	assign read_fp = f1;
 	assign rlp_fp = f13 | f3;
+	assign fcb = f12 | f11;
+	assign lkb = f3 | f1;
 
 	always @ (posedge got_fp, posedge _0_f) begin
 		if (_0_f) begin
@@ -241,9 +243,6 @@ module fps(
 	// ----------------------------------------------------------------------
 	// ----------------------------------------------------------------------
 	// ----------------------------------------------------------------------
-
-	assign fcb = f12 | f11;
-	assign lkb = f3 | f1;
 
 	wire mw = ~mw_;
 	wire mf = ~mf_;
@@ -365,35 +364,21 @@ module fps(
 	wire lpa_s = (start | f2) & ~mw;
 
 	wire M44_8 = (M3_8 & fwz) | f7 | (f4 & ~dw) | (fwz & f4);
-	wire lpb_r = lpa_s | M44_8;
-	wire lpa_r = lpb_s | M44_8;
 
 	wire lp_clk = strob1 & ((lp & f8 & dw) | f1 | f3 | f13);
 
-	ffjk REG_LPB(
-		.s_(~lpb_s),
-		.j(lpa),
-		.c_(lp_clk),
-		.k(lpa),
-		.r_(~lpb_r),
-		.q(lpb)
+	wire lp1, lp2, lp3;
+	lp LP(
+		.lp_clk(lp_clk),
+		.lpb_s(lpb_s),
+		.lpa_s(lpa_s),
+		.M44_8(M44_8),
+		.out({lpb, lpa}),
+		.lp(lp),
+		.lp1(lp1),
+		.lp2(lp2),
+		.lp3(lp3)
 	);
-
-	ffjk REG_LPA(
-		.s_(~lpa_s),
-		.j(1'b1),
-		.c_(lp_clk),
-		.k(1'b1),
-		.r_(~lpa_r),
-		.q(lpa)
-	);
-
-	// sheet 15
-
-	assign lp = lpb | lpa;
-	wire lp1 = lpa & ~lpb;
-	wire lp2 = lpb & ~lpa;
-	wire lp3 = lpb & lpa;
 
 	assign zpa = f13 & ~lpa;
 	assign zpb = f13 & (~lpb ^ lpa);
