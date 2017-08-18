@@ -335,13 +335,11 @@ module fpm(
 
 	wire di_c = ~(idi & f6 & strob2_fp);
 
-	ffd REG_DI(
-		.s_(~fi3),
-		.d(beta),
-		.c(di_c),
-		.r_(~_0_f),
-		.q(di)
-	);
+	always @ (posedge di_c, posedge _0_f, posedge fi3) begin
+		if (_0_f) di <= 1'b0;
+		else if (fi3) di <= 1'b1;
+		else di <= beta;
+	end
 
 	// wskaźnik do badania nadmiaru dzielenia stałoprzecinkowego
 
