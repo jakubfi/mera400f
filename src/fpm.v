@@ -345,16 +345,13 @@ module fpm(
 
 	// wskaźnik do badania nadmiaru dzielenia stałoprzecinkowego
 
-	wire idi_r = ~(strob_fp & ~lp & f8);
+	wire idi_r = strob_fp & ~lp & f8;
 
-	wire idi;
-	ffd REG_IDI(
-		.s_(1'b1),
-		.d(dw),
-		.c(f4),
-		.r_(idi_r),
-		.q(idi)
-	);
+	reg idi;
+	always @ (posedge f4, posedge idi_r) begin
+		if (idi_r) idi <= 1'b0;
+		else if (f4) idi <= dw;
+	end
 
 	// wynik w rejestrze C
 
