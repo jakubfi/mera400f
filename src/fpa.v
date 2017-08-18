@@ -63,7 +63,6 @@ module fpa(
 	// sheet 13
 	// w[12:15]
 	// sheet 14
-	input f2_,
 	input m_40,
 	input cp,
 	input t_c,
@@ -81,7 +80,7 @@ module fpa(
 	input _0_t,
 	output t39,
 	// sheet 17
-	input f9_ka,
+	input f9,
 	input lkb,
 	// sheet 18
 	input z_f,
@@ -104,7 +103,7 @@ module fpa(
 	wire [0:39] k /* synthesis keep */;
 
 	always @ (*) begin
-		case ({lkb, f9_ka})
+		case ({lkb, f9})
 			2'b00: k <= sum[0:39];
 			2'b01: k <= m[0:39];
 			2'b10: k <= {w[0:15], w[0:15], w[0:7]};

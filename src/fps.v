@@ -77,10 +77,10 @@ module fps(
 	input dw,
 	// sheet 8
 	input ss,
-	output f5_,
-	output f6_,
-	output f2_,
-	output f4_,
+	output f5,
+	output f6,
+	output f2,
+	output f4,
 	// sheet 9
 	input ok$,
 	input ff,
@@ -95,11 +95,10 @@ module fps(
 	input ok,
 	output f13,
 	// sheet 12
-	output f10_,
+	output f10,
 	output f9,
-	output f8_,
-	output f7_,
-	output f9_ka,
+	output f8,
+	output f7,
 	// sheet 13
 	input dw_df,
 	input mw_mf,
@@ -199,13 +198,8 @@ module fps(
 
 	assign _0_f = ekc_fp | ~puf;
 
-	reg f2, f4, f5, f6, f7, f8, f10, f11, f12;
+	reg f11, f12;
 
-	assign {f5_, f6_, f2_, f4_} = ~{f5, f6, f2, f4};
-	assign f10_ = ~f10;
-	assign f8_ = ~f8;
-	assign f7_ = ~f7;
-	assign f9_ka = f9;
 	assign read_fp = f1;
 	assign rlp_fp = f13 | f3;
 	assign fcb = f12 | f11;

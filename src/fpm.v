@@ -21,9 +21,9 @@ module fpm(
 	input pc8,
 	// sheet 3
 	input _0_f,
-	input f2_,
+	input f2,
 	input strob2_fp,
-	input f5_,
+	input f5,
 	input strob_fp,
 	output g,
 	output wdt,
@@ -59,14 +59,14 @@ module fpm(
 	output ss,
 	output puf,
 	// sheet 7
-	input f10_,
-	input f7_,
-	input f6_,
+	input f10,
+	input f7,
+	input f6,
 	output fwz,
 	output ws,
 	// sheet 8
 	input lp,
-	input f8_,
+	input f8,
 	input f13,
 	output di,
 	output wc,
@@ -105,7 +105,7 @@ module fpm(
 	input m0,
 	input mb,
 	input c39,
-	input f4_,
+	input f4,
 	input clockm,
 	input _0_m,
 	input m39,
@@ -126,10 +126,6 @@ module fpm(
 	parameter FP_FI0_TICKS;
 
 	wor __NC;
-
-	wire f2 = ~f2_;
-	wire f4 = ~f4_;
-	wire f8 = ~f8_;
 
 	// --- L bus ------------------------------------------------------------
 
@@ -223,7 +219,7 @@ module fpm(
 	wire f4mw = f4 & mw;
 	wire f4dw = f4 & dw;
 
-	wire f5_af_sf = af_sf & ~f5_;
+	wire f5_af_sf = af_sf & f5;
 
 	wire M46_11 = f5_af_sf & sum_c[7];
 	wire M46_8 = f5_af_sf & sum_c[6];
@@ -241,7 +237,7 @@ module fpm(
 
 	wire cda = strob_fp & ~wdt & f8;
 	wire cua = strob_fp & wdt & f8;
-	wire rab = (strob2_fp & g & ~f5_) | _0_f;
+	wire rab = (strob2_fp & g & f5) | _0_f;
 	wire fic_load = strob_fp & (f4 | f5_af_sf);
 
 	fic CNT_FIC(
@@ -269,7 +265,7 @@ module fpm(
 
 	// --- Instruction decoder ----------------------------------------------
 
-	decoder8pos ID(
+	decoder8pos IDEC_FP(
 		.i(ir[7:9]),
 		.ena(pufa),
 		.o({ad, sd, mw, dw, af, sf, mf, df})
@@ -289,7 +285,7 @@ module fpm(
 
 	// wskaźnik zera
 
-	wire fwz_c = strob_fp & ((mw_mf & f2) | (~f10_) | (~af_sf & f4) | (f4 & wt));
+	wire fwz_c = strob_fp & ((mw_mf & f2) | (f10) | (~af_sf & f4) | (f4 & wt));
 
 	ffd REG_FWZ(
 		.s_(1'b1),
@@ -301,7 +297,7 @@ module fpm(
 
 	// przeniesienie FP0 dla dodawania i odejmowania liczb długich
 
-	wire ci_c = ~(strob_fp & ~f7_ & ad_sd);
+	wire ci_c = ~(strob_fp & f7 & ad_sd);
 
 	wire ci;
 	ffd REG_CI(
@@ -318,14 +314,14 @@ module fpm(
 	ffd REG_END(
 		.s_(1'b1),
 		.d(ws),
-		.c(~f7_),
+		.c(f7),
 		.r_(~_0_f),
 		.q(_end)
 	);
 
 	// wskaźnik poprawki
 
-	wire ws_c = ~f10_ & strob_fp;
+	wire ws_c = f10 & strob_fp;
 	wire ws_d = ok & ~df & m_1 & ~_end;
 
 	ffd REG_WS(
@@ -338,7 +334,7 @@ module fpm(
 
 	// wskaźnik przerwania
 
-	wire di_c = ~(idi & ~f6_ & strob2_fp);
+	wire di_c = ~(idi & f6 & strob2_fp);
 
 	ffd REG_DI(
 		.s_(~fi3),
@@ -461,7 +457,7 @@ module fpm(
 
 	// wskaźnik działania sumatora
 
-	wire f6_f7 = ~(f7_ & f6_);
+	wire f6_f7 = f7 | f6;
 	wire cd = f8 & strob_fp;
 	wire d$;
 	ffd REG_D$(
