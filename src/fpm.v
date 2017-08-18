@@ -177,14 +177,14 @@ module fpm(
 
 	// ----------------------------------------------------------------------
 
-	wire wdtwtg_clk = f5_af_sf & strob_fp;
+	wire wdtwtg_clk = ~(f5_af_sf & strob_fp);
 
 	// wskaźnik określający, że wartość różnicy cech w AF i SF jest >= 40
 
 	ffd REG_G(
 		.s_(1'b1),
 		.d(sum_c_ge_40),
-		.c(~wdtwtg_clk),
+		.c(wdtwtg_clk),
 		.r_(~_0_f),
 		.q(g)
 	);
@@ -194,7 +194,7 @@ module fpm(
 	ffd REG_WDT(
 		.s_(1'b1),
 		.d(sum_c_1),
-		.c(~wdtwtg_clk),
+		.c(wdtwtg_clk),
 		.r_(~_0_f),
 		.q(wdt)
 	);
@@ -204,13 +204,11 @@ module fpm(
 	wire wt_s = f2 & ~t & strob_fp & af_sf;
 	wire wt_d = sum_c_ge_40 & ~sum_c_1;
 
-	ffd REG_WT(
-		.s_(~wt_s),
-		.d(wt_d),
-		.c(~wdtwtg_clk),
-		.r_(~_0_f),
-		.q(wt)
-	);
+	always @ (posedge wdtwtg_clk, posedge _0_f, posedge wt_s) begin
+		if (_0_f) wt <= 1'b0;
+		else if (wt_s) wt <= 1'b1;
+		else wt <= wt_d;
+	end
 
 	// --- FIC counter ------------------------------------------------------
 
