@@ -364,14 +364,11 @@ module fpm(
 	// T[-1]
 
 	wire t_1_ = ~t_1;
-	ffd_ena REG_T_1(
-		.s_(1'b1),
-		.d(t_1_d),
-		.c(~strob_fp),
-		.ena(opta),
-		.r_(~_0_t),
-		.q(t_1)
-	);
+
+	always @ (negedge strob_fp, posedge _0_t) begin
+		if (_0_t) t_1 <= 1'b0;
+		else if (opta) t_1 <= t_1_d;
+	end
 
 	assign t0_t_1 = t_1_ ^ ~t0;
 	wire M53_3 = t_1 ^ ~t0;
