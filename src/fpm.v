@@ -286,13 +286,10 @@ module fpm(
 
 	wire fwz_c = strob_fp & ((mw_mf & f2) | (f10) | (~af_sf & f4) | (f4 & wt));
 
-	ffd REG_FWZ(
-		.s_(1'b1),
-		.d(~t),
-		.c(fwz_c),
-		.r_(~_0_f),
-		.q(fwz)
-	);
+	always @ (posedge fwz_c, posedge _0_f) begin
+		if (_0_f) fwz <= 1'b0;
+		else if (fwz_c) fwz <= ~t;
+	end
 
 	// przeniesienie FP0 dla dodawania i odejmowania liczb długich
 
