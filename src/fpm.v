@@ -152,19 +152,19 @@ module fpm(
 	// sheet 2
 	// B register and bus
 
-	reg [0:7] B;
+	reg [0:7] b;
 	always @ (posedge f2strob) begin
-		B <= d;
+		b <= d;
 	end
 
-	wire [0:7] B_BUS /* synthesis keep */;
+	wire [0:7] b_bus /* synthesis keep */;
 
 	always @ (*) begin
 		case ({fcb, scc})
-			2'b00: B_BUS <= ~B;
-			2'b01: B_BUS <= B;
-			2'b10: B_BUS <= 8'hff;
-			2'b11: B_BUS <= 8'h00;
+			2'b00: b_bus <= ~b;
+			2'b01: b_bus <= b;
+			2'b10: b_bus <= 8'hff;
+			2'b11: b_bus <= 8'h00;
 		endcase
 	end
 
@@ -173,11 +173,11 @@ module fpm(
 	wire [0:7] sum_c;
 	wire M29_14;
 	always @ (*) begin
-		{M29_14, sum_c} <= B_BUS + d + pc8;
+		{M29_14, sum_c} <= b_bus + d + pc8;
 	end
 
 	wire M9_3 = ~fcb ^ ~scc;
-	wire M3_6 = ~((B[0] & M9_3) | (~B[0] & ~scc));
+	wire M3_6 = ~((b[0] & M9_3) | (~b[0] & ~scc));
 	wire M27_8 = M3_6 ^ ~d_1;
 	wire sum_c_2 = ~((M29_14 & M3_6) | (M29_14 & ~d_1) | (M3_6 & ~d_1));
 	wire sum_c_1 = M29_14 ^ M27_8;
