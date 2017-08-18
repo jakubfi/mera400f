@@ -179,15 +179,12 @@ module fpm(
 
 	wire wdtwtg_clk = ~(f5_af_sf & strob_fp);
 
-	// wskaźnik określający, że wartość różnicy cech w AF i SF jest >= 40
+	// wskaźnik określający, że wartość różnicy cech przy AF i SF jest >= 40
 
-	ffd REG_G(
-		.s_(1'b1),
-		.d(sum_c_ge_40),
-		.c(wdtwtg_clk),
-		.r_(~_0_f),
-		.q(g)
-	);
+	always @ (posedge wdtwtg_clk, posedge _0_f) begin
+		if (_0_f) g <= 1'b0;
+		else if (wdtwtg_clk) g <= sum_c_ge_40;
+	end
 
 	// wskaźnik denormalnizacji wartości rejestru T
 
