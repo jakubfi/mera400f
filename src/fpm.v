@@ -358,14 +358,11 @@ module fpm(
 
 	// wynik w rejestrze C
 
-	wire wc_s = ~(f4 & af_sf & ~wt & ~t);
-	ffd REG_WC(
-		.s_(wc_s),
-		.d(1'b1),
-		.c(1'b1),
-		.r_(~_0_f),
-		.q(wc)
-	);
+	wire wc_s = f4 & af_sf & ~wt & ~t;
+  always @ (posedge _0_f, posedge wc_s) begin
+    if (wc_s) wc <= 1'b1;
+    else if (_0_f) wc <= 1'b0;
+  end
 
 	wire fi0_q;
 	univib #(.ticks(FP_FI0_TICKS)) VIB_FI0(
