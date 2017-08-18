@@ -191,13 +191,10 @@ module fpm(
 
 	// wskaźnik denormalnizacji wartości rejestru T
 
-	ffd REG_WDT(
-		.s_(1'b1),
-		.d(sum_c_1),
-		.c(wdtwtg_clk),
-		.r_(~_0_f),
-		.q(wdt)
-	);
+	always @ (posedge wdtwtg_clk, posedge _0_f) begin
+		if (_0_f) wdt <= 1'b0;
+		else if (wdtwtg_clk) wdt <= sum_c_1;
+	end
 
 	// wynik w rejestrze T
 
