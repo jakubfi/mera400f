@@ -55,7 +55,7 @@ module fps(
 	input m38,
 	input t0_c0,
 	input ws,
-	input df_,
+	input df,
 	input af,
 	input ad,
 	output frb,
@@ -247,7 +247,6 @@ module fps(
 
 	wire mw = ~mw_;
 	wire mf = ~mf_;
-	wire df = ~df_;
 
 	// sheet 3
 

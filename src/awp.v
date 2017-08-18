@@ -94,7 +94,7 @@ fps FPS(
 	.m38(m38),
 	.t0_c0(t0_c0),
 	.ws(ws),
-	.df_(df_),
+	.df(df),
 	.af(af),
 	.ad(ad),
 	.frb(frb),
@@ -158,7 +158,7 @@ fps FPS(
 // -----------------------------------------------------------------------
 
 wire [0:7] d;
-wire g, wdt, wt, fic, c_f, v_f, m_f, z_f, dw, ad, sd, mw_, dw_, af, sf, mf_, df_, dw_df, mw_mf, af_sf, ad_sd, ff, ss, puf, fwz, ws, di, wc, t_1, t0_t_1, ok, nz, opsu, ta, m_1, ck, m_40, m_32, sgn_t0_c0, sgn;
+wire g, wdt, wt, fic, c_f, v_f, m_f, z_f, dw, ad, sd, mw_, dw_, af, sf, mf_, df, dw_df, mw_mf, af_sf, ad_sd, ff, ss, puf, fwz, ws, di, wc, t_1, t0_t_1, ok, nz, opsu, ta, m_1, ck, m_40, m_32, sgn_t0_c0, sgn;
 
 fpm #(
 	.FP_FI0_TICKS(FP_FI0_TICKS)
@@ -202,7 +202,7 @@ fpm #(
 	.af(af),
 	.sf(sf),
 	.mf_(mf_),
-	.df_(df_),
+	.df(df),
 	.dw_df(dw_df),
 	.mw_mf(mw_mf),
 	.af_sf(af_sf),

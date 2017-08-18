@@ -51,7 +51,7 @@ module fpm(
 	output af,
 	output sf,
 	output mf_,
-	output df_,
+	output df,
 	output dw_df,
 	output mw_mf,
 	output af_sf,
@@ -271,7 +271,7 @@ module fpm(
 
 	// sheet 5
 
-	assign c_f = (df_ & ff & m_1) | (r03 & mwdw) | (ad_sd & ci);
+	assign c_f = (~df & ff & m_1) | (r03 & mwdw) | (ad_sd & ci);
 	// FIX: t0_t_1 instead of t0_t1
 	assign v_f = (r02) | (t0_t_1 & mwadsd);
 	assign m_f = ~((t_1_ & dw_) | (~t16 & dw));
@@ -293,12 +293,12 @@ module fpm(
 	// sheet 6
 	// instruction decoder
 
-	wire ad_, af_, sf_, sd_;
+	wire ad_, af_, sf_, sd_, df_;
 	assign ad = ~ad_;
 	assign af = ~af_;
 	assign sf = ~sf_;
 	assign sd = ~sd_;
-	wire df = ~df_;
+	assign df = ~df_;
 	decoder8 ID(
 		.i(ir[7:9]),
 		.ena_(~pufa),
@@ -306,7 +306,7 @@ module fpm(
 	);
 
 	wire f9df = df & f9;
-	assign dw_df = ~(df_ & dw_);
+	assign dw_df = ~(~df & dw_);
 	assign mw_mf = ~(mf_ & mw_);
 	assign af_sf = ~(sf_ & af_);
 	wire mwdw = ~(dw_ & mw_);
@@ -323,7 +323,7 @@ module fpm(
 	wire M68_8 = M63_8 & strob_fp;
 	wire M49_8 = ~(strob_fp & ~f7_ & ad_sd);
 	wire M72_8 = ~f10_ & strob_fp;
-	wire M47_6 = ok & df_ & m_1 & ~_end;
+	wire M47_6 = ok & ~df & m_1 & ~_end;
 
 	// wskaźnik zera
 
