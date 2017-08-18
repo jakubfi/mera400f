@@ -128,18 +128,22 @@ module fpm(
 
 	wor __NC;
 
-	// sheet 1
-	// L bus
+	wire mw = ~mw_;
+	wire f2 = ~f2_;
+	wire f4 = ~f4_;
+	wire f8 = ~f8_;
+
+	// --- L bus ------------------------------------------------------------
 
 	wire [0:9] L;
 	always @ (*) begin
 		case (lkb)
-			0: L <= {sum_c_2, sum_c_1, sum_c};
+			0: L <= {sum_c_2, sum_c_1, sum_c[0:7]};
 			1: L <= {w[8], w[8], w[8:15]};
 		endcase
 	end
 
-	// D register
+	// --- D register -------------------------------------------------------
 
 	reg d_1, d_2; // d[-1], d[-2] positions
 	always @ (negedge l_d, posedge _0_d) begin
@@ -147,10 +151,9 @@ module fpm(
 		else {d_2, d_1, d} <= L;
 	end
 
-	wire d0_ = ~d[0];
+	// --- B register and bus -----------------------------------------------
 
-	// sheet 2
-	// B register and bus
+	wire f2strob = f2 & strob_fp;
 
 	reg [0:7] b;
 	always @ (posedge f2strob) begin
@@ -168,32 +171,26 @@ module fpm(
 		endcase
 	end
 
-	// exponent adder
+	// --- Exponent adder ---------------------------------------------------
 
-	wire [0:7] sum_c;
-	wire M29_14;
-	always @ (*) begin
-		{M29_14, sum_c} <= b_bus + d + pc8;
-	end
+	wire [-1:7] sum_c = b_bus + d + pc8;
 
-	wire M9_3 = ~fcb ^ ~scc;
+	wire M9_3 = fcb ^ scc;
 	wire M3_6 = ~((b[0] & M9_3) | (~b[0] & ~scc));
 	wire M27_8 = M3_6 ^ ~d_1;
-	wire sum_c_2 = ~((M29_14 & M3_6) | (M29_14 & ~d_1) | (M3_6 & ~d_1));
-	wire sum_c_1 = M29_14 ^ M27_8;
+	wire sum_c_2 = ~((sum_c[-1] & M3_6) | (sum_c[-1] & ~d_1) | (M3_6 & ~d_1));
+	wire sum_c_1 = sum_c[-1] ^ M27_8;
 
-	// sheet 3
+	// ----------------------------------------------------------------------
 
-	wire M68_11 = sum_c_ge_40 & ~sum_c_1;
-	wire M57_8 = ~(f5_af_sf & strob_fp);
-	wire M35_6 = ~(f2 & t_ & strob_fp & af_sf);
+	wire wdtwtg_clk = f5_af_sf & strob_fp;
 
 	// wskaźnik określający, że wartość różnicy cech w AF i SF jest >= 40
 
 	ffd REG_G(
 		.s_(1'b1),
 		.d(sum_c_ge_40),
-		.c(M57_8),
+		.c(~wdtwtg_clk),
 		.r_(~_0_f),
 		.q(g)
 	);
@@ -203,38 +200,33 @@ module fpm(
 	ffd REG_WDT(
 		.s_(1'b1),
 		.d(sum_c_1),
-		.c(M57_8),
+		.c(~wdtwtg_clk),
 		.r_(~_0_f),
 		.q(wdt)
 	);
 
 	// wynik w rejestrze T
 
-	wire wt_ = ~wt;
+	wire wt_s = f2 & ~t & strob_fp & af_sf;
+	wire wt_d = sum_c_ge_40 & ~sum_c_1;
+
 	ffd REG_WT(
-		.s_(M35_6),
-		.d(M68_11),
-		.c(M57_8),
+		.s_(~wt_s),
+		.d(wt_d),
+		.c(~wdtwtg_clk),
 		.r_(~_0_f),
 		.q(wt)
 	);
 
-	wire cda = ~wdt & strob_fp & f8;
-	wire cua = wdt & f8 & strob_fp;
-	wire f8_n_wdt = ~wdt & f8;
-	wire cd$_ = ~(f8 & strob_fp);
-	wire rab = (g & strob2_fp & ~f5_) | _0_f;
+	// --- FIC counter ------------------------------------------------------
 
-	wire f2 = ~f2_;
-	wire f2strob = f2 & strob_fp;
-
-	// sheet 4
+	wire f4mf = f4 & mf;
+	wire f4df = f4 & df;
+	wire f4mw = f4 & mw;
+	wire f4dw = f4 & dw;
 
 	wire f5_af_sf = af_sf & ~f5_;
-	wire M57_3 = f4 & mf;
-	wire M43_8 = f4 & df;
-	wire M57_6 = f4 & mw;
-	wire M57_11 = f4 & dw;
+
 	wire M46_11 = f5_af_sf & sum_c[7];
 	wire M46_8 = f5_af_sf & sum_c[6];
 	wire M46_6 = f5_af_sf & sum_c[5];
@@ -242,14 +234,17 @@ module fpm(
 	wire M43_3 = f5_af_sf & sum_c[3];
 	wire M43_6 = f5_af_sf & sum_c[2];
 
-	wire M54_8 = M46_11 | M57_11 | M57_3;
-	wire M69_8 = M57_3 | M46_8;
-	wire M59_3 = M57_3 | M46_6;
-	wire M59_6 = M43_8 | M46_3;
-	wire M54_6 = M57_11 | M43_3 | M57_6;
-	wire M58_12 = M57_3 | M43_6 | M43_8;
+	wire fic5 = M46_11 | f4dw | f4mf;
+	wire fic4 = f4mf | M46_8;
+	wire fic3 = f4mf | M46_6;
+	wire fic2 = f4df | M46_3;
+	wire fic1 = f4dw | M43_3 | f4mw;
+	wire fic0 = f4mf | M43_6 | f4df;
 
-	wire fic_load = (f4 & strob_fp) | (f5_af_sf & strob_fp);
+	wire cda = strob_fp & ~wdt & f8;
+	wire cua = strob_fp & wdt & f8;
+	wire rab = (strob2_fp & g & ~f5_) | _0_f;
+	wire fic_load = strob_fp & (f4 | f5_af_sf);
 
 	fic CNT_FIC(
 		.clk(__clk),
@@ -257,18 +252,11 @@ module fpm(
 		.cua(cua),
 		.rab(rab),
 		.load(fic_load),
-		.in({M58_12, M54_6, M59_6, M59_3, M69_8, M54_8}),
+		.in({fic0, fic1, fic2, fic3, fic4, fic5}),
 		.fic(fic)
 	);
 
-	// sheet 5
-
-	assign c_f = (~df & ff & m_1) | (r03 & mwdw) | (ad_sd & ci);
-	// FIX: t0_t_1 instead of t0_t1
-	assign v_f = (r02) | (t0_t_1 & mwadsd);
-	assign m_f = ~((t_1_ & ~dw) | (~t16 & dw));
-	wire M77_11 = ~t_24_31 & ~t_16_23;
-	assign z_f = (M77_11 & dw) | (mwadsd & t_) | (ff & fwz);
+	// ----------------------------------------------------------------------
 
 	wire M44_6  = ~sum_c_1 & sum_c[2] & sum_c[4];
 	wire M44_12 = ~sum_c_1 & sum_c[2] & sum_c[3];
@@ -281,8 +269,7 @@ module fpm(
 
 	wire sum_c_ge_40 = ~(~M44_6 & ~M44_12 & M27_3 & M27_11 & ~M44_8 & ~M17_3 & ~M17_11); // does not
 
-	// sheet 6
-	// instruction decoder
+	// --- Instruction decoder ----------------------------------------------
 
 	wire ad_, af_, sf_, sd_, df_, mf_, dw_;
 	assign ad = ~ad_;
@@ -292,6 +279,7 @@ module fpm(
 	assign df = ~df_;
 	assign mf = ~mf_;
 	assign dw = ~dw_;
+
 	decoder8 ID(
 		.i(ir[7:9]),
 		.ena_(~pufa),
@@ -310,31 +298,27 @@ module fpm(
 	assign ss = pufa & ~ir[7]; // any fixed point instruction
 	assign puf = pufa | nrf; // any AWP instruction
 
-	// sheet 7
-
-	wire M63_8 = (mw_mf & f2) | (~f10_) | (~af_sf & f4) | (f4 & wt);
-	wire M68_8 = M63_8 & strob_fp;
-	wire M49_8 = ~(strob_fp & ~f7_ & ad_sd);
-	wire M72_8 = ~f10_ & strob_fp;
-	wire M47_6 = ok & ~df & m_1 & ~_end;
-
 	// wskaźnik zera
+
+	wire fwz_c = strob_fp & ((mw_mf & f2) | (~f10_) | (~af_sf & f4) | (f4 & wt));
 
 	ffd REG_FWZ(
 		.s_(1'b1),
-		.d(t_),
-		.c(M68_8),
+		.d(~t),
+		.c(fwz_c),
 		.r_(~_0_f),
 		.q(fwz)
 	);
 
 	// przeniesienie FP0 dla dodawania i odejmowania liczb długich
 
+	wire ci_c = ~(strob_fp & ~f7_ & ad_sd);
+
 	wire ci;
 	ffd REG_CI(
 		.s_(1'b1),
 		.d(~fp0_),
-		.c(M49_8),
+		.c(ci_c),
 		.r_(~_0_f),
 		.q(ci)
 	);
@@ -352,77 +336,67 @@ module fpm(
 
 	// wskaźnik poprawki
 
+	wire ws_c = ~f10_ & strob_fp;
+	wire ws_d = ok & ~df & m_1 & ~_end;
+
 	ffd REG_WS(
 		.s_(1'b1),
-		.d(M47_6),
-		.c(M72_8),
+		.d(ws_d),
+		.c(ws_c),
 		.r_(~_0_f),
 		.q(ws)
 	);
 
-	wire f6_f7 = ~(f7_ & f6_);
-
-	// sheet 8
-
-	wire M64_8 = (~nrf & nz & f4) | (f2 & (dw_df & ~t)) | (nz & f2);
-	assign fi3 = strob_fp & M64_8;
-	wire M49_12 = ~(idi & ~f6_ & strob2_fp);
-	wire M49_6 = ~(strob_fp & ~lp & f8);
-	wire M35_8 = ~(f4 & af_sf & wt_ & t_);
-
 	// wskaźnik przerwania
+
+	wire di_c = ~(idi & ~f6_ & strob2_fp);
 
 	ffd REG_DI(
 		.s_(~fi3),
 		.d(beta),
-		.c(M49_12),
+		.c(di_c),
 		.r_(~_0_f),
 		.q(di)
 	);
 
 	// wskaźnik do badania nadmiaru dzielenia stałoprzecinkowego
 
+	wire idi_r = ~(strob_fp & ~lp & f8);
+
 	wire idi;
 	ffd REG_IDI(
 		.s_(1'b1),
 		.d(dw),
 		.c(f4),
-		.r_(M49_6),
+		.r_(idi_r),
 		.q(idi)
 	);
 
 	// wynik w rejestrze C
 
+	wire wc_s = ~(f4 & af_sf & ~wt & ~t);
 	ffd REG_WC(
-		.s_(M35_8),
+		.s_(wc_s),
 		.d(1'b1),
 		.c(1'b1),
 		.r_(~_0_f),
 		.q(wc)
 	);
 
-	wire M20_13;
+	wire fi0_q;
 	univib #(.ticks(FP_FI0_TICKS)) VIB_FI0(
 		.clk(__clk),
-		.a_(~M49_12),
+		.a_(~di_c),
 		.b(1'b1),
-		.q(M20_13)
+		.q(fi0_q)
 	);
-
-	assign fi0 = di & M20_13;
-
-	wire t_ = ~t;
-	wire f8 = ~f8_;
-	wire M69_3 = ff & f13;
-	assign fi1 = M69_3 & d_2 & ~(d[0] & d_1);
-	assign fi2 = M69_3 & ~(~d_1 & d0_) & ~d_2;
 
 	// sheet 9
 
 	wire M3_8 = (~fab & ~fc0) | (~faa & fc0);
 	wire M53_6 = ~M3_8 ^ t_1;
 	wire M53_8 = fp0_ ^ M53_6;
-	wire M40_8 = ~((w0_ & lkb) | (~sgn & f9df) | (t_1_t_1 & t_1_) | (f6_f7 & M53_8));
+	wire t_1_d = ~((w0_ & lkb) | (~sgn & f9df) | (t_1_t_1 & t_1_) | (f6_f7 & M53_8));
 	wire M52_8 = (mw_mf & mfwp) | (t0_t1 & dw_df);
 	wire M67_3 = t1 | t0;
 	wire M12_8 = t_32_39 | t_24_31 | t_16_23 | t_8_15;
@@ -436,7 +410,7 @@ module fpm(
 	wire t_1_ = ~t_1;
 	ffd_ena REG_T_1(
 		.s_(1'b1),
-		.d(M40_8),
+		.d(t_1_d),
 		.c(~strob_fp),
 		.ena(opta),
 		.r_(~_0_t),
@@ -449,48 +423,45 @@ module fpm(
 	assign nz = ff & t & M53_3 & ~t0_t1; // liczba nieznormalizowana
 	assign opsu = M52_8 | M25_8 | M66_8; // operacje sumatora
 
-	// sheet 10
-
-	wire M22_8 = (trb & t39) | (m0 & ~mb) | (t_1 & f4) | (af & c39 & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
-
 	// M[-1]
+
+	wire M9_6 = ck ^ ~c39;
+	wire f8_n_wdt = ~wdt & f8;
+	wire m_1_d = (trb & t39) | (m0 & ~mb) | (t_1 & f4) | (af & c39 & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
 
 	ffd_ena REG_M_1(
 			.s_(1'b1),
-			.d(M22_8),
+			.d(m_1_d),
 			.c(~strob_fp),
 			.ena(opm),
 			.r_(~_0_m),
 			.q(m_1)
 	);
 
-	wire M70_11 = f4 & sf;
-	wire M77_6 = ~c39 & ck;
-	wire M9_6 = ck ^ ~c39;
-
 	// przedłużenie sumatora mantys
 
+	wire ck_s = f4 & sf;
+	wire ck_d = ~c39 & ck;
+
 	ffd_ena REG_CK(
-		.s_(~M70_11),
-		.d(M77_6),
+		.s_(~ck_s),
+		.d(ck_d),
 		.c(~strob_fp),
 		.ena(opm),
 		.r_(~_0_m),
 		.q(ck)
 	);
 
-	wire f4 = ~f4_;
+	// wskaźnik przyspieszania mnożenia
 
 	wire M13_6 = (~m39 & mf) | (~m15 & mw);
 	wire M13_8 = (~m38 & mf) | (~m14 & mw);
-	wire M52_6 = ~((~M13_6 & ~pm) | (~M13_8 & mfwp));
-
-	// wskaźnik przyspieszania mnożenia
+	wire pm_d = ~((~M13_6 & ~pm) | (~M13_8 & mfwp));
 
 	wire pm;
 	ffd_ena REG_PM(
 		.s_(1'b1),
-		.d(M52_6),
+		.d(pm_d),
 		.c(~strob_fp),
 		.ena(opm),
 		.r_(~_0_m),
@@ -498,17 +469,16 @@ module fpm(
 	);
 
 	wire mfwp = ~M13_6 ^ ~pm;
-	wire mw = ~mw_;
-
-	// sheet 11
 
 	// wskaźnik działania sumatora
 
+	wire f6_f7 = ~(f7_ & f6_);
+	wire cd = f8 & strob_fp;
 	wire d$;
 	ffd REG_D$(
 		.s_(~f6_f7),
 		.d(1'b0),
-		.c(cd$_),
+		.c(~cd),
 		.r_(~_0_f),
 		.q(d$)
 	);
@@ -529,10 +499,24 @@ module fpm(
 		.q(sgn)
 	);
 
-	wire M39_8 = (~sgn & t_) | (~t0_c0 & t);
+	wire M39_8 = (~sgn & ~t) | (~t0_c0 & t);
 	wire M38_11 = M38_8 ^ sgn;
-	wire M6_12 = sgn & t_ & ~lp;
+	wire M6_12 = sgn & ~t & ~lp;
 	wire beta = M38_11 & ~M6_12;
+
+	// ----------------------------------------------------------------------
+
+	assign fi0 = di & fi0_q;
+	wire M69_3 = ff & f13;
+	assign fi1 = M69_3 & d_2 & ~(d[0] & d_1);
+	assign fi2 = M69_3 & ~(~d_1 & ~d[0]) & ~d_2;
+	wire M64_8 = (~nrf & nz & f4) | (f2 & (dw_df & ~t)) | (nz & f2);
+	assign fi3 = strob_fp & M64_8;
+
+	assign c_f = (~df & ff & m_1) | (r03 & mwdw) | (ad_sd & ci);
+	assign v_f = (r02) | (t0_t_1 & mwadsd);
+	assign m_f = ~((t_1_ & ~dw) | (~t16 & dw));
+	assign z_f = (~t_24_31 & ~t_16_23 & dw) | (mwadsd & ~t) | (ff & fwz);
 
 endmodule
 
