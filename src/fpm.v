@@ -323,13 +323,10 @@ module fpm(
 	wire ws_c = f10 & strob_fp;
 	wire ws_d = ok & ~df & m_1 & ~_end;
 
-	ffd REG_WS(
-		.s_(1'b1),
-		.d(ws_d),
-		.c(ws_c),
-		.r_(~_0_f),
-		.q(ws)
-	);
+	always @ (posedge ws_c, posedge _0_f) begin
+		if (_0_f) ws <= 1'b0;
+		else if (ws_c) ws <= ws_d;
+	end
 
 	// wskaźnik przerwania
 
