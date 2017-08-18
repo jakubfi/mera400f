@@ -298,14 +298,11 @@ module fpm(
 
 	wire ci_c = ~(strob_fp & f7 & ad_sd);
 
-	wire ci;
-	ffd REG_CI(
-		.s_(1'b1),
-		.d(~fp0_),
-		.c(ci_c),
-		.r_(~_0_f),
-		.q(ci)
-	);
+	reg ci;
+	always @ (posedge ci_c, posedge _0_f) begin
+		if (_0_f) ci <= 1'b0;
+		else if (ci_c) ci <= ~fp0_;
+	end
 
 	// wskaźnik zapalony po obliczeniu poprawki
 
