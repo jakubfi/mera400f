@@ -437,13 +437,10 @@ module fpm(
 
 	// wskaźnik znaku ilorazu
 
-	ffd REG_SGN(
-		.s_(1'b1),
-		.d(t0_c0),
-		.c(f4),
-		.r_(~_0_f),
-		.q(sgn)
-	);
+	always @ (posedge f4, posedge _0_f) begin
+		if (_0_f) sgn <= 1'b0;
+		else if (f4) sgn <= t0_c0;
+	end
 
 	wire M39_8 = (~sgn & ~t) | (~t0_c0 & t);
 	wire M38_11 = M38_8 ^ sgn;
