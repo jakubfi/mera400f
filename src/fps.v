@@ -46,7 +46,7 @@ module fps(
 	output taa,
 	output cp,
 	// sheet 5
-	input sd$_,
+	input sd,
 	input ck,
 	input sf,
 	input p32_,
@@ -301,14 +301,14 @@ module fps(
 
 	wire M52_3 = M65_6 & f6;
 
-	wire M80_6 = ~(p32_ & ~dwsgnf7 & sd$_); // does not
+	wire M80_6 = ~(p32_ & ~dwsgnf7 & ~sd); // does not
 	wire M77_8 = (t0_eq_c0 & M76_3) | (M76_6 & m38);
 
-	assign frb = ~(~mw_p16 & sd$_ & ~M77_8 & ~M76_8); // does not
+	assign frb = ~(~mw_p16 & ~sd & ~M77_8 & ~M76_8); // does not
 	assign p_16 = dw_p16 & ~M67_8 & ~M52_3;
 	assign p_32 = M80_6 & ~ad;
 	wire mw_p16 = ~M65_6 & f6;
-	assign p_40 = ~sd$_ | ws | M77_6 | M77_8;
+	assign p_40 = sd | ws | M77_6 | M77_8;
 	assign fab = dwsgnf7 | frb;
 	assign fra = M52_3 | M78_8;
 	assign faa = M67_8 | M52_3 | fra;
