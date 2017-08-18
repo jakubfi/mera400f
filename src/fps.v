@@ -38,7 +38,7 @@ module fps(
 	output t_c,
 	output fcb,
 	// sheet 4
-	input mf_,
+	input mf,
 	input fp16_,
 	output t_1_t_1,
 	output tab,
@@ -246,7 +246,6 @@ module fps(
 	// ----------------------------------------------------------------------
 
 	wire mw = ~mw_;
-	wire mf = ~mf_;
 
 	// sheet 3
 

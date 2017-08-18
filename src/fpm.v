@@ -50,7 +50,7 @@ module fpm(
 	output dw_,
 	output af,
 	output sf,
-	output mf_,
+	output mf,
 	output df,
 	output dw_df,
 	output mw_mf,
@@ -293,12 +293,13 @@ module fpm(
 	// sheet 6
 	// instruction decoder
 
-	wire ad_, af_, sf_, sd_, df_;
+	wire ad_, af_, sf_, sd_, df_, mf_;
 	assign ad = ~ad_;
 	assign af = ~af_;
 	assign sf = ~sf_;
 	assign sd = ~sd_;
 	assign df = ~df_;
+	assign mf = ~mf_;
 	decoder8 ID(
 		.i(ir[7:9]),
 		.ena_(~pufa),
@@ -307,7 +308,7 @@ module fpm(
 
 	wire f9df = df & f9;
 	assign dw_df = ~(~df & dw_);
-	assign mw_mf = ~(mf_ & mw_);
+	assign mw_mf = ~(~mf & mw_);
 	assign af_sf = ~(sf_ & af_);
 	wire mwdw = ~(dw_ & mw_);
 	assign ad_sd = ~(~sd & ad_);
@@ -505,7 +506,6 @@ module fpm(
 	);
 
 	wire mfwp = ~M13_6 ^ ~pm;
-	wire mf = ~mf_;
 	wire mw = ~mw_;
 
 	// sheet 11
