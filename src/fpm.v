@@ -392,14 +392,11 @@ module fpm(
 	wire ck_s = f4 & sf;
 	wire ck_d = ~c39 & ck;
 
-	ffd_ena REG_CK(
-		.s_(~ck_s),
-		.d(ck_d),
-		.c(~strob_fp),
-		.ena(opm),
-		.r_(~_0_m),
-		.q(ck)
-	);
+	always @ (negedge strob_fp, posedge _0_m, posedge ck_s) begin
+		if (_0_m) ck <= 1'b0;
+		else if (ck_s) ck <= 1'b1;
+		else if (opm) ck <= ck_d;
+	end
 
 	// wskaźnik przyspieszania mnożenia
 
