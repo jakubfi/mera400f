@@ -250,18 +250,17 @@ module fpm(
 		.fic(fic)
 	);
 
-	// ----------------------------------------------------------------------
+	// --- sum_c >= 40 ------------------------------------------------------
 
-	wire M44_6  = ~sum_c_1 & sum_c[2] & sum_c[4];
-	wire M44_12 = ~sum_c_1 & sum_c[2] & sum_c[3];
-	wire M27_3  = ~sum_c_1 ^ sum_c[1];
-	wire M27_11 = ~sum_c_1 ^ sum_c[0];
+	wire M44_6 = ~sum_c_1 & sum_c[2] & sum_c[4]; // 40 - 255
+	wire M44_12 = ~sum_c_1 & sum_c[2] & sum_c[3]; // 48 - 255
+	wire M27_11 = sum_c_1 ^ sum_c[0]; // 256 - 383, 128 - 255
+	wire M27_3 = sum_c_1 ^ sum_c[1]; // 256 - 447, 64 - 255
+	wire M44_8 = ~sum_c[7] & ~sum_c[6] & ~sum_c[5] & ~sum_c[2] & sum_c_1; // 256 - 472
+	wire M17_3 = ~sum_c[2] & ~sum_c[4] & sum_c_1; // 256 - 463
+	wire M17_11 = ~sum_c[2] & ~sum_c[3] & sum_c_1; // 256 - 471
 
-	wire M44_8  = ~(sum_c[7] | sum_c[6]) & ~(sum_c[5] | sum_c[2]) & sum_c_1;
-	wire M17_3  = ~(sum_c[2] | sum_c[4]) & sum_c_1;
-	wire M17_11 = ~(sum_c[2] | sum_c[3]) & sum_c_1;
-
-	wire sum_c_ge_40 = ~(~M44_6 & ~M44_12 & M27_3 & M27_11 & ~M44_8 & ~M17_3 & ~M17_11); // does not
+	wire sum_c_ge_40 = M44_6 | M44_12 | M27_3 | M27_11 | M44_8 | M17_3 | M17_11;
 
 	// --- Instruction decoder ----------------------------------------------
 
