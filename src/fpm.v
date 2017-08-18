@@ -306,11 +306,11 @@ module fpm(
 	);
 
 	wire f9df = df & f9;
-	assign dw_df = ~(~df & ~dw);
+	assign dw_df = df | dw;
 	assign mw_mf = ~(~mf & mw_);
-	assign af_sf = ~(sf_ & af_);
+	assign af_sf = sf | af;
 	wire mwdw = ~(~dw & mw_);
-	assign ad_sd = ~(~sd & ad_);
+	assign ad_sd = sd | ad;
 	wire mwadsd = ~(mw_ & ~sd & ad_);
 
 	assign ff = nrf | ir[7]; // any floating point instruction
@@ -431,7 +431,7 @@ module fpm(
 	wire M53_8 = fp0_ ^ M53_6;
 	wire M40_8 = ~((w0_ & lkb) | (~sgn & f9df) | (t_1_t_1 & t_1_) | (f6_f7 & M53_8));
 	wire M52_8 = (mw_mf & mfwp) | (t0_t1 & dw_df);
-	wire M67_3 = ~(~t1 & ~t0);
+	wire M67_3 = t1 | t0;
 	wire M12_8 = t_32_39 | t_24_31 | t_16_23 | t_8_15;
 	assign ta = t_8_15 | t_2_7 | t_0_1 | t_1;
 	wire t = t_1 | t_0_1 | t_2_7 | t_8_15 | t_16_23 | t_24_31 | t_32_39 | m_1;
