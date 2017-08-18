@@ -196,6 +196,8 @@ module fpm(
 	wire M57_8 = ~(f5_af_sf & strob_fp);
 	wire M35_6 = ~(f2 & t_ & strob_fp & af_sf);
 
+	// wskaźnik określający, że wartość różnicy cech w AF i SF jest >= 40
+
 	ffd REG_G(
 		.s_(1'b1),
 		.d(sum_c_ge_40),
@@ -204,6 +206,8 @@ module fpm(
 		.q(g)
 	);
 
+	// wskaźnik denormalnizacji wartości rejestru T
+
 	ffd REG_WDT(
 		.s_(1'b1),
 		.d(sum_c_1),
@@ -211,6 +215,8 @@ module fpm(
 		.r_(~_0_f),
 		.q(wdt)
 	);
+
+	// wynik w rejestrze T
 
 	wire wt_ = ~wt;
 	ffd REG_WT(
@@ -306,11 +312,10 @@ module fpm(
 	assign ad_sd = ~(sd$_ & ad_);
 	wire mwadsd = ~(mw_ & sd$_ & ad_);
 
-	wire nrf_ = ~nrf;
 	wire ff = ~ff_;
-	assign ff_ = ~(nrf | ir[7]);
-	assign ss = ~(ir[7] | ~pufa);
-	assign puf = ~(~pufa & nrf_);
+	assign ff_ = ~(nrf | ir[7]); // any floating point instruction
+	assign ss  = pufa & ~ir[7]; // any fixed point instruction
+	assign puf = pufa | nrf; // any AWP instruction
 
 	// sheet 7
 
@@ -320,6 +325,8 @@ module fpm(
 	wire M72_8 = ~f10_ & strob_fp;
 	wire M47_6 = ok & df_ & m_1 & ~_end;
 
+	// wskaźnik zera
+
 	ffd REG_FWZ(
 		.s_(1'b1),
 		.d(t_),
@@ -327,6 +334,8 @@ module fpm(
 		.r_(~_0_f),
 		.q(fwz)
 	);
+
+	// przeniesienie FP0 dla dodawania i odejmowania liczb długich
 
 	wire ci;
 	ffd REG_CI(
@@ -337,6 +346,8 @@ module fpm(
 		.q(ci)
 	);
 
+	// wskaźnik zapalony po obliczeniu poprawki
+
 	wire _end;
 	ffd REG_END(
 		.s_(1'b1),
@@ -345,6 +356,8 @@ module fpm(
 		.r_(~_0_f),
 		.q(_end)
 	);
+
+	// wskaźnik poprawki
 
 	ffd REG_WS(
 		.s_(1'b1),
@@ -358,11 +371,13 @@ module fpm(
 
 	// sheet 8
 
-	wire M64_8 = (nrf_ & nz & f4) | (f2 & (dw_df & ~t)) | (nz & f2);
+	wire M64_8 = (~nrf & nz & f4) | (f2 & (dw_df & ~t)) | (nz & f2);
 	assign fi3 = strob_fp & M64_8;
 	wire M49_12 = ~(idi & ~f6_ & strob2_fp);
 	wire M49_6 = ~(strob_fp & ~lp & f8);
 	wire M35_8 = ~(f4 & af_sf & wt_ & t_);
+
+	// wskaźnik przerwania
 
 	ffd REG_DI(
 		.s_(~fi3),
@@ -372,6 +387,8 @@ module fpm(
 		.q(di)
 	);
 
+	// wskaźnik do badania nadmiaru dzielenia stałoprzecinkowego
+
 	wire idi;
 	ffd REG_IDI(
 		.s_(1'b1),
@@ -380,6 +397,8 @@ module fpm(
 		.r_(M49_6),
 		.q(idi)
 	);
+
+	// wynik w rejestrze C
 
 	ffd REG_WC(
 		.s_(M35_8),
@@ -419,6 +438,8 @@ module fpm(
 	wire M25_8 = ~M12_8 & dw_df & M67_3 & ~t_2_7;
 	wire M66_8 = c0_eq_c1 & dw & ta;
 
+	// T[-1]
+
 	wire t_1_ = ~t_1;
 	ffd_ena REG_T_1(
 		.s_(1'b1),
@@ -431,13 +452,15 @@ module fpm(
 
 	assign t0_t_1 = t_1_ ^ ~t0;
 	wire M53_3 = t_1 ^ ~t0;
-	assign ok = M53_3 & t0_t1 & t & ff;
-	assign nz = ~t0_t1 & M53_3 & ff & t;
-	assign opsu = M52_8 | M25_8 | M66_8;
+	assign ok = ff & t & M53_3 &  t0_t1; // liczba znormalizowana
+	assign nz = ff & t & M53_3 & ~t0_t1; // liczba nieznormalizowana
+	assign opsu = M52_8 | M25_8 | M66_8; // operacje sumatora
 
 	// sheet 10
 
 	wire M22_8 = (trb & t39) | (m0 & ~mb) | (t_1 & f4) | (af & c39 & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
+
+	// M[-1]
 
 	ffd_ena REG_M_1(
 			.s_(1'b1),
@@ -451,6 +474,8 @@ module fpm(
 	wire M70_11 = f4 & sf;
 	wire M77_6 = ~c39 & ck;
 	wire M9_6 = ck ^ ~c39;
+
+	// przedłużenie sumatora mantys
 
 	ffd_ena REG_CK(
 		.s_(~M70_11),
@@ -466,6 +491,8 @@ module fpm(
 	wire M13_6 = (~m39 & mf) | (~m15 & mw);
 	wire M13_8 = (~m38 & mf) | (~m14 & mw);
 	wire M52_6 = ~((~M13_6 & ~pm) | (~M13_8 & mfwp));
+
+	// wskaźnik przyspieszania mnożenia
 
 	wire pm;
 	ffd_ena REG_PM(
@@ -483,6 +510,8 @@ module fpm(
 
 	// sheet 11
 
+	// wskaźnik działania sumatora
+
 	wire d$;
 	ffd REG_D$(
 		.s_(~f6_f7),
@@ -497,6 +526,8 @@ module fpm(
 	assign m_40 = M38_8 & f8 & df;
 	assign m_32 = ~((M38_6 & dw) | (dw_ & ~m32));
 	assign sgn_t0_c0 = t0_c0 ^ sgn;
+
+	// wskaźnik znaku ilorazu
 
 	ffd REG_SGN(
 		.s_(1'b1),
