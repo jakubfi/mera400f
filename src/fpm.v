@@ -47,7 +47,6 @@ module fpm(
 	output ad,
 	output sd,
 	output mw_,
-	output dw_,
 	output af,
 	output sf,
 	output mf,
@@ -274,10 +273,9 @@ module fpm(
 	assign c_f = (~df & ff & m_1) | (r03 & mwdw) | (ad_sd & ci);
 	// FIX: t0_t_1 instead of t0_t1
 	assign v_f = (r02) | (t0_t_1 & mwadsd);
-	assign m_f = ~((t_1_ & dw_) | (~t16 & dw));
+	assign m_f = ~((t_1_ & ~dw) | (~t16 & dw));
 	wire M77_11 = ~t_24_31 & ~t_16_23;
 	assign z_f = (M77_11 & dw) | (mwadsd & t_) | (ff & fwz);
-	assign dw = ~dw_;
 
 	wire M44_6  = ~sum_c_1 & sum_c[2] & sum_c[4];
 	wire M44_12 = ~sum_c_1 & sum_c[2] & sum_c[3];
@@ -293,13 +291,14 @@ module fpm(
 	// sheet 6
 	// instruction decoder
 
-	wire ad_, af_, sf_, sd_, df_, mf_;
+	wire ad_, af_, sf_, sd_, df_, mf_, dw_;
 	assign ad = ~ad_;
 	assign af = ~af_;
 	assign sf = ~sf_;
 	assign sd = ~sd_;
 	assign df = ~df_;
 	assign mf = ~mf_;
+	assign dw = ~dw_;
 	decoder8 ID(
 		.i(ir[7:9]),
 		.ena_(~pufa),
@@ -307,10 +306,10 @@ module fpm(
 	);
 
 	wire f9df = df & f9;
-	assign dw_df = ~(~df & dw_);
+	assign dw_df = ~(~df & ~dw);
 	assign mw_mf = ~(~mf & mw_);
 	assign af_sf = ~(sf_ & af_);
-	wire mwdw = ~(dw_ & mw_);
+	wire mwdw = ~(~dw & mw_);
 	assign ad_sd = ~(~sd & ad_);
 	wire mwadsd = ~(mw_ & ~sd & ad_);
 
@@ -524,7 +523,7 @@ module fpm(
 	wire M38_8 = d$ ^ ~M39_8;
 	wire M38_6 = ~d$ ^ ~M39_8;
 	assign m_40 = M38_8 & f8 & df;
-	assign m_32 = ~((M38_6 & dw) | (dw_ & ~m32));
+	assign m_32 = ~((M38_6 & dw) | (~dw & ~m32));
 	assign sgn_t0_c0 = t0_c0 ^ sgn;
 
 	// wskaźnik znaku ilorazu

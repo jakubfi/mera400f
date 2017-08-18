@@ -72,7 +72,6 @@ module fps(
 	input sgn_t0_c0,
 	// sheet 7
 	input opsu,
-	input dw_,
 	input wc,
 	input wt,
 	input dw,
