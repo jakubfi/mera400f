@@ -10,7 +10,7 @@ module fpa(
 	input opta, optb, optc, opm,
 	input strob_fp,
 	// sheet 1
-	input [0:15] w, // also on sheets 2, 12, 13
+	input [0:15] w,
 	input taa,
 	// sheet 2
 	input t_1,
@@ -99,9 +99,7 @@ module fpa(
 
 	wor __NC;
 
-	// sheet 1
-
-	// K bus
+	// --- K bus ------------------------------------------------------------
 
 	wire [0:39] k /* synthesis keep */;
 
@@ -116,7 +114,7 @@ module fpa(
 
 	// sheet 2
 
-	// T register
+	// --- T register -------------------------------------------------------
 
 	reg [0:39] t;
 
@@ -150,9 +148,7 @@ module fpa(
 		endcase
 	end
 
-	// sheet 3
-
-	// M register
+	// --- M register -------------------------------------------------------
 
 	reg [0:39] m;
 
@@ -172,10 +168,7 @@ module fpa(
 		endcase
 	end
 
-	// C register
-
-	// NOTE: unused in FPGA
-	// wire f2 = ~f2_;
+	// --- C register -------------------------------------------------------
 
 	reg [0:39] c;
 
@@ -187,19 +180,10 @@ module fpa(
 		else if (cp) c <= {c[0], c[0:38]};
 	end
 
-	assign c0_eq_c1 = c[0] ^ ~c[1];
-	assign fc0 = c[0];
-	assign t1 = t[1];
-	assign t0_eq_c0 = ~fc0 ^ t[0];
-	assign t0_c0 = c[0] ^ t[0];
-	assign t0_t1 = t[0] ^ t[1];
-	assign m0 = m[0];
-	assign t0 = t[0];
-
-	// sheet 4
-	// ALU
+	// --- big ALU ----------------------------------------------------------
 
 	wire [0:39] sum;
+
 /*
 	fpalu FPALU(
 		.t(t),
@@ -217,6 +201,7 @@ module fpa(
 		.sum(sum)
 	);
 */
+
 	wire g0a, g1a, g2a, g3a;
 	wire p0a, p1a, p2a, p3a;
 
@@ -259,8 +244,6 @@ module fpa(
 		.og(__NC)
 	);
 
-	// sheet 6
-
 	alu181 M54(
 		.a(t[8:11]),
 		.b(c[8:11]),
@@ -286,11 +269,6 @@ module fpa(
 		.co_(__NC),
 		.eq(__NC)
 	);
-
-	assign m14 = m[14];
-	assign m15 = m[15];
-
-	// sheet 8
 
 	alu181 M56(
 		.a(t[16:19]),
@@ -318,15 +296,10 @@ module fpa(
 		.eq(__NC)
 	);
 
-	// sheet 9
-
-	assign t16 = t[16];
-
-	// sheet 10
-
 	wire p21_, p24_, p28_;
 	wire g3b, g2b, g1b, g0b;
 	wire p3b, p2b, p1b, p0b;
+
 	carry182 M47(
 		.c_(~p_32),
 		.g({g3b, g2b, g1b, g0b}),
@@ -337,8 +310,6 @@ module fpa(
 		.op(__NC),
 		.og(__NC)
 	);
-
-	// sheet 11
 
 	alu181 M58(
 		.a(t[24:27]),
@@ -365,15 +336,6 @@ module fpa(
 		.co_(__NC),
 		.eq(__NC)
 	);
-
-	// sheet 14
-
-	assign m32 = m[32];
-	assign m38 = m[38];
-	assign m39 = m[39];
-	assign c39 = c[39];
-
-	// sheet 15
 
 	wire p36_;
 
@@ -403,11 +365,7 @@ module fpa(
 		.eq(__NC)
 	);
 
-	// sheet 16
-
-	assign t39 = t[39];
-
-	// sheet 18
+	// --- ZP bus -----------------------------------------------------------
 
 	always @ (*) begin
 		if (_0_zp) zp <= 16'd0;
@@ -418,6 +376,28 @@ module fpa(
 			2'b11: zp <= {z_f, m_f, v_f, c_f, 12'd0};
 		endcase
 	end
+
+	// --- Various output assignments ---------------------------------------
+
+	assign t0_eq_c0 = ~fc0 ^ t[0];
+	assign t0_c0 = c[0] ^ t[0];
+	assign t0_t1 = t[0] ^ t[1];
+
+	assign m0 = m[0];
+	assign m14 = m[14];
+	assign m15 = m[15];
+	assign m32 = m[32];
+	assign m38 = m[38];
+	assign m39 = m[39];
+
+	assign c0_eq_c1 = c[0] ^ ~c[1];
+	assign fc0 = c[0];
+	assign c39 = c[39];
+
+	assign t0 = t[0];
+	assign t1 = t[1];
+	assign t16 = t[16];
+	assign t39 = t[39];
 
 	assign t_0_1 = |t[0:1];
 	assign t_2_7 = |t[2:7];
