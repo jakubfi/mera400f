@@ -46,7 +46,7 @@ module fpm(
 	input nrf,
 	output ad,
 	output sd,
-	output mw_,
+	output mw,
 	output af,
 	output sf,
 	output mf,
@@ -121,14 +121,12 @@ module fpm(
 	output m_32,
 	output sgn_t0_c0,
 	output sgn
-
 );
 
 	parameter FP_FI0_TICKS;
 
 	wor __NC;
 
-	wire mw = ~mw_;
 	wire f2 = ~f2_;
 	wire f4 = ~f4_;
 	wire f8 = ~f8_;
@@ -271,28 +269,19 @@ module fpm(
 
 	// --- Instruction decoder ----------------------------------------------
 
-	wire ad_, af_, sf_, sd_, df_, mf_, dw_;
-	assign ad = ~ad_;
-	assign af = ~af_;
-	assign sf = ~sf_;
-	assign sd = ~sd_;
-	assign df = ~df_;
-	assign mf = ~mf_;
-	assign dw = ~dw_;
-
-	decoder8 ID(
+	decoder8pos ID(
 		.i(ir[7:9]),
-		.ena_(~pufa),
-		.o_({ad_, sd_, mw_, dw_, af_, sf_, mf_, df_})
+		.ena(pufa),
+		.o({ad, sd, mw, dw, af, sf, mf, df})
 	);
 
 	wire f9df = df & f9;
 	assign dw_df = df | dw;
-	assign mw_mf = ~(~mf & mw_);
+	assign mw_mf = mf | mw;
 	assign af_sf = sf | af;
-	wire mwdw = ~(~dw & mw_);
+	wire mwdw = dw | mw;
 	assign ad_sd = sd | ad;
-	wire mwadsd = ~(mw_ & ~sd & ad_);
+	wire mwadsd = mw | sd | ad;
 
 	assign ff = nrf | ir[7]; // any floating point instruction
 	assign ss = pufa & ~ir[7]; // any fixed point instruction
