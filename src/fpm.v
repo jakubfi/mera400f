@@ -141,27 +141,20 @@ module fpm(
 
 	// D register
 
-	reg [0:7] D;
-	reg D_1, D_2;
-	wire _0_d_ = ~_0_d;
-	always @ (negedge l_d, negedge _0_d_) begin
-		if (~_0_d_) {D_2, D_1, D} <= 10'd0;
-		else {D_2, D_1, D} <= L;
+	reg d_1, d_2; // d[-1], d[-2] positions
+	always @ (negedge l_d, posedge _0_d) begin
+		if (_0_d) {d_2, d_1, d} <= 10'd0;
+		else {d_2, d_1, d} <= L;
 	end
 
-	wire d_2_ = ~D_2;
-	wire d_2 = D_2;
-	wire d_1_ = ~D_1;
-	wire d_1 = D_1;
-	wire d0_ = ~D[0];
-	assign d = D[0:7];
+	wire d0_ = ~d[0];
 
 	// sheet 2
 	// B register and bus
 
 	reg [0:7] B;
 	always @ (posedge f2strob) begin
-		B <= D;
+		B <= d;
 	end
 
 	wire [0:7] B_BUS /* synthesis keep */;
@@ -180,13 +173,13 @@ module fpm(
 	wire [0:7] sum_c;
 	wire M29_14;
 	always @ (*) begin
-		{M29_14, sum_c} <= B_BUS + D + pc8;
+		{M29_14, sum_c} <= B_BUS + d + pc8;
 	end
 
 	wire M9_3 = ~fcb ^ ~scc;
 	wire M3_6 = ~((B[0] & M9_3) | (~B[0] & ~scc));
-	wire M27_8 = M3_6 ^ d_1_;
-	wire sum_c_2 = ~((M29_14 & M3_6) | (M29_14 & d_1_) | (M3_6 & d_1_));
+	wire M27_8 = M3_6 ^ ~d_1;
+	wire sum_c_2 = ~((M29_14 & M3_6) | (M29_14 & ~d_1) | (M3_6 & ~d_1));
 	wire sum_c_1 = M29_14 ^ M27_8;
 
 	// sheet 3
@@ -422,7 +415,7 @@ module fpm(
 	wire f8 = ~f8_;
 	wire M69_3 = ff & f13;
 	assign fi1 = M69_3 & d_2 & ~(d[0] & d_1);
-	assign fi2 = M69_3 & ~(d_1_ & d0_) & d_2_;
+	assign fi2 = M69_3 & ~(~d_1 & d0_) & ~d_2;
 
 	// sheet 9
 
