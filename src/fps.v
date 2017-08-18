@@ -84,7 +84,7 @@ module fps(
 	output f4_,
 	// sheet 9
 	input ok$,
-	input ff_,
+	input ff,
 	output read_fp, // memory read
 	// sheet 10
 	input sgn,
@@ -248,7 +248,6 @@ module fps(
 	wire mw = ~mw_;
 	wire mf = ~mf_;
 	wire df = ~df_;
-	wire ff = ~ff_;
 
 	// sheet 3
 

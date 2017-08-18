@@ -56,7 +56,7 @@ module fpm(
 	output mw_mf,
 	output af_sf,
 	output ad_sd,
-	output ff_,
+	output ff,
 	output ss,
 	output puf,
 	// sheet 7
@@ -312,9 +312,8 @@ module fpm(
 	assign ad_sd = ~(sd$_ & ad_);
 	wire mwadsd = ~(mw_ & sd$_ & ad_);
 
-	wire ff = ~ff_;
-	assign ff_ = ~(nrf | ir[7]); // any floating point instruction
-	assign ss  = pufa & ~ir[7]; // any fixed point instruction
+	assign ff = nrf | ir[7]; // any floating point instruction
+	assign ss = pufa & ~ir[7]; // any fixed point instruction
 	assign puf = pufa | nrf; // any AWP instruction
 
 	// sheet 7
