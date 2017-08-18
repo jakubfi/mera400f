@@ -309,14 +309,11 @@ module fpm(
 
 	// wskaźnik zapalony po obliczeniu poprawki
 
-	wire _end;
-	ffd REG_END(
-		.s_(1'b1),
-		.d(ws),
-		.c(f7),
-		.r_(~_0_f),
-		.q(_end)
-	);
+	reg _end;
+	always @ (posedge f7, posedge _0_f) begin
+		if (_0_f) _end <= 1'b0;
+		else if (f7) _end <= ws;
+	end
 
 	// wskaźnik poprawki
 
