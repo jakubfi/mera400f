@@ -382,14 +382,10 @@ module fpm(
 	wire f8_n_wdt = ~wdt & f8;
 	wire m_1_d = (trb & t39) | (m0 & ~mb) | (t_1 & f4) | (af & c39 & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
 
-	ffd_ena REG_M_1(
-			.s_(1'b1),
-			.d(m_1_d),
-			.c(~strob_fp),
-			.ena(opm),
-			.r_(~_0_m),
-			.q(m_1)
-	);
+	always @ (negedge strob_fp, posedge _0_m) begin
+		if (_0_m) m_1 <= 1'b0;
+		else if (opm) m_1  <= m_1_d;
+	end
 
 	// przedłużenie sumatora mantys
 
