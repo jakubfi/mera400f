@@ -200,6 +200,23 @@ module fpa(
 	// ALU
 
 	wire [0:39] sum;
+/*
+	fpalu FPALU(
+		.t(t),
+		.c(c),
+		.faa(faa),
+		.fab(fab),
+		.fra(fra),
+		.frb(frb),
+		.p_16(p_16),
+		.p_32(p_32),
+		.fp0_(fp0_),
+		.fp16_(fp16_),
+		.p32_(p32_),
+		.p_40(p_40),
+		.sum(sum)
+	);
+*/
 	wire g0a, g1a, g2a, g3a;
 	wire p0a, p1a, p2a, p3a;
 
