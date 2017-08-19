@@ -32,33 +32,16 @@ module awp(
 	output ekc_fp			// FPU done
 );
 
-	parameter FP_STROB1_1_TICKS = 2'd3;
-	parameter FP_STROB1_2_TICKS = 2'd3;
-	parameter FP_STROB1_3_TICKS = 2'd3;
-	parameter FP_STROB1_4_TICKS = 2'd3;
-	parameter FP_STROB2_TICKS = 2'd3;
-	parameter FP_KC1_TICKS = 2'd3;
-	parameter FP_KC2_TICKS = 2'd3;
-	parameter FP_START_TICKS = 2'd3;
 	parameter FP_FI0_TICKS = 2'd3;
 
 // -----------------------------------------------------------------------
 // --- F-PS --------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire strob2_fp, _0_f, _0_t, lkb, l_d, clocktc, clocktb, clockta, t_c, fcb, t_1_t_1, tab, trb, taa, cp, frb, p_16, p_32, p_40, fab, faa, fra, f5_, f6_, f2_, f4_, f10_, f9, f8_, f7_, f9_ka, scc, pc8, _0_d, _0_m, mb, ma, clockm, zpa, zpb, _0_zp, lp;
+wire strob2_fp, _0_f, _0_t, lkb, l_d, clocktc, clocktb, clockta, t_c, fcb, t_1_t_1, tab, trb, taa, cp, frb, p_16, p_32, p_40, fab, faa, fra, f5, f6, f2, f4, f10, f9, f8, f7, scc, pc8, _0_d, _0_m, mb, ma, clockm, zpa, zpb, _0_zp, lp;
 wire opta, optb, optc, opm;
 
-fps #(
-	.FP_STROB1_1_TICKS(FP_STROB1_1_TICKS),
-	.FP_STROB1_2_TICKS(FP_STROB1_2_TICKS),
-	.FP_STROB1_3_TICKS(FP_STROB1_3_TICKS),
-	.FP_STROB1_4_TICKS(FP_STROB1_4_TICKS),
-	.FP_STROB2_TICKS(FP_STROB2_TICKS),
-	.FP_KC1_TICKS(FP_KC1_TICKS),
-	.FP_KC2_TICKS(FP_KC2_TICKS),
-	.FP_START_TICKS(FP_START_TICKS)
-) FPS(
+fps FPS(
 	.clk_sys(clk_sys),
 	.opm(opm),
 	.opta(opta),
@@ -80,7 +63,7 @@ fps #(
 	.g(g),
 	.wdt(wdt),
 	.af_sf(af_sf),
-	.mw_(mw_),
+	.mw(mw),
 	._0_t(_0_t),
 	.lkb(lkb),
 	.l_d(l_d),
@@ -89,14 +72,14 @@ fps #(
 	.clockta(clockta),
 	.t_c(t_c),
 	.fcb(fcb),
-	.mf_(mf_),
+	.mf(mf),
 	.fp16_(fp16_),
 	.t_1_t_1(t_1_t_1),
 	.tab(tab),
 	.trb(trb),
 	.taa(taa),
 	.cp(cp),
-	.sd$_(sd$_),
+	.sd(sd),
 	.ck(ck),
 	.sf(sf),
 	.p32_(p32_),
@@ -105,7 +88,7 @@ fps #(
 	.m38(m38),
 	.t0_c0(t0_c0),
 	.ws(ws),
-	.df_(df_),
+	.df(df),
 	.af(af),
 	.ad(ad),
 	.frb(frb),
@@ -120,17 +103,16 @@ fps #(
 	.ta(ta),
 	.sgn_t0_c0(sgn_t0_c0),
 	.opsu(opsu),
-	.dw_(dw_),
 	.wc(wc),
 	.wt(wt),
 	.dw(dw),
 	.ss(ss),
-	.f5_(f5_),
-	.f6_(f6_),
-	.f2_(f2_),
-	.f4_(f4_),
+	.f5(f5),
+	.f6(f6),
+	.f2(f2),
+	.f4(f4),
 	.ok$(ok$),
-	.ff_(ff_),
+	.ff(ff),
 	.read_fp(read_fp),
 	.sgn(sgn),
 	.fwz(fwz),
@@ -139,11 +121,10 @@ fps #(
 	.t0_t_1(t0_t_1),
 	.ok(ok),
 	.f13(f13),
-	.f10_(f10_),
+	.f10(f10),
 	.f9(f9),
-	.f8_(f8_),
-	.f7_(f7_),
-	.f9_ka(f9_ka),
+	.f8(f8),
+	.f7(f7),
 	.dw_df(dw_df),
 	.mw_mf(mw_mf),
 	.scc(scc),
@@ -169,7 +150,7 @@ fps #(
 // -----------------------------------------------------------------------
 
 wire [0:7] d;
-wire g, wdt, wt, fic, c_f, v_f, m_f, z_f, dw, ad, sd$_, mw_, dw_, af, sf, mf_, df_, dw_df, mw_mf, af_sf, ad_sd, ff_, ss, puf, fwz, ws, di, wc, t_1, t0_t_1, ok, nz, opsu, ta, m_1, ck, m_40, m_32, sgn_t0_c0, sgn;
+wire g, wdt, wt, fic, c_f, v_f, m_f, z_f, dw, ad, sd, mw, af, sf, mf, df, dw_df, mw_mf, af_sf, ad_sd, ff, ss, puf, fwz, ws, di, wc, t_1, t0_t_1, ok, nz, opsu, ta, m_1, ck, m_40, m_32, sgn_t0_c0, sgn;
 
 fpm #(
 	.FP_FI0_TICKS(FP_FI0_TICKS)
@@ -186,9 +167,9 @@ fpm #(
 	.scc(scc),
 	.pc8(pc8),
 	._0_f(_0_f),
-	.f2_(f2_),
+	.f2(f2),
 	.strob2_fp(strob2_fp),
-	.f5_(f5_),
+	.f5(f5),
 	.strob_fp(strob_fp),
 	.g(g),
 	.wdt(wdt),
@@ -207,27 +188,26 @@ fpm #(
 	.f9(f9),
 	.nrf(nrf),
 	.ad(ad),
-	.sd$_(sd$_),
-	.mw_(mw_),
-	.dw_(dw_),
+	.sd(sd),
+	.mw(mw),
 	.af(af),
 	.sf(sf),
-	.mf_(mf_),
-	.df_(df_),
+	.mf(mf),
+	.df(df),
 	.dw_df(dw_df),
 	.mw_mf(mw_mf),
 	.af_sf(af_sf),
 	.ad_sd(ad_sd),
-	.ff_(ff_),
+	.ff(ff),
 	.ss(ss),
 	.puf(puf),
-	.f10_(f10_),
-	.f7_(f7_),
-	.f6_(f6_),
+	.f10(f10),
+	.f7(f7),
+	.f6(f6),
 	.fwz(fwz),
 	.ws(ws),
 	.lp(lp),
-	.f8_(f8_),
+	.f8(f8),
 	.f13(f13),
 	.di(di),
 	.wc(wc),
@@ -264,7 +244,7 @@ fpm #(
 	.m0(m0),
 	.mb(mb),
 	.c39(c39),
-	.f4_(f4_),
+	.f4(f4),
 	.clockm(clockm),
 	._0_m(_0_m),
 	.m39(m39),
@@ -329,7 +309,6 @@ fpa FPA(
 	.t16(t16),
 	.m_32(m_32),
 	.p_32(p_32),
-	.f2_(f2_),
 	.m_40(m_40),
 	.cp(cp),
 	.t_c(t_c),
@@ -344,7 +323,7 @@ fpa FPA(
 	.trb(trb),
 	._0_t(_0_t),
 	.t39(t39),
-	.f9_ka(f9_ka),
+	.f9(f9),
 	.lkb(lkb),
 	.z_f(z_f),
 	.m_f(m_f),
