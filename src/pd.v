@@ -163,28 +163,28 @@ module pd(
 
 	// opcode field A register number decoder
 	wire [0:7] a_eq;
-	decoder8pos DEC_A_EQ(
+	decoder8 DEC_A_EQ(
 		.i(ir[7:9]),
 		.ena(1'b1),
 		.o({a_eq})
 	);
 
 	// S opcode group decoder
-	decoder8pos DEC_S(
+	decoder8 DEC_S(
 		.i(ir[7:9]),
 		.ena(s),
 		.o({hlt, mcl, sin, gi, lip, __NC, __NC, __NC})
 	);
 
 	// B/N opcode group decoder
-	decoder8pos DEC_BN(
+	decoder8 DEC_BN(
 		.i(ir[7:9]),
 		.ena(b_n),
 		.o({mb, im, ki, fi, sp, md, rz, ib})
 	);
 
 	wire ngl, srz;
-	decoder8pos DEC_D(
+	decoder8 DEC_D(
 		.i({b_1, ir[15], ir[6]}),
 		.ena(c),
 		.o({__NC, __NC, __NC, __NC, ngl, srz, rpc, lpc})
@@ -195,7 +195,7 @@ module pd(
 
 	// C opcode group decoder
 	wire sx, sz, sly, slx, srxy;
-	decoder8pos DEC_OTHER(
+	decoder8 DEC_OTHER(
 		.i(ir[13:15]),
 		.ena(c_b0),
 		.o({rc$, zb$, sx, ng$, sz, sly, slx, srxy})

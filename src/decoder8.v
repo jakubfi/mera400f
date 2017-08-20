@@ -1,4 +1,4 @@
-module decoder8pos(
+module decoder8(
 	input [0:2] i,
 	input ena,
 	output [0:7] o

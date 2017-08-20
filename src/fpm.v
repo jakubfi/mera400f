@@ -258,7 +258,7 @@ module fpm(
 
 	// --- Instruction decoder ----------------------------------------------
 
-	decoder8pos IDEC_FP(
+	decoder8 IDEC_FP(
 		.i(ir[7:9]),
 		.ena(pufa),
 		.o({ad, sd, mw, dw, af, sf, mf, df})
