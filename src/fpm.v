@@ -22,9 +22,11 @@ module fpm(
 	// sheet 3
 	input _0_f,
 	input f2,
-	input strob2_fp,
 	input f5,
 	input strob_fp,
+	input strobb_fp,
+	input strob2_fp,
+	input strob2b_fp,
 	output g,
 	output wdt,
 	output wt,

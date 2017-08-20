@@ -6,6 +6,7 @@ module strobgen(
 	input ok$, zw, oken,
 	input mode, step,
 	input strob_fp,
+	input strobb_fp,
 	output ldstate,
 	output got,
 	output strob1,
@@ -29,13 +30,11 @@ module strobgen(
 	wire no_strob2 = ss13 | ss14 | ss15;
 
 	assign got = state == S_GOT;
-	assign strob1 = state == S_ST1;
-	assign strob1b = state == S_ST1B;
+	assign strob1 = (state == S_ST1) | strob_fp;
+	assign strob1b = (state == S_ST1B) | strobb_fp;
 	assign strob2 = state == S_ST2;
 	assign strob2b = state == S_ST2B;
 	assign ldstate = ~if_busy & ((state == S_PGOT) | ((state == S_ST1B) & no_strob2) | (state == S_ST2B));
-
-	// TODO: strob_fp
 
 	// * step jest uzbrajany jeśli MODE=1 i wystąpił STROB1
 	// * STEP zabrania przejścia do stanu STROB2 jeśli ss11 | ss12 (czyli jeśli jesteśmy w strob1 po którym jest strob2, to będziemy trzymać strob1)

@@ -136,6 +136,7 @@ px #(
 	.laduj(laduj),
 	.as2_sum_at(as2),
 	.strob_fp(strob_fp),
+	.strobb_fp(strobb_fp),
 	.mode(mode),
 	.step(step),
 	.got(got),
@@ -741,7 +742,7 @@ pa PA(
 // -----------------------------------------------------------------------
 
 wire fi0, fi1, fi2, fi3;
-wire read_fp, strob_fp, sr_fp, ekc_fp, rlp_fp, ustr0_fp, s_fp;
+wire read_fp, strob_fp, strobb_fp, sr_fp, ekc_fp, rlp_fp, ustr0_fp, s_fp;
 wire f13, lpa, lpb;
 wire [0:15] zp;
 
@@ -764,6 +765,7 @@ generate
 			.step(step),
 			.efp(efp),
 			.got(got),
+			.ldstate(ldstate),
 			.ok$(ok$),
 			.oken(oken),
 			.zw(zw),
@@ -779,6 +781,7 @@ generate
 			.ustr0_fp(ustr0_fp),
 			.f13(f13),
 			.strob_fp(strob_fp),
+			.strobb_fp(strobb_fp),
 			.sr_fp(sr_fp),
 			.read_fp(read_fp),
 			.ekc_fp(ekc_fp)

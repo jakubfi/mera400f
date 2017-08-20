@@ -12,7 +12,9 @@ module fps(
 	input mode,
 	input step,
 	output strob_fp,
+	output strobb_fp,
 	output strob2_fp,
+	output strob2b_fp,
 	// sheet 2
 	input oken,
 	input zw,
@@ -20,6 +22,7 @@ module fps(
 	input efp, // Enter FP - start AWP job
 	input puf,
 	input got,
+	input ldstate,
 	output sr_fp, // initiate interface access from AWP
 	output ekc_fp, // AWP has done its job
 	output _0_f,
@@ -123,8 +126,24 @@ module fps(
 );
 
 	// --- Start AWP work ---------------------------------------------------
-	// sync: @ldstate: start <= efp
 
+	localparam STS_IDLE		= 2'd0;
+	localparam STS_DLY		= 2'd1;
+	localparam STS_START	= 2'd2;
+	localparam STS_WAIT		= 2'd3;
+
+	reg [0:1] start_state;
+	wire start = (start_state == STS_START);
+
+	always @ (posedge clk_sys) begin
+		case (start_state)
+			STS_IDLE: if (efp & ldstate) start_state <= STS_DLY;
+			STS_DLY: start_state <= STS_START;
+			STS_START: start_state <= STS_WAIT;
+			STS_WAIT: if (_0_f) start_state <= STS_IDLE;
+		endcase
+	end
+/*
 	wire start_trig;
 	ffjk REG_START(
 		.s_(1'b1),
@@ -142,7 +161,7 @@ module fps(
 		.b(start_trig),
 		.q(start)
 	);
-
+*/
 	// --- Internal AWP strobs (strob_fp to CPU also) -----------------------
 
 	wire dp8 = f4 | f8 | f3 | (ok$ & f1) | f9 | f13;
@@ -150,7 +169,9 @@ module fps(
 	wire dp6 = f2 | f10;
 	wire dp5 = f11 | f7;
 
-	wire strob1, strob2, __got, got_fp;
+	wire strob1, strob1b;
+	wire strob2, strob2b;
+	wire ldstate_fp, __got, got_fp;
 	fp_strobgen FP_STROBGEN(
 		.clk_sys(clk_sys),
 		.start(start),
@@ -164,20 +185,42 @@ module fps(
 		.oken(oken),
 		.f1(f1),
 		.zw(zw),
+		.ldstate(ldstate_fp),
 		.strob1(strob1),
+		.strob1b(strob1b),
 		.strob2(strob2),
+		.strob2b(strob2b),
 		.__got(__got),
 		.got_fp(got_fp),
 		.sr_fp(sr_fp)
 	);
 
 	assign strob_fp = strob1;
+	assign strobb_fp = strob1b;
 	assign strob2_fp = strob2;
+	assign strob2b_fp = strob2b;
 
 	// --- End AWP work -----------------------------------------------------
 
 	wire dkc = ~df13 & f13;
 	wire d_ekc = dkc | di;
+
+	localparam EKCS_IDLE	= 2'd0;
+	localparam EKCS_EKC		= 2'd1;
+	localparam EKCS_WAIT	= 2'd2;
+
+	reg [0:1] ekc_state;
+	assign ekc_fp = (ekc_state == EKCS_EKC);
+
+	always @ (posedge clk_sys) begin
+		case (ekc_state)
+			EKCS_IDLE: if (__got & d_ekc) ekc_state <= EKCS_EKC;
+			EKCS_EKC: ekc_state <= EKCS_WAIT;
+			EKCS_WAIT: if (~puf) ekc_state <= EKCS_IDLE;
+		endcase
+	end
+
+/*
 	wire ekc_fp_trig;
 	ffd REG_KC(
 		.s_(1'b1),
@@ -193,7 +236,7 @@ module fps(
 		.b(ekc_fp_trig),
 		.q(ekc_fp)
 	);
-
+*/
 	// --- State registers --------------------------------------------------
 
 	assign _0_f = ekc_fp | ~puf;

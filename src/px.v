@@ -10,7 +10,8 @@ module px(
 	input clk_sys,	// system clock
 	input clo,			// general clear (reset)
 
-	input strob_fp,	// strob1 from the FPU
+	input strob_fp,	// strob1 front from the FPU
+	input strobb_fp,// strob1 back from the FPU
 	output got,			// CPU ready for the next state (state preload strob)
 	output strob1,	// CPU STROB2
 	output strob1b,	// CPU STROB2 back
@@ -204,6 +205,7 @@ module px(
 		.mode(mode),
 		.step(step),
 		.strob_fp(strob_fp),
+		.strobb_fp(strobb_fp),
 		.ss11(M19_6),
 		.ss12(M18_8),
 		.ss13(M20_8),

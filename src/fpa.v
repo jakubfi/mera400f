@@ -9,6 +9,7 @@
 module fpa(
 	input opta, optb, optc, opm,
 	input strob_fp,
+	input strobb_fp,
 	// sheet 1
 	input [0:15] w,
 	input taa,

@@ -12,6 +12,7 @@ module awp(
 	input step,
 	input efp,
 	input got,
+	input ldstate,
 	input ok$,
 	input oken,
 	input zw,
@@ -26,7 +27,8 @@ module awp(
 	output s_fp,			// ZP->W
 	output ustr0_fp,	// set flags
 	output f13,				// AWP->W
-	output strob_fp,	// fpu strob
+	output strob_fp,	// fpu strob front edge
+	output strobb_fp,	// fpu strob back edge
 	output sr_fp,			// memory read
 	output read_fp,		// memory read
 	output ekc_fp			// FPU done
@@ -38,7 +40,7 @@ module awp(
 // --- F-PS --------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire strob2_fp, _0_f, _0_t, lkb, l_d, clocktc, clocktb, clockta, t_c, fcb, t_1_t_1, tab, trb, taa, cp, frb, p_16, p_32, p_40, fab, faa, fra, f5, f6, f2, f4, f10, f9, f8, f7, scc, pc8, _0_d, _0_m, mb, ma, clockm, zpa, zpb, _0_zp, lp;
+wire strob2_fp, strob2b_fp, _0_f, _0_t, lkb, l_d, clocktc, clocktb, clockta, t_c, fcb, t_1_t_1, tab, trb, taa, cp, frb, p_16, p_32, p_40, fab, faa, fra, f5, f6, f2, f4, f10, f9, f8, f7, scc, pc8, _0_d, _0_m, mb, ma, clockm, zpa, zpb, _0_zp, lp;
 wire opta, optb, optc, opm;
 
 fps FPS(
@@ -50,13 +52,16 @@ fps FPS(
 	.mode(mode),
 	.step(step),
 	.strob_fp(strob_fp),
+	.strobb_fp(strobb_fp),
 	.strob2_fp(strob2_fp),
+	.strob2b_fp(strob2b_fp),
 	.oken(oken),
 	.zw(zw),
 	.di(di),
 	.efp(efp),
 	.puf(puf),
 	.got(got),
+	.ldstate(ldstate),
 	.sr_fp(sr_fp),
 	.ekc_fp(ekc_fp),
 	._0_f(_0_f),
@@ -168,9 +173,11 @@ fpm #(
 	.pc8(pc8),
 	._0_f(_0_f),
 	.f2(f2),
-	.strob2_fp(strob2_fp),
 	.f5(f5),
 	.strob_fp(strob_fp),
+	.strobb_fp(strobb_fp),
+	.strob2_fp(strob2_fp),
+	.strob2b_fp(strob2b_fp),
 	.g(g),
 	.wdt(wdt),
 	.wt(wt),
@@ -273,6 +280,7 @@ fpa FPA(
 	.optc(optc),
 	.opm(opm),
 	.strob_fp(strob_fp),
+	.strobb_fp(strobb_fp),
 	.w(w),
 	.taa(taa),
 	.t_1(t_1),
