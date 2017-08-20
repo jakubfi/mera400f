@@ -260,6 +260,12 @@ module fps(
 	wire f3_s = start & nrf;
 
 	wire f3;
+	always @ (posedge got_fp, posedge f3_s, posedge _0_f) begin
+		if (_0_f) f3 <= 1'b0;
+		else if (f3_s) f3 <= 1'b1;
+		else f3 <= ef3;
+	end
+/*
 	ffd REG_F3(
 		.s_(~f3_s),
 		.d(ef3),
@@ -267,8 +273,14 @@ module fps(
 		.r_(~_0_f),
 		.q(f3)
 	);
-
+*/
 	wire f1;
+	always @ (posedge got_fp, posedge f1_s, posedge _0_f) begin
+		if (_0_f) f1 <= 1'b0;
+		else if (f1_s) f1 <= 1'b1;
+		else f1 <= ef1;
+	end
+/*
 	ffd REG_F1(
 		.s_(~f1_s),
 		.d(ef1),
@@ -276,7 +288,7 @@ module fps(
 		.r_(~_0_f),
 		.q(f1)
 	);
-
+*/
 	// ----------------------------------------------------------------------
 	// ----------------------------------------------------------------------
 	// ----------------------------------------------------------------------
