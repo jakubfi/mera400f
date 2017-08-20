@@ -56,7 +56,7 @@ module fps(
 	input m14,
 	input t0_eq_c0,
 	input m38,
-	input t0_c0,
+	input t0_neq_c0,
 	input ws,
 	input df,
 	input af,
@@ -94,7 +94,7 @@ module fps(
 	input nrf,
 	// sheet 11
 	input nz,
-	input t0_t_1,
+	input t0_neq_t_1,
 	input ok,
 	output f13,
 	// sheet 12
@@ -293,12 +293,13 @@ module fps(
 	// ----------------------------------------------------------------------
 	// ----------------------------------------------------------------------
 
-	// sheet 3
+	wire f9dw = dw & f9;
+	assign t_c = strob1 & f2;
+	assign l_d = strob1 & ((f5 & ~af_sf) | lp3lkb | ((wdt | wc) & ~ws & f7) | fcb);
+
+	// --- T reg. control ---------------------------------------------------
 
 	wire lp3lkb = lp3 & lkb;
-
-	assign _0_t = start | (strob2 & ((g & wdt & f5) | (wc & f4) | (mw & f4) | (f4 & mf)));
-	assign l_d = strob1 & ((f5 & ~af_sf) | lp3lkb | ((wdt | wc) & ~ws & f7) | fcb);
 
 	wire M9_3 = lp3lkb | f7_f12;
 	wire M19_6 = ((mw | lp1) & lkb) | (f7 & ta_alpha) | f7_f12 | f6;
@@ -313,25 +314,24 @@ module fps(
 	assign clocktc = strob1 & M9_3;
 	assign clocktb = strob1 & M19_8;
 	assign clockta = strob1 & M19_6;
-	assign t_c = strob1 & f2;
-
-	// sheet 4
-
-	wire M30_3 = ~(af_sf & ~wdt);
-	wire M30_8 = f9 & dw;
-	wire dwsgnf7 = dw & sgn & f7;
+	assign _0_t = start | (strob2 & ((g & wdt & f5) | (wc & f4) | (mw & f4) | (f4 & mf)));
 
 	wire M53_3 = f8 & (mw | mf | wdt);
+	assign taa = (dw_df & f8) | f12;
+	assign tab = f9dw | f11 | M53_3;
+	assign trb = M53_3 | f11;
+
+	// ----------------------------------------------------------------------
+
+	wire M30_3 = ~(af_sf & ~wdt);
+	wire dwsgnf7 = dw & sgn & f7;
 
 	wire f7_f12 = f9 | f12 | f11 | (~dw & f7) | (M30_3 & f8);
-	assign t_1_t_1 = f8 | f12 | f11 | M30_8;
-	assign tab = M30_8 | f11 | M53_3;
-	assign trb = M53_3 | f11;
-	assign taa = (dw_df & f8) | f12;
+	assign t_1_t_1 = f8 | f12 | f11 | f9dw;
 	assign cp = strob1 & f8 & af_sf & ~wdt;
 	wire dw_p16 = ~(~dwsgnf7 & fp16_ & ~mw_p16); // does not
 
-	// sheet 5
+	// --- Mantissa ALU control ---------------------------------------------
 
 	wire M54_8 = wdt | ck;
 	wire M76_8 = ~ws & sf;
@@ -340,27 +340,27 @@ module fps(
 
 	wire M67_8 = f7 & ~sgn & dw;
 	wire M77_6 = (M54_8 & M76_8) | (~fic & df);
-	wire M65_6 = (mw & ~m14) | (dw & t0_c0);
-	wire M78_8 = (~m38 & M76_6) | (ad) | (df & fic & t0_c0) | (~ws & af);
+	wire M65_6 = (mw & ~m14) | (dw & t0_neq_c0);
+	wire M78_8 = (~m38 & M76_6) | (ad) | (df & fic & t0_neq_c0) | (~ws & af);
 
 	wire M52_3 = M65_6 & f6;
 
 	wire M80_6 = ~(p32_ & ~dwsgnf7 & ~sd); // does not
 	wire M77_8 = (t0_eq_c0 & M76_3) | (M76_6 & m38);
+	wire mw_p16 = ~M65_6 & f6;
 
-	assign frb = ~(~mw_p16 & ~sd & ~M77_8 & ~M76_8); // does not
 	assign p_16 = dw_p16 & ~M67_8 & ~M52_3;
 	assign p_32 = M80_6 & ~ad;
-	wire mw_p16 = ~M65_6 & f6;
 	assign p_40 = sd | ws | M77_6 | M77_8;
+
+	assign faa = M67_8 | M52_3 | fra;
 	assign fab = dwsgnf7 | frb;
 	assign fra = M52_3 | M78_8;
-	assign faa = M67_8 | M52_3 | fra;
+	assign frb = ~(~mw_p16 & ~sd & ~M77_8 & ~M76_8); // does not
 
-	// sheet 7
+	// --- State transitions ------------------------------------------------
 
 	wire df13 = (~lp3 & ss) | (ff & lp);
-	wire f9dw = dw & f9;
 	wire f4mwdw = f4 & dw_mw;
 	wire ta_alpha = ta & sgn_t0_c0;
 	wire f5_f8 = f5 | f8;
@@ -378,17 +378,18 @@ module fps(
 	wire ef8 = (~opsu & ~fwz & M22_11 & fic) | (dw_mw & fic & f6) | (fic & f7);
 	wire ef9 = f8 & ~fic & dw_df;
 	wire ef10 = f11 | (f12 & ok) | (~sgn & df & f9) | (nrf & f4 & ~fwz) | (ff & f7 & ~fic) | (~fic & ~opsu & (f8 & mf));
-	wire ef11 = f10 & t0_t_1;
+	wire ef11 = f10 & t0_neq_t_1;
 	wire ef12 = (f12 | f10) & nz;
 	wire M52_8 = f6 | (~opsu & f8);
 	wire M24_6 = f10 | f4 | (mw & f2);
 	wire ef13 = (M24_6 & fwz) | (ss & f7) | (~ws & ok & f10) | (df13 & f13) | (M52_8 & mw & ~fic) | (~sgn & f9dw & ~ta_alpha) | (wt & (f5 | f4));
 
-	// sheet 13
-
 	assign scc = (mf & f5) | f7 | f11;
 	assign pc8 = (~mf & f5) | f11;
 	assign _0_d = strob2 & ((f5 & wdt) | (wc & f4));
+
+	// --- M reg. control ---------------------------------------------------
+
 	assign _0_m = (strob2 & f9) | start;
 	assign mb = f11 | (af_sf & f8) | (mw_mf & f8);
 	assign ma = (dw_df & f8) | f12;
@@ -398,15 +399,13 @@ module fps(
 	// WORKAROUND: for M/T registers
 	assign opm = M27_12;
 
-	// sheet 14
+	// --- LP counter -------------------------------------------------------
 
 	wire M3_8 = mw & strob1 & f2;
 
 	wire lpb_s = (start & mw) | (~fwz & M3_8);
 	wire lpa_s = (start | f2) & ~mw;
-
 	wire M44_8 = (M3_8 & fwz) | f7 | (f4 & ~dw) | (fwz & f4);
-
 	wire lp_clk = strob1 & ((lp & f8 & dw) | f1 | f3 | f13);
 
 	wire lp1, lp2, lp3;

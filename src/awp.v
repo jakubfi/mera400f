@@ -91,7 +91,7 @@ fps FPS(
 	.m14(m14),
 	.t0_eq_c0(t0_eq_c0),
 	.m38(m38),
-	.t0_c0(t0_c0),
+	.t0_neq_c0(t0_neq_c0),
 	.ws(ws),
 	.df(df),
 	.af(af),
@@ -123,7 +123,7 @@ fps FPS(
 	.fwz(fwz),
 	.nrf(nrf),
 	.nz(nz),
-	.t0_t_1(t0_t_1),
+	.t0_neq_t_1(t0_neq_t_1),
 	.ok(ok),
 	.f13(f13),
 	.f10(f10),
@@ -154,8 +154,8 @@ fps FPS(
 // --- F-PM --------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire [0:7] d;
-wire g, wdt, wt, fic, c_f, v_f, m_f, z_f, dw, ad, sd, mw, af, sf, mf, df, dw_df, mw_mf, af_sf, ad_sd, ff, ss, puf, fwz, ws, di, wc, t_1, t0_t_1, ok, nz, opsu, ta, m_1, ck, m_40, m_32, sgn_t0_c0, sgn;
+wire [-2:7] d;
+wire g, wdt, wt, fic, c_f, v_f, m_f, z_f, dw, ad, sd, mw, af, sf, mf, df, dw_df, mw_mf, af_sf, ad_sd, ff, ss, puf, fwz, ws, di, wc, t_1, t0_neq_t_1, ok, nz, opsu, ta, m_1, ck, m_40, m_32, sgn_t0_c0, sgn;
 
 fpm #(
 	.FP_FI0_TICKS(FP_FI0_TICKS)
@@ -227,9 +227,9 @@ fpm #(
 	.fp0_(fp0_),
 	.fab(fab),
 	.faa(faa),
-	.fc0(fc0),
+	.c0(c0),
 	._0_t(_0_t),
-	.t0_t1(t0_t1),
+	.t0_neq_t1(t0_neq_t1),
 	.c0_eq_c1(c0_eq_c1),
 	.t1(t1),
 	.t0(t0),
@@ -241,7 +241,7 @@ fpm #(
 	.t_24_31(t_24_31),
 	.t_32_39(t_32_39),
 	.t_1(t_1),
-	.t0_t_1(t0_t_1),
+	.t0_neq_t_1(t0_neq_t_1),
 	.ok(ok),
 	.nz(nz),
 	.opsu(opsu),
@@ -261,7 +261,7 @@ fpm #(
 	.m_1(m_1),
 	.ck(ck),
 	.m32(m32),
-	.t0_c0(t0_c0),
+	.t0_neq_c0(t0_neq_c0),
 	.m_40(m_40),
 	.m_32(m_32),
 	.sgn_t0_c0(sgn_t0_c0),
@@ -272,7 +272,7 @@ fpm #(
 // --- F-PA --------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-wire t_0_1, t_2_7, c0_eq_c1, fc0, t1, t0_eq_c0, t0_c0, t0_t1, m0, t0, fp0_, t_8_15, m14, m15, fp16_, t16, m32, m38, m39, c39, p32_, t39, t_32_39, t_16_23, t_24_31;
+wire t_0_1, t_2_7, c0_eq_c1, c0, t1, t0_eq_c0, t0_neq_c0, t0_neq_t1, m0, t0, fp0_, t_8_15, m14, m15, fp16_, t16, m32, m38, m39, c39, p32_, t39, t_32_39, t_16_23, t_24_31;
 
 fpa FPA(
 	.opta(opta),
@@ -300,11 +300,11 @@ fpa FPA(
 	.clockm(clockm),
 	._0_m(_0_m),
 	.c0_eq_c1(c0_eq_c1),
-	.fc0(fc0),
+	.c0(c0),
 	.t1(t1),
 	.t0_eq_c0(t0_eq_c0),
-	.t0_c0(t0_c0),
-	.t0_t1(t0_t1),
+	.t0_neq_c0(t0_neq_c0),
+	.t0_neq_t1(t0_neq_t1),
 	.m0(m0),
 	.t0(t0),
 	.fab(fab),

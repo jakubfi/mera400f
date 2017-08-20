@@ -32,11 +32,11 @@ module fpa(
 	input clockm,
 	input _0_m,
 	output c0_eq_c1,
-	output fc0,
+	output c0,
 	output t1,
 	output t0_eq_c0,
-	output t0_c0,
-	output t0_t1,
+	output t0_neq_c0,
+	output t0_neq_t1,
 	output m0,
 	output t0,
 	// sheet 4
@@ -90,14 +90,11 @@ module fpa(
 	input c_f,
 	output [0:15] zp,
 	// sheet 19
-	input [0:7] d,
+	input [-2:7] d,
 	input _0_zp,
 	input zpb,
 	input zpa
-
 );
-
-	wor __NC;
 
 	// --- K bus ------------------------------------------------------------
 
@@ -111,8 +108,6 @@ module fpa(
 			2'b11: k <= 40'd0;
 		endcase
 	end
-
-	// sheet 2
 
 	// --- T register -------------------------------------------------------
 
@@ -148,6 +143,22 @@ module fpa(
 		endcase
 	end
 
+	assign t0 = t[0];
+	assign t1 = t[1];
+	assign t16 = t[16];
+	assign t39 = t[39];
+
+	assign t0_eq_c0 = t[0] == c[0];
+	assign t0_neq_c0 = c[0] != t[0];
+	assign t0_neq_t1 = t[0] != t[1];
+
+	assign t_0_1 = |t[0:1];
+	assign t_2_7 = |t[2:7];
+	assign t_8_15 = |t[8:15];
+	assign t_16_23 = |t[16:23];
+	assign t_24_31 = |t[24:31];
+	assign t_32_39 = |t[32:39];
+
 	// --- M register -------------------------------------------------------
 
 	reg [0:39] m;
@@ -168,6 +179,13 @@ module fpa(
 		endcase
 	end
 
+	assign m0 = m[0];
+	assign m14 = m[14];
+	assign m15 = m[15];
+	assign m32 = m[32];
+	assign m38 = m[38];
+	assign m39 = m[39];
+
 	// --- C register -------------------------------------------------------
 
 	reg [0:39] c;
@@ -180,7 +198,11 @@ module fpa(
 		else if (cp) c <= {c[0], c[0:38]};
 	end
 
-	// --- big ALU ----------------------------------------------------------
+	assign c0_eq_c1 = c[0] == c[1];
+	assign c0 = c[0];
+	assign c39 = c[39];
+
+	// --- Mantissa ALU -----------------------------------------------------
 
 	wire [0:39] sum;
 
@@ -193,10 +215,10 @@ module fpa(
 		.frb(frb),
 		.p_16(p_16),
 		.p_32(p_32),
-		.fp0_(fp0_),
-		.fp16_(fp16_),
-		.p32_(p32_),
 		.p_40(p_40),
+		.fp0_(fp0_), // carry out above bit 0
+		.fp16_(fp16_), // carry out above bit 16
+		.p32_(p32_), // carry out above bit 32
 		.sum(sum)
 	);
 
@@ -211,35 +233,6 @@ module fpa(
 			2'b11: zp <= {z_f, m_f, v_f, c_f, 12'd0};
 		endcase
 	end
-
-	// --- Various output assignments ---------------------------------------
-
-	assign t0_eq_c0 = ~fc0 ^ t[0];
-	assign t0_c0 = c[0] ^ t[0];
-	assign t0_t1 = t[0] ^ t[1];
-
-	assign m0 = m[0];
-	assign m14 = m[14];
-	assign m15 = m[15];
-	assign m32 = m[32];
-	assign m38 = m[38];
-	assign m39 = m[39];
-
-	assign c0_eq_c1 = c[0] ^ ~c[1];
-	assign fc0 = c[0];
-	assign c39 = c[39];
-
-	assign t0 = t[0];
-	assign t1 = t[1];
-	assign t16 = t[16];
-	assign t39 = t[39];
-
-	assign t_0_1 = |t[0:1];
-	assign t_2_7 = |t[2:7];
-	assign t_8_15 = |t[8:15];
-	assign t_16_23 = |t[16:23];
-	assign t_24_31 = |t[24:31];
-	assign t_32_39 = |t[32:39];
 
 endmodule
 

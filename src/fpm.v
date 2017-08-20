@@ -14,7 +14,7 @@ module fpm(
 	input l_d,
 	input _0_d,
 	input lkb,
-	output [0:7] d,
+	output [-2:7] d,
 	// sheet 2
 	input fcb,
 	input scc,
@@ -82,9 +82,9 @@ module fpm(
 	input fp0_,
 	input fab,
 	input faa,
-	input fc0,
+	input c0,
 	input _0_t,
-	input t0_t1,
+	input t0_neq_t1,
 	input c0_eq_c1,
 	input t1,
 	input t0,
@@ -96,7 +96,7 @@ module fpm(
 	input t_24_31,
 	input t_32_39,
 	output t_1,
-	output t0_t_1,
+	output t0_neq_t_1,
 	output ok,
 	output nz,
 	output opsu,
@@ -118,7 +118,7 @@ module fpm(
 	output ck,
 	// sheet 11
 	input m32,
-	input t0_c0,
+	input t0_neq_c0,
 	output m_40,
 	output m_32,
 	output sgn_t0_c0,
@@ -141,10 +141,9 @@ module fpm(
 
 	// --- D register -------------------------------------------------------
 
-	reg d_1, d_2; // d[-1], d[-2] positions
 	always @ (negedge l_d, posedge _0_d) begin
-		if (_0_d) {d_2, d_1, d} <= 10'd0;
-		else {d_2, d_1, d} <= L;
+		if (_0_d) d <= 10'd0;
+		else d <= L;
 	end
 
 	// --- B register and bus -----------------------------------------------
@@ -153,7 +152,7 @@ module fpm(
 
 	reg [0:7] b;
 	always @ (posedge f2strob) begin
-		b <= d;
+		b <= d[0:7];
 	end
 
 	wire [0:7] b_bus /* synthesis keep */;
@@ -169,42 +168,25 @@ module fpm(
 
 	// --- Exponent adder ---------------------------------------------------
 
-	wire [-1:7] sum_c = b_bus + d + pc8;
+	wire [-1:7] sum_c = b_bus + d[0:7] + pc8;
 
 	wire M9_3 = fcb ^ scc;
 	wire M3_6 = ~((b[0] & M9_3) | (~b[0] & ~scc));
-	wire M27_8 = M3_6 ^ ~d_1;
-	wire sum_c_2 = ~((sum_c[-1] & M3_6) | (sum_c[-1] & ~d_1) | (M3_6 & ~d_1));
+	wire M27_8 = M3_6 ^ ~d[-1];
+	wire sum_c_2 = ~((sum_c[-1] & M3_6) | (sum_c[-1] & ~d[-1]) | (M3_6 & ~d[-1]));
 	wire sum_c_1 = sum_c[-1] ^ M27_8;
 
-	// ----------------------------------------------------------------------
+	// --- |sum_c| >= 40 ----------------------------------------------------
 
-	wire wdtwtg_clk = ~(f5_af_sf & strob_fp);
+	wire M44_6 = ~sum_c_1 & sum_c[2] & sum_c[4];
+	wire M44_12 = ~sum_c_1 & sum_c[2] & sum_c[3];
+	wire M27_11 = sum_c_1 ^ sum_c[0];
+	wire M27_3 = sum_c_1 ^ sum_c[1];
+	wire M44_8 = ~sum_c[7] & ~sum_c[6] & ~sum_c[5] & ~sum_c[2] & sum_c_1;
+	wire M17_3 = ~sum_c[2] & ~sum_c[4] & sum_c_1;
+	wire M17_11 = ~sum_c[2] & ~sum_c[3] & sum_c_1;
 
-	// wskaźnik określający, że wartość różnicy cech przy AF i SF jest >= 40
-
-	always @ (posedge wdtwtg_clk, posedge _0_f) begin
-		if (_0_f) g <= 1'b0;
-		else if (wdtwtg_clk) g <= sum_c_ge_40;
-	end
-
-	// wskaźnik denormalnizacji wartości rejestru T
-
-	always @ (posedge wdtwtg_clk, posedge _0_f) begin
-		if (_0_f) wdt <= 1'b0;
-		else if (wdtwtg_clk) wdt <= sum_c_1;
-	end
-
-	// wynik w rejestrze T
-
-	wire wt_s = f2 & ~t & strob_fp & af_sf;
-	wire wt_d = sum_c_ge_40 & ~sum_c_1;
-
-	always @ (posedge wdtwtg_clk, posedge _0_f, posedge wt_s) begin
-		if (_0_f) wt <= 1'b0;
-		else if (wt_s) wt <= 1'b1;
-		else wt <= wt_d;
-	end
+	wire abs_sum_c_ge_40 = M44_6 | M44_12 | M27_3 | M27_11 | M44_8 | M17_3 | M17_11;
 
 	// --- FIC counter ------------------------------------------------------
 
@@ -244,18 +226,6 @@ module fpm(
 		.fic(fic)
 	);
 
-	// --- sum_c >= 40 ------------------------------------------------------
-
-	wire M44_6 = ~sum_c_1 & sum_c[2] & sum_c[4]; // 40 - 255
-	wire M44_12 = ~sum_c_1 & sum_c[2] & sum_c[3]; // 48 - 255
-	wire M27_11 = sum_c_1 ^ sum_c[0]; // 256 - 383, 128 - 255
-	wire M27_3 = sum_c_1 ^ sum_c[1]; // 256 - 447, 64 - 255
-	wire M44_8 = ~sum_c[7] & ~sum_c[6] & ~sum_c[5] & ~sum_c[2] & sum_c_1; // 256 - 472
-	wire M17_3 = ~sum_c[2] & ~sum_c[4] & sum_c_1; // 256 - 463
-	wire M17_11 = ~sum_c[2] & ~sum_c[3] & sum_c_1; // 256 - 471
-
-	wire sum_c_ge_40 = M44_6 | M44_12 | M27_3 | M27_11 | M44_8 | M17_3 | M17_11;
-
 	// --- Instruction decoder ----------------------------------------------
 
 	decoder8 IDEC_FP(
@@ -275,6 +245,35 @@ module fpm(
 	assign ff = nrf | ir[7]; // any floating point instruction
 	assign ss = pufa & ~ir[7]; // any fixed point instruction
 	assign puf = pufa | nrf; // any AWP instruction
+
+	// --- Indicators -------------------------------------------------------
+
+	wire wdtwtg_clk = ~(f5_af_sf & strob_fp);
+
+	// wskaźnik określający, że wartość różnicy cech przy AF i SF jest >= 40
+
+	always @ (posedge wdtwtg_clk, posedge _0_f) begin
+		if (_0_f) g <= 1'b0;
+		else if (wdtwtg_clk) g <= abs_sum_c_ge_40;
+	end
+
+	// wskaźnik denormalnizacji wartości rejestru T
+
+	always @ (posedge wdtwtg_clk, posedge _0_f) begin
+		if (_0_f) wdt <= 1'b0;
+		else if (wdtwtg_clk) wdt <= sum_c_1;
+	end
+
+	// wynik w rejestrze T
+
+	wire wt_s = f2 & ~t & strob_fp & af_sf;
+	wire wt_d = abs_sum_c_ge_40 & ~sum_c_1;
+
+	always @ (posedge wdtwtg_clk, posedge _0_f, posedge wt_s) begin
+		if (_0_f) wt <= 1'b0;
+		else if (wt_s) wt <= 1'b1;
+		else wt <= wt_d;
+	end
 
 	// wskaźnik zera
 
@@ -341,44 +340,34 @@ module fpm(
     else if (_0_f) wc <= 1'b0;
   end
 
-	wire fi0_q;
-	univib #(.ticks(FP_FI0_TICKS)) VIB_FI0(
-		.clk(clk_sys),
-		.a_(~di_c),
-		.b(1'b1),
-		.q(fi0_q)
-	);
+	// ----------------------------------------------------------------------
 
-	// sheet 9
-
-	wire M3_8 = (~fab & ~fc0) | (~faa & fc0);
+	wire M3_8 = (~fab & ~c0) | (~faa & c0);
 	wire M53_6 = ~M3_8 ^ t_1;
 	wire M53_8 = fp0_ ^ M53_6;
-	wire t_1_d = ~((w0_ & lkb) | (~sgn & f9df) | (t_1_t_1 & t_1_) | (f6_f7 & M53_8));
-	wire M52_8 = (mw_mf & mfwp) | (t0_t1 & dw_df);
-	wire M67_3 = t1 | t0;
-	wire M12_8 = t_32_39 | t_24_31 | t_16_23 | t_8_15;
+	wire t_1_d = ~((w0_ & lkb) | (~sgn & f9df) | (t_1_t_1 & ~t_1) | (f6_f7 & M53_8));
 	assign ta = t_8_15 | t_2_7 | t_0_1 | t_1;
 	wire t = t_1 | t_0_1 | t_2_7 | t_8_15 | t_16_23 | t_24_31 | t_32_39 | m_1;
+
+	wire M67_3 = t1 | t0;
+	wire M12_8 = t_32_39 | t_24_31 | t_16_23 | t_8_15;
 	wire M25_8 = ~M12_8 & dw_df & M67_3 & ~t_2_7;
+	wire M52_8 = (mw_mf & mfwp) | (t0_neq_t1 & dw_df);
 	wire M66_8 = c0_eq_c1 & dw & ta;
+	assign opsu = M52_8 | M25_8 | M66_8; // operacje sumatora
 
-	// T[-1]
-
-	wire t_1_ = ~t_1;
+	// --- T[-1] ------------------------------------------------------------
 
 	always @ (negedge strob_fp, posedge _0_t) begin
 		if (_0_t) t_1 <= 1'b0;
 		else if (opta) t_1 <= t_1_d;
 	end
 
-	assign t0_t_1 = t_1_ ^ ~t0;
-	wire M53_3 = t_1 ^ ~t0;
-	assign ok = ff & t & M53_3 &  t0_t1; // liczba znormalizowana
-	assign nz = ff & t & M53_3 & ~t0_t1; // liczba nieznormalizowana
-	assign opsu = M52_8 | M25_8 | M66_8; // operacje sumatora
+	assign t0_neq_t_1 = t0 != t_1;
+	assign ok = ff & t & ~t0_neq_t_1 &  t0_neq_t1; // liczba znormalizowana
+	assign nz = ff & t & ~t0_neq_t_1 & ~t0_neq_t1; // liczba nieznormalizowana
 
-	// M[-1]
+	// --- M[-1] ------------------------------------------------------------
 
 	wire M9_6 = ck ^ ~c39;
 	wire f8_n_wdt = ~wdt & f8;
@@ -388,6 +377,8 @@ module fpm(
 		if (_0_m) m_1 <= 1'b0;
 		else if (opm) m_1  <= m_1_d;
 	end
+
+	// --- Indicators -------------------------------------------------------
 
 	// przedłużenie sumatora mantys
 
@@ -416,7 +407,7 @@ module fpm(
 		.q(pm)
 	);
 
-	wire mfwp = ~M13_6 ^ ~pm;
+	wire mfwp = M13_6 ^ pm;
 
 	// wskaźnik działania sumatora
 
@@ -435,32 +426,42 @@ module fpm(
 	wire M38_6 = ~d$ ^ ~M39_8;
 	assign m_40 = M38_8 & f8 & df;
 	assign m_32 = ~((M38_6 & dw) | (~dw & ~m32));
-	assign sgn_t0_c0 = t0_c0 ^ sgn;
+	assign sgn_t0_c0 = t0_neq_c0 ^ sgn;
 
 	// wskaźnik znaku ilorazu
 
 	always @ (posedge f4, posedge _0_f) begin
 		if (_0_f) sgn <= 1'b0;
-		else if (f4) sgn <= t0_c0;
+		else if (f4) sgn <= t0_neq_c0;
 	end
 
-	wire M39_8 = (~sgn & ~t) | (~t0_c0 & t);
+	wire M39_8 = (~sgn & ~t) | (~t0_neq_c0 & t);
 	wire M38_11 = M38_8 ^ sgn;
 	wire M6_12 = sgn & ~t & ~lp;
 	wire beta = M38_11 & ~M6_12;
 
-	// ----------------------------------------------------------------------
+	// --- Interrupts -------------------------------------------------------
+
+	wire fi0_q;
+	univib #(.ticks(FP_FI0_TICKS)) VIB_FI0(
+		.clk(clk_sys),
+		.a_(~di_c),
+		.b(1'b1),
+		.q(fi0_q)
+	);
 
 	assign fi0 = di & fi0_q;
 	wire M69_3 = ff & f13;
-	assign fi1 = M69_3 & d_2 & ~(d[0] & d_1);
-	assign fi2 = M69_3 & ~(~d_1 & ~d[0]) & ~d_2;
+	assign fi1 = M69_3 & d[-2] & ~(d[0] & d[-1]);
+	assign fi2 = M69_3 & (d[-1] | d[0]) & ~d[-2];
 	wire M64_8 = (~nrf & nz & f4) | (f2 & (dw_df & ~t)) | (nz & f2);
 	assign fi3 = strob_fp & M64_8;
 
+	// --- CPU flags --------------------------------------------------------
+
 	assign c_f = (~df & ff & m_1) | (r03 & mwdw) | (ad_sd & ci);
-	assign v_f = (r02) | (t0_t_1 & mwadsd);
-	assign m_f = ~((t_1_ & ~dw) | (~t16 & dw));
+	assign v_f = (r02) | (t0_neq_t_1 & mwadsd);
+	assign m_f = ~((~t_1 & ~dw) | (~t16 & dw));
 	assign z_f = (~t_24_31 & ~t_16_23 & dw) | (mwadsd & ~t) | (ff & fwz);
 
 endmodule
