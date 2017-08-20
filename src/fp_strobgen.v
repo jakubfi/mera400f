@@ -41,6 +41,8 @@ module fp_strobgen(
 
 	reg [0:2] state;
 
+	// TODO: step
+
 	always @ (posedge clk_sys) begin
 		case (state)
 			S_GOT:

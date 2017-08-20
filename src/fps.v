@@ -214,7 +214,7 @@ module fps(
 
 	always @ (posedge clk_sys) begin
 		case (ekc_state)
-			EKCS_IDLE: if (__got & d_ekc) ekc_state <= EKCS_EKC;
+			EKCS_IDLE: if (ldstate_fp & d_ekc) ekc_state <= EKCS_EKC;
 			EKCS_EKC: ekc_state <= EKCS_WAIT;
 			EKCS_WAIT: if (~puf) ekc_state <= EKCS_IDLE;
 		endcase
