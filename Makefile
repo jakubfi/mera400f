@@ -5,7 +5,7 @@ PROJECT = mera400f
 TOPLEVEL = mera400f
 SOURCES_DIR = src
 SOURCES = mera400f.v \
-	ffd.v ffjk.v \
+	ffjk.v \
 	decoder16.v decoder8.v \
 	univib.v \
 	alu181.v carry182.v \
