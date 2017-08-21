@@ -16,7 +16,7 @@ SOURCES = mera400f.v \
 	pm.v lk.v mc.v lg.v kcpc.v \
 	pp.v rm.v rzrp.v dok.v \
 	pa.v alu.v at.v ac.v ar.v ic.v w.v a.v \
-	pk.v uart.v sevenseg.v impulse.v display.v timer.v rot_dec.v cpin.v cpout.v \
+	pk.v uart.v sevenseg.v display.v timer.v rot_dec.v cpin.v cpout.v \
 	puks.v \
 	isk.v \
 	cpu.v \
