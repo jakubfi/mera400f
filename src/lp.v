@@ -1,4 +1,5 @@
 module lp(
+	input clk_sys,
 	input lp_clk,
 	input lpb_s,
 	input lpa_s,
@@ -26,20 +27,13 @@ module lp(
 		@f8, @strob1b lp*dw
 */
 
-	wire lpb_r = lpa_s | lpab_r;
-	wire lpa_r = lpb_s | lpab_r;
-
-	wire lpa, lpb;
-
-/*
 	always @ (posedge clk_sys) begin
 		if (lp_clk) out <= out + 2'b1;
 		else if (lpa_s) out <= 2'b01;
 		else if (lpb_s) out <= 2'b10;
-		else if (M44_8) out <= 2'b00;
+		else if (lpab_r) out <= 2'b00;
 	end
-*/
-
+/*
 	ffjk REG_LPB(
 		.s_(~lpb_s),
 		.j(lpa),
@@ -59,6 +53,7 @@ module lp(
 	);
 
 	assign out = {lpb, lpa};
+*/
 	assign lp = (out != 0);
 	assign lp1 = (out == 1);
 	assign lp2 = (out == 2);

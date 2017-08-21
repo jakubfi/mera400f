@@ -411,6 +411,7 @@ module fps(
 
 	wire lp1, lp2, lp3;
 	lp LP(
+		.clk_sys(clk_sys),
 		.lp_clk(lp_clk),
 		.lpb_s(lpb_s),
 		.lpa_s(lpa_s),
