@@ -218,10 +218,10 @@ module pm(
 	wire dpr = run | __cycle_q;
 	wire dprzerw = (__cycle_q | startq) & irq & ~p & mc_0;
 
-	//  PR (pobranie rozkazu - instruction fetch)
-	//  PP (przyjęcie przerwania - interrupt receive)
-	//  KC (koniec cyklu - cycle end)
-	//  PC (początek cyklu - cycle start)
+	// PR (pobranie rozkazu - instruction fetch)
+	// PP (przyjęcie przerwania - interrupt receive)
+	// KC (koniec cyklu - cycle end)
+	// PC (początek cyklu - cycle start)
 
 	wire kc, pc;
 	wire pr;

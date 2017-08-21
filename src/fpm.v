@@ -335,10 +335,10 @@ module fpm(
 	// wynik w rejestrze C
 
 	wire wc_s = f4 & af_sf & ~wt & ~t;
-  always @ (posedge _0_f, posedge wc_s) begin
-    if (wc_s) wc <= 1'b1;
-    else if (_0_f) wc <= 1'b0;
-  end
+	always @ (posedge _0_f, posedge wc_s) begin
+		if (wc_s) wc <= 1'b1;
+		else if (_0_f) wc <= 1'b0;
+	end
 
 	// ----------------------------------------------------------------------
 
@@ -375,7 +375,7 @@ module fpm(
 
 	always @ (negedge strob_fp, posedge _0_m) begin
 		if (_0_m) m_1 <= 1'b0;
-		else if (opm) m_1  <= m_1_d;
+		else if (opm) m_1 <= m_1_d;
 	end
 
 	// --- Indicators -------------------------------------------------------
@@ -398,10 +398,10 @@ module fpm(
 	wire pm_d = ~((~M13_6 & ~pm) | (~M13_8 & mfwp));
 
 	reg pm;
-  always @ (negedge strob_fp, posedge _0_m) begin
-    if (_0_m) pm <= 1'b0;
-    else if (opm) pm <= pm_d;
-  end
+	always @ (negedge strob_fp, posedge _0_m) begin
+		if (_0_m) pm <= 1'b0;
+		else if (opm) pm <= pm_d;
+	end
 
 	wire mfwp = M13_6 ^ pm;
 

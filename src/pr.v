@@ -21,7 +21,7 @@ module pr(
 	input w_rbb,			// A51 - RB[4:9] clock in
 	input w_rbc,			// B46 - RB[0:3] clock in
 	input w_rba,			// B50 - RB[10:15] clock in
-	output [0:3] dnb,	// A86,  A90, A87, B84 - DNB: NB system bus driver
+	output [0:3] dnb,	// A86, A90, A87, B84 - DNB: NB system bus driver
 	input rpn,				// B85
 	input bp_nb,			// B86
 	input pn_nb,			// A92
@@ -131,7 +131,7 @@ module pr(
 	wire lr0 = lpc & strob_a & wa;
 	wire w_zmvc = lr0 | M62_8 | M62_6 | M60_3;
 	wire w_legy = lr0 | M62_8 | M62_6;
-	wire lrp  = lr0 | M61_8 | M61_12;
+	wire lrp = lr0 | M61_8 | M61_12;
 
 	wire cleg = as2 & strob2b & ust_leg;
 	wire vg = (~aryt & ~(zs | ~carry)) | (~(zs | s_1) & aryt);

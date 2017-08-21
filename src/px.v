@@ -287,9 +287,9 @@ module px(
 
 	// ---
 
-  wire gotst1 = got | strob1b;
-  wire zgi_j = wm | i2 | wr | ww | read_fp | i1 | i3 | i4 | i5 | k2fbs | p1 | p5 | k1;
-  wire zgi_set = sr_fp | si1 | sp1;
+	wire gotst1 = got | strob1b;
+	wire zgi_j = wm | i2 | wr | ww | read_fp | i1 | i3 | i4 | i5 | k2fbs | p1 | p5 | k1;
+	wire zgi_set = sr_fp | si1 | sp1;
 	wire ifhold_j = srez$ & wr;
 	wire ifhold_reset = strob2 & w$ & wzi & is;
 

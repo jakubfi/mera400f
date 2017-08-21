@@ -19,9 +19,9 @@ module puks(
 );
 
 	reg on = 1'b0;
-	reg [3:0] pwon_cnt =  4'd0;
+	reg [3:0] pwon_cnt = 4'd0;
 	always @ (posedge clk_sys) begin
-		if (pwon_cnt != 4'b111)  pwon_cnt <= pwon_cnt + 1'b1;
+		if (pwon_cnt != 4'b111) pwon_cnt <= pwon_cnt + 1'b1;
 		if (pwon_cnt == 4'd3) on <= 1'b1;
 		if (pwon_cnt == 4'd3) pon <= 1'b1;
 		else if (pwon_cnt == 4'd5) pon <= 1'b0;
