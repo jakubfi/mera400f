@@ -409,14 +409,13 @@ module fpm(
 
 	wire f6_f7 = f7 | f6;
 	wire cd = f8 & strob_fp;
-	wire d$;
-	ffd REG_D$(
-		.s_(~f6_f7),
-		.d(1'b0),
-		.c(~cd),
-		.r_(~_0_f),
-		.q(d$)
-	);
+
+	reg d$;
+	always @ (negedge cd, posedge _0_f, posedge f6_f7) begin
+		if (_0_f) d$ <= 1'b0;
+		else if (f6_f7) d$ <= 1'b1;
+		else d$ <= 1'b0;
+	end
 
 	wire M38_8 = d$ ^ ~M39_8;
 	wire M38_6 = ~d$ ^ ~M39_8;
