@@ -397,15 +397,11 @@ module fpm(
 	wire M13_8 = (~m38 & mf) | (~m14 & mw);
 	wire pm_d = ~((~M13_6 & ~pm) | (~M13_8 & mfwp));
 
-	wire pm;
-	ffd_ena REG_PM(
-		.s_(1'b1),
-		.d(pm_d),
-		.c(~strob_fp),
-		.ena(opm),
-		.r_(~_0_m),
-		.q(pm)
-	);
+	reg pm;
+  always @ (negedge strob_fp, posedge _0_m) begin
+    if (_0_m) pm <= 1'b0;
+    else if (opm) pm <= pm_d;
+  end
 
 	wire mfwp = M13_6 ^ pm;
 
