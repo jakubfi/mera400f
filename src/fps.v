@@ -404,16 +404,16 @@ module fps(
 	wire M3_8 = mw & strob1 & f2;
 
 	wire lpb_s = (start & mw) | (~fwz & M3_8);
-	wire lpa_s = (start | f2) & ~mw;
-	wire M44_8 = (M3_8 & fwz) | f7 | (f4 & ~dw) | (fwz & f4);
-	wire lp_clk = strob1 & ((lp & f8 & dw) | f1 | f3 | f13);
+	wire lpa_s = (start & ~mw) | (f2 & ~mw);
+	wire lpab_r = (M3_8 & fwz) | f7 | (f4 & ~dw) | (f4 & fwz);
+	wire lp_clk = strob1 & ((f8 & lp & dw) | f1 | f3 | f13);
 
 	wire lp1, lp2, lp3;
 	lp LP(
 		.lp_clk(lp_clk),
 		.lpb_s(lpb_s),
 		.lpa_s(lpa_s),
-		.M44_8(M44_8),
+		.lpab_r(lpab_r),
 		.out({lpb, lpa}),
 		.lp(lp),
 		.lp1(lp1),
