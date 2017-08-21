@@ -134,6 +134,7 @@ module fps(
 
 	reg [0:1] start_state;
 	wire start = (start_state == STS_START);
+	wire pre_start = (start_state == STS_DLY);
 
 	always @ (posedge clk_sys) begin
 		case (start_state)
@@ -248,22 +249,22 @@ module fps(
 	assign fcb = f12 | f11;
 	assign lkb = f3 | f1;
 
-	always @ (posedge got_fp, posedge _0_f) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) begin
 			{f2, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13} <= 4'd0;
-		end else begin
+		end else if (ldstate_fp) begin
 			{f2, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13} <= {ef2, ef4, ef5, ef6, ef7, ef8, ef9, ef10, ef11, ef12, ef13};
 		end
 	end
 
-	wire f1_s = start & ~nrf;
-	wire f3_s = start & nrf;
+	wire f1_s = pre_start & ~nrf;
+	wire f3_s = pre_start & nrf;
 
 	wire f3;
-	always @ (posedge got_fp, posedge f3_s, posedge _0_f) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) f3 <= 1'b0;
 		else if (f3_s) f3 <= 1'b1;
-		else f3 <= ef3;
+		else if (ldstate_fp) f3 <= ef3;
 	end
 /*
 	ffd REG_F3(
@@ -275,10 +276,10 @@ module fps(
 	);
 */
 	wire f1;
-	always @ (posedge got_fp, posedge f1_s, posedge _0_f) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) f1 <= 1'b0;
 		else if (f1_s) f1 <= 1'b1;
-		else f1 <= ef1;
+		else if (ldstate_fp) f1 <= ef1;
 	end
 /*
 	ffd REG_F1(
