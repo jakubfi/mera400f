@@ -143,9 +143,9 @@ module fpm(
 
 	// --- D register -------------------------------------------------------
 
-	always @ (negedge l_d, posedge _0_d) begin
+	always @ (posedge clk_sys, posedge _0_d) begin
 		if (_0_d) d <= 10'd0;
-		else d <= L;
+		else if (l_d) d <= L;
 	end
 
 	// --- B register and bus -----------------------------------------------
@@ -153,8 +153,8 @@ module fpm(
 	wire f2strob = f2 & strob_fp;
 
 	reg [0:7] b;
-	always @ (posedge f2strob) begin
-		b <= d[0:7];
+	always @ (posedge clk_sys) begin
+		if (f2strob) b <= d[0:7];
 	end
 
 	wire [0:7] b_bus /* synthesis keep */;
@@ -213,13 +213,13 @@ module fpm(
 	wire fic1 = f4dw | M43_3 | f4mw;
 	wire fic0 = f4mf | M43_6 | f4df;
 
-	wire cda = strob_fp & ~wdt & f8;
-	wire cua = strob_fp & wdt & f8;
-	wire rab = (strob2_fp & g & f5) | _0_f;
+	wire cda = strobb_fp & ~wdt & f8;
+	wire cua = strobb_fp & wdt & f8;
+	wire rab = (strob2b_fp & g & f5) | _0_f;
 	wire fic_load = strob_fp & (f4 | f5_af_sf);
 
 	fic CNT_FIC(
-		.clk(clk_sys),
+		.clk_sys(clk_sys),
 		.cda(cda),
 		.cua(cua),
 		.rab(rab),
@@ -250,18 +250,18 @@ module fpm(
 
 	// --- Indicators -------------------------------------------------------
 
-	wire wdtwtg_clk = ~(f5_af_sf & strob_fp);
+	wire wdtwtg_clk = f5_af_sf & strobb_fp;
 
 	// wskaźnik określający, że wartość różnicy cech przy AF i SF jest >= 40
 
-	always @ (posedge wdtwtg_clk, posedge _0_f) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) g <= 1'b0;
 		else if (wdtwtg_clk) g <= abs_sum_c_ge_40;
 	end
 
 	// wskaźnik denormalnizacji wartości rejestru T
 
-	always @ (posedge wdtwtg_clk, posedge _0_f) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) wdt <= 1'b0;
 		else if (wdtwtg_clk) wdt <= sum_c_1;
 	end
@@ -271,27 +271,27 @@ module fpm(
 	wire wt_s = f2 & ~t & strob_fp & af_sf;
 	wire wt_d = abs_sum_c_ge_40 & ~sum_c_1;
 
-	always @ (posedge wdtwtg_clk, posedge _0_f, posedge wt_s) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) wt <= 1'b0;
 		else if (wt_s) wt <= 1'b1;
-		else wt <= wt_d;
+		else if (wdtwtg_clk) wt <= wt_d;
 	end
 
 	// wskaźnik zera
 
 	wire fwz_c = strob_fp & ((mw_mf & f2) | (f10) | (~af_sf & f4) | (f4 & wt));
 
-	always @ (posedge fwz_c, posedge _0_f) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) fwz <= 1'b0;
 		else if (fwz_c) fwz <= ~t;
 	end
 
 	// przeniesienie FP0 dla dodawania i odejmowania liczb długich
 
-	wire ci_c = ~(strob_fp & f7 & ad_sd);
+	wire ci_c = strobb_fp & f7 & ad_sd;
 
 	reg ci;
-	always @ (posedge ci_c, posedge _0_f) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) ci <= 1'b0;
 		else if (ci_c) ci <= ~fp0_;
 	end
@@ -299,7 +299,7 @@ module fpm(
 	// wskaźnik zapalony po obliczeniu poprawki
 
 	reg _end;
-	always @ (posedge f7, posedge _0_f) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) _end <= 1'b0;
 		else if (f7) _end <= ws;
 	end
@@ -309,19 +309,19 @@ module fpm(
 	wire ws_c = f10 & strob_fp;
 	wire ws_d = ok & ~df & m_1 & ~_end;
 
-	always @ (posedge ws_c, posedge _0_f) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) ws <= 1'b0;
 		else if (ws_c) ws <= ws_d;
 	end
 
 	// wskaźnik przerwania
 
-	wire di_c = ~(idi & f6 & strob2_fp);
+	wire di_c = idi & f6 & strob2b_fp;
 
-	always @ (posedge di_c, posedge _0_f, posedge fi3) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) di <= 1'b0;
 		else if (fi3) di <= 1'b1;
-		else di <= beta;
+		else if (di_c) di <= beta;
 	end
 
 	// wskaźnik do badania nadmiaru dzielenia stałoprzecinkowego
@@ -329,7 +329,7 @@ module fpm(
 	wire idi_r = strob_fp & ~lp & f8;
 
 	reg idi;
-	always @ (posedge f4, posedge idi_r) begin
+	always @ (posedge clk_sys, posedge idi_r) begin
 		if (idi_r) idi <= 1'b0;
 		else if (f4) idi <= dw;
 	end
@@ -337,9 +337,9 @@ module fpm(
 	// wynik w rejestrze C
 
 	wire wc_s = f4 & af_sf & ~wt & ~t;
-	always @ (posedge _0_f, posedge wc_s) begin
-		if (wc_s) wc <= 1'b1;
-		else if (_0_f) wc <= 1'b0;
+	always @ (posedge clk_sys, posedge _0_f) begin
+		if (_0_f) wc <= 1'b0;
+		else if (wc_s) wc <= 1'b1;
 	end
 
 	// ----------------------------------------------------------------------
@@ -372,10 +372,10 @@ module fpm(
 	wire ck_s = f4 & sf;
 	wire ck_d = ~c39 & ck;
 
-	always @ (negedge strob_fp, posedge _0_m, posedge ck_s) begin
+	always @ (posedge clk_sys, posedge _0_m) begin
 		if (_0_m) ck <= 1'b0;
 		else if (ck_s) ck <= 1'b1;
-		else if (opm) ck <= ck_d;
+		else if (clockm) ck <= ck_d;
 	end
 
 	// wskaźnik przyspieszania mnożenia
@@ -385,9 +385,9 @@ module fpm(
 	wire pm_d = ~((~M13_6 & ~pm) | (~M13_8 & mfwp));
 
 	reg pm;
-	always @ (negedge strob_fp, posedge _0_m) begin
+	always @ (posedge clk_sys, posedge _0_m) begin
 		if (_0_m) pm <= 1'b0;
-		else if (opm) pm <= pm_d;
+		else if (clockm) pm <= pm_d;
 	end
 
 	wire mfwp = M13_6 ^ pm;
@@ -395,13 +395,13 @@ module fpm(
 	// wskaźnik działania sumatora
 
 	wire f6_f7 = f7 | f6;
-	wire cd = f8 & strob_fp;
+	wire cd = f8 & strobb_fp;
 
 	reg d$;
-	always @ (negedge cd, posedge _0_f, posedge f6_f7) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) d$ <= 1'b0;
 		else if (f6_f7) d$ <= 1'b1;
-		else d$ <= 1'b0;
+		else if (cd) d$ <= 1'b0;
 	end
 
 	wire M38_8 = d$ ^ ~M39_8;
@@ -412,7 +412,7 @@ module fpm(
 
 	// wskaźnik znaku ilorazu
 
-	always @ (posedge f4, posedge _0_f) begin
+	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) sgn <= 1'b0;
 		else if (f4) sgn <= t0_neq_c0;
 	end

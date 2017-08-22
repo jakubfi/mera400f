@@ -7,7 +7,7 @@
 */
 
 module fic(
-	input clk,
+	input clk_sys,
 	input cda,
 	input cua,
 	input rab,
@@ -16,14 +16,9 @@ module fic(
 	output fic
 );
 
-	reg op;
-	always @ (posedge clk) begin
-		op <= load | cda | cua | rab;
-	end
-
 	reg [0:5] cnt;
 
-	always @ (posedge op) begin
+	always @ (posedge clk_sys, posedge rab) begin
 		if (rab) cnt <= 0;
 		else if (load) cnt <= in;
 		else if (cda) cnt <= cnt - 1'd1;

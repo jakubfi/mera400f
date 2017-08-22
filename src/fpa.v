@@ -7,6 +7,7 @@
 */
 
 module fpa(
+	input clk_sys,
 	input opta, optb, optc, opm,
 	input strob_fp,
 	input strobb_fp,
@@ -116,9 +117,9 @@ module fpa(
 
 	reg [-1:39] t;
 
-	always @ (negedge strob_fp, posedge _0_t) begin
+	always @ (posedge clk_sys, posedge _0_t) begin
 		if (_0_t) t[0:15] <= 0;
-		else if (opta) case ({~tab, ~taa})
+		else if (clockta) case ({~tab, ~taa})
 			2'b00: t[0:15] <= t[0:15];
 			2'b01: t[0:15] <= t[-1:14];
 			2'b10: t[0:15] <= t[1:16];
@@ -126,9 +127,9 @@ module fpa(
 		endcase
 	end
 
-	always @ (negedge strob_fp, posedge _0_t) begin
+	always @ (posedge clk_sys, posedge _0_t) begin
 		if (_0_t) t[16:31] <= 0;
-		else if (optb) case ({~trb, ~taa})
+		else if (clocktb) case ({~trb, ~taa})
 			2'b00: t[16:31] <= t[16:31];
 			2'b01: t[16:31] <= t[15:30];
 			2'b10: t[16:31] <= t[17:32];
@@ -136,9 +137,9 @@ module fpa(
 		endcase
 	end
 
-	always @ (negedge strob_fp, posedge _0_t) begin
+	always @ (posedge clk_sys, posedge _0_t) begin
 		if (_0_t) t[32:39] <= 0;
-		else if (optc) case ({~trb, ~taa})
+		else if (clocktc) case ({~trb, ~taa})
 			2'b00: t[32:39] <= t[32:39];
 			2'b01: t[32:39] <= t[31:38];
 			2'b10: t[32:39] <= {t[33:39], m[-1]};
@@ -146,9 +147,9 @@ module fpa(
 		endcase
 	end
 
-	always @ (negedge strob_fp, posedge _0_t) begin
+	always @ (posedge clk_sys, posedge _0_t) begin
 		if (_0_t) t[-1] <= 1'b0;
-		else if (opta) t[-1] <= t_1_d;
+		else if (clockta) t[-1] <= t_1_d;
 	end
 
 	assign t_1 = t[-1];
@@ -178,9 +179,9 @@ module fpa(
 	wire ma_ /* synthesis keep */ = ~ma;
 	wire mb_ /* synthesis keep */ = ~mb;
 
-	always @ (negedge strob_fp, posedge _0_m) begin
+	always @ (posedge clk_sys, posedge _0_m) begin
 		if (_0_m) m[0:39] <= 0;
-		else if (opm) case ({mb_, ma_})
+		else if (clockm) case ({mb_, ma_})
 			2'b00: m[0:39] <= m[0:39];
 			2'b01: m[0:39] <= m[-1:38];
 			2'b10: m[0:39] <= {m[1:31], m_32, m[33:39], m_40};
@@ -188,9 +189,9 @@ module fpa(
 		endcase
 	end
 
-	always @ (negedge strob_fp, posedge _0_m) begin
+	always @ (posedge clk_sys, posedge _0_m) begin
 		if (_0_m) m[-1] <= 1'b0;
-		else if (opm) m[-1] <= m_1_d;
+		else if (clockm) m[-1] <= m_1_d;
 	end
 
 	assign m_1 = m[-1];
@@ -207,8 +208,8 @@ module fpa(
 
 	// NOTE: T->C and CP sensitivities have changed (ops are front-edge sensitive now)
 	// NOTE: F2 as 7495's prallel load enable signal was dropped for the FPGA implementation
-	wire cclk = t_c | cp;
-	always @ (posedge cclk) begin
+//	wire cclk = t_c | cp;
+	always @ (posedge clk_sys) begin
 		if (t_c) c <= t[0:39];
 		else if (cp) c <= {c[0], c[0:38]};
 	end

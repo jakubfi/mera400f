@@ -30,8 +30,8 @@ module lp(
 	always @ (posedge clk_sys) begin
 		if (lp_clk) out <= out + 2'b1;
 		else if (lpa_s) out <= 2'b01;
+		else if (lpab_r) out <= 2'b00; // if this one is last tp.asm fails with "UPLOAD FAILED"
 		else if (lpb_s) out <= 2'b10;
-		else if (lpab_r) out <= 2'b00;
 	end
 /*
 	ffjk REG_LPB(

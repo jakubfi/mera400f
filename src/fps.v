@@ -296,7 +296,7 @@ module fps(
 
 	wire f9dw = dw & f9;
 	assign t_c = strob1 & f2;
-	assign l_d = strob1 & ((f5 & ~af_sf) | lp3lkb | ((wdt | wc) & ~ws & f7) | fcb);
+	assign l_d = strob1b & ((f5 & ~af_sf) | lp3lkb | ((wdt | wc) & ~ws & f7) | fcb);
 
 	// --- T reg. control ---------------------------------------------------
 
@@ -312,9 +312,9 @@ module fps(
 	assign optc = M9_3;
 	assign optb = M19_8;
 	assign opta = M19_6;
-	assign clocktc = strob1 & M9_3;
-	assign clocktb = strob1 & M19_8;
-	assign clockta = strob1 & M19_6;
+	assign clocktc = strob1b & M9_3;
+	assign clocktb = strob1b & M19_8;
+	assign clockta = strob1b & M19_6;
 	assign _0_t = start | (strob2 & ((g & wdt & f5) | (wc & f4) | (mw & f4) | (f4 & mf)));
 
 	wire M53_3 = f8 & (mw | mf | wdt);
@@ -396,18 +396,18 @@ module fps(
 	assign ma = (dw_df & f8) | f12;
 
 	wire M27_12 = (mw_mf & f4) | fcb | f8;
-	assign clockm = M27_12 & strob1;
+	assign clockm = M27_12 & strob1b;
 	// WORKAROUND: for M/T registers
 	assign opm = M27_12;
 
 	// --- LP counter -------------------------------------------------------
 
-	wire M3_8 = mw & strob1 & f2;
+	wire M3_8 = mw & strob1b & f2;
 
 	wire lpb_s = (start & mw) | (~fwz & M3_8);
 	wire lpa_s = (start & ~mw) | (f2 & ~mw);
 	wire lpab_r = (M3_8 & fwz) | f7 | (f4 & ~dw) | (f4 & fwz);
-	wire lp_clk = strob1 & ((f8 & lp & dw) | f1 | f3 | f13);
+	wire lp_clk = strob1b & ((f8 & lp & dw) | f1 | f3 | f13);
 
 	wire lp1, lp2, lp3;
 	lp LP(
