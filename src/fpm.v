@@ -9,6 +9,7 @@
 module fpm(
 	input opm, opta,
 	output t_1_d,
+	output m_1_d,
 	input clk_sys,
 	// sheet 1
 	input [8:15] w,
@@ -115,7 +116,7 @@ module fpm(
 	input m15,
 	input m38,
 	input m14,
-	output m_1,
+	input m_1,
 	output ck,
 	// sheet 11
 	input m32,
@@ -360,16 +361,9 @@ module fpm(
 	assign ok = ff & t & ~t0_neq_t_1 &  t0_neq_t1; // liczba znormalizowana
 	assign nz = ff & t & ~t0_neq_t_1 & ~t0_neq_t1; // liczba nieznormalizowana
 
-	// --- M[-1] ------------------------------------------------------------
-
 	wire M9_6 = ck ^ ~c39;
 	wire f8_n_wdt = ~wdt & f8;
-	wire m_1_d = (trb & t39) | (m0 & ~mb) | (t_1 & f4) | (af & c39 & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
-
-	always @ (negedge strob_fp, posedge _0_m) begin
-		if (_0_m) m_1 <= 1'b0;
-		else if (opm) m_1 <= m_1_d;
-	end
+	assign m_1_d = (trb & t39) | (m0 & ~mb) | (t_1 & f4) | (af & c39 & f8_n_wdt) | (sf & f8_n_wdt & M9_6);
 
 	// --- Indicators -------------------------------------------------------
 

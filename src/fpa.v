@@ -16,6 +16,7 @@ module fpa(
 	// sheet 2
 	output t_1,
 	input t_1_d,
+	input m_1_d,
 	input tab,
 	input clockta,
 	input clocktb,
@@ -27,7 +28,7 @@ module fpa(
 	output t_24_31,
 	output t_32_39,
 	// sheet 3
-	input m_1,
+	output m_1,
 	input ma,
 	input mb,
 	input clockm,
@@ -140,7 +141,7 @@ module fpa(
 		else if (optc) case ({~trb, ~taa})
 			2'b00: t[32:39] <= t[32:39];
 			2'b01: t[32:39] <= t[31:38];
-			2'b10: t[32:39] <= {t[33:39], m_1};
+			2'b10: t[32:39] <= {t[33:39], m[-1]};
 			2'b11: t[32:39] <= k[32:39];
 		endcase
 	end
@@ -170,24 +171,29 @@ module fpa(
 
 	// --- M register -------------------------------------------------------
 
-	reg [0:39] m;
+	reg [-1:39] m;
 
 	// NOTE: unused due to M clock/op split
 	// wire clockm_ = ~clockm;
 	wire ma_ /* synthesis keep */ = ~ma;
 	wire mb_ /* synthesis keep */ = ~mb;
-	wire _0_m_ = ~_0_m;
 
-	always @ (negedge strob_fp, negedge _0_m_) begin
-		if (~_0_m_) m[0:39] <= 0;
+	always @ (negedge strob_fp, posedge _0_m) begin
+		if (_0_m) m[0:39] <= 0;
 		else if (opm) case ({mb_, ma_})
 			2'b00: m[0:39] <= m[0:39];
-			2'b01: m[0:39] <= {m_1, m[0:38]};
+			2'b01: m[0:39] <= m[-1:38];
 			2'b10: m[0:39] <= {m[1:31], m_32, m[33:39], m_40};
 			2'b11: m[0:39] <= t[0:39];
 		endcase
 	end
 
+	always @ (negedge strob_fp, posedge _0_m) begin
+		if (_0_m) m[-1] <= 1'b0;
+		else if (opm) m[-1] <= m_1_d;
+	end
+
+	assign m_1 = m[-1];
 	assign m0 = m[0];
 	assign m14 = m[14];
 	assign m15 = m[15];
