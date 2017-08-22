@@ -8,6 +8,7 @@
 
 module fpm(
 	input opm, opta,
+	output t_1_d,
 	input clk_sys,
 	// sheet 1
 	input [8:15] w,
@@ -95,8 +96,8 @@ module fpm(
 	input t_16_23,
 	input t_24_31,
 	input t_32_39,
-	output t_1,
-	output t0_neq_t_1,
+	input t_1,
+	input t0_neq_t_1,
 	output ok,
 	output nz,
 	output opsu,
@@ -345,7 +346,7 @@ module fpm(
 	wire M3_8 = (~fab & ~c0) | (~faa & c0);
 	wire M53_6 = ~M3_8 ^ t_1;
 	wire M53_8 = fp0_ ^ M53_6;
-	wire t_1_d = ~((w0_ & lkb) | (~sgn & f9df) | (t_1_t_1 & ~t_1) | (f6_f7 & M53_8));
+	assign t_1_d = ~((w0_ & lkb) | (~sgn & f9df) | (t_1_t_1 & ~t_1) | (f6_f7 & M53_8));
 	assign ta = t_8_15 | t_2_7 | t_0_1 | t_1;
 	wire t = t_1 | t_0_1 | t_2_7 | t_8_15 | t_16_23 | t_24_31 | t_32_39 | m_1;
 
@@ -356,14 +357,6 @@ module fpm(
 	wire M66_8 = c0_eq_c1 & dw & ta;
 	assign opsu = M52_8 | M25_8 | M66_8; // operacje sumatora
 
-	// --- T[-1] ------------------------------------------------------------
-
-	always @ (negedge strob_fp, posedge _0_t) begin
-		if (_0_t) t_1 <= 1'b0;
-		else if (opta) t_1 <= t_1_d;
-	end
-
-	assign t0_neq_t_1 = t0 != t_1;
 	assign ok = ff & t & ~t0_neq_t_1 &  t0_neq_t1; // liczba znormalizowana
 	assign nz = ff & t & ~t0_neq_t_1 & ~t0_neq_t1; // liczba nieznormalizowana
 

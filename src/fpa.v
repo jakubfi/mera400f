@@ -14,7 +14,8 @@ module fpa(
 	input [0:15] w,
 	input taa,
 	// sheet 2
-	input t_1,
+	output t_1,
+	input t_1_d,
 	input tab,
 	input clockta,
 	input clocktb,
@@ -37,6 +38,7 @@ module fpa(
 	output t0_eq_c0,
 	output t0_neq_c0,
 	output t0_neq_t1,
+	output t0_neq_t_1,
 	output m0,
 	output t0,
 	// sheet 4
@@ -111,14 +113,14 @@ module fpa(
 
 	// --- T register -------------------------------------------------------
 
-	reg [0:39] t;
+	reg [-1:39] t;
 
 	always @ (negedge strob_fp, posedge _0_t) begin
 		if (_0_t) t[0:15] <= 0;
 		else if (opta) case ({~tab, ~taa})
 			2'b00: t[0:15] <= t[0:15];
-			2'b01: t[0:15] <= {t_1, t[0:14]};
-			2'b10: t[0:15] <= {t[1:15], t[16]};
+			2'b01: t[0:15] <= t[-1:14];
+			2'b10: t[0:15] <= t[1:16];
 			2'b11: t[0:15] <= k[0:15];
 		endcase
 	end
@@ -127,8 +129,8 @@ module fpa(
 		if (_0_t) t[16:31] <= 0;
 		else if (optb) case ({~trb, ~taa})
 			2'b00: t[16:31] <= t[16:31];
-			2'b01: t[16:31] <= {t[15], t[16:30]};
-			2'b10: t[16:31] <= {t[17:31], t[32]};
+			2'b01: t[16:31] <= t[15:30];
+			2'b10: t[16:31] <= t[17:32];
 			2'b11: t[16:31] <= k[16:31];
 		endcase
 	end
@@ -137,12 +139,18 @@ module fpa(
 		if (_0_t) t[32:39] <= 0;
 		else if (optc) case ({~trb, ~taa})
 			2'b00: t[32:39] <= t[32:39];
-			2'b01: t[32:39] <= {t[31], t[32:38]};
+			2'b01: t[32:39] <= t[31:38];
 			2'b10: t[32:39] <= {t[33:39], m_1};
 			2'b11: t[32:39] <= k[32:39];
 		endcase
 	end
 
+	always @ (negedge strob_fp, posedge _0_t) begin
+		if (_0_t) t[-1] <= 1'b0;
+		else if (opta) t[-1] <= t_1_d;
+	end
+
+	assign t_1 = t[-1];
 	assign t0 = t[0];
 	assign t1 = t[1];
 	assign t16 = t[16];
@@ -151,6 +159,7 @@ module fpa(
 	assign t0_eq_c0 = t[0] == c[0];
 	assign t0_neq_c0 = c[0] != t[0];
 	assign t0_neq_t1 = t[0] != t[1];
+	assign t0_neq_t_1 = t[0] != t[-1];
 
 	assign t_0_1 = |t[0:1];
 	assign t_2_7 = |t[2:7];
@@ -194,7 +203,7 @@ module fpa(
 	// NOTE: F2 as 7495's prallel load enable signal was dropped for the FPGA implementation
 	wire cclk = t_c | cp;
 	always @ (posedge cclk) begin
-		if (t_c) c <= t;
+		if (t_c) c <= t[0:39];
 		else if (cp) c <= {c[0], c[0:38]};
 	end
 

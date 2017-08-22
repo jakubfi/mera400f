@@ -155,12 +155,13 @@ fps FPS(
 // -----------------------------------------------------------------------
 
 wire [-2:7] d;
-wire g, wdt, wt, fic, c_f, v_f, m_f, z_f, dw, ad, sd, mw, af, sf, mf, df, dw_df, mw_mf, af_sf, ad_sd, ff, ss, puf, fwz, ws, di, wc, t_1, t0_neq_t_1, ok, nz, opsu, ta, m_1, ck, m_40, m_32, sgn_t0_c0, sgn;
+wire g, wdt, wt, fic, c_f, v_f, m_f, z_f, dw, ad, sd, mw, af, sf, mf, df, dw_df, mw_mf, af_sf, ad_sd, ff, ss, puf, fwz, ws, di, wc, t_1, t0_neq_t_1, ok, nz, opsu, ta, m_1, ck, m_40, m_32, sgn_t0_c0, sgn, t_1_d;
 
 fpm #(
 	.FP_FI0_TICKS(FP_FI0_TICKS)
 ) FPM(
 	.opta(opta),
+	.t_1_d(t_1_d),
 	.opm(opm),
 	.clk_sys(clk_sys),
 	.w(w[8:15]),
@@ -275,6 +276,8 @@ fpm #(
 wire t_0_1, t_2_7, c0_eq_c1, c0, t1, t0_eq_c0, t0_neq_c0, t0_neq_t1, m0, t0, fp0_, t_8_15, m14, m15, fp16_, t16, m32, m38, m39, c39, p32_, t39, t_32_39, t_16_23, t_24_31;
 
 fpa FPA(
+	.t_1_d(t_1_d),
+	.t0_neq_t_1(t0_neq_t_1),
 	.opta(opta),
 	.optb(optb),
 	.optc(optc),
