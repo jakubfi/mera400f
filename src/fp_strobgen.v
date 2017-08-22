@@ -13,8 +13,6 @@ module fp_strobgen(
 	output strob1b,
 	output strob2,
 	output strob2b,
-	output __got,
-	output got_fp,
 	output sr_fp
 );
 
@@ -32,7 +30,7 @@ module fp_strobgen(
 	wire has_strob2 = dp8 | dp2;
 	wire no_strob2 = dp6 | dp5;
 
-	assign __got = state == S_GOT;
+	wire __got = state == S_GOT;
 	assign strob1 = state == S_ST1;
 	assign strob1b = state == S_ST1B;
 	assign strob2 = state == S_ST2;
@@ -114,7 +112,7 @@ module fp_strobgen(
 	);
 */
 
-	assign got_fp = ~di & __got;
+	wire got_fp = ~di & __got;
 	wire sr = start | got_fp;
 	assign sr_fp = sr & f1;
 

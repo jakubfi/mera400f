@@ -220,7 +220,7 @@ module fpa(
 	wire [0:39] sum;
 
 	fpalu FPALU(
-		.t(t),
+		.t(t[0:39]),
 		.c(c),
 		.faa(faa),
 		.fab(fab),

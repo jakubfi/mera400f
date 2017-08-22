@@ -153,7 +153,7 @@ module fps(
 
 	wire strob1, strob1b;
 	wire strob2, strob2b;
-	wire ldstate_fp, __got, got_fp;
+	wire ldstate_fp;
 	fp_strobgen FP_STROBGEN(
 		.clk_sys(clk_sys),
 		.start(start),
@@ -172,8 +172,6 @@ module fps(
 		.strob1b(strob1b),
 		.strob2(strob2),
 		.strob2b(strob2b),
-		.__got(__got),
-		.got_fp(got_fp),
 		.sr_fp(sr_fp)
 	);
 
@@ -254,9 +252,6 @@ module fps(
 	wire M19_6 = ((mw | lp1) & lkb) | (f7 & ta_alpha) | f7_f12 | f6;
 	wire M19_8 = f7_f12 | (sgn & f7) | (lp2 & lkb & ~mw);
 
-	// WORKAROUND: opt[abc] and opm are a workaround for T and M
-	// clocks being misaligned causing various problems when
-	// values from one register are shifted into the other one.
 	assign clocktc = strob1b & M9_3;
 	assign clocktb = strob1b & M19_8;
 	assign clockta = strob1b & M19_6;
