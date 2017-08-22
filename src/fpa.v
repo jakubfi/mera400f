@@ -8,7 +8,6 @@
 
 module fpa(
 	input clk_sys,
-	input opta, optb, optc, opm,
 	input strob_fp,
 	input strobb_fp,
 	// sheet 1
@@ -174,8 +173,6 @@ module fpa(
 
 	reg [-1:39] m;
 
-	// NOTE: unused due to M clock/op split
-	// wire clockm_ = ~clockm;
 	wire ma_ /* synthesis keep */ = ~ma;
 	wire mb_ /* synthesis keep */ = ~mb;
 
@@ -208,7 +205,7 @@ module fpa(
 
 	// NOTE: T->C and CP sensitivities have changed (ops are front-edge sensitive now)
 	// NOTE: F2 as 7495's prallel load enable signal was dropped for the FPGA implementation
-//	wire cclk = t_c | cp;
+
 	always @ (posedge clk_sys) begin
 		if (t_c) c <= t[0:39];
 		else if (cp) c <= {c[0], c[0:38]};

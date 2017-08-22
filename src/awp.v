@@ -41,14 +41,9 @@ module awp(
 // -----------------------------------------------------------------------
 
 wire strob2_fp, strob2b_fp, _0_f, _0_t, lkb, l_d, clocktc, clocktb, clockta, t_c, fcb, t_1_t_1, tab, trb, taa, cp, frb, p_16, p_32, p_40, fab, faa, fra, f5, f6, f2, f4, f10, f9, f8, f7, scc, pc8, _0_d, _0_m, mb, ma, clockm, zpa, zpb, _0_zp, lp;
-wire opta, optb, optc, opm;
 
 fps FPS(
 	.clk_sys(clk_sys),
-	.opm(opm),
-	.opta(opta),
-	.optb(optb),
-	.optc(optc),
 	.mode(mode),
 	.step(step),
 	.strob_fp(strob_fp),
@@ -160,10 +155,8 @@ wire g, wdt, wt, fic, c_f, v_f, m_f, z_f, dw, ad, sd, mw, af, sf, mf, df, dw_df,
 fpm #(
 	.FP_FI0_TICKS(FP_FI0_TICKS)
 ) FPM(
-	.opta(opta),
 	.t_1_d(t_1_d),
 	.m_1_d(m_1_d),
-	.opm(opm),
 	.clk_sys(clk_sys),
 	.w(w[8:15]),
 	.l_d(l_d),
@@ -281,10 +274,6 @@ fpa FPA(
 	.t_1_d(t_1_d),
 	.m_1_d(m_1_d),
 	.t0_neq_t_1(t0_neq_t_1),
-	.opta(opta),
-	.optb(optb),
-	.optc(optc),
-	.opm(opm),
 	.strob_fp(strob_fp),
 	.strobb_fp(strobb_fp),
 	.w(w),

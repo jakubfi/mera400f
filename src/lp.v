@@ -33,27 +33,7 @@ module lp(
 		else if (lpab_r) out <= 2'b00; // if this one is last tp.asm fails with "UPLOAD FAILED"
 		else if (lpb_s) out <= 2'b10;
 	end
-/*
-	ffjk REG_LPB(
-		.s_(~lpb_s),
-		.j(lpa),
-		.c_(lp_clk),
-		.k(lpa),
-		.r_(~lpb_r),
-		.q(lpb)
-	);
 
-	ffjk REG_LPA(
-		.s_(~lpa_s),
-		.j(1'b1),
-		.c_(lp_clk),
-		.k(1'b1),
-		.r_(~lpa_r),
-		.q(lpa)
-	);
-
-	assign out = {lpb, lpa};
-*/
 	assign lp = (out != 0);
 	assign lp1 = (out == 1);
 	assign lp2 = (out == 2);

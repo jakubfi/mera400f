@@ -7,7 +7,6 @@
 */
 
 module fpm(
-	input opm, opta,
 	output t_1_d,
 	output m_1_d,
 	input clk_sys,

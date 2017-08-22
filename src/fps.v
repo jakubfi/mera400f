@@ -37,7 +37,6 @@ module fps(
 	output clocktc,
 	output clocktb,
 	output clockta,
-	output opta, optb, optc, opm,
 	output t_c,
 	output fcb,
 	// sheet 4
@@ -144,25 +143,7 @@ module fps(
 			STS_WAIT: if (_0_f) start_state <= STS_IDLE;
 		endcase
 	end
-/*
-	wire start_trig;
-	ffjk REG_START(
-		.s_(1'b1),
-		.j(efp),
-		.c_(~got),
-		.k(1'b1),
-		.r_(~_0_f),
-		.q(start_trig)
-	);
 
-	wire start;
-	univib #(.ticks(2'd3)) VIB_START(
-		.clk(clk_sys),
-		.a_(got),
-		.b(start_trig),
-		.q(start)
-	);
-*/
 	// --- Internal AWP strobs (strob_fp to CPU also) -----------------------
 
 	wire dp8 = f4 | f8 | f3 | (ok$ & f1) | f9 | f13;
@@ -221,23 +202,6 @@ module fps(
 		endcase
 	end
 
-/*
-	wire ekc_fp_trig;
-	ffd REG_KC(
-		.s_(1'b1),
-		.d(d_ekc),
-		.c(__got),
-		.r_(puf),
-		.q(ekc_fp_trig)
-	);
-
-	univib #(.ticks(2'd3)) VIB_KC(
-		.clk(clk_sys),
-		.a_(1'b0),
-		.b(ekc_fp_trig),
-		.q(ekc_fp)
-	);
-*/
 	// --- State registers --------------------------------------------------
 
 	assign _0_f = ekc_fp | ~puf;
@@ -266,30 +230,14 @@ module fps(
 		else if (f3_s) f3 <= 1'b1;
 		else if (ldstate_fp) f3 <= ef3;
 	end
-/*
-	ffd REG_F3(
-		.s_(~f3_s),
-		.d(ef3),
-		.c(got_fp),
-		.r_(~_0_f),
-		.q(f3)
-	);
-*/
+
 	wire f1;
 	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) f1 <= 1'b0;
 		else if (f1_s) f1 <= 1'b1;
 		else if (ldstate_fp) f1 <= ef1;
 	end
-/*
-	ffd REG_F1(
-		.s_(~f1_s),
-		.d(ef1),
-		.c(got_fp),
-		.r_(~_0_f),
-		.q(f1)
-	);
-*/
+
 	// ----------------------------------------------------------------------
 	// ----------------------------------------------------------------------
 	// ----------------------------------------------------------------------
@@ -309,9 +257,6 @@ module fps(
 	// WORKAROUND: opt[abc] and opm are a workaround for T and M
 	// clocks being misaligned causing various problems when
 	// values from one register are shifted into the other one.
-	assign optc = M9_3;
-	assign optb = M19_8;
-	assign opta = M19_6;
 	assign clocktc = strob1b & M9_3;
 	assign clocktb = strob1b & M19_8;
 	assign clockta = strob1b & M19_6;
@@ -397,8 +342,6 @@ module fps(
 
 	wire M27_12 = (mw_mf & f4) | fcb | f8;
 	assign clockm = M27_12 & strob1b;
-	// WORKAROUND: for M/T registers
-	assign opm = M27_12;
 
 	// --- LP counter -------------------------------------------------------
 
