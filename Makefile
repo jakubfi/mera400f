@@ -6,7 +6,6 @@ TOPLEVEL = mera400f
 SOURCES_DIR = src
 SOURCES = mera400f.v \
 	decoder16.v decoder8.v \
-	univib.v \
 	alu181.v carry182.v \
 	dly.v \
 	pr.v regs.v r0.v rb.v bar.v ki.v l.v \
