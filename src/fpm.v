@@ -130,22 +130,19 @@ module fpm(
 
 	wor __NC;
 
-	// --- L bus ------------------------------------------------------------
+	// --- L bus and D register ---------------------------------------------
 
-	wire [0:9] L;
-	always @ (*) begin
-		case (lkb)
-			0: L <= {sum_c_2, sum_c_1, sum_c[0:7]};
-			1: L <= {w[8], w[8], w[8:15]};
-		endcase
-	end
-
-	// --- D register -------------------------------------------------------
-
-	always @ (posedge clk_sys, posedge _0_d) begin
-		if (_0_d) d <= 10'd0;
-		else if (l_d) d <= L;
-	end
+	ld LD(
+		.clk_sys(clk_sys),
+		.lkb(lkb),
+		._0_d(_0_d),
+		.l_d(l_d),
+		.sum_c(sum_c[0:7]),
+		.sum_c_1(sum_c_1),
+		.sum_c_2(sum_c_2),
+		.w(w[8:15]),
+		.d(d)
+	);
 
 	// --- B register and bus -----------------------------------------------
 
