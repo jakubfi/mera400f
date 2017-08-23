@@ -20,7 +20,7 @@ SOURCES = mera400f.v \
 	isk.v \
 	cpu.v \
 	mem_elwro_sram.v memcfg.v \
-	awp.v fps.v fpm.v fpa.v fic.v lp.v fpalu.v \
+	awp.v fps.v fpm.v fpa.v fic.v lp.v fpalu.v m.v \
 	fp_strobgen.v
 TESTS_DIR = 
 TESTS = 

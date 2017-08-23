@@ -171,25 +171,19 @@ module fpa(
 
 	// --- M register -------------------------------------------------------
 
-	reg [-1:39] m;
-
-	wire ma_ /* synthesis keep */ = ~ma;
-	wire mb_ /* synthesis keep */ = ~mb;
-
-	always @ (posedge clk_sys, posedge _0_m) begin
-		if (_0_m) m[0:39] <= 0;
-		else if (clockm) case ({mb_, ma_})
-			2'b00: m[0:39] <= m[0:39];
-			2'b01: m[0:39] <= m[-1:38];
-			2'b10: m[0:39] <= {m[1:31], m_32, m[33:39], m_40};
-			2'b11: m[0:39] <= t[0:39];
-		endcase
-	end
-
-	always @ (posedge clk_sys, posedge _0_m) begin
-		if (_0_m) m[-1] <= 1'b0;
-		else if (clockm) m[-1] <= m_1_d;
-	end
+	wire [-1:39] m;
+	m M(
+		.clk_sys(clk_sys),
+		._0_m(_0_m),
+		.clockm(clockm),
+		.ma(ma),
+		.mb(mb),
+		.m_32(m_32),
+		.m_40(m_40),
+		.m_1_d(m_1_d),
+		.t(t[0:39]),
+		.m(m)
+	);
 
 	assign m_1 = m[-1];
 	assign m0 = m[0];
