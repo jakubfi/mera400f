@@ -175,15 +175,15 @@ module fpa(
 
 	// --- C register -------------------------------------------------------
 
-	reg [0:39] c;
+	wire [0:39] c;
 
-	// NOTE: T->C and CP sensitivities have changed (ops are front-edge sensitive now)
-	// NOTE: F2 as 7495's prallel load enable signal was dropped for the FPGA implementation
-
-	always @ (posedge clk_sys) begin
-		if (t_c) c <= t[0:39];
-		else if (cp) c <= {c[0], c[0:38]};
-	end
+	c C(
+		.clk_sys(clk_sys),
+		.t(t[0:39]),
+		.t_c(t_c),
+		.cp(cp),
+		.c(c)
+	);
 
 	assign c0_eq_c1 = c[0] == c[1];
 	assign c0 = c[0];
