@@ -101,16 +101,16 @@ module fpa(
 
 	// --- K bus ------------------------------------------------------------
 
-	wire [0:39] k /* synthesis keep */;
+	wire [0:39] k;
 
-	always @ (*) begin
-		case ({lkb, f9})
-			2'b00: k <= sum[0:39];
-			2'b01: k <= m[0:39];
-			2'b10: k <= {w[0:15], w[0:15], w[0:7]};
-			2'b11: k <= 40'd0;
-		endcase
-	end
+	k K(
+		.lkb(lkb),
+		.f9(f9),
+		.sum(sum),
+		.m(m[0:39]),
+		.w(w),
+		.k(k)
+	);
 
 	// --- T register -------------------------------------------------------
 
@@ -211,15 +211,18 @@ module fpa(
 
 	// --- ZP bus -----------------------------------------------------------
 
-	always @ (*) begin
-		if (_0_zp) zp <= 16'd0;
-		else case ({zpb, zpa})
-			2'b00: zp <= t[0:15];
-			2'b01: zp <= t[16:31];
-			2'b10: zp <= {t[32:39], d[0:7]};
-			2'b11: zp <= {z_f, m_f, v_f, c_f, 12'd0};
-		endcase
-	end
+	zp ZP(
+		._0_zp(_0_zp),
+		.zpa(zpa),
+		.zpb(zpb),
+		.t(t[0:39]),
+		.d(d[0:7]),
+		.z_f(z_f),
+		.m_f(m_f),
+		.v_f(v_f),
+		.c_f(c_f),
+		.zp(zp)
+	);
 
 endmodule
 
