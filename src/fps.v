@@ -204,37 +204,28 @@ module fps(
 
 	assign _0_f = ekc_fp | ~puf;
 
-	reg f11, f12;
+	wire f1_s = pre_start & ~nrf;
+	wire f3_s = pre_start & nrf;
+
+	reg f1, f3, f11, f12;
+	always @ (posedge clk_sys, posedge _0_f) begin
+		if (_0_f) begin
+			{f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13} <= 0;
+		end else begin
+			if (ldstate_fp) {f2, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13} <= {ef2, ef4, ef5, ef6, ef7, ef8, ef9, ef10, ef11, ef12, ef13};
+
+			if (f3_s) f3 <= 1'b1;
+			else if (ldstate_fp) f3 <= ef3;
+
+			if (f1_s) f1 <= 1'b1;
+			else if (ldstate_fp) f1 <= ef1;
+		end
+	end
 
 	assign read_fp = f1;
 	assign rlp_fp = f13 | f3;
 	assign fcb = f12 | f11;
 	assign lkb = f3 | f1;
-
-	always @ (posedge clk_sys, posedge _0_f) begin
-		if (_0_f) begin
-			{f2, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13} <= 4'd0;
-		end else if (ldstate_fp) begin
-			{f2, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13} <= {ef2, ef4, ef5, ef6, ef7, ef8, ef9, ef10, ef11, ef12, ef13};
-		end
-	end
-
-	wire f1_s = pre_start & ~nrf;
-	wire f3_s = pre_start & nrf;
-
-	wire f3;
-	always @ (posedge clk_sys, posedge _0_f) begin
-		if (_0_f) f3 <= 1'b0;
-		else if (f3_s) f3 <= 1'b1;
-		else if (ldstate_fp) f3 <= ef3;
-	end
-
-	wire f1;
-	always @ (posedge clk_sys, posedge _0_f) begin
-		if (_0_f) f1 <= 1'b0;
-		else if (f1_s) f1 <= 1'b1;
-		else if (ldstate_fp) f1 <= ef1;
-	end
 
 	// ----------------------------------------------------------------------
 	// ----------------------------------------------------------------------
