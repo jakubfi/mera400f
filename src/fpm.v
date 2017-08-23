@@ -148,28 +148,24 @@ module fpm(
 
 	wire f2strob = f2 & strob_fp;
 
-	reg [0:7] b;
-	always @ (posedge clk_sys) begin
-		if (f2strob) b <= d[0:7];
-	end
-
-	wire [0:7] b_bus /* synthesis keep */;
-
-	always @ (*) begin
-		case ({fcb, scc})
-			2'b00: b_bus <= ~b;
-			2'b01: b_bus <= b;
-			2'b10: b_bus <= 8'hff;
-			2'b11: b_bus <= 8'h00;
-		endcase
-	end
+	wire b0;
+	wire [0:7] b;
+	b B(
+		.clk_sys(clk_sys),
+		.f2strob(f2strob),
+		.d(d[0:7]),
+		.fcb(fcb),
+		.scc(scc),
+		.b0(b0),
+		.b(b)
+	);
 
 	// --- Exponent adder ---------------------------------------------------
 
-	wire [-1:7] sum_c = b_bus + d[0:7] + pc8;
+	wire [-1:7] sum_c = b + d[0:7] + pc8;
 
 	wire M9_3 = fcb ^ scc;
-	wire M3_6 = ~((b[0] & M9_3) | (~b[0] & ~scc));
+	wire M3_6 = ~((b0 & M9_3) | (~b0 & ~scc));
 	wire M27_8 = M3_6 ^ ~d[-1];
 	wire sum_c_2 = ~((sum_c[-1] & M3_6) | (sum_c[-1] & ~d[-1]) | (M3_6 & ~d[-1]));
 	wire sum_c_1 = sum_c[-1] ^ M27_8;
