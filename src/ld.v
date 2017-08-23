@@ -4,8 +4,6 @@ module ld(
 	input _0_d,
 	input l_d,
 	input [-2:7] sum_c,
-	input sum_c_2,
-	input sum_c_1,
 	input [8:15] w,
 	output reg [-2:7] d
 );
