@@ -270,7 +270,7 @@ module fps(
 	wire f7_f12 = f9 | f12 | f11 | (~dw & f7) | (M30_3 & f8);
 	assign t_1_t_1 = f8 | f12 | f11 | f9dw;
 	assign cp = strob1 & f8 & af_sf & ~wdt;
-	wire dw_p16 = ~(~dwsgnf7 & fp16_ & ~mw_p16); // does not
+	wire dw_p16 = dwsgnf7 | ~fp16_ | mw_p16;
 
 	// --- Mantissa ALU control ---------------------------------------------
 
@@ -286,7 +286,7 @@ module fps(
 
 	wire M52_3 = M65_6 & f6;
 
-	wire M80_6 = ~(p32_ & ~dwsgnf7 & ~sd); // does not
+	wire M80_6 = ~p32_ | dwsgnf7 | sd;
 	wire M77_8 = (t0_eq_c0 & M76_3) | (M76_6 & m38);
 	wire mw_p16 = ~M65_6 & f6;
 
@@ -297,7 +297,7 @@ module fps(
 	assign faa = M67_8 | M52_3 | fra;
 	assign fab = dwsgnf7 | frb;
 	assign fra = M52_3 | M78_8;
-	assign frb = ~(~mw_p16 & ~sd & ~M77_8 & ~M76_8); // does not
+	assign frb = mw_p16 | sd | M77_8 | M76_8;
 
 	// --- State transitions ------------------------------------------------
 

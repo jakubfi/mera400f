@@ -425,9 +425,9 @@ module fpm(
 	);
 
 	assign fi0 = di & fi0_q;
-	wire M69_3 = ff & f13;
-	assign fi1 = M69_3 & d[-2] & ~(d[0] & d[-1]);
-	assign fi2 = M69_3 & (d[-1] | d[0]) & ~d[-2];
+	wire fff13 = ff & f13;
+	assign fi1 = fff13 &  d[-2] & ~(d[-1] & d[0]); // 100, 101, 110
+	assign fi2 = fff13 & ~d[-2] &  (d[-1] | d[0]); // 001, 010, 011
 	wire M64_8 = (~nrf & nz & f4) | (f2 & (dw_df & ~t)) | (nz & f2);
 	assign fi3 = strob_fp & M64_8;
 
