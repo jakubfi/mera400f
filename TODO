@@ -1,10 +1,6 @@
-Keep an eye on:
-* AWP uses STROB1 falling edge to get mem argument, so it may be already too late
-* AWP: T and M are interdependent and thus need to use the same clock
-
 Features:
-* MEGA
-* DRAM driver
-* DRAM cache
-* serial system bus
 * bus reservation
+* serial system bus
+* MEGA memory
+* DRAM driver
+* cache
