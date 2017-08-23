@@ -34,8 +34,6 @@ module awp(
 	output ekc_fp			// FPU done
 );
 
-	parameter FP_FI0_TICKS = 2'd3;
-
 // -----------------------------------------------------------------------
 // --- F-PS --------------------------------------------------------------
 // -----------------------------------------------------------------------
@@ -152,9 +150,7 @@ fps FPS(
 wire [-2:7] d;
 wire g, wdt, wt, fic, c_f, v_f, m_f, z_f, dw, ad, sd, mw, af, sf, mf, df, dw_df, mw_mf, af_sf, ad_sd, ff, ss, puf, fwz, ws, di, wc, t_1, t0_neq_t_1, ok, nz, opsu, ta, m_1, ck, m_40, m_32, sgn_t0_c0, sgn, t_1_d, m_1_d;
 
-fpm #(
-	.FP_FI0_TICKS(FP_FI0_TICKS)
-) FPM(
+fpm FPM(
 	.t_1_d(t_1_d),
 	.m_1_d(m_1_d),
 	.clk_sys(clk_sys),

@@ -126,10 +126,6 @@ module fpm(
 	output sgn
 );
 
-	parameter FP_FI0_TICKS;
-
-	wor __NC;
-
 	// --- B register and bus -----------------------------------------------
 
 	wire f2strob = f2 & strob_fp;
@@ -407,15 +403,16 @@ module fpm(
 
 	// --- Interrupts -------------------------------------------------------
 
-	wire fi0_q;
-	univib #(.ticks(FP_FI0_TICKS)) VIB_FI0(
-		.clk(clk_sys),
-		.a_(~di_c),
-		.b(1'b1),
-		.q(fi0_q)
-	);
+	reg [0:1] di_c_st;
+	always @ (posedge clk_sys) begin
+		case (di_c_st)
+			0: if (di_c) di_c_st <= 1;
+			1: di_c_st <= 2;
+			2: if (~di_c) di_c_st <= 0;
+		endcase
+	end
 
-	assign fi0 = di & fi0_q;
+	assign fi0 = di & (di_c_st == 1);
 	wire fff13 = ff & f13;
 	assign fi1 = fff13 &  d[-2] & ~(d[-1] & d[0]); // 100, 101, 110
 	assign fi2 = fff13 & ~d[-2] &  (d[-1] | d[0]); // 001, 010, 011
