@@ -3,7 +3,7 @@ module ld(
 	input lkb,
 	input _0_d,
 	input l_d,
-	input [0:7] sum_c,
+	input [-2:7] sum_c,
 	input sum_c_2,
 	input sum_c_1,
 	input [8:15] w,
@@ -14,7 +14,7 @@ module ld(
 
 	always @ (*) begin
 		case (lkb)
-			0: l <= {sum_c_2, sum_c_1, sum_c[0:7]};
+			0: l <= sum_c[-2:7];
 			1: l <= {w[8], w[8], w[8:15]};
 		endcase
 	end

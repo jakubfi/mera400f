@@ -130,20 +130,6 @@ module fpm(
 
 	wor __NC;
 
-	// --- L bus and D register ---------------------------------------------
-
-	ld LD(
-		.clk_sys(clk_sys),
-		.lkb(lkb),
-		._0_d(_0_d),
-		.l_d(l_d),
-		.sum_c(sum_c[0:7]),
-		.sum_c_1(sum_c_1),
-		.sum_c_2(sum_c_2),
-		.w(w[8:15]),
-		.d(d)
-	);
-
 	// --- B register and bus -----------------------------------------------
 
 	wire f2strob = f2 & strob_fp;
@@ -162,18 +148,30 @@ module fpm(
 
 	// --- Exponent adder ---------------------------------------------------
 
-	wire [-1:7] sum_c = b + d[0:7] + pc8;
+	wire [-2:7] sum_c;
+	wire abs_sum_c_ge_40;
+	expadd EXPADD(
+		.b(b),
+		.d(d[-1:7]),
+		.pc8(pc8),
+		.fcb(fcb),
+		.scc(scc),
+		.b0(b0),
+		.abs_sum_c_ge_40(abs_sum_c_ge_40),
+		.sum_c(sum_c)
+	);
 
-	wire M9_3 = fcb ^ scc;
-	wire M3_6 = ~((b0 & M9_3) | (~b0 & ~scc));
-	wire M27_8 = M3_6 ^ ~d[-1];
-	wire sum_c_2 = ~((sum_c[-1] & M3_6) | (sum_c[-1] & ~d[-1]) | (M3_6 & ~d[-1]));
-	wire sum_c_1 = sum_c[-1] ^ M27_8;
+	// --- L bus and D register ---------------------------------------------
 
-	// --- |sum_c| >= 40 ----------------------------------------------------
-
-	wire signed [0:8] v = {sum_c_1, sum_c[0:7]};
-	wire abs_sum_c_ge_40 = (v >= 40) || (v <= -40);
+	ld LD(
+		.clk_sys(clk_sys),
+		.lkb(lkb),
+		._0_d(_0_d),
+		.l_d(l_d),
+		.sum_c(sum_c[-2:7]),
+		.w(w[8:15]),
+		.d(d)
+	);
 
 	// --- FIC counter ------------------------------------------------------
 
@@ -248,13 +246,13 @@ module fpm(
 
 	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) wdt <= 1'b0;
-		else if (wdtwtg_clk) wdt <= sum_c_1;
+		else if (wdtwtg_clk) wdt <= sum_c[-1];
 	end
 
 	// wynik w rejestrze T
 
 	wire wt_s = f2 & ~t & strob_fp & af_sf;
-	wire wt_d = abs_sum_c_ge_40 & ~sum_c_1;
+	wire wt_d = abs_sum_c_ge_40 & ~sum_c[-1];
 
 	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) wt <= 1'b0;
