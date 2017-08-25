@@ -33,7 +33,6 @@ module mem_elwro_sram(
 	wire [0:7] cfg_page = ~{rdt_[12:15], rdt_[0:3]};
 	wire [0:7] cfg_frame = ~{ad_[11:14], ad_[7:10]};
 	wire [0:7] page = ~{nb_, ad_[0:3]};
-	reg map_rd = 0;
 	wire [0:7] frame;
 	wire cok;
 	wire pvalid;
@@ -47,7 +46,7 @@ module mem_elwro_sram(
 		.reset_hold(reset_hold),
 		.s_(s_),
 		.ad15(~ad_[15]),
-		.rd(map_rd),
+		.rd(mem_access),
 		.cfg_page(cfg_page),
 		.cfg_frame(cfg_frame),
 		.page(page),
@@ -63,48 +62,21 @@ module mem_elwro_sram(
 	localparam S_MAP	= 2'd2;
 
 	reg [1:0] state = S_IDLE;
-	reg we, oe, ok;
-	reg [0:15] rd_data;
+	wire mem_access = ~r_ | ~w_;
+	wire oe = ~r_;
+	wire we = ~w_ & ok;
+	wire ok = (state == S_OK) & mem_access;
+	wire [0:15] rd_data = SRAM_D;
 
 	always @ (posedge clk) begin
 		case (state)
-
-			S_IDLE: begin
-				if (~r_) begin
-					state <= S_MAP;
-					map_rd <= 1;
-					oe <= 1;
-				end else if (~w_) begin
-					state <= S_MAP;
-					map_rd <= 1;
-				end
-			end
-
-			S_MAP: begin
-				map_rd <= 0;
-				if (~pvalid) begin
-					state <= S_IDLE;
-				end else if (~r_) begin
-					rd_data <= SRAM_D;
-					ok <= 1;
-					state <= S_OK;
-				end else if (~w_) begin
-					state <= S_OK;
-					ok <= 1;
-					we <= 1;
-				end
-			end
-	
-			S_OK: begin
-				map_rd <= 0;
-				oe <= 0;
-				we <= 0;
-				if (r_ & w_) begin
-					ok <= 0;
-					state <= S_IDLE;
-				end
-			end
-
+			S_IDLE:
+				if (mem_access) state <= S_MAP;
+			S_MAP:
+				if (pvalid) state <= S_OK;
+				else state <= S_IDLE;
+			S_OK:
+				if (~mem_access) state <= S_IDLE;
 		endcase
 	end
 
