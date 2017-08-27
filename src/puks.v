@@ -8,7 +8,6 @@
 
 module puks(
 	input clk_sys,
-	input zoff,	// not implemented
 	input rcl,	// received clear
 	input dcl,	// clear driver
 	output off,	// power lines not ready (in real hardware: goes high 0.5-2s after the power is switched on)

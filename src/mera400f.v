@@ -13,14 +13,22 @@ module mera400f(
 	output F_CS, F_OE, F_WE
 );
 
-	// FPGA cruft
+// -----------------------------------------------------------------------
+// --- FPGA stuff --------------------------------------------------------
+// -----------------------------------------------------------------------
+
+	// silence the buzzer
+
 	assign BUZZER = 1'b1;
+
 	// disable flash, which uses the same D and A buses as sram
+
 	assign F_CS = 1'b1;
 	assign F_OE = 1'b1;
 	assign F_WE = 1'b1;
 
 	// clocks
+
 	localparam CLK_EXT_HZ = 50_000_000;
 	localparam CLK_SYS_HZ = CLK_EXT_HZ;
 	localparam CLK_UART_HZ = CLK_EXT_HZ;
@@ -29,35 +37,64 @@ module mera400f(
 	wire clk_sram = CLK_EXT;
 
 // -----------------------------------------------------------------------
+// --- INTERFACE ---------------------------------------------------------
+// -----------------------------------------------------------------------
+
+	// signal positions on the system bus
+
+	`define pa	0
+	`define cl	1
+	`define w		2
+	`define r		3
+	`define s		4
+	`define f		5
+	`define in	6
+	`define ok	7
+	`define en	8
+	`define pe	9
+	`define qb	10
+	`define pn	11
+	`define nb	12:15
+	`define ad	16:31
+	`define dt 	32:47
+	`define BUS_MAX 47
+
+	// bus drivers for CPUs and memory (receivers on CPU and memory side)
+
+	wire [0:`BUS_MAX] cpu0r;
+	wire [0:`BUS_MAX] cpu1r;
+	wire [0:`BUS_MAX] memr;
+
+	// interface reservation signals
+
+	wire [1:4] zg;
+	wire [1:4] zw;
+	wire [1:4] zz;
+
+	isk ISK(
+		.cpu0d(cpu0d),
+		.cpu0r(cpu0r),
+		.cpu1d(0),
+		.cpu1r(cpu1r),
+		.memd(memd),
+		.memr(memr),
+		.zg(zg),
+		.zw(zw),
+		.zz(zz)
+	);
+
+// -----------------------------------------------------------------------
 // --- CPU ---------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-	// output: to system bus - drivers
-	wire dw;
-	wire dr;
-	wire ds;
-	wire df;
-	wire din;
-	wire dok;
-	wire dqb;
-	wire dpn;
-	wire [0:3] dnb;
-	wire [0:15] dad;
-	wire [0:15] ddt;
-	wire dmcl;
-	// input: from system bus - receivers
-	wire rpa = 0;
-	wire rin = 0;
-	wire rok;
-	wire ren = 0;
-	wire rpe = 0;
-	wire rpn = 0;
-	wire [0:15] rdt;
-	wire zg;
-	wire zw = zg;
-	wire zz;
+	// to system bus
 
-	// output: to control panel
+	wire [0:`BUS_MAX] cpu0d;
+	wire dmcl;
+	assign cpu0d[`cl] = dcl | dmcl;
+
+	// to control panel
+
 	wire p0;
 	wire [0:15] w;
 	wire hlt_n, p, run, _wait, irq, q, mc_0, awaria;
@@ -80,7 +117,6 @@ module mera400f(
 		.pout(pout),
 		.clm(clm),
 		.clo(clo),
-		.dmcl(dmcl),
 		// control panel
 		.kl(kl),
 		.panel_store(panel_store),
@@ -117,29 +153,31 @@ module mera400f(
 		.q(q),
 		.mc_0(mc_0),
 		.awaria(awaria),
-		// system bus
-		.rpa(rpa),
-		.dw(dw),
-		.dr(dr),
-		.ds(ds),
-		.df(df),
-		.din(din),
-		.rin(rin),
-		.dok(dok),
-		.rok(rok),
-		.ren(ren),
-		.rpe(rpe),
-		.dqb(dqb),
-		.dpn(dpn),
-		.rpn(rpn),
-		.dnb(dnb),
-		.dad(dad),
-		.ddt(ddt),
-		.rdt(rdt),
-		// ssytem bus reservation
-		.zg(zg),
-		.zw(zw),
-		.zz(zz)
+		// system bus - drivers
+		.dmcl(dmcl),
+		.dw(cpu0d[`w]),
+		.dr(cpu0d[`r]),
+		.ds(cpu0d[`s]),
+		.df(cpu0d[`f]),
+		.din(cpu0d[`in]),
+		.dok(cpu0d[`ok]),
+		.dqb(cpu0d[`qb]),
+		.dpn(cpu0d[`pn]),
+		.dnb(cpu0d[`nb]),
+		.dad(cpu0d[`ad]),
+		.ddt(cpu0d[`dt]),
+		// system bus - receivers
+		.rpa(cpu0r[`pa]),
+		.rin(cpu0r[`in]),
+		.rok(cpu0r[`ok]),
+		.ren(cpu0r[`en]),
+		.rpe(cpu0r[`pe]),
+		.rpn(cpu0r[`pn]),
+		.rdt(cpu0r[`dt]),
+		// system bus reservation
+		.zg(zg[1]),
+		.zw(zw[1]),
+		.zz(zz[1])
 	);
 
 // -----------------------------------------------------------------------
@@ -206,42 +244,10 @@ module mera400f(
 	);
 
 // -----------------------------------------------------------------------
-// --- POWER SUPPLY ------------------------------------------------------
-// -----------------------------------------------------------------------
-
-	wire off, pout, pon, clo, clm;
-
-	puks PUKS(
-		.clk_sys(clk_sys),
-		.zoff(zoff),
-		.rcl(rcl),
-		.dcl(dcl),
-		.off(off),
-		.pout(pout),
-		.pon(pon),
-		.clo(clo),
-		.clm(clm)
-	);
-
-// -----------------------------------------------------------------------
-// --- I/F ---------------------------------------------------------------
-// -----------------------------------------------------------------------
-
-	wire rcl, zoff;
-
-	isk ISK(
-		.dmcl(dmcl),
-		.dcl(dcl|dcl_hold),
-		.off(off),
-		.rcl(rcl),
-		.zoff(zoff)
-	);
-
-// -----------------------------------------------------------------------
 // --- MEMORY ------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-	wire dcl_hold;
+	wire [0:`BUS_MAX] memd;
 
 	mem_elwro_sram MEM(
 		.clk(clk_sram),
@@ -252,16 +258,33 @@ module mera400f(
 		.SRAM_LB(SRAM_LB),
 		.SRAM_A(SRAM_A),
 		.SRAM_D(SRAM_D),
-		.reset(clm),
-		.reset_hold(dcl_hold),
-		.nb(dnb),
-		.ad(dad),
-		.rdt(ddt),
-		.ddt(rdt),
-		.w(dw),
-		.r(dr),
-		.s(ds),
-		.ok(rok)
+		.reset(memr[`cl]),
+		.reset_hold(memd[`cl]),
+		.nb(memr[`nb]),
+		.ad(memr[`ad]),
+		.rdt(memr[`dt]),
+		.ddt(memd[`dt]),
+		.w(memr[`w]),
+		.r(memr[`r]),
+		.s(memr[`s]),
+		.ok(memd[`ok])
+	);
+
+// -----------------------------------------------------------------------
+// --- POWER SUPPLY ------------------------------------------------------
+// -----------------------------------------------------------------------
+
+	wire off, pout, pon, clo, clm;
+
+	puks PUKS(
+		.clk_sys(clk_sys),
+		.rcl(cpu0r[`cl]),
+		.dcl(dcl),
+		.off(off),
+		.pout(pout),
+		.pon(pon),
+		.clo(clo),
+		.clm(clm)
 	);
 
 endmodule
