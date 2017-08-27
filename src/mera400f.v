@@ -1,5 +1,3 @@
-// MERA-400 top
-
 module mera400f(
 	input CLK_EXT,
 	output BUZZER,
@@ -17,6 +15,10 @@ module mera400f(
 
 	// FPGA cruft
 	assign BUZZER = 1'b1;
+	// disable flash, which uses the same D and A buses as sram
+	assign F_CS = 1'b1;
+	assign F_OE = 1'b1;
+	assign F_WE = 1'b1;
 
 	// clocks
 	localparam CLK_EXT_HZ = 50_000_000;
@@ -208,6 +210,7 @@ module mera400f(
 // -----------------------------------------------------------------------
 
 	wire off, pout, pon, clo, clm;
+
 	puks PUKS(
 		.clk_sys(clk_sys),
 		.zoff(zoff),
@@ -225,6 +228,7 @@ module mera400f(
 // -----------------------------------------------------------------------
 
 	wire rcl, zoff;
+
 	isk ISK(
 		.dmcl(dmcl),
 		.dcl(dcl|dcl_hold),
@@ -237,16 +241,10 @@ module mera400f(
 // --- MEMORY ------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-	// disable flash, which uses the same D and A buses as sram
-	assign F_CS = 1'b1;
-	assign F_OE = 1'b1;
-	assign F_WE = 1'b1;
-
 	wire dcl_hold;
+
 	mem_elwro_sram MEM(
 		.clk(clk_sram),
-		.reset(clm),
-		.reset_hold(dcl_hold),
 		.SRAM_CE(SRAM_CE),
 		.SRAM_OE(SRAM_OE),
 		.SRAM_WE(SRAM_WE),
@@ -254,20 +252,17 @@ module mera400f(
 		.SRAM_LB(SRAM_LB),
 		.SRAM_A(SRAM_A),
 		.SRAM_D(SRAM_D),
-		.nb_(~dnb),
-		.ad_(~dad),
-		.rdt_(~ddt),
-		.ddt_(rdt_),
-		.w_(~dw),
-		.r_(~dr),
-		.s_(~ds),
-		.ok_(rok_)
+		.reset(clm),
+		.reset_hold(dcl_hold),
+		.nb(dnb),
+		.ad(dad),
+		.rdt(ddt),
+		.ddt(rdt),
+		.w(dw),
+		.r(dr),
+		.s(ds),
+		.ok(rok)
 	);
-
-	wire rok_;
-	assign rok = ~rok_;
-	wire [0:15] rdt_;
-	assign rdt = ~rdt_;
 
 endmodule
 

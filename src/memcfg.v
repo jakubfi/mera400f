@@ -4,7 +4,7 @@ module memcfg(
 	input clk,
 	input reset,
 	output reset_hold,
-	input s_,
+	input s,
 	input ad15,
 	input rd,
 	input [0:7] cfg_page,
@@ -31,9 +31,9 @@ module memcfg(
 
 	wire [0:7] addr;
 	always @ (*) begin
-		case ({reset, s_})
-			2'b00: addr = cfg_page;	// memory configuration
-			2'b01: addr = page;			// memory read
+		case ({reset, s})
+			2'b00: addr = page;			// memory read
+			2'b01: addr = cfg_page;	// memory configuration
 			2'b10: addr = clr_cnt;	// map reset
 			2'b11: addr = clr_cnt;	// map reset
 		endcase
@@ -73,7 +73,7 @@ module memcfg(
 	assign pvalid = (addr < 2) | (frame != 0);
 
 	wire frame_addr_valid = (cfg_frame & invalidity_mask) == 8'd0;
-	wire cfg_cmd_valid = ~s_ && ad15 && (cfg_page > 1) && frame_addr_valid;
+	wire cfg_cmd_valid = s && ad15 && (cfg_page > 1) && frame_addr_valid;
 
 	localparam S_CIDLE	= 3'd0;
 	localparam S_CCFG		= 3'd1;
@@ -106,7 +106,7 @@ module memcfg(
 			end
 
 			S_COK: begin
-				if (s_) begin
+				if (~s) begin
 					cok <= 0;
 					cstate <= S_CIDLE;
 				end

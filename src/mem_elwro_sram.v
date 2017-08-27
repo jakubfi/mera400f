@@ -7,12 +7,12 @@ module mem_elwro_sram(
 	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,
 	output [17:0] SRAM_A,
 	inout [15:0] SRAM_D,
-	input [0:3] nb_,
-	input [0:15] ad_,
-	output [0:15] ddt_,
-	input [0:15] rdt_,
-	input w_, r_, s_,
-	output ok_
+	input [0:3] nb,
+	input [0:15] ad,
+	output [0:15] ddt,
+	input [0:15] rdt,
+	input w, r, s,
+	output ok
 );
 
 	// RAM module signals
@@ -21,18 +21,18 @@ module mem_elwro_sram(
 	assign SRAM_LB = 0;
 	assign SRAM_WE = ~we;
 	assign SRAM_OE = ~oe;
-	assign SRAM_A[17:0] = {frame[2:7], ~ad_[4:15]};
-	assign SRAM_D = we ? ~rdt_ : 16'hzzzz;
+	assign SRAM_A[17:0] = {frame[2:7], ad[4:15]};
+	assign SRAM_D = we ? rdt : 16'hzzzz;
 
 	// Interface signals
-	assign ok_ = ~((ok & (~r_ | ~w_)) | (cok & ~s_));
-	assign ddt_ = ~r_ ? ~rd_data : 16'hffff;
+	assign ok = rwok | (cok & s);
+	assign ddt = r ? rd_data : 16'h0000;
 
 	// --- memory configuration ------------------------------------------------
 
-	wire [0:7] cfg_page = ~{rdt_[12:15], rdt_[0:3]};
-	wire [0:7] cfg_frame = ~{ad_[11:14], ad_[7:10]};
-	wire [0:7] page = ~{nb_, ad_[0:3]};
+	wire [0:7] cfg_page = {rdt[12:15], rdt[0:3]};
+	wire [0:7] cfg_frame = {ad[11:14], ad[7:10]};
+	wire [0:7] page = {nb, ad[0:3]};
 	wire [0:7] frame;
 	wire cok;
 	wire pvalid;
@@ -44,8 +44,8 @@ module mem_elwro_sram(
 		.clk(clk),
 		.reset(reset),
 		.reset_hold(reset_hold),
-		.s_(s_),
-		.ad15(~ad_[15]),
+		.s(s),
+		.ad15(ad[15]),
 		.rd(mem_access),
 		.cfg_page(cfg_page),
 		.cfg_frame(cfg_frame),
@@ -62,10 +62,10 @@ module mem_elwro_sram(
 	localparam S_MAP	= 2'd2;
 
 	reg [1:0] state = S_IDLE;
-	wire mem_access = ~r_ | ~w_;
-	wire oe = ~r_;
-	wire we = ~w_ & ok;
-	wire ok = (state == S_OK) & mem_access;
+	wire mem_access = r | w;
+	wire oe = r;
+	wire we = w & ok;
+	wire rwok = (state == S_OK) & mem_access;
 	wire [0:15] rd_data = SRAM_D;
 
 	always @ (posedge clk) begin
