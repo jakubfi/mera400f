@@ -64,6 +64,7 @@ module mera400f(
 	wire [0:`BUS_MAX] cpu0r;
 	wire [0:`BUS_MAX] cpu1r;
 	wire [0:`BUS_MAX] memr;
+	wire [0:`BUS_MAX] iobr;
 
 	// interface reservation signals
 
@@ -76,6 +77,8 @@ module mera400f(
 		.cpu0r(cpu0r),
 		.cpu1d(0),
 		.cpu1r(cpu1r),
+		.iobd(iobd),
+		.iobr(iobr),
 		.memd(memd),
 		.memr(memr),
 		.zg(zg),
@@ -241,6 +244,39 @@ module mera400f(
 		.wrs(wrs),
 		.wrz(wrz),
 		.wkb(wkb)
+	);
+
+// -----------------------------------------------------------------------
+// --- IO BRIDGE ---------------------------------------------------------
+// -----------------------------------------------------------------------
+
+	wire [0:`BUS_MAX] iobd;
+
+	io_bridge IO_BRIDGE(
+		.clk_sys(clk_sys),
+		.zg(zg[4]),
+		.zw(zw[4]),
+		.dpa(iobd[`pa]),
+		.rcl(iobr[`cl]),
+		.dw(iobd[`w]),
+		.dr(iobd[`r]),
+		.rs(iobr[`s]),
+		.rf(iobr[`f]),
+		.din(iobd[`in]),
+		.rok(iobr[`ok]),
+		.dok(iobd[`ok]),
+		.den(iobd[`en]),
+		.dpe(iobd[`pe]),
+		.rpe(iobr[`pe]),
+		.rqb(iobr[`qb]),
+		.rpn(iobr[`pn]),
+		.dpn(iobd[`pn]),
+		.rnb(iobr[`nb]),
+		.dnb(iobd[`nb]),
+		.rad(iobr[`ad]),
+		.dad(iobd[`ad]),
+		.rdt(iobr[`dt]),
+		.ddt(iobd[`dt])
 	);
 
 // -----------------------------------------------------------------------
