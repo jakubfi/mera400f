@@ -12,7 +12,13 @@ module isk(
 	output [1:4] zw
 );
 
-	assign zw = zz & zg;
+	always @ (*) begin
+		zw[1] = zg[1];
+		zw[2] = zg[2] & ~zg[1];
+		zw[3] = zg[3] & ~zg[2] & ~zg[1];
+		zw[4] = zg[4] & ~zg[3] & ~zg[2] & ~zg[1];
+	end
+
 	assign cpu0r = memd | cpu1d;
 	assign cpu1r = memd | cpu0d;
 	assign memr = cpu0d | cpu1d;
