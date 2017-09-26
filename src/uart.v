@@ -61,7 +61,7 @@ module uart_tx(
 		end
 	end
 
-	assign busy = |state;
+	assign busy = |state | send;
 	assign txd = txbuf[0];
 
 endmodule
@@ -105,7 +105,7 @@ module uart_rx(
 		end
 	end
 
-	assign busy = |state;
+	assign busy = |state | ~rxd;
 	assign d = rxbuf[9:2];
 
 endmodule
