@@ -14,11 +14,20 @@ def asm(l):
         print("FAILED: %s" % stdout_data.decode('ascii').strip())
         return []
 
+    addr = 0;
+
     for line in stdout_data.decode('ascii').split("\n"):
         if len(line) > 0 and "none" not in line:
-            print("   %s" % line)
             dls = line.split()
-            tab.append(int(dls[3], 0))
+            waddr = int(dls[1], 0)
+            wval = int(dls[3], 0)
+            while addr < waddr:
+                print("   @ 0x%04x : 0x0000" % addr)
+                tab.append(0)
+                addr += 1
+            print("   %s" % line)
+            tab.append(wval)
+            addr += 1
     return tab
 
 # ------------------------------------------------------------------------
