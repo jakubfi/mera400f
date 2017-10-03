@@ -68,6 +68,7 @@ module pk(
 
 	wire tx_busy;
 	wire rx_busy;
+	wire rx_ready;
 	wire [7:0] rx_byte;
 	uart #(
 		.baud(UART_BAUD),
@@ -76,6 +77,7 @@ module pk(
 		.clk(clk_uart),
 		.rx_byte(rx_byte),
 		.rx_busy(rx_busy),
+		.rx_ready(rx_ready),
 		.rxd(RXD),
 		.send(send),
 		.tx_busy(tx_busy),
@@ -101,6 +103,7 @@ module pk(
 		.clk_sys(clk_sys),
 		.rx_byte(rx_byte),
 		.rx_busy(rx_busy),
+		.rx_ready(rx_ready),
 		.send_leds(send_leds),
 		.fnkey(fnkey),
 		.rotary_pos(rotary_pos),

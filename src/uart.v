@@ -8,6 +8,7 @@ module uart(
 	output [7:0] rx_byte,
 	output tx_busy,
 	output rx_busy,
+	output rx_ready,
 	output txd,
 	input rxd
 );
@@ -16,7 +17,7 @@ module uart(
 	parameter clk_speed;
 
 	uart_tx #(.clk_speed(clk_speed), .baud(baud)) tx(.clk(clk), .d(tx_byte), .busy(tx_busy), .txd(txd), .send(send));
-	uart_rx #(.clk_speed(clk_speed), .baud(baud)) rx(.clk(clk), .d(rx_byte), .busy(rx_busy), .rxd(rxd));
+	uart_rx #(.clk_speed(clk_speed), .baud(baud)) rx(.clk(clk), .d(rx_byte), .busy(rx_busy), .rxd(rxd), .ready(rx_ready));
 
 endmodule
 
@@ -71,6 +72,7 @@ module uart_rx(
 	input clk,
 	output [7:0] d,
 	output busy,
+	output ready,
 	input rxd
 );
 
@@ -86,6 +88,7 @@ module uart_rx(
 
 	always @ (posedge clk) begin
 		if (state == 0) begin // idle state
+			ready <= 0;
 			if (~rxd) begin // receive trigger
 				state <= 1;
 				divcnt <= (period >> 1) - 1'b1;
@@ -100,13 +103,14 @@ module uart_rx(
 					rxbuf <= {rxd, rxbuf[9:1]}; // push the bit
 				end else begin // transmission is done
 					state <= 0;
+					ready <= 1;
+					d <= rxbuf[9:2];
 				end
 			end
 		end
 	end
 
 	assign busy = |state | ~rxd;
-	assign d = rxbuf[9:2];
 
 endmodule
 
