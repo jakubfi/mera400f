@@ -163,12 +163,12 @@ class m4cp:
     # --------------------------------------------------------------------
     def upload(self, start_addr, tab):
         pre_s = self.state()
-        self.cmds("mode0;clk0;stop;clear;0;ic;load;%i;ar;load;kb" % start_addr)
+        self.cmds("stop;%i;ar;load;kb" % start_addr)
     
         for word in tab:
             self.cmds("%s;store" % word)
     
-        self.cmds("ar;0;load;ac")
+        self.cmds("ar;%i;load;ac" % start_addr)
         count = 0;
         for word in tab:
             self.cmds("fetch")
