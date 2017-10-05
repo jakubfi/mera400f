@@ -1,4 +1,3 @@
-// Minimal 8N1 TX/RX UART driver
 
 // -----------------------------------------------------------------------
 module uart(
@@ -7,6 +6,7 @@ module uart(
 	input [7:0] tx_byte,
 	output [7:0] rx_byte,
 	output tx_busy,
+	output tx_ready,
 	output rx_busy,
 	output rx_ready,
 	output txd,
@@ -16,8 +16,32 @@ module uart(
 	parameter baud;
 	parameter clk_speed;
 
-	uart_tx #(.clk_speed(clk_speed), .baud(baud)) tx(.clk(clk), .d(tx_byte), .busy(tx_busy), .txd(txd), .send(send));
-	uart_rx #(.clk_speed(clk_speed), .baud(baud)) rx(.clk(clk), .d(rx_byte), .busy(rx_busy), .rxd(rxd), .ready(rx_ready));
+	localparam prescale = clk_speed/baud;
+	localparam width = $clog2(prescale+1);
+	localparam [width-1:0] period = prescale[width-1:0] - 1'b1;
+
+	uart_tx #(
+		.width(width),
+		.period(period)
+	) tx(
+		.clk(clk),
+		.d(tx_byte),
+		.busy(tx_busy),
+		.txd(txd),
+		.send(send),
+		.ready(tx_ready)
+	);
+
+	uart_rx #(
+		.width(width),
+		.period(period)
+	) rx(
+		.clk(clk),
+		.d(rx_byte),
+		.busy(rx_busy),
+		.rxd(rxd),
+		.ready(rx_ready)
+	);
 
 endmodule
 
@@ -27,43 +51,60 @@ module uart_tx(
 	input [7:0] d,
 	input send,
 	output busy,
+	output ready,
 	output txd
 );
 
-	parameter baud;
-	parameter clk_speed;
-	localparam prescale = clk_speed/baud;
-	localparam width = $clog2(prescale+1);
-	localparam [width-1:0] period = prescale[width-1:0];
+	parameter width;
+	parameter period;
 
-	reg [10:0] txbuf = 11'b1;
-	reg [3:0] state = 0;
+	localparam TX_IDLE	= 2'd0;
+	localparam TX_SEND	= 2'd1;
+	localparam TX_WAIT	= 2'd2;
+	reg [1:0] txstate = TX_IDLE;
+
 	reg [width-1:0] divcnt;
+	reg [3:0] bitcnt;
+	reg [0:10] txbuf = {11'b11111111111};
 
 	always @ (posedge clk) begin
-		if (state == 0) begin // idle state
-			if (send) begin // send trigger
-				state <= 1;
-				divcnt <= period;
-				txbuf <= {1'b1, 1'b1, d, 1'b0}; // load data
-			end
-		end else begin // transmission
-			if (divcnt > 0) begin // waiting for the next serial clk tick
-				divcnt <= divcnt - 1'b1;
-			end else begin // next serial clk tick
-				divcnt <= period; // preload serial clock timer
-				txbuf <= txbuf >> 1; // push the bit
-				if (state < 10) begin
-					state <= state + 1'b1;
-				end else begin
-					state <= 0;
+
+		ready <= 0;
+
+		case (txstate)
+			TX_IDLE:
+				if (send) begin
+					bitcnt <= 4'd10;
+					txbuf <= {1'b1, 1'b1, d, 1'b0};
+					divcnt <= period;
+					txstate <= TX_WAIT;
 				end
+
+			TX_SEND: begin
+				txbuf <= {1'b1, txbuf[0:9]};
+				divcnt <= period;
+				txstate <= TX_WAIT;
 			end
-		end
+
+			TX_WAIT:
+				if (divcnt != 0) begin
+					divcnt <= divcnt - 1'd1;
+				end else begin
+					if (bitcnt == 1) begin
+						ready <= 1;
+						txstate <= TX_IDLE;
+					end else begin
+						bitcnt <= bitcnt - 1'd1;
+						txstate <= TX_SEND;
+					end
+				end
+
+		endcase
+
 	end
 
-	assign busy = |state | send;
-	assign txd = txbuf[0];
+	assign busy = (txstate != TX_IDLE) | send;
+	assign txd = txbuf[10];
 
 endmodule
 
@@ -76,41 +117,61 @@ module uart_rx(
 	input rxd
 );
 
-	parameter baud;
-	parameter clk_speed;
-	localparam prescale = clk_speed/baud;
-	localparam width = $clog2(prescale+1);
-	localparam [width-1:0] period = prescale[width-1:0];
+	parameter width;
+	parameter period;
+	localparam halfperiod = period / 2;
 
-	reg [9:0] rxbuf;
-	reg [3:0] state = 0;
+	localparam RX_IDLE	= 2'd0;
+	localparam RX_START	= 2'd1;
+	localparam RX_DATA	= 2'd3;
+	reg [1:0] rxstate = RX_IDLE;
+
 	reg [width-1:0] divcnt;
+	reg [3:0] bitcnt;
+	reg [8:0] rxbuf;
 
 	always @ (posedge clk) begin
-		if (state == 0) begin // idle state
-			ready <= 0;
-			if (~rxd) begin // receive trigger
-				state <= 1;
-				divcnt <= (period >> 1) - 1'b1;
-			end
-		end else begin // receiving data
-			if (divcnt > 0) begin // waiting for the next serial clk tick
-				divcnt <= divcnt - 1'b1;
-			end else begin // next serial clk tick
-				divcnt <= period - 1'b1; // preload serial clock timer
-				if (state < 10) begin
-					state <= state + 1'b1; // advance to the next state
-					rxbuf <= {rxd, rxbuf[9:1]}; // push the bit
-				end else begin // transmission is done
-					state <= 0;
-					ready <= 1;
-					d <= rxbuf[9:2];
+
+		ready <= 0;
+
+		case (rxstate)
+			RX_IDLE:
+				if (!rxd) begin
+					divcnt <= period;
+					rxstate <= RX_START;
 				end
-			end
-		end
+
+			RX_START:
+				if (rxd) begin // RXD gone high during the first half of start bit
+					rxstate <= RX_IDLE;
+				end else if (divcnt > halfperiod) begin
+					divcnt <= divcnt - 1'd1;
+				end else begin
+					divcnt <= period;
+					bitcnt <= 4'd9;
+					rxstate <= RX_DATA;
+				end
+
+			RX_DATA:
+				if (bitcnt == 0) begin
+					rxstate <= RX_IDLE;
+					if (rxd) begin // RXD needs to be high @ stop bit for the frame to be OK
+						d <= rxbuf[7:0];
+						ready <= 1;
+					end
+				end else if (divcnt != 0) begin
+					divcnt <= divcnt - 1'd1;
+				end else begin
+					divcnt <= period;
+					bitcnt <= bitcnt - 1'd1;
+					rxbuf <= {rxd, rxbuf[8:1]};
+				end
+
+		endcase
+
 	end
 
-	assign busy = |state | ~rxd;
+	assign busy = |rxstate | ~rxd;
 
 endmodule
 
