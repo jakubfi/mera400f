@@ -197,10 +197,7 @@ module pp(
 	wire int_ext = int_chan | int_cpu;
 
 	wire dok_trig;
-	dok #(
-		.DOK_DLY_TICKS(DOK_DLY_TICKS),
-		.DOK_TICKS(DOK_TICKS)
-	) DOK(
+	dok DOK(
 		.clk_sys(clk_sys),
 		.rin(rin),
 		.zw(zw),
