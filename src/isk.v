@@ -1,6 +1,7 @@
 // I-SK unit (system interface)
 
 module isk(
+	input clk_sys,
 	input [0:`BUS_MAX] cpu0d,
 	output [0:`BUS_MAX] cpu0r,
 	input [0:`BUS_MAX] cpu1d,
@@ -14,11 +15,23 @@ module isk(
 	output [1:4] zw
 );
 
-	always @ (*) begin
-		zw[1] = zg[1];
-		zw[2] = zg[2] & ~zg[1];
-		zw[3] = zg[3] & ~zg[2] & ~zg[1];
-		zw[4] = zg[4] & ~zg[3] & ~zg[2] & ~zg[1];
+	always @ (posedge clk_sys) begin
+		if (zg[1] & ~zw[2] & ~zw[3] & ~zw[4]) zw[1] <= 1;
+		else begin
+			zw[1] <= 0;
+			if (zg[2] & ~zw[1] & ~zw[3] & ~zw[4]) zw[2] <= 1;
+			else begin
+				zw[2] <= 0;
+				if (zg[3] & ~zw[1] & ~zw[2] & ~zw[4]) zw[3] <= 1;
+				else begin
+					zw[3] <= 0;
+					if (zg[4] & ~zw[1] & ~zw[2] & ~zw[3]) zw[4] <= 1;
+					else begin
+						zw[4] <= 0;
+					end
+				end
+			end
+		end
 	end
 
 	assign cpu0r =	0			| cpu1d	|	iobd	| memd;

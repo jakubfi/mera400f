@@ -6,6 +6,9 @@ module mera400f(
 	output TXD,
 	output [7:0] DIG,
 	output [7:0] SEG,
+	// interface
+	input RXD2,
+	output TXD2,
 	// RAM
 	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,
 	output [17:0] SRAM_A,
@@ -73,6 +76,7 @@ module mera400f(
 	wire [1:4] zz;
 
 	isk ISK(
+		.clk_sys(clk_sys),
 		.cpu0d(cpu0d),
 		.cpu0r(cpu0r),
 		.cpu1d(0),
@@ -108,10 +112,8 @@ module mera400f(
 		.INOU_USER_ILLEGAL(1'b1),
 		.STOP_ON_NOMEM(1'b1),
 		.LOW_MEM_WRITE_DENY(1'b0),
-		.ALARM_DLY_TICKS(8'd250),
-		.ALARM_TICKS(8'd3),
-		.DOK_DLY_TICKS(4'd15),
-		.DOK_TICKS(3'd7)
+		.ALARM_DLY_TICKS(18'd250000),
+		.ALARM_TICKS(8'd3)
 	) CPU0(
 		.clk_sys(clk_sys),
 		// power supply
@@ -252,8 +254,14 @@ module mera400f(
 
 	wire [0:`BUS_MAX] iobd;
 
-	io_bridge IO_BRIDGE(
+	iobus #(
+		.CLK_UART_HZ(CLK_UART_HZ),
+		.UART_BAUD(1_000_000)
+	) IOBUS(
 		.clk_sys(clk_sys),
+		.clk_uart(clk_uart),
+		.RXD2(RXD2),
+		.TXD2(TXD2),
 		.zg(zg[4]),
 		.zw(zw[4]),
 		.dpa(iobd[`pa]),

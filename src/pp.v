@@ -47,9 +47,6 @@ module pp(
 	output [0:15] dad
 );
 
-	parameter DOK_DLY_TICKS;
-	parameter DOK_TICKS;
-
 	// --- RM - interrupt mask register
 
 	wire clm$ = clm | (strob1 & i4);

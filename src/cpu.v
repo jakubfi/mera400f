@@ -64,8 +64,6 @@ module cpu(
 
 	parameter ALARM_DLY_TICKS = 8'd250; // 2.5-5us in DTR, >=5us from notes on HSO schematic, ~10us in hw(?)
 	parameter ALARM_TICKS = 2'd3; // 60ns
-	parameter DOK_DLY_TICKS = 4'd15; // 300ns
-	parameter DOK_TICKS = 3'd7; // 153ns
 
 	// -DDT open-collector composition
 	assign ddt = pa_ddt | px_ddt;
@@ -619,10 +617,7 @@ wire [0:15] bus_rz;
 wire przerw_z;
 wire [0:15] pp_dad;
 
-pp #(
-	.DOK_DLY_TICKS(DOK_DLY_TICKS),
-	.DOK_TICKS(DOK_TICKS)
-) PP(
+pp PP(
 	.clk_sys(clk_sys),
 	.w(w),
 	.clm(clm),
