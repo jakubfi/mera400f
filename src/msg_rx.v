@@ -16,7 +16,8 @@ module msg_rx(
 	output [0:15] dt,
 
 	output r, w, in, pa,
-	output ok, pe, en
+	output ok, pe, en,
+	output cp, cpd, cpr, cpf, cps
 );
 
 	// --- Command decoder ---------------------------------------------------
@@ -30,7 +31,12 @@ module msg_rx(
 		.pa(pa),
 		.ok(ok),
 		.pe(pe),
-		.en(en)
+		.en(en),
+		.cp(cp),
+		.cpd(cpd),
+		.cpr(cpr),
+		.cpf(cpf),
+		.cps(cps)
 	);
 
 	// --- Receiver ----------------------------------------------------------
@@ -116,24 +122,30 @@ endmodule
 module cmd_dec(
 	input req,
 	input [0:3] cmd,
-	output r, w, in, pa, ok, pe, en
+	output cp,
+	output r, w, in, pa, ok, pe, en, cpd, cpr, cpf, cps
 );
 
-	wire [0:6] bus;
+	wire [0:10] bus;
 	always @ (*) begin
 		case ({req, cmd})
-			{ `MSG_REQ, `CMD_R }	: bus = 7'b1000000;
-			{ `MSG_REQ, `CMD_W }	: bus = 7'b0100000;
-			{ `MSG_REQ, `CMD_IN }	: bus = 7'b0010000;
-			{ `MSG_REQ, `CMD_PA }	: bus = 7'b0001000;
-			{ `MSG_RESP, `CMD_OK }: bus = 7'b0000100;
-			{ `MSG_RESP, `CMD_PE }: bus = 7'b0000010;
-			{ `MSG_RESP, `CMD_EN }: bus = 7'b0000001;
-			default: bus = 7'b0000000;
+			{ `MSG_REQ, `CMD_R }	 : bus = 11'b10000000000;
+			{ `MSG_REQ, `CMD_W }	 : bus = 11'b01000000000;
+			{ `MSG_REQ, `CMD_IN }	 : bus = 11'b00100000000;
+			{ `MSG_REQ, `CMD_PA }	 : bus = 11'b00010000000;
+			{ `MSG_RESP, `CMD_OK } : bus = 11'b00001000000;
+			{ `MSG_RESP, `CMD_PE } : bus = 11'b00000100000;
+			{ `MSG_RESP, `CMD_EN } : bus = 11'b00000010000;
+			{ `MSG_REQ, `CMD_CPD } : bus = 11'b00000001000;
+			{ `MSG_REQ, `CMD_CPR } : bus = 11'b00000000100;
+			{ `MSG_REQ, `CMD_CPF } : bus = 11'b00000000010;
+			{ `MSG_REQ, `CMD_CPS } : bus = 11'b00000000001;
+			default: bus = 11'd0;
 		endcase
 	end
 
-	assign { r, w, in, pa, ok, pe, en } = bus;
+	assign cp = cpd | cpr | cpf | cps;
+	assign { r, w, in, pa, ok, pe, en, cpd, cpr, cpf, cps } = bus;
 
 endmodule
 

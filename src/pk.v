@@ -56,7 +56,20 @@ module pk(
 	output wir,
 	output wrs,
 	output wrz,
-	output wkb
+	output wkb,
+
+	// to IOBUS
+	output [0:3] rotary_pos,
+	output [0:9] indicators,
+
+	// from IOBUS
+	input [0:3] rotary_in,
+	input rotary_trig,
+	input [0:15] keys,
+	input keys_trig,
+	input [0:3] fn,
+	input fn_v,
+	input fn_trig
 );
 
 	parameter CLK_SYS_HZ;
@@ -98,7 +111,6 @@ module pk(
 
 	wire send_leds;
 	wire [11:0] fnkey;
-	wire [3:0] rotary_pos;
 	cpin CPIN(
 		.clk_sys(clk_sys),
 		.rx_byte(rx_byte),
@@ -142,13 +154,15 @@ module pk(
 
 	// --- Control panel output (leds over serial)
 
+	assign indicators = {mode, stop_n, zeg, q, p, ~mc_0, irq, run, _wait, alarm};
+
 	wire send;
 	wire [7:0] tx_byte;
 	cpout CPOUT(
 		.clk_sys(clk_sys),
 		.trigger(send_leds),
 		.w(w),
-		.indicators({mode, stop_n, zeg, q, p, ~mc_0, irq, run, _wait, alarm}),
+		.indicators(indicators),
 		.rotary_pos(rotary_pos),
 		.tx_busy(tx_busy),
 		.tx_byte(tx_byte),
@@ -174,7 +188,7 @@ module pk(
 		.clk_sys(clk_sys),
 		.w(w),
 		.rotary_bus(rotary_bus),
-		.indicators({run, _wait, alarm, irq, mode, stop_n, zeg, q, p, mc_0}),
+		.indicators(indicators),
 		.SEG(SEG),
 		.DIG(DIG)
 	);

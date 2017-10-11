@@ -19,8 +19,8 @@ module display(
 	rb2seg d5(.r(rotary_bus), .seg(digs[5]));
 	ra2seg d6(.r(rotary_bus), .seg(digs[6]));
 
-	assign digs[7][0] = indicators[1];
-	assign digs[7][6] = ~indicators[0];
+	assign digs[7][0] = indicators[5];
+	assign digs[7][6] = indicators[4];
 	assign digs[7][5:1] = 0;
 
 	sevenseg_drv DRV(
@@ -28,7 +28,7 @@ module display(
 		.seg(SEG),
 		.dig(DIG),
 		.digs(digs),
-		.dots(indicators[9:2])
+		.dots({indicators[2:0], indicators[3], indicators[9:6]})
 	);
 
 endmodule

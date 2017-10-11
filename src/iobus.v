@@ -11,6 +11,10 @@
 `define CMD_EN	4'b0001
 `define CMD_OK	4'b0010
 `define CMD_PE	4'b0011
+`define CMD_CPD	4'b1000
+`define CMD_CPR	4'b1001
+`define CMD_CPF	4'b1010
+`define CMD_CPS	4'b1011
 
 module iobus(
 	input clk_sys,
@@ -41,7 +45,19 @@ module iobus(
 	input [0:15] rad,
 	output [0:15] dad,
 	input [0:15] rdt,
-	output [0:15] ddt
+	output [0:15] ddt,
+
+  input [0:15] w,
+  input [0:3] rotary_pos,
+	input [0:9] indicators,
+
+	output [0:3] rotary_out,
+	output rotary_trig,
+	output [0:15] keys,
+	output keys_trig,
+	output [0:3] fn,
+	output fn_v,
+	output fn_trig
 );
 
 	parameter CLK_UART_HZ;
@@ -75,8 +91,12 @@ module iobus(
 
 	// --- Transmitter -------------------------------------------------------
 
-	wire txbusy;
-	reg txsend;
+	wire txbusy;	// transmitter is sending a message
+	reg txsend;		// send message trigger
+
+	// switch arguments for rxcp
+	wire [0:15] txa2 = rxcp ? w : rad;
+	wire [0:15] txa3 = rxcp ? { indicators, 2'b00, rotary_pos } : rdt;
 
 	msg_tx MSG_TX(
 		.clk_sys(clk_sys),
@@ -85,28 +105,31 @@ module iobus(
 		.uart_busy(utx_busy),
 		.send(txsend),
 		.busy(txbusy),
-		.ok_with_dt(dr),
+		.ok_with_a3(dr),
 		.s(rs),
 		.f(rf),
 		.cl(rcl),
 		.ok(rok),
 		.pe(rpe),
-		.bar({rqb, rpn, rnb}),
-		.ad(rad),
-		.dt(rdt)
+		.a1({2'd0, rqb, rpn, rnb}),
+		.a2(txa2),
+		.a3(txa3)
 	);
 
 	// --- Receiver ----------------------------------------------------------
 
-	wire rxbusy, rxcmdready;
-	reg rxreset;
+	wire rxbusy;			// receiver is receiving a message
+	wire rxcmdready;	// received a command (arguments are ready after rxbusy goes low)
+	reg rxreset;			// reset the receiver before accepting next command
 
-	wire rxreq;
+	wire rxreq;				// received a command
+	wire rxcp;				// received a CP command
 	wire rxpn;
 	wire [0:3] rxnb;
 	wire [0:15] rxad;
 	wire [0:15] rxdt;
-	wire rxr, rxw, rxin, rxpa, rxok, rxpe, rxen;
+	wire rxr, rxw, rxin, rxpa, rxok, rxpe, rxen; // interface requests and responses
+	wire rxcpd, rxcpr, rxcpf, rxcps; // CP requests
 
 	msg_rx MSG_RX(
 		.clk_sys(clk_sys),
@@ -127,7 +150,12 @@ module iobus(
 		.pa(rxpa),
 		.ok(rxok),
 		.pe(rxpe),
-		.en(rxen)
+		.en(rxen),
+		.cp(rxcp),
+		.cpd(rxcpd),
+		.cpr(rxcpr),
+		.cpf(rxcpf),
+		.cps(rxcps)
 	);
 
 	// --- Transmachine ------------------------------------------------------

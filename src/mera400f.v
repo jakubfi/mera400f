@@ -197,6 +197,10 @@ module mera400f(
 	wire oprq, stop, start, work, mode, step, stop_n, cycle;
 	wire dcl;
 
+	// outputs to IOBUS
+	wire [0:3] rotary_pos;
+	wire [0:9] indicators;
+
 	pk #(
 		.TIMER_CYCLE_MS(8'd10),
 		.CLK_SYS_HZ(CLK_SYS_HZ),
@@ -245,14 +249,32 @@ module mera400f(
 		.wir(wir),
 		.wrs(wrs),
 		.wrz(wrz),
-		.wkb(wkb)
+		.wkb(wkb),
+		.indicators(indicators),
+		.rotary_pos(rotary_pos),
+		.rotary_in(rotary_out),
+		.rotary_trig(rotary_trig),
+		.keys(keys),
+		.keys_trig(keys_trig),
+		.fn(fn),
+		.fn_v(fn_v),
+		.fn_trig(fn_trig)
 	);
 
 // -----------------------------------------------------------------------
-// --- IO BRIDGE ---------------------------------------------------------
+// --- IO BUS ------------------------------------------------------------
 // -----------------------------------------------------------------------
 
 	wire [0:`BUS_MAX] iobd;
+
+	// outputs to CP
+	wire [0:3] rotary_out;
+	wire rotary_trig;
+	wire [0:15] keys;
+	wire keys_trig;
+	wire [0:3] fn;
+	wire fn_v;
+	wire fn_trig;
 
 	iobus #(
 		.CLK_UART_HZ(CLK_UART_HZ),
@@ -284,7 +306,18 @@ module mera400f(
 		.rad(iobr[`ad]),
 		.dad(iobd[`ad]),
 		.rdt(iobr[`dt]),
-		.ddt(iobd[`dt])
+		.ddt(iobd[`dt]),
+		.w(w),
+		.rotary_pos(rotary_pos),
+		.indicators(indicators),
+		.rotary_out(rotary_out),
+		.rotary_trig(rotary_trig),
+		.keys(keys),
+		.keys_trig(keys_trig),
+		.fn(fn),
+		.fn_v(fn_v),
+		.fn_trig(fn_trig)
+
 	);
 
 // -----------------------------------------------------------------------

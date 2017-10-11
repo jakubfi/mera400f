@@ -8,12 +8,12 @@ module msg_tx(
 	input send,
 	output busy,
 
-	input ok_with_dt,
+	input ok_with_a3,
 	input f, s, cl,
 	input ok, pe,
-	input [0:5] bar,
-	input [0:15] ad,
-	input [0:15] dt
+	input [0:7] a1,
+	input [0:15] a2,
+	input [0:15] a3
 );
 
 	// --- Argument presence enc. --------------------------------------------
@@ -22,7 +22,7 @@ module msg_tx(
 	args_enc ARGS_ENC(
 		.cmd(cmd),
 		.req(req),
-		.ok_with_dt(ok_with_dt),
+		.ok_with_a3(ok_with_a3),
 		.arg(arg)
 	);
 
@@ -70,7 +70,7 @@ module msg_tx(
 
 			BAR: begin
 				if (!uart_busy) begin
-					uart_data <= { 2'b00, bar };
+					uart_data <= a1;
 					uart_send <= 1;
 					if (arg[1]) state <= ADH;
 					else if (arg[2]) state <= DTH;
@@ -80,7 +80,7 @@ module msg_tx(
 
 			ADH: begin
 				if (!uart_busy) begin
-					uart_data <= ad[0:7];
+					uart_data <= a2[0:7];
 					uart_send <= 1;
 					state <= ADL;
 				end
@@ -88,7 +88,7 @@ module msg_tx(
 
 			ADL: begin
 				if (!uart_busy) begin
-					uart_data <= ad[8:15];
+					uart_data <= a2[8:15];
 					uart_send <= 1;
 					if (arg[2]) state <= DTH;
 					else state <= WAIT;
@@ -97,7 +97,7 @@ module msg_tx(
 
 			DTH: begin
 				if (!uart_busy) begin
-					uart_data <= dt[0:7];
+					uart_data <= a3[0:7];
 					uart_send <= 1;
 					state <= DTL;
 				end
@@ -105,7 +105,7 @@ module msg_tx(
 
 			DTL: begin
 				if (!uart_busy) begin
-					uart_data <= dt[8:15];
+					uart_data <= a3[8:15];
 					uart_send <= 1;
 					state <= WAIT;
 				end
@@ -128,7 +128,7 @@ endmodule
 module args_enc(
 	input [0:3] cmd,
 	input req,
-	input ok_with_dt,
+	input ok_with_a3,
 	output [0:2] arg
 );
 
@@ -145,8 +145,8 @@ module args_enc(
 		endcase
 	end
 
-	wire okdt = (cmd == `CMD_OK) && ok_with_dt;
-	assign arg = req ? a : {2'd0, okdt};
+	wire oka3 = (cmd == `CMD_OK) && ok_with_a3;
+	assign arg = req ? a : {2'd0, oka3};
 
 endmodule
 
