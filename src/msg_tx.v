@@ -8,9 +8,11 @@ module msg_tx(
 	input send,
 	output busy,
 
+	input ok_with_a2,
 	input ok_with_a3,
 	input f, s, cl,
 	input ok, pe,
+	input cpresp,
 	input [0:7] a1,
 	input [0:15] a2,
 	input [0:15] a3
@@ -23,6 +25,7 @@ module msg_tx(
 		.cmd(cmd),
 		.req(req),
 		.ok_with_a3(ok_with_a3),
+		.ok_with_a2(ok_with_a2),
 		.arg(arg)
 	);
 
@@ -36,6 +39,7 @@ module msg_tx(
 		.cl(cl),
 		.ok(ok),
 		.pe(pe),
+		.cpresp(cpresp),
 		.req(req),
 		.cmd(cmd)
 	);
@@ -128,6 +132,7 @@ endmodule
 module args_enc(
 	input [0:3] cmd,
 	input req,
+	input ok_with_a2,
 	input ok_with_a3,
 	output [0:2] arg
 );
@@ -141,18 +146,23 @@ module args_enc(
 			`CMD_S : a = 3'b111;
 			`CMD_F : a = 3'b110;
 			`CMD_IN: a = 3'b101;
+			`CMD_CPD:a = 3'b001;
+			`CMD_CPR:a = 3'b100;
+			`CMD_CPF:a = 3'b100;
+			`CMD_CPS:a = 3'b000;
 			default: a = 3'b000;
 		endcase
 	end
 
+	wire oka2 = (cmd == `CMD_OK) && ok_with_a2;
 	wire oka3 = (cmd == `CMD_OK) && ok_with_a3;
-	assign arg = req ? a : {2'd0, oka3};
+	assign arg = req ? a : {1'd0, oka2, oka3};
 
 endmodule
 
 // -----------------------------------------------------------------------
 module cmd_enc(
-	input f, s, cl, ok, pe,
+	input f, s, cl, ok, pe, cpresp,
 	output req,
 	output [0:3] cmd
 );
@@ -160,13 +170,14 @@ module cmd_enc(
 	wire [0:4] rcmd;
 
 	always @ (*) begin
-		case ({f, s, cl, ok, pe})
-			5'b10000: rcmd = { `MSG_REQ, `CMD_F };
-			5'b01000: rcmd = { `MSG_REQ, `CMD_S };
-			5'b00100: rcmd = { `MSG_REQ, `CMD_CL };
-			5'b00010: rcmd = { `MSG_RESP, `CMD_OK };
-			5'b00001: rcmd = { `MSG_RESP, `CMD_PE };
-			default: rcmd = 5'b00000;
+		case ({f, s, cl, ok, pe, cpresp})
+			6'b100000: rcmd = { `MSG_REQ, `CMD_F };
+			6'b010000: rcmd = { `MSG_REQ, `CMD_S };
+			6'b001000: rcmd = { `MSG_REQ, `CMD_CL };
+			6'b000100: rcmd = { `MSG_RESP, `CMD_OK };
+			6'b000010: rcmd = { `MSG_RESP, `CMD_PE };
+			6'b000001: rcmd = { `MSG_RESP, `CMD_OK };
+			default: rcmd = 5'd0;
 		endcase
 	end
 

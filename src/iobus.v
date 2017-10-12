@@ -105,7 +105,9 @@ module iobus(
 		.uart_busy(utx_busy),
 		.send(txsend),
 		.busy(txbusy),
-		.ok_with_a3(dr),
+		.ok_with_a2(rxcps),
+		.ok_with_a3(dr | rxcps),
+		.cpresp(rxcps),
 		.s(rs),
 		.f(rf),
 		.cl(rcl),
@@ -164,15 +166,18 @@ module iobus(
 	wire r_resp = rok | rpe;
 	wire d_req = rxcmdready & rxreq;
 	wire d_resp = rxcmdready & ~rxreq;
+	wire cp_req = rxcmdready & rxreq & rxcp;
 
-	localparam IDLE		= 3'd0;
-	localparam R_REQ	= 3'd1;
-	localparam D_RESP	= 3'd2;
-	localparam D_REQ	= 3'd3;
-	localparam R_RESP	= 3'd4;
-	localparam D_EN		= 3'd5;
-	localparam WAIT		= 3'd6;
-	reg [0:2] state = IDLE;
+	localparam IDLE		= 4'd0;
+	localparam R_REQ	= 4'd1;
+	localparam D_REQ	= 4'd2;
+	localparam CP_REQ	= 4'd3;
+	localparam CP_ARG	= 4'd4;
+	localparam D_RESP	= 4'd5;
+	localparam R_RESP	= 4'd6;
+	localparam D_EN		= 4'd7;
+	localparam WAIT		= 4'd8;
+	reg [0:3] state = IDLE;
 
 	always @ (posedge clk_sys) begin
 
@@ -180,11 +185,21 @@ module iobus(
 
 			IDLE: begin
 				d_ena <= 0;
+				keys_trig <= 0;
+				fn_trig <= 0;
+				rotary_trig <= 0;
 				rxreset <= 0;
 				if (r_req) begin						// internal request
 					txsend <= 1;
 					if (rcl) state <= D_RESP;	// CL -> no reply
 					else state <= R_REQ;			// other int. -> need reply
+				end else if (cp_req) begin	// CP request
+					if (!rxcps) begin					// CP req that doesn't need response but has args
+						state <= CP_ARG;
+					end else begin						// CP that needs response, but has no args
+						zg <= 1;
+						state <= CP_REQ;
+					end
 				end else if (d_req) begin		// external request
 					if (rxpa) begin						// PA -> only need to let the interrupt go through
 						d_ena <= 1;
@@ -193,6 +208,22 @@ module iobus(
 						zg <= 1;
 						state <= D_REQ;
 					end
+				end
+			end
+
+			CP_ARG: begin
+				if (!rxbusy) begin
+					if (rxcpd) keys_trig <= 1;
+					else if (rxcpf) fn_trig <= 1;
+					else if (rxcpr) rotary_trig <= 1;
+					state <= WAIT;
+				end
+			end
+
+			CP_REQ: begin									// control panel request
+				if (zw & !rxbusy) begin
+					txsend <= 1;
+					state <= WAIT;
 				end
 			end
 
@@ -265,6 +296,13 @@ module iobus(
 	assign dok = d_ena ? rxok :  1'd0;
 	assign den= (d_ena ? rxen :  1'd0) | xen;
 	assign dpe = d_ena ? rxpe :  1'd0;
+
+	// --- CP drivers --------------------------------------------------------
+
+	assign keys = rxdt;
+	assign rotary_out = rxnb;
+	assign fn = rxnb;
+	assign fn_v = rxpn;
 
 endmodule
 
