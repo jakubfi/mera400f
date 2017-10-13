@@ -6,9 +6,6 @@ module mera400f(
 	output TXD,
 	output [7:0] DIG,
 	output [7:0] SEG,
-	// interface
-	input RXD2,
-	output TXD2,
 	// RAM
 	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,
 	output [17:0] SRAM_A,
@@ -203,14 +200,9 @@ module mera400f(
 
 	pk #(
 		.TIMER_CYCLE_MS(8'd10),
-		.CLK_SYS_HZ(CLK_SYS_HZ),
-		.CLK_UART_HZ(CLK_UART_HZ),
-		.UART_BAUD(1_000_000)
+		.CLK_SYS_HZ(CLK_SYS_HZ)
 	) PK(
 		.clk_sys(clk_sys),
-		.clk_uart(clk_uart),
-		.RXD(RXD),
-		.TXD(TXD),
 		.SEG(SEG),
 		.DIG(DIG),
 		.hlt_n(hlt_n),
@@ -282,8 +274,8 @@ module mera400f(
 	) IOBUS(
 		.clk_sys(clk_sys),
 		.clk_uart(clk_uart),
-		.RXD2(RXD2),
-		.TXD2(TXD2),
+		.RXD(RXD),
+		.TXD(TXD),
 		.zg(zg[4]),
 		.zw(zw[4]),
 		.dpa(iobd[`pa]),

@@ -8,13 +8,14 @@ SOURCES = mera400f.v \
 	decoder16.v decoder8.v \
 	alu181.v carry182.v \
 	dly.v \
+	uart.v \
 	pr.v regs.v r0.v rb.v bar.v ki.v l.v \
 	pd.v ir.v idec1.v \
 	px.v strobgen.v ifctl.v alarm.v \
 	pm.v lk.v mc.v lg.v kcpc.v \
 	pp.v rm.v rzrp.v dok.v \
 	pa.v alu.v at.v ac.v ar.v ic.v w.v a.v \
-	pk.v uart.v sevenseg.v display.v timer.v rot_dec.v cpin.v cpout.v \
+	pk.v sevenseg.v display.v timer.v rot_dec.v \
 	puks.v \
 	isk.v \
 	cpu.v \

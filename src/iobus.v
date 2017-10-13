@@ -19,8 +19,8 @@
 module iobus(
 	input clk_sys,
 	input clk_uart,
-	input RXD2,
-	output TXD2,
+	input RXD,
+	output TXD,
 
 	output zg,
 	input zw,
@@ -81,12 +81,12 @@ module iobus(
 		.rx_byte(urx_byte),
 		.rx_busy(urx_busy),
 		.rx_ready(urx_ready),
-		.rxd(RXD2),
+		.rxd(RXD),
 		.send(utx_send),
 		.tx_byte(utx_byte),
 		.tx_busy(utx_busy),
 		.tx_ready(utx_ready),
-		.txd(TXD2)
+		.txd(TXD)
 	);
 
 	// --- Transmitter -------------------------------------------------------
@@ -110,7 +110,7 @@ module iobus(
 		.cpresp(rxcps),
 		.s(rs),
 		.f(rf),
-		.cl(rcl),
+		.cl(0/*rcl*/),
 		.ok(rok),
 		.pe(rpe),
 		.a1({2'd0, rqb, rpn, rnb}),
@@ -162,7 +162,7 @@ module iobus(
 
 	// --- Transmachine ------------------------------------------------------
 
-	wire r_req = rs | rf | rcl;
+	wire r_req = (rs | rf) & ~rad[15];
 	wire r_resp = rok | rpe;
 	wire d_req = rxcmdready & rxreq;
 	wire d_resp = rxcmdready & ~rxreq;
@@ -191,8 +191,9 @@ module iobus(
 				rxreset <= 0;
 				if (r_req) begin						// internal request
 					txsend <= 1;
-					if (rcl) state <= D_RESP;	// CL -> no reply
-					else state <= R_REQ;			// other int. -> need reply
+					//if (rcl) state <= D_RESP;	// CL -> no reply
+					//else state <= R_REQ;			// other int. -> need reply
+					state <= R_REQ;
 				end else if (cp_req) begin	// CP request
 					if (!rxcps) begin					// CP req that doesn't need response but has args
 						state <= CP_ARG;

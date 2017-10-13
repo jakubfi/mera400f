@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import serial
 import os
 import sys
+import iobus
 
 rot_names = {
      0 : "R0",
@@ -24,38 +24,37 @@ rot_names = {
 } 
 
 functions = {
-    "start"     : 0b00100001,
-    "stop"      : 0b00100000,
-    "mode1"     : 0b00100011,
-    "mode0"     : 0b00100010,
-    "clk1"      : 0b00100101,
-    "clk0"      : 0b00100100,
-    "stopn"     : 0b00100111,
-    "step"      : 0b00101001,
-    "fetch"     : 0b00101011,
-    "store"     : 0b00101101,
-    "cycle"     : 0b00101111,
-    "load"      : 0b00110001,
-    "bin"       : 0b00110011,
-    "oprq"      : 0b00110101,
-    "clear"     : 0b00110111,
+    "start"     : [ iobus.CPF, 0b00100000 ],
+    "stop"      : [ iobus.CPF, 0b00000000 ],
+    "mode1"     : [ iobus.CPF, 0b00100001 ],
+    "mode0"     : [ iobus.CPF, 0b00000001 ],
+    "clk1"      : [ iobus.CPF, 0b00100010 ],
+    "clk0"      : [ iobus.CPF, 0b00000010 ],
+    "stopn"     : [ iobus.CPF, 0b00100011 ],
+    "step"      : [ iobus.CPF, 0b00100100 ],
+    "fetch"     : [ iobus.CPF, 0b00100101 ],
+    "store"     : [ iobus.CPF, 0b00100110 ],
+    "cycle"     : [ iobus.CPF, 0b00100111 ],
+    "load"      : [ iobus.CPF, 0b00101000 ],
+    "bin"       : [ iobus.CPF, 0b00101001 ],
+    "oprq"      : [ iobus.CPF, 0b00101010 ],
+    "clear"     : [ iobus.CPF, 0b00101011 ],
 
-    "r0"        : 0b11100000,
-    "r1"        : 0b11100001,
-    "r2"        : 0b11100010,
-    "r3"        : 0b11100011,
-    "r4"        : 0b11100100,
-    "r5"        : 0b11100101,
-    "r6"        : 0b11100110,
-    "r7"        : 0b11100111,
-
-    "ic"        : 0b11101000,
-    "ac"        : 0b11101001,
-    "ar"        : 0b11101010,
-    "ir"        : 0b11101011,
-    "sr"        : 0b11101100,
-    "rz"        : 0b11101101,
-    "kb"        : 0b11101110,
+    "r0"        : [ iobus.CPR, 0b00000000 ],
+    "r1"        : [ iobus.CPR, 0b00000001 ],
+    "r2"        : [ iobus.CPR, 0b00000010 ],
+    "r3"        : [ iobus.CPR, 0b00000011 ],
+    "r4"        : [ iobus.CPR, 0b00000100 ],
+    "r5"        : [ iobus.CPR, 0b00000101 ],
+    "r6"        : [ iobus.CPR, 0b00000110 ],
+    "r7"        : [ iobus.CPR, 0b00000111 ],
+    "ic"        : [ iobus.CPR, 0b00001000 ],
+    "ac"        : [ iobus.CPR, 0b00001001 ],
+    "ar"        : [ iobus.CPR, 0b00001010 ],
+    "ir"        : [ iobus.CPR, 0b00001011 ],
+    "sr"        : [ iobus.CPR, 0b00001100 ],
+    "rz"        : [ iobus.CPR, 0b00001101 ],
+    "kb"        : [ iobus.CPR, 0b00001110 ],
 }
 
 # ------------------------------------------------------------------------
@@ -63,11 +62,11 @@ class m4state:
 # ------------------------------------------------------------------------
 
     # --------------------------------------------------------------------
-    def __init__(self, val):
-        self.data = val[0]*256 + val[1]
-        self.rot = val[3] >> 4
+    def __init__(self, mi):
+        self.data = mi.a2
+        self.rot = mi.a3 & 0b1111
         self.rot_n = rot_names[self.rot]
-        self.sleds = (val[2] << 2) | (val[3] & 0b11)
+        self.sleds = mi.a3 >> 6
         self.mode = (self.sleds >> 9) & 1
         self.stopn = (self.sleds >> 8) & 1
         self.clock = (self.sleds >> 7) & 1
@@ -98,32 +97,18 @@ class m4cp:
         except:
             self.debug = 0
 
-        self.s = serial.Serial(
-            port = device,
-            baudrate = baud,
-            bytesize = serial.EIGHTBITS,
-            parity = serial.PARITY_NONE,
-            stopbits = serial.STOPBITS_ONE,
-            timeout = 1,
-            xonxoff = False,
-            rtscts = False,
-            dsrdtr = False)
-
-        self.s.flushInput()
-        self.s.flushOutput()
+        self.iobus = iobus.IOBus(device, baud)
 
     # --------------------------------------------------------------------
     def close(self):
-        self.s.flushInput()
-        self.s.flushOutput()
-        self.s.close()
+        self.iobus.close()
     
     # --------------------------------------------------------------------
     def cmd(self, cmd):
         if self.debug:
             print("  %s" % cmd, file=sys.stderr);
         try:
-            self.s.write([functions[cmd.lower()]])
+            self.iobus.write(iobus.Message(iobus.REQ, functions[cmd][0], a1=functions[cmd][1]))
         except:
             raise SyntaxError("No such command: %s" % cmd)
 
@@ -131,18 +116,17 @@ class m4cp:
     def keys(self, val):
         if self.debug:
             print("  keys: 0x%04x" % val, file=sys.stderr);
-        k1 = (val >> 0)  & 0b111111
-        k2 = (val >> 6)  & 0b11111
-        k3 = (val >> 11) & 0b11111
-        self.s.write([0b01000000 | k1])
-        self.s.write([0b10000000 | k2])
-        self.s.write([0b10100000 | k3])
+        self.iobus.write(iobus.Message(iobus.REQ, iobus.CPK, a3=val))
 
     # --------------------------------------------------------------------
     def state(self):
-        self.s.write([0b11000000])
-        res = self.s.read(4)
-        st = m4state(res)
+        self.iobus.write(iobus.Message(iobus.REQ, iobus.CPS))
+        mi = self.iobus.read()
+        # ignore everything that doesn't look like response for CP req
+        while (mi.type != iobus.RESP) or (mi.cmd != iobus.OK):
+            #print(mi)
+            mi = self.iobus.read()
+        st = m4state(mi)
         if self.debug:
             print("  %s" % st, file=sys.stderr);
         return st;

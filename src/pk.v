@@ -15,9 +15,6 @@
 
 module pk(
 	input clk_sys,
-	input clk_uart,
-	input RXD,
-	output TXD,
 	output [7:0] SEG,
 	output [7:0] DIG,
 	input hlt_n,
@@ -73,30 +70,33 @@ module pk(
 );
 
 	parameter CLK_SYS_HZ;
-	parameter CLK_UART_HZ;
 	parameter TIMER_CYCLE_MS;
-	parameter UART_BAUD;
 
-	// --- UART
+	// --- Input from IOBUS
 
-	wire tx_busy;
-	wire rx_busy;
-	wire rx_ready;
-	wire [7:0] rx_byte;
-	uart #(
-		.baud(UART_BAUD),
-		.clk_speed(CLK_UART_HZ))
-	UART0(
-		.clk(clk_uart),
-		.rx_byte(rx_byte),
-		.rx_busy(rx_busy),
-		.rx_ready(rx_ready),
-		.rxd(RXD),
-		.send(send),
-		.tx_busy(tx_busy),
-		.tx_byte(tx_byte),
-		.txd(TXD)
-	);
+	reg [11:0] fnkey;
+
+	always @ (posedge clk_sys) begin
+		// reset all monostable switches
+		fnkey[`FN_STOPN] <= 1'b0;
+		fnkey[`FN_STEP] <= 1'b0;
+		fnkey[`FN_FETCH] <= 1'b0;
+		fnkey[`FN_STORE] <= 1'b0;
+		fnkey[`FN_CYCLE] <= 1'b0;
+		fnkey[`FN_LOAD] <= 1'b0;
+		fnkey[`FN_BIN] <= 1'b0;
+		fnkey[`FN_OPRQ] <= 1'b0;
+		fnkey[`FN_CLEAR] <= 1'b0;
+		if (keys_trig) kl <= keys;
+		if (rotary_trig) rotary_pos <= rotary_in;
+		if (fn_trig) begin
+			fnkey[fn] <= fn_v;
+		end
+	end
+
+	// --- To IOBUS
+
+	assign indicators = {mode, stop_n, zeg, q, p, ~mc_0, irq, run, _wait, alarm};
 
 	// --- Rotary switch position decoder
 
@@ -105,21 +105,6 @@ module pk(
 	rot_dec ROT_DEC(
 		.in(rotary_pos),
 		.out(rotary_bus)
-	);
-
-	// --- Control panel input (switches over serial)
-
-	wire send_leds;
-	wire [11:0] fnkey;
-	cpin CPIN(
-		.clk_sys(clk_sys),
-		.rx_byte(rx_byte),
-		.rx_busy(rx_busy),
-		.rx_ready(rx_ready),
-		.send_leds(send_leds),
-		.fnkey(fnkey),
-		.rotary_pos(rotary_pos),
-		.kl(kl)
 	);
 
 	// --- Virtual switches assignments
@@ -151,23 +136,6 @@ module pk(
 	assign load = fnkey[`FN_LOAD] & p0;
 	assign bin = fnkey[`FN_BIN] & p0;
 	assign oprq = fnkey[`FN_OPRQ];
-
-	// --- Control panel output (leds over serial)
-
-	assign indicators = {mode, stop_n, zeg, q, p, ~mc_0, irq, run, _wait, alarm};
-
-	wire send;
-	wire [7:0] tx_byte;
-	cpout CPOUT(
-		.clk_sys(clk_sys),
-		.trigger(send_leds),
-		.w(w),
-		.indicators(indicators),
-		.rotary_pos(rotary_pos),
-		.tx_busy(tx_busy),
-		.tx_byte(tx_byte),
-		.send(send)
-	);
 
 	// --- Timer
 
