@@ -24,37 +24,37 @@ rot_names = {
 } 
 
 functions = {
-    "start"     : [ iobus.CPF, 0b00100000 ],
-    "stop"      : [ iobus.CPF, 0b00000000 ],
-    "mode1"     : [ iobus.CPF, 0b00100001 ],
-    "mode0"     : [ iobus.CPF, 0b00000001 ],
-    "clk1"      : [ iobus.CPF, 0b00100010 ],
-    "clk0"      : [ iobus.CPF, 0b00000010 ],
-    "stopn"     : [ iobus.CPF, 0b00100011 ],
-    "step"      : [ iobus.CPF, 0b00100100 ],
-    "fetch"     : [ iobus.CPF, 0b00100101 ],
-    "store"     : [ iobus.CPF, 0b00100110 ],
-    "cycle"     : [ iobus.CPF, 0b00100111 ],
-    "load"      : [ iobus.CPF, 0b00101000 ],
-    "bin"       : [ iobus.CPF, 0b00101001 ],
-    "oprq"      : [ iobus.CPF, 0b00101010 ],
-    "clear"     : [ iobus.CPF, 0b00101011 ],
+    "start" : [ iobus.CPF, 0b00100000 ],
+    "stop"  : [ iobus.CPF, 0b00000000 ],
+    "mode1" : [ iobus.CPF, 0b00100001 ],
+    "mode0" : [ iobus.CPF, 0b00000001 ],
+    "clk1"  : [ iobus.CPF, 0b00100010 ],
+    "clk0"  : [ iobus.CPF, 0b00000010 ],
+    "stopn" : [ iobus.CPF, 0b00100011 ],
+    "step"  : [ iobus.CPF, 0b00100100 ],
+    "fetch" : [ iobus.CPF, 0b00100101 ],
+    "store" : [ iobus.CPF, 0b00100110 ],
+    "cycle" : [ iobus.CPF, 0b00100111 ],
+    "load"  : [ iobus.CPF, 0b00101000 ],
+    "bin"   : [ iobus.CPF, 0b00101001 ],
+    "oprq"  : [ iobus.CPF, 0b00101010 ],
+    "clear" : [ iobus.CPF, 0b00101011 ],
 
-    "r0"        : [ iobus.CPR, 0b00000000 ],
-    "r1"        : [ iobus.CPR, 0b00000001 ],
-    "r2"        : [ iobus.CPR, 0b00000010 ],
-    "r3"        : [ iobus.CPR, 0b00000011 ],
-    "r4"        : [ iobus.CPR, 0b00000100 ],
-    "r5"        : [ iobus.CPR, 0b00000101 ],
-    "r6"        : [ iobus.CPR, 0b00000110 ],
-    "r7"        : [ iobus.CPR, 0b00000111 ],
-    "ic"        : [ iobus.CPR, 0b00001000 ],
-    "ac"        : [ iobus.CPR, 0b00001001 ],
-    "ar"        : [ iobus.CPR, 0b00001010 ],
-    "ir"        : [ iobus.CPR, 0b00001011 ],
-    "sr"        : [ iobus.CPR, 0b00001100 ],
-    "rz"        : [ iobus.CPR, 0b00001101 ],
-    "kb"        : [ iobus.CPR, 0b00001110 ],
+    "r0"    : [ iobus.CPR, 0b00000000 ],
+    "r1"    : [ iobus.CPR, 0b00000001 ],
+    "r2"    : [ iobus.CPR, 0b00000010 ],
+    "r3"    : [ iobus.CPR, 0b00000011 ],
+    "r4"    : [ iobus.CPR, 0b00000100 ],
+    "r5"    : [ iobus.CPR, 0b00000101 ],
+    "r6"    : [ iobus.CPR, 0b00000110 ],
+    "r7"    : [ iobus.CPR, 0b00000111 ],
+    "ic"    : [ iobus.CPR, 0b00001000 ],
+    "ac"    : [ iobus.CPR, 0b00001001 ],
+    "ar"    : [ iobus.CPR, 0b00001010 ],
+    "ir"    : [ iobus.CPR, 0b00001011 ],
+    "sr"    : [ iobus.CPR, 0b00001100 ],
+    "rz"    : [ iobus.CPR, 0b00001101 ],
+    "kb"    : [ iobus.CPR, 0b00001110 ],
 }
 
 # ------------------------------------------------------------------------
@@ -91,18 +91,14 @@ class m4cp:
 # ------------------------------------------------------------------------
 
     # --------------------------------------------------------------------
-    def __init__(self, device, baud):
+    def __init__(self, iobus):
         try:
             self.debug = os.environ['CPDBG']
         except:
             self.debug = 0
 
-        self.iobus = iobus.IOBus(device, baud)
+        self.iobus = iobus
 
-    # --------------------------------------------------------------------
-    def close(self):
-        self.iobus.close()
-    
     # --------------------------------------------------------------------
     def cmd(self, cmd):
         if self.debug:

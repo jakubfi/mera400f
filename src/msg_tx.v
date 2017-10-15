@@ -19,11 +19,11 @@ module msg_tx(
 	// --- Transmission ------------------------------------------------------
 
 	localparam IDLE	= 3'd0;
-	localparam BAR	= 3'd1;
-	localparam ADH	= 3'd2;
-	localparam ADL	= 3'd3;
-	localparam DTH	= 3'd4;
-	localparam DTL	= 3'd5;
+	localparam A1	= 3'd1;
+	localparam A2H	= 3'd2;
+	localparam A2L	= 3'd3;
+	localparam A3H	= 3'd4;
+	localparam A3L	= 3'd5;
 	localparam WAIT	= 3'd6;
 
 	reg [0:2] state = IDLE;
@@ -37,49 +37,49 @@ module msg_tx(
 				if (send) begin
 					uart_data <= cmdarg;
 					uart_send <= 1;
-					if (arg[0]) state <= BAR;
-					else if (arg[1]) state <= ADH;
-					else if (arg[2]) state <= DTH;
+					if (arg[0]) state <= A1;
+					else if (arg[1]) state <= A2H;
+					else if (arg[2]) state <= A3H;
 					else state <= WAIT;
 				end
 			end
 
-			BAR: begin
+			A1: begin
 				if (!uart_busy) begin
 					uart_data <= a1;
 					uart_send <= 1;
-					if (arg[1]) state <= ADH;
-					else if (arg[2]) state <= DTH;
+					if (arg[1]) state <= A2H;
+					else if (arg[2]) state <= A3H;
 					else state <= WAIT;
 				end
 			end
 
-			ADH: begin
+			A2H: begin
 				if (!uart_busy) begin
 					uart_data <= a2[0:7];
 					uart_send <= 1;
-					state <= ADL;
+					state <= A2L;
 				end
 			end
 
-			ADL: begin
+			A2L: begin
 				if (!uart_busy) begin
 					uart_data <= a2[8:15];
 					uart_send <= 1;
-					if (arg[2]) state <= DTH;
+					if (arg[2]) state <= A3H;
 					else state <= WAIT;
 				end
 			end
 
-			DTH: begin
+			A3H: begin
 				if (!uart_busy) begin
 					uart_data <= a3[0:7];
 					uart_send <= 1;
-					state <= DTL;
+					state <= A3L;
 				end
 			end
 
-			DTL: begin
+			A3L: begin
 				if (!uart_busy) begin
 					uart_data <= a3[8:15];
 					uart_send <= 1;

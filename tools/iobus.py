@@ -96,6 +96,10 @@ class IOBus:
         #print(m, file=sys.stderr)
         self.swrite(m.serialize())
 
+    # --------------------------------------------------------------------
+    def fileno(self):
+        return self.s.fileno()
+
 # ------------------------------------------------------------------------
 class Message:
 

@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
 from cplib import *
-import readline
 from subprocess import Popen, PIPE, STDOUT
+import os
+import sys
+import fcntl
+import select
+import testdev
 
 # ------------------------------------------------------------------------
 def asm(l):
@@ -80,10 +84,42 @@ def cmd_loop(m):
 # --- MAIN ---------------------------------------------------------------
 # ------------------------------------------------------------------------
 
-readline.set_history_length(1000)
+iobus = iobus.IOBus("/dev/ttyUSB0", 1000000)
+m = m4cp(iobus)
+td = testdev.TestDev(iobus)
 
-m = m4cp("/dev/ttyUSB0", 1000000)
-cmd_loop(m)
-m.close()
+cmdfd = sys.stdin.fileno()
+fl = fcntl.fcntl(cmdfd, fcntl.F_GETFL)
+fcntl.fcntl(cmdfd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+
+iofd = iobus.fileno()
+
+epoll = select.poll()
+epoll.register(cmdfd, select.POLLIN)
+epoll.register(iofd, select.POLLIN)
+
+while True:
+    print("CPU> ", end="", flush=True)
+    events = epoll.poll()
+    for fileno, event in events:
+        if fileno == cmdfd:
+            line = ""
+            while True:
+                l = sys.stdin.read(16)
+                if not l:
+                    break
+                line += l
+            input_process(m, line)
+        elif fileno == iofd:
+            print ("", end="\r")
+            td.process()
+        else:
+            print(fileno, event)
+
+epoll.unregister(cmdfd)
+epoll.unregister(iofd)
+epoll.close()
+
+iobus.close()
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

@@ -105,13 +105,14 @@ def emu_process(m, line):
 # --- MAIN ---------------------------------------------------------------
 # ------------------------------------------------------------------------
 
-m = m4cp("/dev/ttyUSB0", 1000000)
+iobus = iobus.IOBus("/dev/ttyUSB0", 1000000)
+m = m4cp(iobus)
 
 quit = 0
 while not quit:
     line = input()
     quit = emu_process(m, line)
 
-m.close()
+iobus.close()
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

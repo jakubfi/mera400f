@@ -1,4 +1,8 @@
+Enhancements:
+ * iobus: timeouts
+ * iobus: immune to bad commands
+
 Features:
-* MEGA memory
-* DRAM driver
-* cache
+ * MEGA memory
+ * DRAM driver
+ * cache
