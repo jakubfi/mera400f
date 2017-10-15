@@ -19,7 +19,7 @@ SOURCES = mera400f.v \
 	puks.v \
 	isk.v \
 	cpu.v \
-	iobus.v msg_rx.v msg_tx.v \
+	iobus.v msg_cmd.v msg_rx.v msg_tx.v \
 	mem_elwro_sram.v memcfg.v \
 	awp.v fps.v fpm.v fpa.v fic.v lp.v fpalu.v m.v t.v c.v k.v zp.v ld.v b.v expadd.v \
 	fp_strobgen.v

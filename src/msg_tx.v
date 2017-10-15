@@ -8,41 +8,13 @@ module msg_tx(
 	input send,
 	output busy,
 
-	input ok_with_a2,
-	input ok_with_a3,
-	input f, s, cl,
-	input ok, pe,
-	input cpresp,
+	input [0:7] cmdarg,
 	input [0:7] a1,
 	input [0:15] a2,
 	input [0:15] a3
 );
 
-	// --- Argument presence enc. --------------------------------------------
-
-	wire [0:2] arg;
-	args_enc ARGS_ENC(
-		.cmd(cmd),
-		.req(req),
-		.ok_with_a3(ok_with_a3),
-		.ok_with_a2(ok_with_a2),
-		.arg(arg)
-	);
-
-	// --- Command enc. ------------------------------------------------------
-
-	wire req;
-	wire [0:3] cmd;
-	cmd_enc CMD_ENC(
-		.f(f),
-		.s(s),
-		.cl(cl),
-		.ok(ok),
-		.pe(pe),
-		.cpresp(cpresp),
-		.req(req),
-		.cmd(cmd)
-	);
+	wire [0:2] arg = cmdarg[5:7];
 
 	// --- Transmission ------------------------------------------------------
 
@@ -63,7 +35,7 @@ module msg_tx(
 
 			IDLE: begin
 				if (send) begin
-					uart_data <= { req, cmd, arg };
+					uart_data <= cmdarg;
 					uart_send <= 1;
 					if (arg[0]) state <= BAR;
 					else if (arg[1]) state <= ADH;
@@ -125,64 +97,6 @@ module msg_tx(
 	end
 
 	assign busy = (state != IDLE) | send;
-
-endmodule
-
-// -----------------------------------------------------------------------
-module args_enc(
-	input [0:3] cmd,
-	input req,
-	input ok_with_a2,
-	input ok_with_a3,
-	output [0:2] arg
-);
-
-	wire [0:2] a;
-
-	always @ (*) begin
-		case (cmd)
-			`CMD_W : a = 3'b111;
-			`CMD_R : a = 3'b110;
-			`CMD_S : a = 3'b111;
-			`CMD_F : a = 3'b110;
-			`CMD_IN: a = 3'b101;
-			`CMD_CPD:a = 3'b001;
-			`CMD_CPR:a = 3'b100;
-			`CMD_CPF:a = 3'b100;
-			`CMD_CPS:a = 3'b000;
-			default: a = 3'b000;
-		endcase
-	end
-
-	wire oka2 = (cmd == `CMD_OK) && ok_with_a2;
-	wire oka3 = (cmd == `CMD_OK) && ok_with_a3;
-	assign arg = req ? a : {1'd0, oka2, oka3};
-
-endmodule
-
-// -----------------------------------------------------------------------
-module cmd_enc(
-	input f, s, cl, ok, pe, cpresp,
-	output req,
-	output [0:3] cmd
-);
-
-	wire [0:4] rcmd;
-
-	always @ (*) begin
-		case ({f, s, cl, ok, pe, cpresp})
-			6'b100000: rcmd = { `MSG_REQ, `CMD_F };
-			6'b010000: rcmd = { `MSG_REQ, `CMD_S };
-			6'b001000: rcmd = { `MSG_REQ, `CMD_CL };
-			6'b000100: rcmd = { `MSG_RESP, `CMD_OK };
-			6'b000010: rcmd = { `MSG_RESP, `CMD_PE };
-			6'b000001: rcmd = { `MSG_RESP, `CMD_OK };
-			default: rcmd = 5'd0;
-		endcase
-	end
-
-	assign req = rcmd[0];
-	assign cmd = rcmd[1:4];
 
 endmodule
 

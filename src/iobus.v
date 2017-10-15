@@ -47,8 +47,8 @@ module iobus(
 	input [0:15] rdt,
 	output [0:15] ddt,
 
-  input [0:15] w,
-  input [0:3] rotary_pos,
+	input [0:15] w,
+	input [0:3] rotary_pos,
 	input [0:9] indicators,
 
 	output [0:3] rotary_out,
@@ -89,6 +89,19 @@ module iobus(
 		.txd(TXD)
 	);
 
+	// --- Command endcoder --------------------------------------------------
+
+	cmdarg_enc CMDARG(
+		.f(rf),
+		.s(rs),
+		.r(dr),
+		.w(dw),
+		.ok(rok),
+		.pe(rpe),
+		.cpresp(rxcps),
+		.cmdarg(cmdarg)
+	);
+
 	// --- Transmitter -------------------------------------------------------
 
 	wire txbusy;	// transmitter is sending a message
@@ -105,14 +118,7 @@ module iobus(
 		.uart_busy(utx_busy),
 		.send(txsend),
 		.busy(txbusy),
-		.ok_with_a2(rxcps),
-		.ok_with_a3(dr | rxcps),
-		.cpresp(rxcps),
-		.s(rs),
-		.f(rf),
-		.cl(0/*rcl*/),
-		.ok(rok),
-		.pe(rpe),
+		.cmdarg(cmdarg),
 		.a1({2'd0, rqb, rpn, rnb}),
 		.a2(txa2),
 		.a3(txa3)
@@ -167,6 +173,8 @@ module iobus(
 	wire d_req = rxcmdready & rxreq;
 	wire d_resp = rxcmdready & ~rxreq;
 	wire cp_req = rxcmdready & rxreq & rxcp;
+
+	reg [0:7] cmdarg;
 
 	localparam IDLE		= 4'd0;
 	localparam R_REQ	= 4'd1;
