@@ -1,14 +1,13 @@
 // -----------------------------------------------------------------------
 module cmd_dec(
-	input req,
-	input [0:3] cmd,
+	input [0:7] cmd,
 	output cp,
 	output r, w, in, pa, ok, pe, en, cpd, cpr, cpf, cps
 );
 
 	wire [0:10] bus;
 	always @ (*) begin
-		case ({req, cmd})
+		case (cmd[0:4])
 			{ `MSG_REQ, `CMD_R }   : bus = 11'b10000000000;
 			{ `MSG_REQ, `CMD_W }   : bus = 11'b01000000000;
 			{ `MSG_REQ, `CMD_IN }  : bus = 11'b00100000000;

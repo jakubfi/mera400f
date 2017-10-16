@@ -129,17 +129,13 @@ module iobus(
 	// --- Receiver ----------------------------------------------------------
 
 	wire rxbusy;			// receiver is receiving a message
-	wire rxcmdready;	// received a command (arguments are ready after rxbusy goes low)
+	wire rxcmdready;	// received a command (but arguments are ready after rxbusy goes low)
 	reg rxreset;			// reset the receiver before accepting next command
 
-	wire rxreq;				// received a command
-	wire rxcp;				// received a CP command
-	wire rxpn;
-	wire [0:3] rxnb;
-	wire [0:15] rxad;
-	wire [0:15] rxdt;
-	wire rxr, rxw, rxin, rxpa, rxok, rxpe, rxen; // interface requests and responses
-	wire rxcpd, rxcpr, rxcpf, rxcps; // CP requests
+	wire [0:7] rxcmd;
+	wire [0:7] rxa1;
+	wire [0:15] rxa2;
+	wire [0:15] rxa3;
 
 	msg_rx MSG_RX(
 		.clk_sys(clk_sys),
@@ -149,11 +145,26 @@ module iobus(
 		.cmd_ready(rxcmdready),
 		.busy(rxbusy),
 		.reset(rxreset),
-		.req(rxreq),
-		.pn(rxpn),
-		.nb(rxnb),
-		.ad(rxad),
-		.dt(rxdt),
+		.cmd(rxcmd),
+		.a1(rxa1),
+		.a2(rxa2),
+		.a3(rxa3)
+	);
+
+	wire rxreq = rxcmd[0];
+	wire rxpn = rxa1[2];
+	wire [0:3] rxnb = rxa1[4:7];
+	wire [0:15] rxad = rxa2;
+	wire [0:15] rxdt = rxa3;
+
+	// --- Command decoder ---------------------------------------------------
+
+	wire rxr, rxw, rxin, rxpa, rxok, rxpe, rxen;
+	wire rxcp;
+	wire rxcpd, rxcpr, rxcpf, rxcps;
+
+	cmd_dec CMD_DEC(
+		.cmd(rxcmd),
 		.r(rxr),
 		.w(rxw),
 		.in(rxin),

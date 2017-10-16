@@ -9,50 +9,25 @@ module msg_rx(
 	output cmd_ready,
 	input reset,
 
-	output req,
-	output pn,
-	output [0:3] nb,
-	output [0:15] ad,
-	output [0:15] dt,
-
-	output r, w, in, pa,
-	output ok, pe, en,
-	output cp, cpd, cpr, cpf, cps
+	output [0:7] cmd,
+	output [0:7] a1,
+	output [0:15] a2,
+	output [0:15] a3
 );
-
-	// --- Command decoder ---------------------------------------------------
-
-	cmd_dec CMD_DEC(
-		.req(req),
-		.cmd(cmd),
-		.r(r),
-		.w(w),
-		.in(in),
-		.pa(pa),
-		.ok(ok),
-		.pe(pe),
-		.en(en),
-		.cp(cp),
-		.cpd(cpd),
-		.cpr(cpr),
-		.cpf(cpf),
-		.cps(cps)
-	);
 
 	// --- Receiver ----------------------------------------------------------
 
-	localparam IDLE	= 4'd0;
-	localparam ARG	= 4'd1;
-	localparam BAR	= 4'd2;
-	localparam ADH	= 4'd3;
-	localparam ADL	= 4'd4;
-	localparam DTH	= 4'd5;
-	localparam DTL	= 4'd6;
+	localparam IDLE = 4'd0;
+	localparam ARG  = 4'd1;
+	localparam A1   = 4'd2;
+	localparam A2H  = 4'd3;
+	localparam A2L  = 4'd4;
+	localparam A3H  = 4'd5;
+	localparam A3L  = 4'd6;
 
 	reg [0:2] state = IDLE;
 
-	reg [0:3] cmd;
-	reg [0:2] arg;
+	wire [0:2] arg = cmd[5:7];
 
 	always @ (posedge clk_sys, posedge reset) begin
 		if (reset) cmd_ready <= 0;
@@ -60,53 +35,53 @@ module msg_rx(
 
 			IDLE: begin
 				if (uart_ready) begin
-					{ req, cmd, arg } <= uart_data;
+					cmd <= uart_data;
 					cmd_ready <= 1;
 					state <= ARG;
 				end
 			end
 
 			ARG: begin
-				if (arg[0]) state <= BAR;
-				else if (arg[1]) state <= ADH;
-				else if (arg[2]) state <= DTH;
+				if (arg[0]) state <= A1;
+				else if (arg[1]) state <= A2H;
+				else if (arg[2]) state <= A3H;
 				else state <= IDLE;
 			end
 
-			BAR: begin
+			A1: begin
 				if (uart_ready) begin
-					{ pn, nb } <= { uart_data[2], uart_data[4:7] };
-					if (arg[1]) state <= ADH;
-					else if (arg[2]) state <= DTH;
+					a1 <= uart_data;
+					if (arg[1]) state <= A2H;
+					else if (arg[2]) state <= A3H;
 					else state <= IDLE;
 				end
 			end
 
-			ADH: begin
+			A2H: begin
 				if (uart_ready) begin
-					ad[0:7] <= uart_data;
-					state <= ADL;
+					a2[0:7] <= uart_data;
+					state <= A2L;
 				end
 			end
 
-			ADL: begin
+			A2L: begin
 				if (uart_ready) begin
-					ad[8:15] <= uart_data;
-					if (arg[2]) state <= DTH;
+					a2[8:15] <= uart_data;
+					if (arg[2]) state <= A3H;
 					else state <= IDLE;
 				end
 			end
 
-			DTH: begin
+			A3H: begin
 				if (uart_ready) begin
-					dt[0:7] <= uart_data;
-					state <= DTL;
+					a3[0:7] <= uart_data;
+					state <= A3L;
 				end
 			end
 
-			DTL: begin
+			A3L: begin
 				if (uart_ready) begin
-					dt[8:15] <= uart_data;
+					a3[8:15] <= uart_data;
 					state <= IDLE;
 				end
 			end
