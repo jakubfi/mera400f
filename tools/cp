@@ -94,13 +94,20 @@ fcntl.fcntl(cmdfd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
 iofd = iobus.fileno()
 
-epoll = select.poll()
-epoll.register(cmdfd, select.POLLIN)
-epoll.register(iofd, select.POLLIN)
+poll = select.poll()
+poll.register(cmdfd, select.POLLIN)
+poll.register(iofd, select.POLLIN)
 
-while True:
+quit = False;
+
+while not quit:
     print("CPU> ", end="", flush=True)
-    events = epoll.poll()
+    try:
+        events = poll.poll()
+    except KeyboardInterrupt:
+        print ("")
+        quit = True
+        continue
     for fileno, event in events:
         if fileno == cmdfd:
             line = ""
@@ -109,16 +116,19 @@ while True:
                 if not l:
                     break
                 line += l
-            input_process(m, line)
+            if not line:
+                print ("")
+                quit = True
+                continue
+            quit = input_process(m, line)
         elif fileno == iofd:
             print ("", end="\r")
             td.process()
         else:
             print(fileno, event)
 
-epoll.unregister(cmdfd)
-epoll.unregister(iofd)
-epoll.close()
+poll.unregister(cmdfd)
+poll.unregister(iofd)
 
 iobus.close()
 
