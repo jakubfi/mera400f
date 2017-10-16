@@ -120,7 +120,7 @@ module iobus(
 		.uart_busy(utx_busy),
 		.send(txsend),
 		.busy(txbusy),
-		.cmd(cmd),
+		.cmd(txcmd),
 		.a1({2'd0, rqb, rpn, rnb}),
 		.a2(txa2),
 		.a3(txa3)
@@ -198,6 +198,8 @@ module iobus(
 	localparam WAIT		= 4'd8;
 	reg [0:3] state = IDLE;
 
+	reg [0:7] txcmd;
+
 	always @ (posedge clk_sys) begin
 
 		case (state)
@@ -209,6 +211,7 @@ module iobus(
 				rotary_trig <= 0;
 				rxreset <= 0;
 				if (r_req) begin						// internal request
+					txcmd <= cmd;
 					txsend <= 1;
 					//if (rcl) state <= D_RESP;	// CL -> no reply
 					//else state <= R_REQ;			// other int. -> need reply
@@ -242,6 +245,7 @@ module iobus(
 
 			CP_REQ: begin									// control panel request
 				if (zw & !rxbusy) begin
+					txcmd <= cmd;
 					txsend <= 1;
 					state <= WAIT;
 				end
@@ -275,6 +279,7 @@ module iobus(
 
 			R_RESP: begin					// internal response
 				if (r_resp) begin		// wait for the internal response and start sending it
+					txcmd <= cmd;
 					txsend <= 1;
 					state <= WAIT;
 				end
