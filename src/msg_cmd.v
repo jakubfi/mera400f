@@ -6,7 +6,7 @@ module cmd_dec(
 	output r, w, in, pa, ok, pe, en, cpd, cpr, cpf, cps
 );
 
-	wire [0:10] bus /* synthesis keep */;
+	wire [0:10] bus;
 	always @ (*) begin
 		case ({req, cmd})
 			{ `MSG_REQ, `CMD_R }   : bus = 11'b10000000000;
@@ -30,23 +30,23 @@ module cmd_dec(
 endmodule
 
 // -----------------------------------------------------------------------
-module cmdarg_enc(
+module cmd_enc(
 	input f, s, r, w, ok, pe, cpresp,
-	output [0:7] cmdarg
+	output [0:7] cmd
 );
 
 	always @ (*) begin
 		case ({f, s, r, w, ok, pe, cpresp})
 			// I/F requests
-			7'b1000000 : cmdarg = { `MSG_REQ,  `CMD_F,  3'b110 };
-			7'b0100000 : cmdarg = { `MSG_REQ,  `CMD_S,  3'b111 };
+			7'b1000000 : cmd = { `MSG_REQ,  `CMD_F,  3'b110 };
+			7'b0100000 : cmd = { `MSG_REQ,  `CMD_S,  3'b111 };
 			// I/F responses
-			7'b0010100 : cmdarg = { `MSG_RESP, `CMD_OK, 3'b001 };
-			7'b0010010 : cmdarg = { `MSG_RESP, `CMD_PE, 3'b000 };
-			7'b0001100 : cmdarg = { `MSG_RESP, `CMD_OK, 3'b000 };
+			7'b0010100 : cmd = { `MSG_RESP, `CMD_OK, 3'b001 };
+			7'b0010010 : cmd = { `MSG_RESP, `CMD_PE, 3'b000 };
+			7'b0001100 : cmd = { `MSG_RESP, `CMD_OK, 3'b000 };
 			// CP responses
-			7'b0000001 : cmdarg = { `MSG_RESP, `CMD_OK, 3'b011 };
-			default    : cmdarg = 8'd0;
+			7'b0000001 : cmd = { `MSG_RESP, `CMD_OK, 3'b011 };
+			default    : cmd = 8'd0;
 		endcase
 	end
 

@@ -91,7 +91,9 @@ module iobus(
 
 	// --- Command endcoder --------------------------------------------------
 
-	cmdarg_enc CMDARG(
+	reg [0:7] cmd;
+
+	cmd_enc CMD_ENC(
 		.f(rf),
 		.s(rs),
 		.r(dr),
@@ -99,7 +101,7 @@ module iobus(
 		.ok(rok),
 		.pe(rpe),
 		.cpresp(rxcps),
-		.cmdarg(cmdarg)
+		.cmd(cmd)
 	);
 
 	// --- Transmitter -------------------------------------------------------
@@ -118,7 +120,7 @@ module iobus(
 		.uart_busy(utx_busy),
 		.send(txsend),
 		.busy(txbusy),
-		.cmdarg(cmdarg),
+		.cmd(cmd),
 		.a1({2'd0, rqb, rpn, rnb}),
 		.a2(txa2),
 		.a3(txa3)
@@ -173,8 +175,6 @@ module iobus(
 	wire d_req = rxcmdready & rxreq;
 	wire d_resp = rxcmdready & ~rxreq;
 	wire cp_req = rxcmdready & rxreq & rxcp;
-
-	reg [0:7] cmdarg;
 
 	localparam IDLE		= 4'd0;
 	localparam R_REQ	= 4'd1;

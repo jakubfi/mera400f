@@ -8,13 +8,13 @@ module msg_tx(
 	input send,
 	output busy,
 
-	input [0:7] cmdarg,
+	input [0:7] cmd,
 	input [0:7] a1,
 	input [0:15] a2,
 	input [0:15] a3
 );
 
-	wire [0:2] arg = cmdarg[5:7];
+	wire [0:2] arg = cmd[5:7];
 
 	// --- Transmission ------------------------------------------------------
 
@@ -35,7 +35,7 @@ module msg_tx(
 
 			IDLE: begin
 				if (send) begin
-					uart_data <= cmdarg;
+					uart_data <= cmd;
 					uart_send <= 1;
 					if (arg[0]) state <= A1;
 					else if (arg[1]) state <= A2H;
