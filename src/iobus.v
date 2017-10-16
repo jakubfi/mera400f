@@ -152,7 +152,7 @@ module iobus(
 	);
 
 	wire rxreq = rxcmd[0];
-	wire rxpn = rxa1[2];
+	wire rxpn = rxa1[3];
 	wire [0:3] rxnb = rxa1[4:7];
 	wire [0:15] rxad = rxa2;
 	wire [0:15] rxdt = rxa3;
@@ -319,10 +319,10 @@ module iobus(
 
 	// --- CP drivers --------------------------------------------------------
 
-	assign keys = rxdt;
-	assign rotary_out = rxnb;
-	assign fn = rxnb;
-	assign fn_v = rxpn;
+	assign keys = rxa3;
+	assign rotary_out = rxa1[4:7];
+	assign fn = rxa1[4:7];
+	assign fn_v = rxa1[3];
 
 endmodule
 
