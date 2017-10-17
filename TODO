@@ -1,6 +1,5 @@
 Enhancements:
- * iobus: timeouts
- * iobus: immune to bad commands
+ * iobus: timeouts?
 
 Features:
  * MEGA memory

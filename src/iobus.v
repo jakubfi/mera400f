@@ -159,12 +159,14 @@ module iobus(
 
 	// --- Command decoder ---------------------------------------------------
 
+	wire rxvalid;
 	wire rxr, rxw, rxin, rxpa, rxok, rxpe, rxen;
 	wire rxcp;
 	wire rxcpd, rxcpr, rxcpf, rxcps;
 
 	cmd_dec CMD_DEC(
 		.cmd(rxcmd),
+		.valid(rxvalid),
 		.r(rxr),
 		.w(rxw),
 		.in(rxin),
@@ -183,9 +185,10 @@ module iobus(
 
 	wire r_req = (rs | rf) & ~rad[15];
 	wire r_resp = rok | rpe;
-	wire d_req = rxcmdready & rxreq;
-	wire d_resp = rxcmdready & ~rxreq;
-	wire cp_req = rxcmdready & rxreq & rxcp;
+	wire rxcmdok = rxcmdready & rxvalid;
+	wire d_req = rxcmdok & rxreq;
+	wire d_resp = rxcmdok & ~rxreq;
+	wire cp_req = rxcmdok & rxreq & rxcp;
 
 	localparam IDLE		= 4'd0;
 	localparam R_REQ	= 4'd1;
