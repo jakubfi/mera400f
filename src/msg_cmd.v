@@ -33,22 +33,20 @@ endmodule
 
 // -----------------------------------------------------------------------
 module cmd_enc(
-	input f, s, r, w, ok, pe, cpresp,
+	input f, s, r, w, in, ok, pe, cps,
 	output [0:7] cmd
 );
 
 	always @ (*) begin
-		case ({f, s, r, w, ok, pe, cpresp})
-			// I/F requests
-			7'b1000000 : cmd = { `MSG_REQ,  `CMD_F,  3'b110 };
-			7'b0100000 : cmd = { `MSG_REQ,  `CMD_S,  3'b111 };
-			// I/F responses
-			7'b0010100 : cmd = { `MSG_RESP, `CMD_OK, 3'b001 };
-			7'b0010010 : cmd = { `MSG_RESP, `CMD_PE, 3'b000 };
-			7'b0001100 : cmd = { `MSG_RESP, `CMD_OK, 3'b000 };
-			// CP responses
-			7'b0000001 : cmd = { `MSG_RESP, `CMD_OK, 3'b011 };
-			default    : cmd = 8'd0;
+		case ({f, s, r, w, in, ok, pe, cps})
+			8'b10000000 : cmd = { `MSG_REQ,  `CMD_F,  3'b110 }; // req: F
+			8'b01000000 : cmd = { `MSG_REQ,  `CMD_S,  3'b111 }; // req: S
+			8'b00100100 : cmd = { `MSG_RESP, `CMD_OK, 3'b001 }; // rsp: OK for R
+			8'b00100010 : cmd = { `MSG_RESP, `CMD_PE, 3'b000 }; // rsp: PE for R
+			8'b00010100 : cmd = { `MSG_RESP, `CMD_OK, 3'b000 }; // rsp: OK for W
+			8'b00001100 : cmd = { `MSG_RESP, `CMD_OK, 3'b000 }; // rsp: OK for IN
+			8'b00000001 : cmd = { `MSG_RESP, `CMD_OK, 3'b011 }; // rsp: OK for CPS
+			default     : cmd = 8'd0;
 		endcase
 	end
 

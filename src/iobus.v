@@ -98,9 +98,10 @@ module iobus(
 		.s(rs),
 		.r(dr),
 		.w(dw),
+		.in(din),
 		.ok(rok),
 		.pe(rpe),
-		.cpresp(rxcps),
+		.cps(rxcps),
 		.cmd(cmd)
 	);
 
