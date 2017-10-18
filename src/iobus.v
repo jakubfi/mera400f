@@ -104,6 +104,15 @@ module iobus(
 		.cmd(cmd)
 	);
 
+	// --- CL conditioner ----------------------------------------------------
+
+	reg cl_reset;
+	reg rclh;
+	always @ (posedge clk_sys, posedge cl_reset) begin
+		if (cl_reset) rclh <= 0;
+		else if (rcl) rclh <= 1;
+	end
+
 	// --- Transmitter -------------------------------------------------------
 
 	wire txbusy;	// transmitter is sending a message
@@ -199,6 +208,7 @@ module iobus(
 	localparam R_RESP	= 4'd6;
 	localparam D_EN		= 4'd7;
 	localparam WAIT		= 4'd8;
+	localparam CLEAR	= 4'd9;
 	reg [0:3] state = IDLE;
 
 	reg [0:7] txcmd;
@@ -213,11 +223,14 @@ module iobus(
 				fn_trig <= 0;
 				rotary_trig <= 0;
 				rxreset <= 0;
-				if (r_req) begin						// internal request
+				cl_reset <= 0;
+				if (rclh) begin							// internal CLEAR request
+					txcmd <= { `MSG_REQ, `CMD_CL, 3'b000 };
+					txsend <= 1;
+					state <= CLEAR;
+				end else if (r_req) begin		// internal request
 					txcmd <= cmd;
 					txsend <= 1;
-					//if (rcl) state <= D_RESP;	// CL -> no reply
-					//else state <= R_REQ;			// other int. -> need reply
 					state <= R_REQ;
 				end else if (cp_req) begin	// CP request
 					if (!rxcps) begin					// CP req that doesn't need response but has args
@@ -292,6 +305,14 @@ module iobus(
 				if (!r_req) begin		// wait for the internal request to end and serve the external request
 					zg <= 1;
 					state <= D_REQ;
+				end
+			end
+
+			CLEAR: begin
+				txsend <= 0;
+				if (!rcl & !txbusy) begin
+					cl_reset <= 1;
+					state <= IDLE;
 				end
 			end
 
