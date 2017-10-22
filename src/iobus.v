@@ -118,10 +118,11 @@ module iobus(
 
 	wire txbusy;	// transmitter is sending a message
 	reg txsend;		// send message trigger
+	reg cpargs;
 
 	// switch arguments for rxcp
-	wire [0:15] txa2 = rxcp ? w : rad;
-	wire [0:15] txa3 = rxcp ? { indicators, 2'b00, rotary_pos } : rdt;
+	wire [0:15] txa2 = cpargs ? w : rad;
+	wire [0:15] txa3 = cpargs ? { indicators, 2'b00, rotary_pos } : rdt;
 
 	msg_tx MSG_TX(
 		.clk_sys(clk_sys),
@@ -225,6 +226,7 @@ module iobus(
 				rotary_trig <= 0;
 				rxreset <= 0;
 				cl_reset <= 0;
+				cpargs <= 0;
 				if (rclh) begin							// internal CLEAR request
 					txcmd <= { `MSG_REQ, `CMD_CL, 3'b000 };
 					txsend <= 1;
@@ -239,6 +241,7 @@ module iobus(
 					end else begin						// CP that needs response, but has no args
 						zg <= 1;
 						state <= CP_REQ;
+						cpargs <= 1;
 					end
 				end else if (d_req) begin		// external request
 					if (rxpa) begin						// PA -> only need to let the interrupt go through
