@@ -1,0 +1,3 @@
+project_open mera400f
+create_timing_netlist
+report_clock_fmax_summary

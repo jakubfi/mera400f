@@ -141,6 +141,9 @@ $(POF_OUTPUT): $(FIT_OUTPUT)
 sta: $(FIT_OUTPUT)
 	$(Q_STA) $(STA_ARGS) $(PROJECT)
 
+fmax: $(FIT_OUTPUT)
+	$(Q_STA) -t src/fmax.tcl
+
 jtag: $(SOF_OUTPUT)
 	$(Q_PGM) $(PGM_ARGS) -m JTAG -o "p;$(SOF_OUTPUT)"
 
