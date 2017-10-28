@@ -109,7 +109,7 @@ module mera400f(
 		.INOU_USER_ILLEGAL(1'b1),
 		.STOP_ON_NOMEM(1'b1),
 		.LOW_MEM_WRITE_DENY(1'b0),
-		.ALARM_DLY_TICKS(18'd250000),
+		.ALARM_DLY_TICKS(23'd5_000_000),
 		.ALARM_TICKS(8'd3)
 	) CPU0(
 		.clk_sys(clk_sys),
