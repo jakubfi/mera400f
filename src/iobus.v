@@ -8,13 +8,15 @@
 `define CMD_S		4'b0100
 `define CMD_F		4'b0101
 `define CMD_IN	4'b0110
-`define CMD_EN	4'b0001
-`define CMD_OK	4'b0010
-`define CMD_PE	4'b0011
 `define CMD_CPD	4'b1000
 `define CMD_CPR	4'b1001
 `define CMD_CPF	4'b1010
 `define CMD_CPS	4'b1011
+
+`define CMD_EN	4'b0001
+`define CMD_OK	4'b0010
+`define CMD_PE	4'b0011
+`define CMD_NO	4'b0100
 
 module iobus(
 	input clk_sys,
@@ -101,7 +103,7 @@ module iobus(
 		.in(din),
 		.ok(rok),
 		.pe(rpe),
-		.cps(rxcps),
+		.cps(rxcps & zw),
 		.cmd(cmd)
 	);
 
@@ -155,7 +157,7 @@ module iobus(
 		.uart_ready(urx_ready),
 		.cmd_ready(rxcmdready),
 		.busy(rxbusy),
-		.reset(rxreset),
+		.reset(rxreset | cp_rxreset),
 		.cmd(rxcmd),
 		.a1(rxa1),
 		.a2(rxa2),
@@ -192,12 +194,54 @@ module iobus(
 		.cps(rxcps)
 	);
 
-	// --- Transmachine ------------------------------------------------------
+	// --- CP transmaschine --------------------------------------------------
+
+	localparam CP_IDLE = 1'b0;
+	localparam CP_TRIG = 1'b1;
+	reg cp_state = CP_IDLE;
+	reg cp_rxreset;
+
+	always @ (posedge clk_sys) begin
+
+		case (cp_state)
+
+			CP_IDLE: begin
+				keys_trig <= 0;
+				fn_trig <= 0;
+				rotary_trig <= 0;
+				cp_rxreset <= 0;
+				if (cp_req && !rxcps) begin
+					cp_state <= CP_TRIG;
+				end
+			end
+
+			CP_TRIG: begin
+				if (!rxbusy) begin
+					if (rxcpd) keys_trig <= 1;
+					else if (rxcpf) fn_trig <= 1;
+					else if (rxcpr) rotary_trig <= 1;
+					cp_rxreset <= 1;
+					cp_state <= CP_IDLE;
+				end
+			end
+
+		endcase
+
+	end
+
+	// --- CP drivers --------------------------------------------------------
+
+	assign keys = rxa3;
+	assign rotary_out = rxa1[4:7];
+	assign fn = rxa1[4:7];
+	assign fn_v = rxa1[3];
+
+	// --- Bus transmaschine -------------------------------------------------
 
 	wire r_req = (rs | rf) & ~rad[15];
 	wire r_resp = rok | rpe;
 	wire rxcmdok = rxcmdready & rxvalid;
-	wire d_req = rxcmdok & rxreq;
+	wire d_req = rxcmdok & rxreq & ~rxcp;
 	wire d_resp = rxcmdok & ~rxreq;
 	wire cp_req = rxcmdok & rxreq & rxcp;
 
@@ -205,15 +249,14 @@ module iobus(
 	localparam R_REQ	= 4'd1;
 	localparam D_REQ	= 4'd2;
 	localparam CP_REQ	= 4'd3;
-	localparam CP_ARG	= 4'd4;
-	localparam D_RESP	= 4'd5;
-	localparam R_RESP	= 4'd6;
-	localparam D_EN		= 4'd7;
-	localparam WAIT		= 4'd8;
-	localparam CLEAR	= 4'd9;
-	reg [0:3] state = IDLE;
+	localparam D_RESP	= 4'd4;
+	localparam R_RESP	= 4'd5;
+	localparam WAIT		= 4'd6;
+	localparam CLEAR	= 4'd7;
+	reg [0:2] state = IDLE;
 
 	reg [0:7] txcmd;
+	reg [0:3] timeout;
 
 	always @ (posedge clk_sys) begin
 
@@ -221,9 +264,6 @@ module iobus(
 
 			IDLE: begin
 				d_ena <= 0;
-				keys_trig <= 0;
-				fn_trig <= 0;
-				rotary_trig <= 0;
 				rxreset <= 0;
 				cl_reset <= 0;
 				cpargs <= 0;
@@ -235,14 +275,10 @@ module iobus(
 					txcmd <= cmd;
 					txsend <= 1;
 					state <= R_REQ;
-				end else if (cp_req) begin	// CP request
-					if (!rxcps) begin					// CP req that doesn't need response but has args
-						state <= CP_ARG;
-					end else begin						// CP that needs response, but has no args
-						zg <= 1;
-						state <= CP_REQ;
-						cpargs <= 1;
-					end
+				end else if (cp_req && rxcps) begin	// CP request
+					zg <= 1;
+					state <= CP_REQ;
+					cpargs <= 1;
 				end else if (d_req) begin		// external request
 					if (rxpa) begin						// PA -> only need to let the interrupt go through
 						d_ena <= 1;
@@ -251,15 +287,6 @@ module iobus(
 						zg <= 1;
 						state <= D_REQ;
 					end
-				end
-			end
-
-			CP_ARG: begin
-				if (!rxbusy) begin
-					if (rxcpd) keys_trig <= 1;
-					else if (rxcpf) fn_trig <= 1;
-					else if (rxcpr) rotary_trig <= 1;
-					state <= WAIT;
 				end
 			end
 
@@ -276,8 +303,8 @@ module iobus(
 				if (d_resp & ~rxbusy) begin			// wait for the finished external response
 					d_ena <= 1;
 					state <= D_RESP;
-				end else if (!zw & d_req & !rxbusy) begin	// watch for an external request
-					state <= D_EN;
+				end else if (!r_req) begin			// request is gone (alarm?)
+					state <= IDLE;
 				end
 			end
 
@@ -293,6 +320,7 @@ module iobus(
 			D_REQ: begin					// external request
 				if (zw & !rxbusy) begin
 					d_ena <= 1;
+					timeout <= 4'd15;
 					state <= R_RESP;
 				end
 			end
@@ -302,13 +330,12 @@ module iobus(
 					txcmd <= cmd;
 					txsend <= 1;
 					state <= WAIT;
-				end
-			end
-
-			D_EN: begin
-				if (!r_req) begin		// wait for the internal request to end and serve the external request
-					zg <= 1;
-					state <= D_REQ;
+				end else if (timeout == 0) begin
+					txcmd <= { `MSG_RESP, `CMD_NO, 3'b000 };
+					txsend <= 1;
+					state <= WAIT;
+				end else begin
+					timeout <= timeout - 1'd1;
 				end
 			end
 
@@ -332,8 +359,6 @@ module iobus(
 		endcase
 	end
 
-	wire xen = (state == D_EN);
-
 	// --- Bus drivers -------------------------------------------------------
 
 	reg d_ena;
@@ -347,15 +372,8 @@ module iobus(
 	assign din = d_ena ? rxin :  1'd0;
 	assign dpa = d_ena ? rxpa :  1'd0;
 	assign dok = d_ena ? rxok :  1'd0;
-	assign den= (d_ena ? rxen :  1'd0) | xen;
+	assign den = d_ena ? rxen :  1'd0;
 	assign dpe = d_ena ? rxpe :  1'd0;
-
-	// --- CP drivers --------------------------------------------------------
-
-	assign keys = rxa3;
-	assign rotary_out = rxa1[4:7];
-	assign fn = rxa1[4:7];
-	assign fn_v = rxa1[3];
 
 endmodule
 
