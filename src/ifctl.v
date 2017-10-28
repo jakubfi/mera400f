@@ -65,10 +65,11 @@ module ifctl(
 	end
 
 	// ok$ - koniec pracy z interfejsem (niezależnie od finału: ok/en/alarm)
-	// oryginalnie był to przerzutnik, ale w sumie...
-
 	wire ok_clk = ren | talarm | rok;
-	assign ok$ = zwzg & ok_clk;
+	always @ (posedge clk_sys, negedge zgi) begin
+		if (!zgi) ok$ <= 0;
+		else ok$ <= zwzg & ok_clk;
+	end
 
 	// alarm przy braku odpowiedzi z interfejsu
 
