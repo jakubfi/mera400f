@@ -31,7 +31,7 @@ module mem_elwro_sram(
 	// --- memory configuration ------------------------------------------------
 
 	wire [0:7] cfg_page = {rdt[12:15], rdt[0:3]};
-	wire [0:7] cfg_frame = {ad[11:14], ad[7:10]};
+	wire [0:7] cfg_frame = {ad[11:14], 1'b0, ad[8:10]};
 	wire [0:7] page = {nb, ad[0:3]};
 	wire [0:7] frame;
 	wire cok;
