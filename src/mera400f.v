@@ -76,7 +76,7 @@ module mera400f(
 		.clk_sys(clk_sys),
 		.cpu0d(cpu0d),
 		.cpu0r(cpu0r),
-		.cpu1d(0),
+		.cpu1d(48'd0),
 		.cpu1r(cpu1r),
 		.iobd(iobd),
 		.iobr(iobr),
