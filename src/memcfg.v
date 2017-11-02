@@ -60,7 +60,7 @@ module memcfg(
 		rd_addr <= addr;
 	end
 
-	assign frame = rd ? map[rd_addr] : 8'hzz;
+	assign frame = map[rd_addr];
 
 	// --- configuration process -----------------------------------------------
 
