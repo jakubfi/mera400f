@@ -5,7 +5,7 @@ set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
 
 # -- Clocks --------------------------------------------------------------
 set_location_assignment PIN_23 -to CLK_EXT
-set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to EXT_CLK
+set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to CLK_EXT
 
 # -- UART ----------------------------------------------------------------
 set_location_assignment PIN_160 -to RXD
