@@ -5,12 +5,10 @@ module memcfg(
 	input reset,
 	output reset_hold,
 	input s,
-	input ad15,
-	input rd,
 	input [0:7] cfg_page,
 	input [0:7] cfg_frame,
 	input [0:7] page,
-	output reg cok,
+	output cfgok,
 	output [0:7] frame,
 	output pvalid
 );
@@ -70,58 +68,58 @@ module memcfg(
 	localparam [3:0] module_addr_mask = mmask[3:0];
 	localparam [7:0] invalidity_mask = ~{module_addr_mask, frame_addr_mask};
 
-	assign pvalid = (addr < 2) | (frame != 0);
+	assign pvalid = (addr < 2) || (frame != 0);
 
 	wire frame_addr_valid = (cfg_frame & invalidity_mask) == 8'd0;
-	wire cfg_cmd_valid = s && ad15 && (cfg_page > 1) && frame_addr_valid;
+	wire cfg_cmd_valid = s && (cfg_page > 1) && frame_addr_valid;
 
-	localparam S_CIDLE	= 3'd0;
-	localparam S_CCFG		= 3'd1;
-	localparam S_COK		= 3'd2;
-	localparam S_RESET	= 3'd3;
-	localparam S_CLEAR	= 3'd4;
+	localparam CIDLE	= 3'd0;
+	localparam CCFG		= 3'd1;
+	localparam COK		= 3'd2;
+	localparam RESET	= 3'd3;
+	localparam CLEAR	= 3'd4;
+	reg [2:0] cstate = CIDLE;
 
-	reg [2:0] cstate = S_CIDLE;
 	reg [7:0] clr_cnt;
 	reg [7:0] frame_clear;
 
-	assign reset_hold = (cstate == S_CLEAR) | (cstate == S_RESET);
+	assign reset_hold = (cstate == CLEAR) | (cstate == RESET);
 
 	always @ (posedge clk) begin
-		if (reset & ~reset_hold) cstate <= S_RESET;
+		if (reset & ~reset_hold) cstate <= RESET;
 		else case (cstate)
 
-			S_CIDLE: begin
+			CIDLE: begin
 				frame_clear <= 8'hff;
 				if (cfg_cmd_valid) begin
 					map_wr <= 1;
-					cstate <= S_CCFG;
+					cstate <= CCFG;
 				end
 			end
 
-			S_CCFG: begin
+			CCFG: begin
 				map_wr <= 0;
-				cok <= 1;
-				cstate <= S_COK;
+				cfgok <= 1;
+				cstate <= COK;
 			end
 
-			S_COK: begin
+			COK: begin
 				if (~s) begin
-					cok <= 0;
-					cstate <= S_CIDLE;
+					cfgok <= 0;
+					cstate <= CIDLE;
 				end
 			end
 
-			S_RESET: begin
+			RESET: begin
 				clr_cnt <= 2;
 				map_wr <= 1;
 				frame_clear <= 8'd0;
-				cstate <= S_CLEAR;
+				cstate <= CLEAR;
 			end
 
-			S_CLEAR: begin
+			CLEAR: begin
 				if (clr_cnt == 8'hff) begin
-					cstate <= S_CIDLE;
+					cstate <= CIDLE;
 					map_wr <= 0;
 				end else begin
 					clr_cnt <= clr_cnt + 1'b1;
