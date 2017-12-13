@@ -32,19 +32,19 @@ set_location_assignment PIN_117 -to SEG[6]
 set_location_assignment PIN_118 -to SEG[7]
 
 # -- Buzzer --------------------------------------------------------------
-set_location_assignment PIN_30 -to BUZZER
+set_location_assignment PIN_30 -to BUZZER_
 
 # -- FLASH (Spansion S29GL064N, 64Mbit) ----------------------------------
-set_location_assignment PIN_67 -to F_CS
-set_location_assignment PIN_68 -to F_OE
-set_location_assignment PIN_44 -to F_WE
+set_location_assignment PIN_67 -to F_CS_
+set_location_assignment PIN_68 -to F_OE_
+set_location_assignment PIN_44 -to F_WE_
 
 # -- SRAM (ISSI IS61LV25616AL-10, 256K x 16bit) --------------------------
-set_location_assignment PIN_96 -to SRAM_OE
-set_location_assignment PIN_97 -to SRAM_WE
-set_location_assignment PIN_99 -to SRAM_CE
-set_location_assignment PIN_95 -to SRAM_UB
-set_location_assignment PIN_94 -to SRAM_LB
+set_location_assignment PIN_96 -to SRAM_OE_
+set_location_assignment PIN_97 -to SRAM_WE_
+set_location_assignment PIN_99 -to SRAM_CE_
+set_location_assignment PIN_95 -to SRAM_UB_
+set_location_assignment PIN_94 -to SRAM_LB_
 
 set_location_assignment PIN_69 -to SRAM_D[0]
 set_location_assignment PIN_72 -to SRAM_D[1]

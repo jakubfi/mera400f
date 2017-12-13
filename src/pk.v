@@ -15,8 +15,8 @@
 
 module pk(
 	input clk_sys,
-	output [7:0] SEG,
-	output [7:0] DIG,
+	output [7:0] seg,
+	output [7:0] dig,
 	input hlt_n,
 	input off,
 	output work,
@@ -157,8 +157,8 @@ module pk(
 		.w(w),
 		.rotary_bus(rotary_bus),
 		.indicators(indicators),
-		.SEG(SEG),
-		.DIG(DIG)
+		.seg(seg),
+		.dig(dig)
 	);
 
 endmodule

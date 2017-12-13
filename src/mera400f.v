@@ -1,40 +1,27 @@
 module mera400f(
-	input CLK_EXT,
-	output BUZZER,
+	input clk_ext,
 	// control panel
-	input RXD,
-	output TXD,
-	output [7:0] DIG,
-	output [7:0] SEG,
+	input rxd,
+	output txd,
+	output [7:0] dig,
+	output [7:0] seg,
 	// RAM
-	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,
-	output [17:0] SRAM_A,
-	inout [15:0] SRAM_D,
-	output F_CS, F_OE, F_WE
+	output ram_ce, ram_oe, ram_we,
+	output [17:0] ram_a,
+	inout [15:0] ram_d
 );
 
+	parameter CLK_EXT_HZ;
+
 // -----------------------------------------------------------------------
-// --- FPGA stuff --------------------------------------------------------
+// --- Clocks ------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-	// silence the buzzer
-
-	assign BUZZER = 1'b1;
-
-	// disable flash, which uses the same D and A buses as sram
-
-	assign F_CS = 1'b1;
-	assign F_OE = 1'b1;
-	assign F_WE = 1'b1;
-
-	// clocks
-
-	localparam CLK_EXT_HZ = 50_000_000;
 	localparam CLK_SYS_HZ = CLK_EXT_HZ;
 	localparam CLK_UART_HZ = CLK_EXT_HZ;
-	wire clk_sys = CLK_EXT;
-	wire clk_uart = CLK_EXT;
-	wire clk_sram = CLK_EXT;
+	wire clk_sys = clk_ext;
+	wire clk_uart = clk_ext;
+	wire clk_ram = clk_ext;
 
 // -----------------------------------------------------------------------
 // --- INTERFACE ---------------------------------------------------------
@@ -203,8 +190,8 @@ module mera400f(
 		.CLK_SYS_HZ(CLK_SYS_HZ)
 	) PK(
 		.clk_sys(clk_sys),
-		.SEG(SEG),
-		.DIG(DIG),
+		.seg(seg),
+		.dig(dig),
 		.hlt_n(hlt_n),
 		.off(off),
 		.work(work),
@@ -274,8 +261,8 @@ module mera400f(
 	) IOBUS(
 		.clk_sys(clk_sys),
 		.clk_uart(clk_uart),
-		.RXD(RXD),
-		.TXD(TXD),
+		.rxd(rxd),
+		.txd(txd),
 		.zg(zg[4]),
 		.zw(zw[4]),
 		.dpa(iobd[`pa]),
@@ -309,7 +296,6 @@ module mera400f(
 		.fn(fn),
 		.fn_v(fn_v),
 		.fn_trig(fn_trig)
-
 	);
 
 // -----------------------------------------------------------------------
@@ -319,14 +305,12 @@ module mera400f(
 	wire [0:`BUS_MAX] memd;
 
 	mem_elwro_sram MEM(
-		.clk(clk_sram),
-		.SRAM_CE(SRAM_CE),
-		.SRAM_OE(SRAM_OE),
-		.SRAM_WE(SRAM_WE),
-		.SRAM_UB(SRAM_UB),
-		.SRAM_LB(SRAM_LB),
-		.SRAM_A(SRAM_A),
-		.SRAM_D(SRAM_D),
+		.clk(clk_ram),
+		.ram_ce(ram_ce),
+		.ram_oe(ram_oe),
+		.ram_we(ram_we),
+		.ram_a(ram_a),
+		.ram_d(ram_d),
 		.reset(memr[`cl]),
 		.reset_hold(memd[`cl]),
 		.nb(memr[`nb]),

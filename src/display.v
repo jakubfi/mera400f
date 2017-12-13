@@ -5,8 +5,8 @@ module display(
 	input [0:15] w,
 	input [10:0] rotary_bus,
 	input [9:0] indicators,
-	output [7:0] SEG,
-	output [7:0] DIG
+	output [7:0] seg,
+	output [7:0] dig
 );
 
 	wire [6:0] digs [7:0];
@@ -25,8 +25,8 @@ module display(
 
 	sevenseg_drv DRV(
 		.clk(clk_sys),
-		.seg(SEG),
-		.dig(DIG),
+		.seg(seg),
+		.dig(dig),
 		.digs(digs),
 		.dots({indicators[2:0], indicators[3], indicators[9:6]})
 	);

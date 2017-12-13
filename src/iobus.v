@@ -21,8 +21,8 @@
 module iobus(
 	input clk_sys,
 	input clk_uart,
-	input RXD,
-	output TXD,
+	input rxd,
+	output txd,
 
 	output zg,
 	input zw,
@@ -83,12 +83,12 @@ module iobus(
 		.rx_byte(urx_byte),
 		.rx_busy(urx_busy),
 		.rx_ready(urx_ready),
-		.rxd(RXD),
+		.rxd(rxd),
 		.send(utx_send),
 		.tx_byte(utx_byte),
 		.tx_busy(utx_busy),
 		.tx_ready(utx_ready),
-		.txd(TXD)
+		.txd(txd)
 	);
 
 	// --- Command endcoder --------------------------------------------------

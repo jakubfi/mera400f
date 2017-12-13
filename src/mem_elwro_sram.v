@@ -4,9 +4,9 @@ module mem_elwro_sram(
 	input clk,
 	input reset,
 	output reset_hold,
-	output SRAM_CE, SRAM_OE, SRAM_WE, SRAM_UB, SRAM_LB,
-	output [17:0] SRAM_A,
-	inout [15:0] SRAM_D,
+	output ram_ce, ram_oe, ram_we,
+	output [17:0] ram_a,
+	inout [15:0] ram_d,
 	input [0:3] nb,
 	input [0:15] ad,
 	output [0:15] ddt,
@@ -69,16 +69,14 @@ module mem_elwro_sram(
 
 	// Interface signals
 	assign ok = rwok | cfgok;
-	assign ddt = r ? SRAM_D : 16'h0000;
+	assign ddt = r ? ram_d : 16'h0000;
 
 	// RAM module signals
-	assign SRAM_CE = 0;
-	assign SRAM_UB = 0;
-	assign SRAM_LB = 0;
-	assign SRAM_WE = ~we;
-	assign SRAM_OE = 0; // controlled by WE
-	assign SRAM_A[17:0] = { frame[2:7], ad[4:15] };
-	assign SRAM_D = we ? rdt : 16'hzzzz;
+	assign ram_ce = 1;
+	assign ram_we = we;
+	assign ram_oe = 1; // controlled by WE
+	assign ram_a[17:0] = { frame[2:7], ad[4:15] };
+	assign ram_d = we ? rdt : 16'hzzzz;
 
 endmodule
 
