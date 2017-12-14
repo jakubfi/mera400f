@@ -3,12 +3,14 @@ module mera400f(
 	// control panel
 	input rxd,
 	output txd,
-	output [7:0] dig,
-	output [7:0] seg,
 	// RAM
 	output ram_ce, ram_oe, ram_we,
 	output [17:0] ram_a,
-	inout [15:0] ram_d
+	inout [15:0] ram_d,
+	// display
+	output [0:15] w,
+	output [10:0] rotary_bus,
+	output [0:9] indicators
 );
 
 	parameter CLK_EXT_HZ;
@@ -87,7 +89,6 @@ module mera400f(
 	// to control panel
 
 	wire p0;
-	wire [0:15] w;
 	wire hlt_n, p, run, _wait, irq, q, mc_0, awaria;
 
 	cpu #(
@@ -183,15 +184,13 @@ module mera400f(
 
 	// outputs to IOBUS
 	wire [0:3] rotary_pos;
-	wire [0:9] indicators;
+	assign rotary_bus = {wre, rsc, rsb, rsa, wic, wac, war, wir, wrs, wrz, wkb};
 
 	pk #(
 		.TIMER_CYCLE_MS(8'd10),
 		.CLK_SYS_HZ(CLK_SYS_HZ)
 	) PK(
 		.clk_sys(clk_sys),
-		.seg(seg),
-		.dig(dig),
 		.hlt_n(hlt_n),
 		.off(off),
 		.work(work),
@@ -210,7 +209,6 @@ module mera400f(
 		.bin(panel_bin),
 		.oprq(oprq),
 		.zegar(zegar),
-		.w(w),
 		.p(p),
 		.mc_0(mc_0),
 		.alarm(awaria),

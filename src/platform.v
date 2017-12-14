@@ -18,19 +18,24 @@ module platform(
 // --- MERA-400f ---------------------------------------------------------
 
 	wire sram_ce, sram_oe, sram_we;
+	wire [0:15] w;
+	wire [10:0] rotary_bus;
+	wire [0:9] indicators;
+
 	mera400f #(
 		.CLK_EXT_HZ(CLK_EXT_HZ)
 	) MERA400F (
 		.clk_ext(CLK_EXT),
 		.rxd(RXD),
 		.txd(TXD),
-		.dig(DIG),
-		.seg(SEG),
 		.ram_ce(sram_ce),
 		.ram_oe(sram_oe),
 		.ram_we(sram_we),
 		.ram_a(SRAM_A),
-		.ram_d(SRAM_D)
+		.ram_d(SRAM_D),
+		.w(w),
+		.rotary_bus(rotary_bus),
+		.indicators(indicators)
 	);
 
 // --- External devices --------------------------------------------------
@@ -49,6 +54,17 @@ module platform(
 	assign SRAM_CE_ = ~sram_ce;
 	assign SRAM_OE_ = ~sram_oe;
 	assign SRAM_WE_ = ~sram_we;
+
+  // --- 7-segment display
+
+	display DISPLAY(
+		.clk_sys(CLK_EXT),
+		.w(w),
+		.rotary_bus(rotary_bus),
+		.indicators(indicators),
+		.seg(SEG),
+		.dig(DIG)
+	);
 
 endmodule
 

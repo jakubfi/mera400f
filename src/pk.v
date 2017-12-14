@@ -15,8 +15,6 @@
 
 module pk(
 	input clk_sys,
-	output [7:0] seg,
-	output [7:0] dig,
 	input hlt_n,
 	input off,
 	output work,
@@ -35,7 +33,6 @@ module pk(
 	output bin,
 	output oprq,
 	output reg zegar,
-	input [0:15] w,
 	input p,
 	input mc_0,
 	input alarm,
@@ -100,11 +97,9 @@ module pk(
 
 	// --- Rotary switch position decoder
 
-	wire [10:0] rotary_bus;
-	assign {wre, rsc, rsb, rsa, wic, wac, war, wir, wrs, wrz, wkb} = rotary_bus;
 	rot_dec ROT_DEC(
 		.in(rotary_pos),
-		.out(rotary_bus)
+		.out({wre, rsc, rsb, rsa, wic, wac, war, wir, wrs, wrz, wkb})
 	);
 
 	// --- Virtual switches assignments
@@ -148,17 +143,6 @@ module pk(
 		.clk_sys(clk_sys),
 		.enable(zeg),
 		.zegar(zegar)
-	);
-
-	// --- 7-segment display
-
-	display DISPLAY(
-		.clk_sys(clk_sys),
-		.w(w),
-		.rotary_bus(rotary_bus),
-		.indicators(indicators),
-		.seg(seg),
-		.dig(dig)
 	);
 
 endmodule
