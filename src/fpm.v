@@ -238,7 +238,7 @@ module fpm(
 		else if (wdtwtg_clk) g <= abs_sum_c_ge_40;
 	end
 
-	// wskaźnik denormalnizacji wartości rejestru T
+	// wskaźnik denormalizacji wartości rejestru T
 
 	always @ (posedge clk_sys, posedge _0_f) begin
 		if (_0_f) wdt <= 1'b0;

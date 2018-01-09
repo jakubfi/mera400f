@@ -51,6 +51,7 @@ module platform(
 	// always use full 16-bit word
 	assign SRAM_LB_ = 1'b0;
 	assign SRAM_UB_ = 1'b0;
+
 	assign SRAM_CE_ = ~sram_ce;
 	assign SRAM_OE_ = ~sram_oe;
 	assign SRAM_WE_ = ~sram_we;

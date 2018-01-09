@@ -4,6 +4,8 @@
 /*.qpf
 /*.qws
 /*.ddb
+/*.stp
+/doc
 /db/
 /incremental_db/
 /output_files/

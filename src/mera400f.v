@@ -1,9 +1,9 @@
 module mera400f(
 	input clk_ext,
-	// control panel
+	// iobus
 	input rxd,
 	output txd,
-	// RAM
+	// ram
 	output ram_ce, ram_oe, ram_we,
 	output [17:0] ram_a,
 	inout [15:0] ram_d,
