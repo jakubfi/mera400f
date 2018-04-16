@@ -15,7 +15,8 @@ module cmd_dec(
 			{ `MSG_REQ,  `CMD_PA,  3'b000 } : bus = 11'b00010000000;
 			{ `MSG_RESP, `CMD_OK,  3'b000 } : bus = 11'b00001000000;
 			{ `MSG_RESP, `CMD_OK,  3'b001 } : bus = 11'b00001000000;
-			{ `MSG_RESP, `CMD_PE,  3'b000 } : bus = 11'b00000100000;
+			{ `MSG_RESP, `CMD_PE,  3'b000 } : bus = 11'b00001100000;
+			{ `MSG_RESP, `CMD_PE,  3'b001 } : bus = 11'b00001100000;
 			{ `MSG_RESP, `CMD_EN,  3'b000 } : bus = 11'b00000010000;
 			{ `MSG_REQ,  `CMD_CPD, 3'b001 } : bus = 11'b00000001000;
 			{ `MSG_REQ,  `CMD_CPR, 3'b100 } : bus = 11'b00000000100;
