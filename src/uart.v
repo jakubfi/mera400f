@@ -5,9 +5,7 @@ module uart(
 	input send,
 	input [7:0] tx_byte,
 	output [7:0] rx_byte,
-	output tx_busy,
 	output tx_ready,
-	output rx_busy,
 	output rx_ready,
 	output txd,
 	input rxd
@@ -26,7 +24,6 @@ module uart(
 	) tx(
 		.clk(clk),
 		.d(tx_byte),
-		.busy(tx_busy),
 		.txd(txd),
 		.send(send),
 		.ready(tx_ready)
@@ -38,7 +35,6 @@ module uart(
 	) rx(
 		.clk(clk),
 		.d(rx_byte),
-		.busy(rx_busy),
 		.rxd(rxd),
 		.ready(rx_ready)
 	);
@@ -50,7 +46,6 @@ module uart_tx(
 	input clk,
 	input [7:0] d,
 	input send,
-	output busy,
 	output ready,
 	output txd
 );
@@ -103,7 +98,6 @@ module uart_tx(
 
 	end
 
-	assign busy = (txstate != TX_IDLE) | send;
 	assign txd = txbuf[10];
 
 endmodule
@@ -111,8 +105,7 @@ endmodule
 // -----------------------------------------------------------------------
 module uart_rx(
 	input clk,
-	output [7:0] d,
-	output busy,
+	output reg [7:0] d,
 	output ready,
 	input rxd
 );
@@ -170,8 +163,6 @@ module uart_rx(
 		endcase
 
 	end
-
-	assign busy = |rxstate | ~rxd;
 
 endmodule
 
